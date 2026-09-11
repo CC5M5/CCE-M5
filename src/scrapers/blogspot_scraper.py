@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Scraper completo para el Cancionero Escolapio de CCE M5 Music (Blogspot)
-Extrae TODAS las canciones, las parsea y guarda en la base de datos
+Scraper completo para el Cancionero Escolapio - VERSION CON POSICIONAMIENTO
+Extrae TODAS las canciones con acordes posicionados y guarda en la base de datos
 """
 
 import requests
@@ -22,9 +22,9 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 }
 
-# Importar parser
+# Importar parser V2
 sys.path.insert(0, str(PROJECT_DIR / "src" / "parsers"))
-from acordes_parser import AcordesParser
+from acordes_parser_v2 import AcordesParser
 
 class CancioneroScraper:
     def __init__(self):
@@ -67,7 +67,7 @@ class CancioneroScraper:
         return canciones
     
     def obtener_cancion(self, url):
-        """Obtiene y parsea una cancion"""
+        """Obtiene y parsea una cancion con formato posicionado"""
         html = self.obtener_pagina(url)
         if not html:
             return None
@@ -79,21 +79,34 @@ class CancioneroScraper:
         if not post_body:
             return None
         
-        # Extraer texto
+        # Extraer texto con formato preservado
+        # Usamos get_text con separador para mantener la estructura de lineas
         texto_completo = post_body.get_text('\n').strip()
         
-        # Separar letra y acordes
-        resultado = self.parser.separar_letra_y_acordes(texto_completo)
+        # Guardar HTML original como backup
+        html_original = str(post_body)
         
-        # Detectar tono y momento
-        tono = self.parser.detectar_tono(resultado['acordes'])
+        # Parsear con el nuevo parser
+        estructura = self.parser.parsear_cancion_completa(texto_completo)
+        
+        # Detectar tono
+        tono = self.parser.detectar_tono(estructura)
+        
+        # Generar HTML visual
+        html_visual = self.parser.generar_html_visual(estructura)
         
         return {
-            'titulo': None,  # Se asignara despues
+            'titulo': None,
             'url': url,
-            'letra_con_acordes': resultado['letra'] + '\n\n' + resultado['acordes'],
-            'letra_sin_acordes': resultado['letra'],
-            'acordes_json': json.dumps(resultado['acordes_lista']),
+            'letra_con_acordes': texto_completo,
+            'letra_sin_acordes': '\n'.join(
+                linea.get('texto', linea.get('letra', '')) 
+                for linea in estructura 
+                if linea['tipo'] in ['letra', 'mixta']
+            ),
+            'estructura_json': json.dumps(estructura, ensure_ascii=False),
+            'html_visual': html_visual,
+            'html_original': html_original,
             'tono': tono,
             'fuente': 'blogspot'
         }
@@ -103,16 +116,31 @@ class CancioneroScraper:
         conn = sqlite3.connect(str(DB_PATH))
         cursor = conn.cursor()
         
+        # Verificar si existe columna estructura_json
+        cursor.execute("PRAGMA table_info(canciones)")
+        columnas = [row[1] for row in cursor.fetchall()]
+        
+        if 'estructura_json' not in columnas:
+            # Agregar nueva columna
+            cursor.execute('ALTER TABLE canciones ADD COLUMN estructura_json TEXT')
+            cursor.execute('ALTER TABLE canciones ADD COLUMN html_visual TEXT')
+            cursor.execute('ALTER TABLE canciones ADD COLUMN html_original TEXT')
+            conn.commit()
+        
         cursor.execute('''
             INSERT OR REPLACE INTO canciones 
-            (titulo, titulo_url, letra_con_acordes, letra_sin_acordes, acordes_json, tono, fuente)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (titulo, titulo_url, letra_con_acordes, letra_sin_acordes, acordes_json, 
+             estructura_json, html_visual, html_original, tono, fuente)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             cancion['titulo'],
             cancion['url'],
             cancion.get('letra_con_acordes', ''),
             cancion.get('letra_sin_acordes', ''),
-            cancion.get('acordes_json', '[]'),
+            json.dumps([]),  # acordes_json legacy
+            cancion.get('estructura_json', '[]'),
+            cancion.get('html_visual', ''),
+            cancion.get('html_original', ''),
             cancion.get('tono', ''),
             'blogspot'
         ))
@@ -123,7 +151,7 @@ class CancioneroScraper:
     def ejecutar(self):
         """Ejecuta el scraper completo"""
         print("=" * 70)
-        print("SCRAPER CANCIONERO ESCOLAPIO - VERSION COMPLETA")
+        print("SCRAPER CANCIONERO ESCOLAPIO - VERSION CON POSICIONAMIENTO")
         print("=" * 70)
         
         # Obtener pagina principal
