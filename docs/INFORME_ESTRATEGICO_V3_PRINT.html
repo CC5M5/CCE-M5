@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informe CCE-M5-Web-Presentaciones V3.0</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; border-bottom: 2px solid #95a5a6; padding-bottom: 5px; margin-top: 30px; }
+        h3 { color: #7f8c8d; }
+        .box { 
+            border: 2px solid #3498db; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin: 15px 0; 
+            background: #f8f9fa;
+        }
+        .box-title { 
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin-bottom: 10px; 
+            font-size: 1.1em;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+        }
+        th, td { 
+            border: 1px solid #bdc3c7; 
+            padding: 8px; 
+            text-align: left;
+        }
+        th { 
+            background: #34495e; 
+            color: white;
+        }
+        tr:nth-child(even) { background: #f8f9fa; }
+        .emoji { font-size: 1.2em; }
+        .highlight { background: #fff3cd; padding: 2px 5px; border-radius: 3px; }
+        .code { 
+            font-family: monospace; 
+            background: #f4f4f4; 
+            padding: 2px 6px; 
+            border-radius: 3px;
+        }
+        ul li { margin: 5px 0; }
+        .section { margin: 20px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+            h2 { page-break-before: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>📋 INFORME ESTRATÉGICO: CCE-M5-Web-Presentaciones</h1>
+<p><strong>Versión 3.0</strong> | Fecha: 9 de septiembre de 2026</p>
+
+<div class="box">
+    <div class="box-title">🎯 Propósito del Proyecto</div>
+    <p>Sistema automatizado para la preparación semanal de presentaciones litúrgicas con cancionero escolapio, hoja para músicos con acordes, y web de publicación.</p>
+</div>
+
+<h2>📊 Stack Tecnológico</h2>
+
+<table>
+    <tr>
+        <th>Componente</th>
+        <th>Tecnología</th>
+        <th>Rol</th>
+    </tr>
+    <tr>
+        <td>🎛️ Orquestación</td>
+        <td>Mission Control (crshdn)</td>
+        <td>Pipeline automático</td>
+    </tr>
+    <tr>
+        <td>💻 Desarrollo</td>
+        <td>OpenCode</td>
+        <td>Código complejo</td>
+    </tr>
+    <tr>
+        <td>🤖 Validación</td>
+        <td>OpenClaw</td>
+        <td>Validación humana</td>
+    </tr>
+    <tr>
+        <td>🗄️ Base de datos</td>
+        <td>SQLite → PostgreSQL</td>
+        <td>Datos persistentes</td>
+    </tr>
+    <tr>
+        <td>📄 PPTX</td>
+        <td>python-pptx</td>
+        <td>Presentaciones</td>
+    </tr>
+    <tr>
+        <td>🌐 Web</td>
+        <td>Astro + Tailwind</td>
+        <td>Sitio estático</td>
+    </tr>
+    <tr>
+        <td>☁️ Hosting</td>
+        <td>GitHub Pages</td>
+        <td>Publicación</td>
+    </tr>
+</table>
+
+<h2>📍 Fuentes de Datos</h2>
+
+<div class="grid-2">
+    <div class="box">
+        <div class="box-title">📖 Lecturas</div>
+        <p><strong>URL:</strong> servicioskoinonia.org</p>
+        <p><strong>Tipo:</strong> Calendario litúrgico CEE</p>
+        <p><strong>Extracción:</strong> Web scraping</p>
+    </div>
+    <div class="box">
+        <div class="box-title">🎵 Canciones</div>
+        <p><strong>URL:</strong> ccem5music.blogspot.com</p>
+        <p><strong>Tipo:</strong> Blogspot cancionero</p>
+        <p><strong>Canciones:</strong> 50+ escolapias</p>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-title">💾 Plantilla PPTX</div>
+    <p><strong>Formato base:</strong> <span class="code">274 Domingo 21 06 2026.pptx</span> (16:9, 13.33" x 7.50")</p>
+    <p><strong>MASTER:</strong> Solo referencia de canciones (4:3, no usar para formato)</p>
+    <p><strong>Ubicación:</strong> NAS //192.168.1.177/homes/Rafa/Escolapios/11 Presentaciones PPT CCE M5/</p>
+</div>
+
+<h2>🎼 Momentos Litúrgicos (12)</h2>
+
+<table>
+    <tr>
+        <th>#</th>
+        <th>Momento</th>
+        <th>Icono</th>
+    </tr>
+    <tr><td>1</td><td>Entrada</td><td>🚪</td></tr>
+    <tr><td>2</td><td>Perdón</td><td>🙏</td></tr>
+    <tr><td>3</td><td>Gloria</td><td>✨</td></tr>
+    <tr><td>4</td><td>Salmo</td><td>📜</td></tr>
+    <tr><td>5</td><td>Aleluya</td><td>🌟</td></tr>
+    <tr><td>6</td><td>Ofertorio</td><td>🎁</td></tr>
+    <tr><td>7</td><td>Santo</td><td>🔥</td></tr>
+    <tr><td>8</td><td>Padre Nuestro</td><td>🙌</td></tr>
+    <tr><td>9</td><td>Paz</td><td>🤝</td></tr>
+    <tr><td>10</td><td>Comunión</td><td>🍞</td></tr>
+    <tr><td>11</td><td>Canto a María</td><td>🌹</td></tr>
+    <tr><td>12</td><td>Despedida</td><td>👋</td></tr>
+</table>
+
+<h2>🤖 Agentes Definidos</h2>
+
+<table>
+    <tr>
+        <th>Agente</th>
+        <th>Herramienta</th>
+        <th>Tarea</th>
+        <th>Trigger</th>
+    </tr>
+    <tr>
+        <td>lector-liturgico</td>
+        <td>OpenClaw</td>
+        <td>📖 Scraping Koinonia</td>
+        <td>Lunes 9:00</td>
+    </tr>
+    <tr>
+        <td>musico-liturgico</td>
+        <td>OpenClaw</td>
+        <td>🎵 Matching temático</td>
+        <td>Manual</td>
+    </tr>
+    <tr>
+        <td>presentador-fieles</td>
+        <td>OpenCode</td>
+        <td>🖥️ PPTX sin acordes</td>
+        <td>Pipeline</td>
+    </tr>
+    <tr>
+        <td>presentador-musicos</td>
+        <td>OpenCode</td>
+        <td>🎼 PDF con acordes</td>
+        <td>Pipeline</td>
+    </tr>
+    <tr>
+        <td>web-developer</td>
+        <td>OpenCode</td>
+        <td>🌐 Astro + deploy</td>
+        <td>Pipeline</td>
+    </tr>
+    <tr>
+        <td>catalogador-canciones</td>
+        <td>OpenCode</td>
+        <td>📚 Scraper Blogspot</td>
+        <td>Inicial</td>
+    </tr>
+    <tr>
+        <td>moderador-comentarios</td>
+        <td>OpenClaw</td>
+        <td>💬 Moderación</td>
+        <td>Cada 6h</td>
+    </tr>
+</table>
+
+<h2>📅 Flujo Semanal</h2>
+
+<div class="box">
+    <div class="box-title">Lunes 9:00 - Inicio Automático</div>
+    <ol>
+        <li>🌐 <strong>Scraper Koinonia</strong> → Extrae lecturas → JSON</li>
+        <li>✅ <strong>Usuario confirma</strong> lecturas</li>
+        <li>🔍 <strong>Matching temático</strong> → Propone canciones</li>
+        <li>✅ <strong>Usuario elige</strong> canciones</li>
+        <li>❓ <strong>Pregunta eventos</strong> especiales</li>
+        <li>⚙️ <strong>OpenCode genera:</strong> PPTX + PDF músicos + Web</li>
+        <li>🚀 <strong>Despliegue</strong> GitHub Pages</li>
+        <li>📱 <strong>Notificación</strong> usuario</li>
+    </ol>
+</div>
+
+<h2>📁 Estructura del Proyecto</h2>
+
+<div class="code" style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+~/proyectos/CCE-M5-Web-Presentaciones/<br>
+├── .mission-control/       # Mission Control<br>
+├── .openclaw/              # Automatizaciones<br>
+├── specs/                  # 10 specs SDD<br>
+├── data/                     # Lecturas, canciones, DB<br>
+├── src/                      # Scrapers, parsers, generators<br>
+├── presentaciones/         # Output PPTX/PDF<br>
+├── web/                      # Astro site<br>
+├── docs/                     # Documentación<br>
+└── tests/                    # Tests
+</div>
+
+<h2>📅 Cronograma: 8 Semanas</h2>
+
+<table>
+    <tr>
+        <th>Semana</th>
+        <th>Fase</th>
+        <th>Entregables</th>
+    </tr>
+    <tr>
+        <td>1️⃣</td>
+        <td>Fundación</td>
+        <td>Specs, DB, repo, MC</td>
+    </tr>
+    <tr>
+        <td>2️⃣</td>
+        <td>Scraping + Seed</td>
+        <td>50+ canciones, parser</td>
+    </tr>
+    <tr>
+        <td>3️⃣-4️⃣</td>
+        <td>Matching + PPTX</td>
+        <td>PPTX 16:9, PDF músicos</td>
+    </tr>
+    <tr>
+        <td>5️⃣-6️⃣</td>
+        <td>Web + Deploy</td>
+        <td>Web completa, GitHub Pages</td>
+    </tr>
+    <tr>
+        <td>7️⃣</td>
+        <td>Integración</td>
+        <td>Flujo end-to-end, tests</td>
+    </tr>
+    <tr>
+        <td>8️⃣</td>
+        <td>Refinamiento</td>
+        <td>Optimizaciones, docs</td>
+    </tr>
+</table>
+
+<h2>✅ Correcciones Aplicadas</h2>
+
+<table>
+    <tr>
+        <th>#</th>
+        <th>Corrección</th>
+        <th>Estado</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Formato PPTX: 16:9 (274 Domingo 21 06 2026)</td>
+        <td>✅ OK</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Migración completa cancionero</td>
+        <td>✅ OK</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Vista músicos con acordes + PDF</td>
+        <td>✅ OK</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>12 momentos litúrgicos completos</td>
+        <td>✅ OK</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Cronograma 8 semanas</td>
+        <td>✅ OK</td>
+    </tr>
+</table>
+
+<div class="box" style="background: #d4edda; border-color: #28a745;">
+    <div class="box-title">🚀 ¿Listo para iniciar?</div>
+    <p>El proyecto está documentado y listo para comenzar la <strong>FASE 0: Fundación</strong>.</p>
+    <p><strong>¿Aprobado para inicio mañana?</strong></p>
+</div>
+
+</body>
+</html>
