@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+
+# Node
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Build outputs
+web/dist/
+web/.astro/
+*.pptx
+*.pdf
+presentaciones/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Data (se genera dinamicamente)
+data/db.sqlite3
+data/cache/
