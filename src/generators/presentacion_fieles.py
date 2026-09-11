@@ -2,18 +2,32 @@
 """
 Generador de presentaciones PPTX para la asamblea (sin acordes)
 Formato 16:9 basado en 274 Domingo 21 06 2026.pptx
+
+MEJORAS APLICADAS (basado en análisis de OpenCode + Kimi):
+- Logging profesional
+- Manejo seguro de conexiones SQLite
+- Validación de datos antes de generar
+- Templates reutilizables
+- Mejor manejo de errores
 """
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
-from pptx.enum.shapes import MSO_SHAPE
-from datetime import datetime
+from pptx.enum.text import PP_ALIGN
 import sqlite3
+import logging
 from pathlib import Path
 
-PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Configuracion
+PROJECT_DIR = Path(__file__).parent.parent.parent
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 OUTPUT_DIR = PROJECT_DIR / "presentaciones"
 
@@ -27,19 +41,28 @@ COLORES_LITURGICOS = {
     'negro': RGBColor(0x21, 0x21, 0x21)
 }
 
+# Dimensiones 16:9
+SLIDE_WIDTH = Inches(13.333)
+SLIDE_HEIGHT = Inches(7.5)
+
+
 class GeneradorPPTX:
-    def __init__(self):
+    """Generador de presentaciones litúrgicas en formato 16:9."""
+    
+    def __init__(self, db_path=None):
+        self.db_path = db_path or DB_PATH
         self.prs = Presentation()
-        # Configurar dimensiones 16:9 (13.333 x 7.5 pulgadas)
-        self.prs.slide_width = Inches(13.333)
-        self.prs.slide_height = Inches(7.5)
-        
+        self.prs.slide_width = SLIDE_WIDTH
+        self.prs.slide_height = SLIDE_HEIGHT
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        
+    
+    def _get_connection(self):
+        """Obtiene conexión a la base de datos."""
+        return sqlite3.connect(str(self.db_path))
+    
     def crear_diapositiva_titulo(self, titulo, subtitulo, color_fondo='verde'):
-        """Crea diapositiva de titulo"""
-        blank_layout = self.prs.slide_layouts[6]  # Blank layout
-        slide = self.prs.slides.add_slide(blank_layout)
+        """Crea diapositiva de título con color litúrgico."""
+        slide = self.prs.slides.add_slide(self.prs.slide_layouts[6])
         
         # Fondo
         background = slide.background
@@ -47,7 +70,7 @@ class GeneradorPPTX:
         fill.solid()
         fill.fore_color.rgb = COLORES_LITURGICOS.get(color_fondo, COLORES_LITURGICOS['verde'])
         
-        # Titulo
+        # Título principal
         left = Inches(1)
         top = Inches(2.5)
         width = Inches(11.333)
@@ -62,7 +85,7 @@ class GeneradorPPTX:
         p.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         p.alignment = PP_ALIGN.CENTER
         
-        # Subtitulo
+        # Subtítulo
         top = Inches(4.2)
         textbox = slide.shapes.add_textbox(left, top, width, height)
         tf = textbox.text_frame
@@ -75,9 +98,8 @@ class GeneradorPPTX:
         return slide
     
     def crear_diapositiva_lectura(self, titulo, cita, texto, color_fondo='blanco'):
-        """Crea diapositiva de lectura"""
-        blank_layout = self.prs.slide_layouts[6]
-        slide = self.prs.slides.add_slide(blank_layout)
+        """Crea diapositiva de lectura."""
+        slide = self.prs.slides.add_slide(self.prs.slide_layouts[6])
         
         # Fondo blanco
         background = slide.background
@@ -85,7 +107,7 @@ class GeneradorPPTX:
         fill.solid()
         fill.fore_color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         
-        # Titulo de la lectura
+        # Título de la lectura
         left = Inches(0.5)
         top = Inches(0.3)
         width = Inches(12.333)
@@ -116,7 +138,10 @@ class GeneradorPPTX:
         tf = textbox.text_frame
         tf.word_wrap = True
         p = tf.paragraphs[0]
-        p.text = texto[:500] + "..." if len(texto) > 500 else texto
+        
+        # Limitar texto para que quepa en la diapositiva
+        texto_limpio = texto[:500] + "..." if len(texto) > 500 else texto
+        p.text = texto_limpio
         p.font.size = Pt(18)
         p.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
         p.line_spacing = 1.5
@@ -124,17 +149,16 @@ class GeneradorPPTX:
         return slide
     
     def crear_diapositiva_cancion(self, titulo, letra, momento, color_fondo='blanco'):
-        """Crea diapositiva de cancion (sin acordes)"""
-        blank_layout = self.prs.slide_layouts[6]
-        slide = self.prs.slides.add_slide(blank_layout)
+        """Crea diapositiva de canción sin acordes."""
+        slide = self.prs.slides.add_slide(self.prs.slide_layouts[6])
         
-        # Fondo
+        # Fondo blanco
         background = slide.background
         fill = background.fill
         fill.solid()
         fill.fore_color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
         
-        # Titulo del momento
+        # Título del momento
         left = Inches(0.5)
         top = Inches(0.3)
         width = Inches(12.333)
@@ -148,7 +172,7 @@ class GeneradorPPTX:
         p.font.bold = True
         p.font.color.rgb = RGBColor(0x99, 0x99, 0x99)
         
-        # Titulo de la cancion
+        # Título de la canción
         top = Inches(0.9)
         textbox = slide.shapes.add_textbox(left, top, width, height)
         tf = textbox.text_frame
@@ -165,7 +189,10 @@ class GeneradorPPTX:
         tf = textbox.text_frame
         tf.word_wrap = True
         p = tf.paragraphs[0]
-        p.text = letra[:800] + "..." if len(letra) > 800 else letra
+        
+        # Limitar letra para que quepa
+        letra_limpia = letra[:800] + "..." if len(letra) > 800 else letra
+        p.text = letra_limpia
         p.font.size = Pt(20)
         p.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
         p.line_spacing = 1.5
@@ -174,133 +201,134 @@ class GeneradorPPTX:
         return slide
     
     def generar_presentacion(self, fecha_domingo, lectura_id, canciones_ids):
-        """
-        Genera una presentacion completa.
+        """Genera una presentación completa."""
+        logger.info(f"Generando presentación para: {fecha_domingo}")
         
-        Args:
-            fecha_domingo: Fecha del domingo (YYYY-MM-DD)
-            lectura_id: ID de la lectura en la DB
-            canciones_ids: Lista de IDs de canciones por momento
-        """
-        conn = sqlite3.connect(str(DB_PATH))
-        cursor = conn.cursor()
-        
-        # Obtener lecturas
-        cursor.execute('''
-            SELECT celebracion, temporada, color_liturgico,
-                   primera_lectura_cita, primera_lectura_texto,
-                   salmo_cita, salmo_antifona, salmo_texto,
-                   segunda_lectura_cita, segunda_lectura_texto,
-                   evangelio_cita, evangelio_texto
-            FROM lecturas WHERE id = ?
-        ''', (lectura_id,))
-        
-        lectura = cursor.fetchone()
-        if not lectura:
-            print(f"ERROR: No se encontró lectura {lectura_id}")
-            return None
-        
-        (celebracion, temporada, color, 
-         p_cita, p_texto, s_cita, s_antifona, s_texto,
-         seg_cita, seg_texto, e_cita, e_texto) = lectura
-        
-        # Portada
-        self.crear_diapositiva_titulo(
-            celebracion or "Celebración del Domingo",
-            fecha_domingo,
-            color or 'verde'
-        )
-        
-        # Primera lectura
-        if p_texto:
-            self.crear_diapositiva_lectura(
-                "Primera Lectura",
-                p_cita or "",
-                p_texto,
-                color or 'verde'
-            )
-        
-        # Salmo
-        if s_texto:
-            self.crear_diapositiva_lectura(
-                "Salmo Responsorial",
-                s_cita or "",
-                f"Antífona: {s_antifona or ''}\n\n{s_texto}",
-                color or 'verde'
-            )
-        
-        # Segunda lectura
-        if seg_texto:
-            self.crear_diapositiva_lectura(
-                "Segunda Lectura",
-                seg_cita or "",
-                seg_texto,
-                color or 'verde'
-            )
-        
-        # Evangelio
-        if e_texto:
-            self.crear_diapositiva_lectura(
-                "Evangelio",
-                e_cita or "",
-                e_texto,
-                color or 'verde'
-            )
-        
-        # Canciones
-        momentos = ['entrada', 'perdon', 'gloria', 'salmo', 'aleluya', 
-                   'ofertorio', 'santo', 'padre_nuestro', 'paz', 
-                   'comunion', 'maria', 'despedida']
-        
-        for momento in momentos:
-            if momento in canciones_ids:
-                cancion_id = canciones_ids[momento]
-                cursor.execute('SELECT titulo, letra_sin_acordes FROM canciones WHERE id = ?', (cancion_id,))
-                cancion = cursor.fetchone()
+        try:
+            with self._get_connection() as conn:
+                cursor = conn.cursor()
                 
-                if cancion:
-                    titulo, letra = cancion
-                    self.crear_diapositiva_cancion(
-                        titulo or "Canción",
-                        letra or "",
-                        momento,
-                        'blanco'
+                # Obtener lecturas
+                cursor.execute('''
+                    SELECT celebracion, temporada, color_liturgico,
+                           primera_lectura_cita, primera_lectura_texto,
+                           salmo_cita, salmo_antifona, salmo_texto,
+                           segunda_lectura_cita, segunda_lectura_texto,
+                           evangelio_cita, evangelio_texto
+                    FROM lecturas WHERE id = ?
+                ''', (lectura_id,))
+                
+                lectura = cursor.fetchone()
+                if not lectura:
+                    logger.error(f"No se encontró lectura {lectura_id}")
+                    return None
+                
+                (celebracion, temporada, color, 
+                 p_cita, p_texto, s_cita, s_antifona, s_texto,
+                 seg_cita, seg_texto, e_cita, e_texto) = lectura
+                
+                # Validar datos mínimos
+                if not celebracion:
+                    celebracion = "Celebración del Domingo"
+                
+                # Portada
+                self.crear_diapositiva_titulo(
+                    celebracion,
+                    fecha_domingo,
+                    color or 'verde'
+                )
+                
+                # Lecturas
+                if p_texto:
+                    self.crear_diapositiva_lectura(
+                        "Primera Lectura",
+                        p_cita or "",
+                        p_texto,
+                        color or 'verde'
                     )
-        
-        # Guardar
-        filename = f"{fecha_domingo}_presentacion.pptx"
-        filepath = OUTPUT_DIR / filename
-        self.prs.save(str(filepath))
-        
-        conn.close()
-        
-        print(f"✅ Presentación generada: {filepath}")
-        return filepath
+                
+                if s_texto:
+                    self.crear_diapositiva_lectura(
+                        "Salmo Responsorial",
+                        s_cita or "",
+                        f"Antífona: {s_antifona or ''}\n\n{s_texto}",
+                        color or 'verde'
+                    )
+                
+                if seg_texto:
+                    self.crear_diapositiva_lectura(
+                        "Segunda Lectura",
+                        seg_cita or "",
+                        seg_texto,
+                        color or 'verde'
+                    )
+                
+                if e_texto:
+                    self.crear_diapositiva_lectura(
+                        "Evangelio",
+                        e_cita or "",
+                        e_texto,
+                        color or 'verde'
+                    )
+                
+                # Canciones
+                momentos = ['entrada', 'perdon', 'gloria', 'salmo', 'aleluya', 
+                           'ofertorio', 'santo', 'padre_nuestro', 'paz', 
+                           'comunion', 'maria', 'despedida']
+                
+                for momento in momentos:
+                    if momento in canciones_ids:
+                        cancion_id = canciones_ids[momento]
+                        cursor.execute(
+                            'SELECT titulo, letra_sin_acordes FROM canciones WHERE id = ?',
+                            (cancion_id,)
+                        )
+                        cancion = cursor.fetchone()
+                        
+                        if cancion:
+                            titulo, letra = cancion
+                            self.crear_diapositiva_cancion(
+                                titulo or "Canción",
+                                letra or "",
+                                momento,
+                                'blanco'
+                            )
+                
+                # Guardar
+                filename = f"{fecha_domingo}_presentacion.pptx"
+                filepath = OUTPUT_DIR / filename
+                self.prs.save(str(filepath))
+                
+                logger.info(f"✅ Presentación generada: {filepath}")
+                logger.info(f"Diapositivas: {len(self.prs.slides)}")
+                return filepath
+                
+        except sqlite3.Error as e:
+            logger.error(f"Error de base de datos: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Error al generar presentación: {e}")
+            return None
+
 
 def probar_generador():
-    """Prueba el generador con datos mock"""
-    print("=" * 70)
-    print("GENERADOR DE PRESENTACIONES PPTX")
-    print("=" * 70)
+    """Prueba el generador con datos de ejemplo."""
+    logger.info("=" * 70)
+    logger.info("GENERADOR DE PRESENTACIONES PPTX")
+    logger.info("=" * 70)
     
     generador = GeneradorPPTX()
     
-    # Crear presentacion de prueba
-    prs = Presentation()
-    prs.slide_width = Inches(13.333)
-    prs.slide_height = Inches(7.5)
-    
-    # Portada
+    # Crear presentación de prueba
     generador.crear_diapositiva_titulo(
         "Domingo XXIV del Tiempo Ordinario",
         "14 de septiembre de 2026",
         'verde'
     )
     
-    # Diapositiva de prueba
     generador.crear_diapositiva_cancion(
         "PREPARAD EL CAMINO",
-        "PREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\n\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+        "PREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)",
         "Entrada",
         'blanco'
     )
@@ -309,10 +337,11 @@ def probar_generador():
     filepath = OUTPUT_DIR / "prueba_presentacion.pptx"
     generador.prs.save(str(filepath))
     
-    print(f"\n✅ Presentación de prueba generada: {filepath}")
-    print(f"Dimensiones: 13.333\" x 7.5\" (16:9)")
-    print(f"Diapositivas: {len(generador.prs.slides)}")
-    print("=" * 70)
+    logger.info(f"\n✅ Presentación de prueba: {filepath}")
+    logger.info(f"Dimensiones: 13.333\" x 7.5\" (16:9)")
+    logger.info(f"Diapositivas: {len(generador.prs.slides)}")
+    logger.info("=" * 70)
+
 
 if __name__ == "__main__":
     probar_generador()
