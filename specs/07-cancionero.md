@@ -287,12 +287,78 @@ Formulario en /admin (protegido):
 | Actualizar acordes | Bajo demanda | Usuario |
 | Backup | Semanal | Automático (git) |
 
+## Parser de Acordes V2 (Con Posicionamiento)
+
+**Archivo:** `src/parsers/acordes_parser_v2.py`
+
+**Implementación:** 2026-09-11
+
+### Mejoras sobre V1
+- ✅ Posicionamiento exacto de acordes sobre la letra
+- ✅ Soporte notación inglesa (C, D, G) y española (Do, Re, Sol)
+- ✅ Manejo de mayúsculas/minúsculas (SOL, Sol, lam, Lam)
+- ✅ Generación de HTML visual con acordes posicionados
+- ✅ Estructura JSON para renderizado flexible
+
+### Tipos de Líneas Detectadas
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| `letra` | Solo texto | "PREPARAD EL CAMINO AL SEÑOR" |
+| `acordes` | Solo acordes | "SOL Lam Sim DO RE7" |
+| `mixta` | Acordes sobre letra | "SOL Mim\nVoz que clama..." |
+
+### Estructura JSON de Salida
+
+```json
+{
+  "tipo": "acordes",
+  "acordes": [
+    {"acorde": "SOL", "posicion": 0},
+    {"acorde": "Lam", "posicion": 6},
+    {"acorde": "Sim", "posicion": 17},
+    {"acorde": "DO", "posicion": 37},
+    {"acorde": "RE7", "posicion": 49}
+  ]
+}
+```
+
+### Campos en Base de Datos (Ampliados)
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `letra_con_acordes` | TEXT | Texto original completo |
+| `letra_sin_acordes` | TEXT | Letra limpia |
+| `estructura_json` | TEXT | **NUEVO** JSON con posiciones |
+| `html_visual` | TEXT | **NUEVO** HTML con acordes |
+| `html_original` | TEXT | **NUEVO** HTML del Blogspot |
+| `tono` | TEXT | Tono principal detectado |
+
+### Uso en la Web
+
+```html
+<div class="cancion-con-acordes">
+  <div class="linea-acordes">SOL Lam Sim DO RE7</div>
+  <div class="letra">PREPARAD EL CAMINO AL SEÑOR</div>
+</div>
+```
+
+### Importancia del Posicionamiento
+
+El posicionamiento exacto es **CRÍTICO** para:
+1. Vista de músicos (una de las funcionalidades principales)
+2. Generación de PDF con acordes
+3. Experiencia de usuario en la web
+
+Los acordes deben aparecer exactamente encima de la sílaba/letra correspondiente, no solo al principio de la línea.
+
 ## Comparativa: Web Original vs. Nueva
 
 | Característica | Blogspot Original | Nueva Plataforma |
 |----------------|-------------------|------------------|
 | Navegación | Lista simple | Buscable, filtrable |
 | Acordes | Solo con acordes | Toggle con/sin |
+| Posicionamiento acordes | Fijo (Blogspot) | Flexible (JSON+HTML) |
 | Audio | Solo enlaces | Reproductor embebido |
 | Responsive | Limitado | Mobile-first |
 | Descargas | No | PPTX/PDF/Web |
