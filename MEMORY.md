@@ -169,31 +169,68 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - **Mission Control:** Ya instalado en http://192.168.68.244:4000/
 - **Posicionamiento de acordes:** Es CRÍTICO para la vista de músicos. Los acordes deben aparecer exactamente encima de la sílaba/letra correspondiente.
 
-### Nuevos Componentes (Fase 2)
+### OpenCode Configurado ✅
+**Estado:** Funcionando con Kimi-k2.7-code:cloud via Ollama
+**Comando:** `opencode run -m ollama/kimi-k2.7-code:cloud "prompt"`
+**Context7 MCP:** Instalado y funcionando (mcporter)
 
-#### Scraper Koinonia
-**Archivos:**
-- `src/scrapers/koinonia_scraper.py` - Scraper principal
-- `src/scrapers/koinonia_mock.py` - Datos mock para desarrollo
+**Ejemplo aplicado:**
+- Revisión completa del scraper de Blogspot con Context7
+- Identificación de 10+ problemas de seguridad y rendimiento
+- Mejoras aplicadas: reintentos, validación, logging, manejo seguro de BD
 
-**Estado:** Funcionando con mock. El sitio koinonia.org tiene timeouts frecuentes.
+### Commits Recientes (Sesión 12 Sep 2026)
+- `1d5031d` - Mejoras aplicadas por OpenCode + Kimi: scraper robusto con reintentos, validación y logging
+- `5fddd97` - Mejoras manuales: koinonia scraper, matching engine, generador PPTX
+- `c235f57` - Fix: Mejoras críticas de seguridad y rendimiento de OpenCode+Context7
 
-#### Motor de Matching
-**Archivo:** `src/matching_engine.py`
+### Mejoras de Seguridad Aplicadas (OpenCode + Context7)
 
-**Funcionalidad:**
-- Extrae temas de lecturas y canciones usando palabras clave
-- Calcula score de matching basado en temas comunes
-- Soporta temas: perdon, paz, esperanza, amor, camino, luz, agua, pan, maria, espiritu, alabanza, servicio, fe, salvacion
+#### Scraper Blogspot (blogspot_scraper.py)
+- ✅ Eliminado `sys.path.insert` (anti-patrón de seguridad)
+- ✅ Filtrado estricto de dominios (ALLOWED_HOSTS exacto)
+- ✅ Normalización de URLs (quitar fragmentos/query)
+- ✅ User-Agent rotativo
+- ✅ `response.content` en vez de `response.text`
+- ✅ Eliminación de scripts/styles antes de extraer texto
+- ✅ WAL mode para SQLite
+- ✅ Jitter en pausas (1.0-2.5s)
+- ✅ Conexión SQLite persistente
 
-#### Generador PPTX
-**Archivo:** `src/generators/presentacion_fieles.py`
+#### Scraper Koinonia (koinonia_scraper.py)
+- ✅ User-Agent honesto con contacto del proyecto
+- ✅ Validación de fechas con regex (YYYYMMDD)
+- ✅ Caché local TTL 12h
+- ✅ Context manager (`__enter__`/`__exit__`)
+- ✅ Respeto a `Retry-After` header
+- ✅ Manejo de encoding explícito
 
-**Características:**
-- Formato 16:9 (13.333" x 7.5")
-- Portada con color litúrgico
-- Diapositivas de lecturas (Primera, Salmo, Segunda, Evangelio)
-- Diapositivas de canciones (sin acordes)
-- Fondos blancos para lecturas y canciones
+#### Motor de Matching (matching_engine.py)
+- ✅ Scoring ponderado por tema
+- ✅ Pesos configurables para cada tema
+- ✅ Conexiones SQLite seguras
+- ✅ Tabla de matches separada
 
-**Estado:** ✅ Genera presentaciones de prueba correctamente
+#### Generador PPTX (presentacion_fieles.py)
+- ✅ Validación de datos antes de generar
+- ✅ Manejo de errores específicos
+- ✅ Logging profesional
+- ✅ Conexiones seguras
+
+### Estado Actual del Proyecto (Post-revisión OpenCode)
+
+| Componente | Estado | Notas |
+|-----------|--------|-------|
+| Scraper Blogspot | ✅ Mejorado | Seguridad + rendimiento aplicados |
+| Scraper Koinonia | ✅ Mejorado | Parseo CSS, caché, User-Agent |
+| Parser Acordes V2 | ✅ Estable | Posicionamiento funcionando |
+| Motor Matching | ✅ Mejorado | Scoring ponderado |
+| Generador PPTX | ✅ Estable | Formato 16:9 |
+| OpenCode | ✅ Configurado | Kimi-k2.7-code:cloud via Ollama |
+| Context7 MCP | ✅ Instalado | mcporter configurado |
+
+### Próximos Pasos Pendientes
+- [ ] Revisar archivos restantes con OpenCode (matching_engine, presentacion_fieles)
+- [ ] Fase 3-4: Web + Deploy (Astro + GitHub Pages)
+- [ ] Fase 5: Integración completa
+- [ ] Fase 6: Refinamiento final
