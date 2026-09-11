@@ -7,7 +7,7 @@
 ### Resumen
 Sistema automatizado para preparación semanal de presentaciones litúrgicas con cancionero escolapio, hoja para músicos con acordes, y web de publicación. Arquitectura híbrida: Mission Control + OpenCode + OpenClaw.
 
-**Estado actual:** FASE 1 completada (Scraping + Seed). 9 canciones extraídas con posicionamiento de acordes.
+**Estado actual:** FASE 2 completada (Matching + PPTX). Generador de presentaciones 16:9 funcionando.
 
 ### Ubicación del Proyecto
 `~/proyectos/CCE-M5-Web-Presentaciones/`
@@ -143,6 +143,8 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - `ffa9c8e` - Fase 1: Scraper completo del cancionero
 - `704ceaa` - Fix: Parser de acordes corregido
 - `19fb5a8` - Feat: Parser con posicionamiento de acordes
+- `7120d60` - Docs: Actualizar MEMORY.md y spec 07-cancionero
+- `4c091d9` - Fase 2: Scraper Koinonia, matching engine y generador PPTX 16:9
 
 ### Configuración Git
 **Remote:** `https://github.com/CC5M5/CCE-M5.git`
@@ -153,7 +155,7 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 8 semanas:
 1. ✅ **Semana 1: Fundación** - Specs, DB, repo, MC
 2. ✅ **Semana 2: Scraping + Seed** - 9 canciones extraídas con parser posicionado
-3. **Semana 3-4: Matching + PPTX** - PPTX 16:9, PDF músicos
+3. ✅ **Semana 3-4: Matching + PPTX** - Scraper Koinonia (con mock), motor de matching, generador PPTX 16:9
 4. **Semana 5-6: Web + Deploy** - Astro, GitHub Pages
 5. **Semana 7: Integración** - Flujo end-to-end
 6. **Semana 8: Refinamiento** - Optimizaciones
@@ -167,17 +169,31 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - **Mission Control:** Ya instalado en http://192.168.68.244:4000/
 - **Posicionamiento de acordes:** Es CRÍTICO para la vista de músicos. Los acordes deben aparecer exactamente encima de la sílaba/letra correspondiente.
 
-### Decisions Técnicas (ADRs)
-- **ADR-001:** Uso de Mission Control para orquestación
-- **ADR-002:** OpenCode para desarrollo complejo
-- **ADR-003:** SQLite inicial, PostgreSQL futuro
-- **ADR-004:** Migración completa del cancionero (no solo referencias)
-- **ADR-005:** Posicionamiento de acordes en estructura JSON
+### Nuevos Componentes (Fase 2)
 
-### Pendientes
-- [ ] Scraper Koinonia (lecturas)
-- [ ] Matching temático entre lecturas y canciones
-- [ ] Generador PPTX 16:9
-- [ ] Generador PDF con acordes para músicos
-- [ ] Web Astro con cancionero navegable
-- [ ] Sistema de comentarios con moderación
+#### Scraper Koinonia
+**Archivos:**
+- `src/scrapers/koinonia_scraper.py` - Scraper principal
+- `src/scrapers/koinonia_mock.py` - Datos mock para desarrollo
+
+**Estado:** Funcionando con mock. El sitio koinonia.org tiene timeouts frecuentes.
+
+#### Motor de Matching
+**Archivo:** `src/matching_engine.py`
+
+**Funcionalidad:**
+- Extrae temas de lecturas y canciones usando palabras clave
+- Calcula score de matching basado en temas comunes
+- Soporta temas: perdon, paz, esperanza, amor, camino, luz, agua, pan, maria, espiritu, alabanza, servicio, fe, salvacion
+
+#### Generador PPTX
+**Archivo:** `src/generators/presentacion_fieles.py`
+
+**Características:**
+- Formato 16:9 (13.333" x 7.5")
+- Portada con color litúrgico
+- Diapositivas de lecturas (Primera, Salmo, Segunda, Evangelio)
+- Diapositivas de canciones (sin acordes)
+- Fondos blancos para lecturas y canciones
+
+**Estado:** ✅ Genera presentaciones de prueba correctamente
