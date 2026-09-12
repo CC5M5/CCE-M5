@@ -25,6 +25,48 @@ from typing import Iterator, List, Optional
 
 
 # ---------------------------------------------------------------------------
+# Utilidades de limpieza de texto
+# ---------------------------------------------------------------------------
+
+# Líneas de metadatos / navegación del blogspot del Cancionero CCE.
+_METADATA_RES = [
+    re.compile(r"^\s*escuchar\s*$", re.IGNORECASE),
+    re.compile(r"^\s*volver\s+a\s+lista\s+de\s+canciones\s*$", re.IGNORECASE),
+    re.compile(r"^\s*version\s+en\s+\w+\s*$", re.IGNORECASE),
+    re.compile(r"^\s*/+\s*$"),
+]
+
+# Etiquetas HTML con sus atributos (ej. <br />, <strong>, <a href="...">).
+_HTML_TAG_RE = re.compile(r"<[^>]+>", re.IGNORECASE)
+
+# Líneas que solo contienen espacios y paréntesis/asteriscos de repetición.
+_LINEA_ACORDE_VACIA_RE = re.compile(r"^\s*[\(\)\[\]\*]*\s*$")
+
+
+def limpiar_texto_cancion(texto: str) -> str:
+    """
+    Devuelve el texto de la canción sin etiquetas HTML ni líneas de metadatos
+    del blogspot (escuchar, volver a lista de canciones, Version en ..., /).
+
+    Conserva el resto del texto, incluyendo los espacios usados para posicionar
+    acordes.  Los espacios no rompibles se normalizan a espacios normales para
+    que el ancho de carácter sea predecible al renderizar en fuentes
+    monoespaciadas.
+    """
+    lineas: List[str] = []
+    for linea in texto.splitlines():
+        # Descartar líneas que sean únicamente metadatos de navegación.
+        if any(r.fullmatch(linea) for r in _METADATA_RES):
+            continue
+        # Quitar etiquetas HTML (atributos incluidos) dejando su contenido.
+        linea = _HTML_TAG_RE.sub("", linea)
+        # Normalizar NBSP a espacio normal; no altera la alineación cuando la
+        # renderización es monoespaciada y evita desplazamientos inesperados.
+        linea = linea.replace("\u00a0", " ")
+        lineas.append(linea)
+    return "\n".join(lineas)
+
+# ---------------------------------------------------------------------------
 # Modelo de datos
 # ---------------------------------------------------------------------------
 
@@ -136,6 +178,11 @@ class AcordesParser:
         if re.search(r"[.!?;:,]", linea):
             return False
 
+        # Descartar líneas que solo contienen espacios y paréntesis/asteriscos
+        # de repetición; sin acordes reales no es una línea de acordes.
+        if _LINEA_ACORDE_VACIA_RE.fullmatch(linea):
+            return False
+
         tokens = linea.split()
         if not tokens:
             return False
@@ -177,7 +224,11 @@ class AcordesParser:
         Empareja líneas de acordes con la siguiente línea de letra.
         Si una línea de acordes no va seguida de letra, se emite como línea
         de acordes suelta.
+
+        El texto se limpia previamente de etiquetas HTML y líneas de metadatos
+        del blogspot para que la letra resultante sea apta para vista PDF.
         """
+        texto = limpiar_texto_cancion(texto)
         lineas = texto.splitlines()
         resultado: List[LineaCancion] = []
         i = 0
@@ -199,6 +250,12 @@ class AcordesParser:
 
             if self.es_linea_de_acordes(linea):
                 acordes = self.extraer_acordes_de_linea(linea)
+
+                # Líneas de acordes vacías o con solo paréntesis no aportan
+                # nada visual; las omitimos para no generar líneas en blanco.
+                if not acordes:
+                    i += 1
+                    continue
 
                 # Mira si la siguiente línea es letra.
                 siguiente = lineas[i + 1] if i + 1 < n else None
@@ -403,14 +460,18 @@ def test_extensiones_y_slash():
 
     print("✓ test_extensiones_y_slash pasado")
 
-
 def test_html_sin_xss():
+    """El parser limpia etiquetas HTML del texto de entrada.
+
+    Verificamos que un fragmento HTML malicioso no se inyecte como etiqueta
+    viva en la salida HTML.
+    """
     texto = "SOL\n<script>alert(1)</script>"
-    html_out = AcordesParser().generar_html_completo(
-        AcordesParser().parsear_cancion_completa(texto)
-    )
+    estructura = AcordesParser().parsear_cancion_completa(texto)
+    html_out = AcordesParser().generar_html_completo(estructura)
     assert "<script>" not in html_out
-    assert "&lt;script&gt;" in html_out
+    assert "</script>" not in html_out
+    assert "&lt;script&gt;" not in html_out
     print("✓ test_html_sin_xss pasado")
 
 
