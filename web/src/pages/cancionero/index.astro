@@ -1,0 +1,92 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getCanciones, getAllMomentos } from '@lib/db.js';
+import BuscadorCanciones from '@components/BuscadorCanciones.jsx';
+import FiltroMomentos from '@components/FiltroMomentos.jsx';
+import '../../styles/global.css';
+
+const base = import.meta.env.BASE_PATH || '/';
+const canciones = getCanciones();
+const momentos = getAllMomentos();
+
+function slugify(text) {
+  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '').replace(/\-+/g, '-');
+}
+
+const cancionesConSlug = canciones.map(c => ({
+  ...c,
+  slug: slugify(c.titulo),
+  letraPreview: (c.letra_sin_acordes || '').slice(0, 120).replace(/\n/g, ' '),
+}));
+
+const cancionesPorLetra = {};
+for (const c of cancionesConSlug) {
+  const letra = (c.titulo || ' ').trim()[0].toUpperCase();
+  if (!cancionesPorLetra[letra]) cancionesPorLetra[letra] = [];
+  cancionesPorLetra[letra].push(c);
+}
+const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 'es'));
+---
+
+<Layout 
+  title="Cancionero" 
+  description="Listado completo del cancionero escolapio. Busca por título, momento litúrgico o tono."
+>
+  <section class="container mx-auto px-4 py-10">
+    <h1 class="section-title">Cancionero escolapio</h1>
+    <p class="text-slate-600 mb-8 max-w-2xl">
+      Explora las canciones de la Comunidad Cristiana Escolapia M5. Usa el buscador o filtra por momento litúrgico.
+    </p>
+
+    <div class="grid md:grid-cols-[1fr_auto] gap-4 mb-8 items-start">
+      <BuscadorCanciones client:load basePath={base} />
+      <FiltroMomentos client:load momentos={momentos} basePath={base} />
+    </div>
+
+    <div id="listado-canciones" class="space-y-8">
+      {letras.length > 0 ? letras.map(letra => (
+        <div key={letra} class="card" data-letra={letra}>
+          <h2 class="text-3xl font-heading font-bold text-liturgia-verde border-b-2 border-liturgia-verde/20 pb-2 mb-4">{letra}</h2>
+          <ul class="space-y-3">
+            {cancionesPorLetra[letra].map(c => (
+              <li key={c.id} class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 rounded-lg hover:bg-slate-50 transition">
+                <a href={`${base}cancionero/${encodeURIComponent(c.slug)}/`} class="font-heading font-semibold text-lg text-slate-800 hover:text-liturgia-verde">
+                  {c.titulo}
+                </a>
+                <div class="flex items-center gap-3 text-sm">
+                  {c.momento_liturgico && <span class="px-2 py-1 rounded bg-liturgia-verde/10 text-liturgia-verde font-medium">{c.momento_liturgico}</span>}
+                  {c.tono && <span class="text-slate-500">{c.tono}</span>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )) : (
+        <div class="card text-center py-12">
+          <p class="text-slate-600">No hay canciones disponibles todavía.</p>
+        </div>
+      )}
+    </div>
+
+    <p class="mt-6 text-sm text-slate-500">Total: {canciones.length} {canciones.length === 1 ? 'canción' : 'canciones'} en el cancionero.</p>
+  </section>
+
+  <script define:vars={{ base }}>
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q')?.toLowerCase() || '';
+    const m = params.get('momento')?.toLowerCase() || '';
+    if (q || m) {
+      const items = document.querySelectorAll('#listado-canciones li');
+      items.forEach(li => {
+        const texto = li.textContent.toLowerCase();
+        const momento = li.querySelector('.bg-liturgia-verde\\/10')?.textContent.toLowerCase() || '';
+        const match = (!q || texto.includes(q)) && (!m || momento.includes(m));
+        li.style.display = match ? '' : 'none';
+      });
+      document.querySelectorAll('#listado-canciones > div').forEach(div => {
+        const visible = div.querySelectorAll('li:not([style*="none"])').length > 0;
+        div.style.display = visible ? '' : 'none';
+      });
+    }
+  </script>
+</Layout>

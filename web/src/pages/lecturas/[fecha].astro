@@ -1,0 +1,65 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getAllPresentacionesFechas, getPresentacionByFecha } from '@lib/db.js';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const fechas = getAllPresentacionesFechas();
+  if (fechas.length === 0) return [];
+  return fechas.map(fecha => ({ params: { fecha } }));
+}
+
+const { fecha } = Astro.params;
+const base = import.meta.env.BASE_PATH || '/';
+const p = getPresentacionByFecha(fecha);
+
+if (!p) {
+  return Astro.redirect(`${base}404`);
+}
+
+const lecturas = [
+  { label: 'Primera lectura', cita: p.primera_lectura_cita, texto: p.primera_lectura_texto },
+  { label: 'Salmo', cita: p.salmo_cita, texto: p.salmo_texto, antifona: p.salmo_antifona },
+  { label: 'Segunda lectura', cita: p.segunda_lectura_cita, texto: p.segunda_lectura_texto },
+  { label: 'Evangelio', cita: p.evangelio_cita, texto: p.evangelio_texto },
+].filter(l => l.texto);
+---
+
+<Layout 
+  title={`Lecturas · ${p.domingo || fecha}`} 
+  description={`Lecturas del ${p.domingo || fecha}: ${p.primera_lectura_cita || ''}, ${p.evangelio_cita || ''}.`}
+  colorLiturgico={p.color_liturgico || 'verde'}
+  canonical={`lecturas/${fecha}/`}
+>
+  <section class="container mx-auto px-4 py-10">
+    <div class="max-w-3xl mx-auto">
+      <nav aria-label="Migas de pan" class="text-sm text-slate-500 mb-4">
+        <a href={`${base}`} class="hover:text-liturgia-verde">Inicio</a>
+        <span class="mx-2">/</span>
+        <span class="text-slate-800" aria-current="page">Lecturas</span>
+      </nav>
+
+      <h1 class="section-title">Lecturas del día</h1>
+      <p class="text-lg text-slate-600 mb-8 font-body">
+        {p.domingo ? `${p.domingo} — ` : ''}
+        {new Date(fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+      </p>
+
+      {lecturas.length > 0 ? (
+        <div class="space-y-8">
+          {lecturas.map(l => (
+            <article key={l.label} class="card">
+              <h2 class="text-xl font-heading font-bold text-liturgia-verde mb-1">{l.label}</h2>
+              <p class="text-sm font-semibold text-slate-500 mb-4">{l.cita}{l.antifona ? ` — "${l.antifona}"` : ''}</p>
+              <div class="font-body leading-loose text-slate-800 whitespace-pre-line">{l.texto}</div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="card">
+          <p class="text-slate-600">No hay lecturas registradas para esta fecha.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

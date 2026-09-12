@@ -1,0 +1,132 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  canonical?: string;
+  colorLiturgico?: 'verde' | 'morado' | 'rosa' | 'rojo' | 'blanco' | 'dorado';
+}
+
+const { 
+  title, 
+  description = 'Cancionero escolapio y presentaciones litúrgicas de la Comunidad Cristiana Escolapia M5.',
+  image = '/og-default.png',
+  canonical,
+  colorLiturgico = 'verde'
+} = Astro.props;
+
+const site = import.meta.env.SITE_URL || 'https://cce-m5.github.io';
+const base = import.meta.env.BASE_PATH || '/';
+const colorMap = {
+  verde: 'bg-liturgia-verde',
+  morado: 'bg-liturgia-morado',
+  rosa: 'bg-liturgia-rosa',
+  rojo: 'bg-liturgia-rojo',
+  blanco: 'bg-slate-100',
+  dorado: 'bg-liturgia-dorado',
+};
+const navColor = colorMap[colorLiturgico] || colorMap.verde;
+
+const canonicalUrl = canonical ? new URL(canonical, site).toString() : site + base.replace(/^\//, '');
+const imageUrl = image.startsWith('http') ? image : new URL(image, site).toString();
+
+const navLinks = [
+  { href: `${base}`, label: 'Inicio' },
+  { href: `${base}cancionero/`, label: 'Cancionero' },
+  { href: `${base}musicos/`, label: 'Músicos' },
+  { href: `${base}sobre/`, label: 'Sobre' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} · CCE M5 Music</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={colorLiturgico === 'blanco' ? '#f5f5f5' : colorLiturgico === 'dorado' ? '#ffb300' : undefined} class:list={{'text-liturgia-verde': colorLiturgico === 'verde', 'text-liturgia-morado': colorLiturgico === 'morado', 'text-liturgia-rosa': colorLiturgico === 'rosa', 'text-liturgia-rojo': colorLiturgico === 'rojo'}} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href={`${base}sitemap-index.xml`} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CCE M5 Music" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:locale" content="es_ES" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a href="#contenido" class="skip-link">Saltar al contenido principal</a>
+    <header class:list={['text-white shadow-md', navColor]}>
+      <nav class="container mx-auto px-4 py-4 flex items-center justify-between" aria-label="Navegación principal">
+        <a href={`${base}`} class="flex items-center gap-2 font-heading font-bold text-lg md:text-xl" aria-label="CCE M5 Music - Inicio">
+          <span class="text-2xl">🎵</span>
+          <span>CCE M5 Music</span>
+        </a>
+        <ul class="flex items-center gap-1 md:gap-4 text-sm md:text-base" role="menubar">
+          {navLinks.map(link => {
+            const isActive = currentPath === link.href || currentPath === link.href.slice(0, -1);
+            return (
+              <li role="none">
+                <a 
+                  href={link.href} 
+                  role="menuitem"
+                  class:list={[
+                    'px-3 py-2 rounded-lg transition font-medium',
+                    isActive ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/90'
+                  ]}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </header>
+
+    <main id="contenido" class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="bg-slate-900 text-slate-300 py-8 mt-12">
+      <div class="container mx-auto px-4 grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-white font-heading font-bold mb-2">CCE M5 Music</h3>
+          <p class="text-sm">Cancionero escolapio y recursos litúrgicos para la comunidad.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-heading font-semibold mb-2">Enlaces</h4>
+          <ul class="space-y-1 text-sm">
+            <li><a href={`${base}`} class="hover:text-white">Inicio</a></li>
+            <li><a href={`${base}cancionero/`} class="hover:text-white">Cancionero</a></li>
+            <li><a href={`${base}musicos/`} class="hover:text-white">Músicos</a></li>
+            <li><a href={`${base}comentarios/`} class="hover:text-white">Comentarios</a></li>
+            <li><a href={`${base}sobre/`} class="hover:text-white">Sobre</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-heading font-semibold mb-2">Contacto</h4>
+          <p class="text-sm">¿Sugerencias o correcciones? Escríbenos en la página de <a href={`${base}comentarios/`} class="underline hover:text-white">comentarios</a>.</p>
+        </div>
+      </div>
+      <div class="container mx-auto px-4 mt-8 pt-4 border-t border-slate-800 text-xs text-center text-slate-400">
+        © {new Date().getFullYear()} CCE M5 Music. Hecho con Astro y Tailwind CSS.
+      </div>
+    </footer>
+  </body>
+</html>
