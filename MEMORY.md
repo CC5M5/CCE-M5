@@ -276,8 +276,57 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 | OpenCode | ✅ Configurado | Kimi-k2.7-code:cloud via Ollama |
 | Context7 MCP | ✅ Instalado | mcporter configurado |
 
+### Fase 3-4: Web + Deploy ✅
+**Estado:** Proyecto web creado y funcionando en build local
+
+**Stack:** Astro 4.x + Tailwind CSS + React islands + better-sqlite3
+
+**Estructura en `web/`:**
+- `package.json`, `astro.config.mjs`, `tailwind.config.mjs`
+- `src/pages/` con todas las rutas del spec 06-web
+- `src/components/` React: BuscadorCanciones, FiltroMomentos, VisorAcordes, FormularioComentarios
+- `src/lib/db.js` - lectura de SQLite en build time
+- `src/layouts/Layout.astro` - layout base con navegación y SEO
+- `src/styles/global.css` - tokens de colores litúrgicos y fuentes
+- `.github/workflows/deploy.yml` - despliegue en GitHub Pages
+
+**Build verificado:**
+```bash
+BASE_PATH=/ SITE_URL=http://localhost npm run build
+# Resultado: 15 páginas generadas, sitemap creado
+```
+
+**Skills de OpenCode instaladas:**
+- `.opencode/skills/` desde `farmage/opencode-skills` (66 skills)
+- Usadas para revisión: `code-reviewer`, `react-expert`, `typescript-pro`
+
+**Correcciones tras revisión con skills:**
+- `comentarios.astro`: etiqueta `</blockquote>` cerrada correctamente
+- `VisorAcordes.jsx`: sanitización robusta con parser DOM + whitelist
+- `FormularioComentarios.jsx`: validación de inputs, maxLength, escape de datos
+
+**Commits de la fase:**
+- `7258866` - Feat: Fase 3-4 - Proyecto web Astro + Tailwind + GitHub Pages
+- `29c26ac` - Fix: Correcciones criticas tras revision OpenCode con skills
+- `f9b0a48` - Chore: Instalar skills de OpenCode (farmage/opencode-skills) para revisiones
+
+### Estado Actual del Proyecto
+
+| Componente | Estado | Notas |
+|-----------|--------|-------|
+| Scraper Blogspot | ✅ Mejorado | Bugs críticos corregidos, usa parser v3 |
+| Scraper Koinonia | ✅ Mejorado | Arquitectura separada, caché, validación |
+| Parser Acordes | ✅ V3 estable | Posicionamiento exacto, tests pasan |
+| Motor Matching | ✅ Mejorado | Scoring 0-1, tokenización robusta |
+| Generador PPTX | ✅ Mejorado | Template real, bugs corregidos |
+| db_manager | ✅ Mejorado | PRAGMAs, migraciones, índices |
+| Web Astro | ✅ Funcionando | Build local OK, 15 páginas generadas |
+| Skills OpenCode | ✅ Instaladas | farmage/opencode-skills en `.opencode/` |
+| OpenCode | ✅ Configurado | Kimi-k2.7-code:cloud via Ollama |
+| Context7 MCP | ✅ Instalado | mcporter configurado |
+
 ### Próximos Pasos Pendientes
-- [ ] Revisar archivos restantes con OpenCode (matching_engine, presentacion_fieles)
-- [ ] Fase 3-4: Web + Deploy (Astro + GitHub Pages)
-- [ ] Fase 5: Integración completa
+- [ ] Fase 5: Integración end-to-end (lecturas → matching → PPTX/PDF → web)
+- [ ] Generador PDF para músicos con acordes
+- [ ] Configurar GitHub Pages en el repositorio remoto
 - [ ] Fase 6: Refinamiento final
