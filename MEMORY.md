@@ -165,7 +165,7 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 
 ### Notas Importantes
 - **Formato PPTX:** Usar SIEMPRE `274 Domingo 21 06 2026.pptx` (16:9), nunca el MASTER (4:3)
-- **Token GitHub:** Usar fine-grained token con permisos `contents:read` y `contents:write`
+- **Token GitHub:** Token clásico (`classic`) con permisos `repo` completos (lectura y escritura de contenidos).
 - **Mission Control:** Ya instalado en http://192.168.68.244:4000/
 - **Posicionamiento de acordes:** Es CRÍTICO para la vista de músicos. Los acordes deben aparecer exactamente encima de la sílaba/letra correspondiente.
 
@@ -180,52 +180,99 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - Mejoras aplicadas: reintentos, validación, logging, manejo seguro de BD
 
 ### Commits Recientes (Sesión 12 Sep 2026)
+- `127ef1d` - Refactor: Corregir db_manager y blogspot_scraper con OpenCode+Context7
+- `60b275f` - Fix: Parser de acordes v3 con posicionamiento exacto y sin falsos positivos
+- `0a35bff` - Refactor: Aplicar correcciones OpenCode+Context7 a matching, PPTX y Koinonia
+- `1d3199d` - Docs: Actualizar MEMORY.md con progreso completo de revisión OpenCode+Context7
 - `1d5031d` - Mejoras aplicadas por OpenCode + Kimi: scraper robusto con reintentos, validación y logging
 - `5fddd97` - Mejoras manuales: koinonia scraper, matching engine, generador PPTX
 - `c235f57` - Fix: Mejoras críticas de seguridad y rendimiento de OpenCode+Context7
 
+### Parser de Acordes V3 (corregido)
+**Archivo:** `src/parsers/acordes_parser_v3.py`
+
+**Correcciones críticas:**
+- Ya no detecta "LA" en "ESCUCHAD LA PALABRA" como acorde
+- Empareja líneas de acordes con la siguiente línea de letra
+- Preserva el texto de la letra sin modificarlo
+- Soporta bemoles, sostenidos dobles, extensiones y slash chords
+- HTML monoespaciado con spans posicionados en `ch`
+- 4 tests incluidos, todos pasan
+
+**Archivos relacionados:**
+- `docs/auditoria_parser_acordes.md` - Informe completo de auditoría
+- `web/cancion_preview.html` - Preview visual
+
 ### Mejoras de Seguridad Aplicadas (OpenCode + Context7)
 
 #### Scraper Blogspot (blogspot_scraper.py)
-- ✅ Eliminado `sys.path.insert` (anti-patrón de seguridad)
-- ✅ Filtrado estricto de dominios (ALLOWED_HOSTS exacto)
-- ✅ Normalización de URLs (quitar fragmentos/query)
-- ✅ User-Agent rotativo
-- ✅ `response.content` en vez de `response.text`
-- ✅ Eliminación de scripts/styles antes de extraer texto
-- ✅ WAL mode para SQLite
-- ✅ Jitter en pausas (1.0-2.5s)
-- ✅ Conexión SQLite persistente
+- ✅ Añadido `import time` (bug crítico)
+- ✅ Validación estricta de scheme `https`
+- ✅ Normalización de URLs (decode, lowercase netloc)
+- ✅ Bug corregido: `cancion.get('titulo_url')` → `cancion.get('url')`
+- ✅ Crea tabla `canciones` si no existe
+- ✅ Manejo de excepciones alrededor del parser
+- ✅ Import del parser al inicio
+- ✅ Context manager `__enter__`/`__exit__`
+- ✅ Conexión SQLite persistente + inserciones en batch (`executemany`)
+- ✅ Límite de tamaño de respuesta (10 MB)
+- ✅ Progreso guardado en `data/scraper_progress.json` para reanudar
+- ✅ Usa `acordes_parser_v3` (posicionamiento correcto)
 
-#### Scraper Koinonia (koinonia_scraper.py)
-- ✅ User-Agent honesto con contacto del proyecto
-- ✅ Validación de fechas con regex (YYYYMMDD)
-- ✅ Caché local TTL 12h
-- ✅ Context manager (`__enter__`/`__exit__`)
-- ✅ Respeto a `Retry-After` header
-- ✅ Manejo de encoding explícito
+#### Gestor de Base de Datos (db_manager.py)
+- ✅ Variable de entorno `CCE_PROJECT_DIR` con fallback
+- ✅ PRAGMAs: `journal_mode=WAL`, `foreign_keys=ON`, `synchronous=NORMAL`, `trusted_schema=OFF`
+- ✅ `PRAGMA integrity_check` al conectar
+- ✅ `create_connection()` con `row_factory=sqlite3.Row`, `timeout=30`, `isolation_level=DEFERRED`
+- ✅ Tabla `schema_version` para migraciones
+- ✅ Índices faltantes en FK y campos de búsqueda
+- ✅ Logging en lugar de print
+- ✅ Carga `data/schema.sql` si existe
 
 #### Motor de Matching (matching_engine.py)
-- ✅ Scoring ponderado por tema
-- ✅ Pesos configurables para cada tema
-- ✅ Conexiones SQLite seguras
-- ✅ Tabla de matches separada
+- ✅ Arquitectura separada: `TextPreprocessor`, `ThemeExtractor`, `ScoreNormalizer`, `MatchRepository`, `MatchingService`
+- ✅ Tokenización con palabras completas (evita "amor" en "amoroso")
+- ✅ Score normalizado al rango [0, 1]
+- ✅ Afinidad momento litúrgico - tema (boost configurable)
+- ✅ Caché de vectores lectura/canción
+- ✅ Validación de inputs
 
 #### Generador PPTX (presentacion_fieles.py)
-- ✅ Validación de datos antes de generar
-- ✅ Manejo de errores específicos
-- ✅ Logging profesional
-- ✅ Conexiones seguras
+- ✅ Carga template real `274 Domingo 21 06 2026.pptx`
+- ✅ Bug corregido: `letra_limpia` ya no usa `texto` por error
+- ✅ Color de fondo configurable con contraste automático de texto
+- ✅ Sanitización de nombres de archivo y texto XML
+- ✅ `sqlite3.Row` para acceso por nombre
+- ✅ Precarga de canciones con un solo query `IN(...)`
+- ✅ Fuente y márgenes consistentes
+- ✅ Manejo de errores específico
+
+#### Scraper Koinonia (koinonia_scraper.py)
+- ✅ Validación regex de fecha `YYYYMMDD`
+- ✅ Separación: `KoinoniaClient`, `KoinoniaParser`, `KoinoniaRepository`
+- ✅ Caché HTTP con `requests-cache` TTL 12h
+- ✅ Selectores CSS con `find_next_sibling`
+- ✅ Cita bíblica extraída con regex del título
+- ✅ Zona horaria `Europe/Madrid`
+- ✅ Validación de lecturas completas
+
+### Scripts de Demo
+- `scripts/demo_blogspot.py` - Demo del scraper de Blogspot
+- `scripts/demo_koinonia.py` - Demo del scraper de Koinonia
+- `scripts/demo_matching.py` - Demo del motor de matching
+- `scripts/init_db.py` - Inicialización de base de datos
+- `src/generators/demo_presentacion.py` - Demo del generador PPTX
 
 ### Estado Actual del Proyecto (Post-revisión OpenCode)
 
 | Componente | Estado | Notas |
 |-----------|--------|-------|
-| Scraper Blogspot | ✅ Mejorado | Seguridad + rendimiento aplicados |
-| Scraper Koinonia | ✅ Mejorado | Parseo CSS, caché, User-Agent |
-| Parser Acordes V2 | ✅ Estable | Posicionamiento funcionando |
-| Motor Matching | ✅ Mejorado | Scoring ponderado |
-| Generador PPTX | ✅ Estable | Formato 16:9 |
+| Scraper Blogspot | ✅ Mejorado | Bugs críticos corregidos, usa parser v3 |
+| Scraper Koinonia | ✅ Mejorado | Arquitectura separada, caché, validación |
+| Parser Acordes V2 | ✅ Reemplazado por V3 | Posicionamiento exacto, tests pasan |
+| Motor Matching | ✅ Mejorado | Scoring 0-1, tokenización robusta |
+| Generador PPTX | ✅ Mejorado | Template real, bugs corregidos |
+| db_manager | ✅ Mejorado | PRAGMAs, migraciones, índices |
 | OpenCode | ✅ Configurado | Kimi-k2.7-code:cloud via Ollama |
 | Context7 MCP | ✅ Instalado | mcporter configurado |
 
