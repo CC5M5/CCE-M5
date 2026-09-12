@@ -1,0 +1,68 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { Music, BookOpen, Heart, Github } from 'lucide-react';
+import '../styles/global.css';
+
+const base = import.meta.env.BASE_PATH || '/';
+---
+
+<Layout 
+  title="Sobre el proyecto" 
+  description="Conoce el cancionero escolapio, los recursos para músicos y cómo contribuir."
+>
+  <section class="container mx-auto px-4 py-10">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="section-title">Sobre CCE M5 Music</h1>
+
+      <div class="card mb-8">
+        <p class="text-lg leading-relaxed text-slate-700 mb-4">
+          CCE M5 Music es el punto central de acceso para la comunidad, músicos y visitantes que desean 
+          consultar el cancionero escolapio y las presentaciones litúrgicas de la Comunidad Cristiana Escolapia M5.
+        </p>
+        <p class="text-slate-600">
+          La web está construida con Astro y Tailwind CSS, generando un sitio estático rápido, accesible y fácil de mantener.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-6 mb-8">
+        <div class="card">
+          <Music className="w-10 h-10 text-liturgia-verde mb-3" />
+          <h2 class="text-xl font-heading font-bold mb-2">Cancionero</h2>
+          <p class="text-slate-600">Listado alfabético completo con búsqueda, filtros por momento litúrgico y visor de acordes.</p>
+        </div>
+        <div class="card">
+          <BookOpen className="w-10 h-10 text-liturgia-verde mb-3" />
+          <h2 class="text-xl font-heading font-bold mb-2">Presentaciones</h2>
+          <p class="text-slate-600">Accede a la presentación semanal, lecturas del día y descargas en PPTX y PDF.</p>
+        </div>
+        <div class="card">
+          <Heart className="w-10 h-10 text-liturgia-verde mb-3" />
+          <h2 class="text-xl font-heading font-bold mb-2">Músicos</h2>
+          <p class="text-slate-600">Hojas con acordes para cada domingo, optimizadas para imprimir o proyectar.</p>
+        </div>
+        <div class="card">
+          <Github className="w-10 h-10 text-liturgia-verde mb-3" />
+          <h2 class="text-xl font-heading font-bold mb-2">Código abierto</h2>
+          <p class="text-slate-600">El proyecto vive en GitHub. Puedes sugerir mejoras o reportar errores desde la web.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="text-xl font-heading font-bold mb-4">Colores litúrgicos</h2>
+        <p class="text-slate-600 mb-4">El sitio utiliza los colores litúrgicos como tokens de diseño:</p>
+        <div class="flex flex-wrap gap-3">
+          <span class="px-3 py-1 rounded-full bg-liturgia-verde text-white text-sm">Verde</span>
+          <span class="px-3 py-1 rounded-full bg-liturgia-morado text-white text-sm">Morado</span>
+          <span class="px-3 py-1 rounded-full bg-liturgia-rosa text-white text-sm">Rosa</span>
+          <span class="px-3 py-1 rounded-full bg-liturgia-rojo text-white text-sm">Rojo</span>
+          <span class="px-3 py-1 rounded-full bg-liturgia-blanco text-slate-800 text-sm border">Blanco</span>
+          <span class="px-3 py-1 rounded-full bg-liturgia-dorado text-slate-900 text-sm">Dorado</span>
+        </div>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href={`${base}comentarios/`} class="btn-primary">Enviar un comentario</a>
+      </div>
+    </div>
+  </section>
+</Layout>
