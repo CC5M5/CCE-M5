@@ -7,6 +7,10 @@ const TIPOS = [
   { id: 'otro', label: '💬 Otro', color: 'bg-slate-100 text-slate-800 border-slate-200' },
 ];
 
+const MAX_MENSAJE = 2000;
+const MAX_NOMBRE = 100;
+const MAX_PRESENTACION = 30;
+
 export default function FormularioComentarios({ basePath = '/' }) {
   const [form, setForm] = useState({ nombre: '', email: '', tipo: 'sugerencia', presentacion: '', mensaje: '' });
   const [loading, setLoading] = useState(false);
@@ -22,16 +26,45 @@ export default function FormularioComentarios({ basePath = '/' }) {
     setForm((f) => ({ ...f, tipo }));
   };
 
+  const escapeMarkdown = (str) => (str || '').replace(/[\r\n]/g, ' ').trim();
+
+  const validateEmail = (email) => {
+    if (!email) return false;
+    // RFC 5322 simplificado, suficiente para front-end
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
     try {
-      const title = `[Comentario] ${TIPOS.find((t) => t.id === form.tipo)?.label.replace(/[^a-zA-Záéíóúñ\s]/g, '').trim()}${form.presentacion ? ` - Domingo ${form.presentacion}` : ''}`;
-      const body = `**Autor**: ${form.nombre || 'Anónimo'}\n**Email**: ${form.email || 'No proporcionado'}\n**Tipo**: ${TIPOS.find((t) => t.id === form.tipo)?.label}\n**Presentación**: ${form.presentacion || 'No especificada'}\n**Mensaje**:\n${form.mensaje}`;
-      
+      const nombre = escapeMarkdown(form.nombre.slice(0, MAX_NOMBRE));
+      const email = form.email.trim().slice(0, 254);
+      const presentacion = escapeMarkdown(form.presentacion.slice(0, MAX_PRESENTACION));
+      const mensaje = form.mensaje.trim().slice(0, MAX_MENSAJE);
+
+      if (!nombre) {
+        throw new Error('Por favor, introduce tu nombre.');
+      }
+      if (!validateEmail(email)) {
+        throw new Error('Por favor, introduce un email válido.');
+      }
+      if (!mensaje) {
+        throw new Error('Por favor, escribe un mensaje.');
+      }
+
+      const tipoLabel = TIPOS.find((t) => t.id === form.tipo)?.label || 'Otro';
+      const title = `[Comentario] ${tipoLabel.replace(/[^a-zA-Z0-9áéíóúñüÁÉÍÓÚÑÜ\s]/g, '').trim()}${presentacion ? ` - Domingo ${presentacion}` : ''}`.slice(0, 256);
+      const body = `**Autor**: ${nombre || 'Anónimo'}\n**Email**: ${email || 'No proporcionado'}\n**Tipo**: ${tipoLabel}\n**Presentación**: ${presentacion || 'No especificada'}\n**Mensaje**:\n${mensaje}`;
+
       const owner = import.meta.env.PUBLIC_GITHUB_REPO_OWNER || 'cce-m5';
       const repo = import.meta.env.PUBLIC_GITHUB_REPO_NAME || 'cce-m5-music';
+      // El token debe viajar desde una variable de entorno PÚBLICA porque este es un sitio
+      // estático que se ejecuta en el navegador. Para evitar exposición permanente, la app
+      // puede apuntar a un proxy/edge function en el futuro. Hasta entonces, usamos la
+      // variable pública documentada en la spec.
       const token = import.meta.env.PUBLIC_GITHUB_TOKEN;
 
       if (!token) {
@@ -79,7 +112,7 @@ export default function FormularioComentarios({ basePath = '/' }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card space-y-5">
+    <form onSubmit={handleSubmit} className="card space-y-5" noValidate>
       <div>
         <label htmlFor="nombre" className="block text-sm font-medium text-slate-700 mb-1">Tu nombre</label>
         <input
@@ -89,6 +122,7 @@ export default function FormularioComentarios({ basePath = '/' }) {
           value={form.nombre}
           onChange={handleChange}
           required
+          maxLength={MAX_NOMBRE}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-liturgia-verde focus:border-transparent"
           placeholder="María García"
         />
@@ -103,6 +137,7 @@ export default function FormularioComentarios({ basePath = '/' }) {
           value={form.email}
           onChange={handleChange}
           required
+          maxLength={254}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-liturgia-verde focus:border-transparent"
           placeholder="maria@email.com"
         />
@@ -137,6 +172,7 @@ export default function FormularioComentarios({ basePath = '/' }) {
           type="text"
           value={form.presentacion}
           onChange={handleChange}
+          maxLength={MAX_PRESENTACION}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-liturgia-verde focus:border-transparent"
           placeholder="2026-09-13"
         />
@@ -151,13 +187,15 @@ export default function FormularioComentarios({ basePath = '/' }) {
           onChange={handleChange}
           required
           rows={5}
+          maxLength={MAX_MENSAJE}
           className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-liturgia-verde focus:border-transparent"
           placeholder="Escribe aquí tu sugerencia o corrección..."
         />
+        <p className="text-xs text-slate-500 mt-1" aria-live="polite">{form.mensaje.length}/{MAX_MENSAJE}</p>
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg bg-red-50 text-red-800 text-sm">{error}</div>
+        <div className="p-3 rounded-lg bg-red-50 text-red-800 text-sm" role="alert">{error}</div>
       )}
 
       <button
