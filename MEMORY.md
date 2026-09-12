@@ -310,6 +310,37 @@ BASE_PATH=/ SITE_URL=http://localhost npm run build
 - `29c26ac` - Fix: Correcciones criticas tras revision OpenCode con skills
 - `f9b0a48` - Chore: Instalar skills de OpenCode (farmage/opencode-skills) para revisiones
 
+### Servidor Web Local Permanente ✅
+**Estado:** Servicio systemd `cce-m5-web.service` instalado y funcionando
+
+**IP del servidor:** `192.168.68.244`
+**Puerto:** `4321`
+**URL de acceso desde la red local:** http://192.168.68.244:4321/
+
+**Características del servicio:**
+- Se inicia automáticamente al arrancar el PC
+- Reconstruye la web con `npm run build` antes de servir
+- Sirve desde `web/dist/` en `0.0.0.0:4321`
+- Se reinicia automáticamente si falla
+
+**Comando de instalación usado:**
+```bash
+sudo bash /tmp/install_cce_m5_web_service.sh
+```
+
+**Archivos del servicio:**
+- `/etc/systemd/system/cce-m5-web.service`
+- `/tmp/install_cce_m5_web_service.sh`
+- `/tmp/cce-m5-web.service`
+
+**Comandos útiles:**
+```bash
+sudo systemctl status cce-m5-web.service   # Ver estado
+sudo systemctl restart cce-m5-web.service  # Reiniciar
+sudo systemctl stop cce-m5-web.service     # Detener
+sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
+```
+
 ### Estado Actual del Proyecto
 
 | Componente | Estado | Notas |
@@ -321,6 +352,7 @@ BASE_PATH=/ SITE_URL=http://localhost npm run build
 | Generador PPTX | ✅ Mejorado | Template real, bugs corregidos |
 | db_manager | ✅ Mejorado | PRAGMAs, migraciones, índices |
 | Web Astro | ✅ Funcionando | Build local OK, 15 páginas generadas |
+| Servidor web local | ✅ Permanente | systemd, accesible en red local |
 | Skills OpenCode | ✅ Instaladas | farmage/opencode-skills en `.opencode/` |
 | OpenCode | ✅ Configurado | Kimi-k2.7-code:cloud via Ollama |
 | Context7 MCP | ✅ Instalado | mcporter configurado |
