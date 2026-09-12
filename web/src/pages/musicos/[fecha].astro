@@ -1,0 +1,130 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getAllPresentacionesFechas, getPresentacionByFecha, getCancionesPresentacion } from '@lib/db.js';
+import VisorAcordes from '@components/VisorAcordes.jsx';
+import { Printer, Download, Share2, Music } from 'lucide-react';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const fechas = getAllPresentacionesFechas();
+  if (fechas.length === 0) {
+    return [{ params: { fecha: 'proxima' } }];
+  }
+  return fechas.map(fecha => ({ params: { fecha } }));
+}
+
+const { fecha } = Astro.params;
+const base = import.meta.env.BASE_PATH || '/';
+const presentacion = fecha === 'proxima' ? null : getPresentacionByFecha(fecha);
+const canciones = fecha === 'proxima' ? [] : getCancionesPresentacion(fecha);
+
+if (!presentacion) {
+  return Astro.redirect(`${base}`);
+}
+
+const momentosOrden = [
+  'entrada', 'acto penitencial', 'gloria', 'salmo', 'aleluya', 'evangelio',
+  'credo', 'paz', 'comunion', 'comunión', 'accion de gracias', 'despedida'
+];
+const cancionesOrdenadas = [...canciones].sort((a, b) => {
+  const ia = momentosOrden.indexOf((a.momento_liturgico || '').toLowerCase());
+  const ib = momentosOrden.indexOf((b.momento_liturgico || '').toLowerCase());
+  return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
+});
+
+const colorLiturgico = presentacion?.color_liturgico || 'verde';
+---
+
+<Layout 
+  title={`Hoja de músicos · ${presentacion.domingo || fecha}`} 
+  description={`Hoja de músicos para el ${presentacion.domingo || fecha}. Acordes y selección musical.`}
+  colorLiturgico={colorLiturgico}
+  canonical={`musicos/${fecha}/`}
+>
+  <section class="container mx-auto px-4 py-10">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center gap-3 mb-2">
+        <Music className="w-8 h-8" class:list={{'text-liturgia-verde': colorLiturgico === 'verde', 'text-liturgia-morado': colorLiturgico === 'morado', 'text-liturgia-rosa': colorLiturgico === 'rosa', 'text-liturgia-rojo': colorLiturgico === 'rojo', 'text-slate-600': colorLiturgico === 'blanco', 'text-liturgia-dorado': colorLiturgico === 'dorado'}} />
+        <h1 class="section-title mb-0">Hoja de Músicos</h1>
+      </div>
+
+      <p class="text-lg text-slate-600 mb-6 font-body">
+        {presentacion.domingo ? `${presentacion.domingo} — ` : ''}
+        {new Date(fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+      </p>
+
+      <div class="flex flex-wrap gap-3 mb-6 no-print">
+        <button type="button" onclick="window.print()" class="btn-primary">
+          <Printer className="w-4 h-4" /> Imprimir
+        </button>
+        {presentacion.ruta_pdf_musicos && (
+          <a href={presentacion.ruta_pdf_musicos.replace(/^.*presentaciones\//, '/presentaciones/')} class="btn-secondary">
+            <Download className="w-4 h-4" /> Descargar PDF
+          </a>
+        )}
+        <button 
+          type="button" 
+          class="btn-secondary" 
+          data-share
+          data-title={`Hoja de músicos ${presentacion.domingo || fecha}`}
+          data-url={`${base}musicos/${fecha}/`}
+        >
+          <Share2 className="w-4 h-4" /> Compartir
+        </button>
+      </div>
+
+      {cancionesOrdenadas.length > 0 ? (
+        <div class="space-y-10">
+          {cancionesOrdenadas.map((c, i) => (
+            <article key={c.id} class="card print:shadow-none print:border-0 print:p-0">
+              <h2 class="text-xl font-heading font-bold mb-1 flex items-center gap-2">
+                <span class="text-liturgia-verdo">{i + 1}.</span>
+                <span class="uppercase text-sm text-slate-500">{c.momento_liturgico || 'Canto'}</span>
+                <span class="mx-2">—</span>
+                <span>{c.titulo}</span>
+                {c.tono && <span class="text-sm text-slate-500 font-normal ml-2">({c.tono})</span>}
+              </h2>
+              <VisorAcordes client:visible htmlVisual={c.html_visual || ''} titulo={c.titulo} compact={true} />
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="card">
+          <p class="text-slate-600">No hay canciones asignadas a esta presentación.</p>
+        </div>
+      )}
+
+      {presentacion.evento_especial && (
+        <div class="card mt-8">
+          <h3 class="font-heading font-bold mb-2">📝 Notas</h3>
+          <p class="text-slate-700">{presentacion.evento_especial}</p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <script define:vars={{ base }}>
+    document.querySelectorAll('[data-share]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const url = new URL(btn.dataset.url || '', window.location.origin).toString();
+        const title = btn.dataset.title || document.title;
+        if (navigator.share) {
+          try { await navigator.share({ title, url }); } catch {}
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(url);
+          const original = btn.textContent;
+          btn.textContent = '¡Copiado!';
+          setTimeout(() => btn.textContent = original, 1500);
+        }
+      });
+    });
+  </script>
+
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      header, footer { display: none !important; }
+      .card { box-shadow: none; border: none; padding: 0; margin-bottom: 1.5rem; break-inside: avoid; }
+    }
+  </style>
+</Layout>

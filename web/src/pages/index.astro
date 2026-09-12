@@ -1,0 +1,176 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { 
+  getLatestPresentacion, 
+  getCancionesPresentacion, 
+  getRecentPresentaciones,
+  getLatestPresentacionFecha,
+} from '@lib/db.js';
+import '../styles/global.css';
+
+const base = import.meta.env.BASE_PATH || '/';
+
+let presentacion = getLatestPresentacion();
+let canciones = [];
+let semanas = [];
+let latestFecha = getLatestPresentacionFecha();
+
+if (presentacion) {
+  canciones = getCancionesPresentacion(presentacion.fecha_domingo);
+}
+semanas = getRecentPresentaciones(6);
+
+const colorLiturgico = presentacion?.color_liturgico || 'verde';
+const domingo = presentacion?.domingo || 'Presentación semanal';
+const fecha = presentacion?.fecha_domingo || '';
+
+const lecturas = [
+  { label: 'Primera lectura', cita: presentacion?.primera_lectura_cita },
+  { label: 'Salmo', cita: presentacion?.salmo_cita, antifona: presentacion?.salmo_antifona },
+  { label: 'Segunda lectura', cita: presentacion?.segunda_lectura_cita },
+  { label: 'Evangelio', cita: presentacion?.evangelio_cita },
+].filter(l => l.cita);
+
+const momentosOrden = [
+  'entrada', 'acto penitencial', 'gloria', 'salmo', 'aleluya', 'evangelio',
+  'credo', 'paz', 'comunion', 'comunión', 'accion de gracias', 'despedida'
+];
+const cancionesOrdenadas = [...canciones].sort((a, b) => {
+  const ia = momentosOrden.indexOf((a.momento_liturgico || '').toLowerCase());
+  const ib = momentosOrden.indexOf((b.momento_liturgico || '').toLowerCase());
+  return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
+});
+---
+
+<Layout 
+  title="Inicio" 
+  description="Presentaciones semanales, cancionero escolapio y recursos para músicos de la Comunidad Cristiana Escolapia M5."
+  colorLiturgico={colorLiturgico}
+>
+  <section class={`py-12 md:py-20 text-white relative overflow-hidden bg-liturgia-${colorLiturgico}`} 
+    class:list={{
+      'bg-liturgia-verde': colorLiturgico === 'verde',
+      'bg-liturgia-morado': colorLiturgico === 'morado',
+      'bg-liturgia-rosa': colorLiturgico === 'rosa',
+      'bg-liturgia-rojo': colorLiturgico === 'rojo',
+      'bg-slate-100 text-slate-800': colorLiturgico === 'blanco',
+      'bg-liturgia-dorado text-slate-900': colorLiturgico === 'dorado',
+    }}
+  >
+    <div class="container mx-auto px-4 relative z-10">
+      <div class="max-w-3xl mx-auto text-center">
+        <p class="text-sm md:text-base uppercase tracking-wider opacity-90 mb-2">{presentacion?.temporada || 'Tiempo Ordinario'}</p>
+        <h1 class="text-3xl md:text-5xl font-heading font-extrabold mb-4 leading-tight">{domingo}</h1>
+        <p class="text-xl md:text-2xl font-body mb-8 opacity-95">{fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : ''}</p>
+        
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          {presentacion ? (
+            <>
+              <a href={`${base}presentacion/${fecha}/`} class="btn bg-white/20 hover:bg-white/30 text-white border border-white/30">
+                ▶️ Ver presentación
+              </a>
+              {presentacion.ruta_pptx && (
+                <a href={presentacion.ruta_pptx.replace(/^.*presentaciones\//, '/presentaciones/')} class="btn bg-white text-slate-900 hover:bg-slate-100">
+                  ⬇️ Descargar PPTX
+                </a>
+              )}
+              {presentacion.ruta_pdf_fieles && (
+                <a href={presentacion.ruta_pdf_fieles.replace(/^.*presentaciones\//, '/presentaciones/')} class="btn bg-white text-slate-900 hover:bg-slate-100">
+                  ⬇️ Descargar PDF
+                </a>
+              )}
+              <a href={`${base}musicos/${fecha}/`} class="btn bg-white/20 hover:bg-white/30 text-white border border-white/30">
+                🎵 Hoja músicos
+              </a>
+            </>
+          ) : (
+            <div class="card text-slate-700">
+              <p>Aún no hay una presentación publicada para esta semana.</p>
+              <a href={`${base}cancionero/`} class="btn-primary mt-4">Explorar el cancionero</a>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {presentacion && (
+    <div class="container mx-auto px-4 py-10 grid lg:grid-cols-3 gap-8">
+      <section class="lg:col-span-2 space-y-8">
+        <div class="card">
+          <h2 class="section-title flex items-center gap-2">
+            <span>📖</span> Lecturas del día
+          </h2>
+          <ul class="space-y-3">
+            {lecturas.map(l => (
+              <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 border-b border-slate-100 pb-3 last:border-0">
+                <span class="text-sm font-semibold text-liturgia-verde min-w-[8rem]">{l.label}:</span>
+                <span class="font-body">{l.cita}{l.antifona ? ` — "${l.antifona}"` : ''}</span>
+              </li>
+            ))}
+          </ul>
+          {fecha && (
+            <a href={`${base}lecturas/${fecha}/`} class="inline-flex items-center gap-1 text-liturgia-verde hover:underline mt-4 font-medium">
+              Ver lecturas completas →
+            </a>
+          )}
+        </div>
+
+        <div class="card">
+          <h2 class="section-title flex items-center gap-2">
+            <span>🎶</span> Selección musical
+          </h2>
+          {cancionesOrdenadas.length > 0 ? (
+            <ul class="space-y-3">
+              {cancionesOrdenadas.map(c => (
+                <li class="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0">
+                  <div>
+                    <span class="text-sm uppercase tracking-wide text-slate-500 block">{c.momento_liturgico || 'Canto'}</span>
+                    <a href={`${base}cancionero/${encodeURIComponent(c.titulo.toLowerCase().replace(/\s+/g, '-'))}/`} class="font-heading font-semibold text-lg hover:text-liturgia-verde">
+                      {c.titulo}
+                    </a>
+                  </div>
+                  <span class="text-sm text-slate-500">{c.tono || ''}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="text-slate-600">No hay canciones asignadas a esta presentación.</p>
+          )}
+          {latestFecha && (
+            <a href={`${base}musicos/${latestFecha}/`} class="inline-flex items-center gap-1 text-liturgia-verde hover:underline mt-4 font-medium">
+              Ver hoja completa de músicos →
+            </a>
+          )}
+        </div>
+      </section>
+
+      <aside class="space-y-6">
+        <div class="card">
+          <h3 class="text-lg font-heading font-bold mb-4">📅 Semanas anteriores</h3>
+          {semanas.length > 0 ? (
+            <div class="flex flex-wrap gap-2">
+              {semanas.map(s => (
+                <a 
+                  href={`${base}presentacion/${s.fecha_domingo}/`} 
+                  class="btn-secondary text-sm"
+                  title={s.domingo}
+                >
+                  {new Date(s.fecha_domingo + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p class="text-sm text-slate-600">No hay presentaciones anteriores.</p>
+          )}
+        </div>
+
+        <div class="card">
+          <h3 class="text-lg font-heading font-bold mb-2">💬 Comentarios</h3>
+          <p class="text-sm text-slate-600 mb-4">¿Tienes una sugerencia musical o has visto un error? Cuéntanos.</p>
+          <a href={`${base}comentarios/`} class="btn-primary w-full">Dejar comentario</a>
+        </div>
+      </aside>
+    </div>
+  )}
+</Layout>

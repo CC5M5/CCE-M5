@@ -1,0 +1,140 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getCancionBySlug, getAllCancionesSlugs } from '@lib/db.js';
+import VisorAcordes from '@components/VisorAcordes.jsx';
+import { Play, ExternalLink, Printer, Share2, Music } from 'lucide-react';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const slugs = getAllCancionesSlugs();
+  return slugs.map(({ id, slug }) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const base = import.meta.env.BASE_PATH || '/';
+const cancion = getCancionBySlug(slug);
+
+if (!cancion) {
+  return Astro.redirect(`${base}404`);
+}
+
+function slugify(text) {
+  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '').replace(/\-+/g, '-');
+}
+
+const cancionSlug = slugify(cancion.titulo);
+---
+
+<Layout 
+  title={cancion.titulo} 
+  description={`Letra y acordes de "${cancion.titulo}". Momento: ${cancion.momento_liturgico || 'varios'}. Tono: ${cancion.tono || '-'}.`}
+  canonical={`cancionero/${cancionSlug}/`}
+>
+  <section class="container mx-auto px-4 py-10">
+    <div class="max-w-3xl mx-auto">
+      <nav aria-label="Migas de pan" class="text-sm text-slate-500 mb-4">
+        <a href={`${base}`} class="hover:text-liturgia-verde">Inicio</a>
+        <span class="mx-2">/</span>
+        <a href={`${base}cancionero/`} class="hover:text-liturgia-verde">Cancionero</a>
+        <span class="mx-2">/</span>
+        <span class="text-slate-800" aria-current="page">{cancion.titulo}</span>
+      </nav>
+
+      <div class="flex items-start gap-3 mb-2">
+        <Music className="w-8 h-8 text-liturgia-verde mt-1" />
+        <h1 class="section-title mb-0">{cancion.titulo}</h1>
+      </div>
+      <hr class="border-slate-200 mb-6" />
+
+      <div class="flex flex-wrap gap-4 mb-6 text-sm">
+        {cancion.momento_liturgico && (
+          <div>
+            <span class="text-slate-500">Momento:</span>{' '}
+            <span class="font-medium">{cancion.momento_liturgico}</span>
+          </div>
+        )}
+        {cancion.tono && (
+          <div>
+            <span class="text-slate-500">Tono:</span>{' '}
+            <span class="font-medium">{cancion.tono}</span>
+          </div>
+        )}
+      </div>
+
+      {(cancion.temas || cancion.referencias_biblicas) && (
+        <div class="bg-slate-50 rounded-lg p-4 mb-6 text-sm space-y-2">
+          {cancion.temas && (
+            <div>
+              <span class="font-semibold text-slate-700">Temas:</span>{' '}
+              <span class="text-slate-600">{cancion.temas}</span>
+            </div>
+          )}
+          {cancion.referencias_biblicas && (
+            <div>
+              <span class="font-semibold text-slate-700">Referencias:</span>{' '}
+              <span class="text-slate-600">{cancion.referencias_biblicas}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div class="flex flex-wrap gap-3 mb-6">
+        {cancion.enlace_audio && (
+          <a href={cancion.enlace_audio} target="_blank" rel="noopener noreferrer" class="btn-secondary text-sm">
+            <Play className="w-4 h-4" /> Escuchar
+          </a>
+        )}
+        {cancion.enlace_alt && (
+          <a href={cancion.enlace_alt} target="_blank" rel="noopener noreferrer" class="btn-secondary text-sm">
+            <ExternalLink className="w-4 h-4" /> Versión alternativa
+          </a>
+        )}
+      </div>
+
+      <VisorAcordes client:load 
+        htmlVisual={cancion.html_visual || ''} 
+        titulo={cancion.titulo}
+        slug={cancionSlug}
+      />
+
+      <div class="mt-8 flex flex-wrap gap-3 no-print">
+        <button type="button" onclick="window.print()" class="btn-secondary">
+          <Printer className="w-4 h-4" /> Imprimir
+        </button>
+        <button 
+          type="button" 
+          class="btn-secondary" 
+          data-share
+          data-title={cancion.titulo}
+          data-url={`${base}cancionero/${cancionSlug}/`}
+        >
+          <Share2 className="w-4 h-4" /> Compartir
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script define:vars={{ base }}>
+    document.querySelectorAll('[data-share]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const url = new URL(btn.dataset.url || '', window.location.origin).toString();
+        const title = btn.dataset.title || document.title;
+        if (navigator.share) {
+          try { await navigator.share({ title, url }); } catch {}
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(url);
+          const original = btn.textContent;
+          btn.textContent = '¡Copiado!';
+          setTimeout(() => btn.textContent = original, 1500);
+        }
+      });
+    });
+  </script>
+
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      header, footer { display: none !important; }
+    }
+  </style>
+</Layout>
