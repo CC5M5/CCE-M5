@@ -261,6 +261,9 @@ def proponer_canciones_matching(
 ) -> Dict[str, int]:
     """
     Usa src.matching_engine para proponer canciones para cada momento.
+    
+    Si hay menos de 20 canciones en la base de datos, usa DEFAULT_ASIGNACION
+    directamente para evitar que todas las canciones sean la misma.
 
     Args:
         lectura_id: id de la lectura en la tabla lecturas.
@@ -269,6 +272,20 @@ def proponer_canciones_matching(
     Returns:
         Diccionario {momento_key: cancion_id} con una canción por momento.
     """
+    import sqlite3
+    
+    # Verificar cuántas canciones hay en la BD
+    conn = sqlite3.connect(str(DB_PATH))
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM canciones WHERE titulo IS NOT NULL AND titulo != ''")
+    count = cursor.fetchone()[0]
+    conn.close()
+    
+    # Si hay pocas canciones, usar DEFAULT_ASIGNACION directamente
+    if count < 20:
+        logger.info("Solo %s canciones en BD. Usando DEFAULT_ASIGNACION.", count)
+        return dict(DEFAULT_ASIGNACION)
+    
     from src.matching_engine import MatchingEngine
 
     engine = MatchingEngine(str(DB_PATH))
@@ -392,7 +409,7 @@ def generar_pptx(
     try:
         from src.generators.presentacion_master import GeneradorPPTXMaster
 
-        gen = GeneradorPPTX(
+        gen = GeneradorPPTXMaster(
             db_path=str(DB_PATH),
             template_path=str(TEMPLATE_PATH),
             output_dir=str(OUTPUT_DIR),
