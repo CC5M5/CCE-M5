@@ -99,6 +99,7 @@ def _create_default_schema(conn: sqlite3.Connection) -> None:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 fecha DATE NOT NULL,
                 domingo TEXT NOT NULL,
+                celebracion TEXT,
                 temporada TEXT NOT NULL,
                 ciclo TEXT,
                 color_liturgico TEXT NOT NULL,
@@ -117,6 +118,9 @@ def _create_default_schema(conn: sqlite3.Connection) -> None:
             )
             """
         )
+
+        # Migración: añadir celebracion si la tabla ya existía sin ella.
+        _add_column_if_missing(conn, "lecturas", "celebracion", "TEXT")
 
         # Canciones del cancionero
         conn.execute(
@@ -200,6 +204,22 @@ def _create_default_indexes(conn: sqlite3.Connection) -> None:
         conn.execute("CREATE INDEX IF NOT EXISTS idx_presentaciones_lectura ON presentaciones(lectura_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_comentarios_presentacion ON comentarios(presentacion_id)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_automation_log_agente_fecha ON automation_log(agente, fecha)")
+
+
+def _add_column_if_missing(
+    conn: sqlite3.Connection,
+    tabla: str,
+    columna: str,
+    tipo: str,
+) -> None:
+    """Añade una columna a una tabla si no existe (migración ligera)."""
+    cols = {
+        row["name"]
+        for row in conn.execute(f"PRAGMA table_info({tabla})").fetchall()
+    }
+    if columna not in cols:
+        conn.execute(f"ALTER TABLE {tabla} ADD COLUMN {columna} {tipo}")
+        logger.info("Migración: añadida columna %s a %s", columna, tabla)
 
 
 def get_connection() -> sqlite3.Connection:
