@@ -140,6 +140,18 @@ def obtener_lecturas(
     except Exception as exc:
         logger.warning("Error al consultar Koinonia para %s: %s", fecha_domingo, exc)
 
+    # Fallback a Ciudad Redonda
+    try:
+        from src.scrapers.ciudadredonda_scraper import obtener_lecturas_ciudadredonda
+        
+        lecturas_cr = obtener_lecturas_ciudadredonda(fecha_domingo)
+        if lecturas_cr:
+            logger.info("Lecturas de Ciudad Redonda obtenidas para %s", fecha_domingo)
+            return lecturas_cr
+        logger.warning("Ciudad Redonda no devolvió datos para %s; se usará mock", fecha_domingo)
+    except Exception as exc_cr:
+        logger.warning("Error al consultar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr)
+
     # Fallback a mock (persistimos en BD para permitir matching posterior)
     try:
         from src.scrapers.koinonia_mock import generar_mock_aleatorio
