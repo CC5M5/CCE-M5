@@ -7,6 +7,7 @@ Formato 16:9 basado en 274 Domingo 21 06 2026.pptx
 import os
 import logging
 import re
+import copy
 import sqlite3
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
@@ -121,7 +122,18 @@ class GeneradorPPTX:
             )
 
         self.prs = Presentation(str(self.template_path))
+        self._limpiar_slides_existentes()
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def _limpiar_slides_existentes(self) -> None:
+        """Elimina todas las slides existentes de la plantilla, dejando solo layouts."""
+        # python-pptx no expone remove_slide en la API pública,
+        # pero podemos acceder al XML subyacente.
+        slide_ids = list(self.prs.slides._sldIdLst)
+        for sldId in slide_ids:
+            self.prs.part.drop_rel(sldId.rId)
+            self.prs.slides._sldIdLst.remove(sldId)
+        logger.info("Plantilla limpiada: %s slides eliminadas", len(slide_ids))
 
     def _get_connection(self) -> sqlite3.Connection:
         """Obtiene conexión a la base de datos con filas accesibles por nombre."""
@@ -173,6 +185,26 @@ class GeneradorPPTX:
         p.alignment = PP_ALIGN.RIGHT
         p.text = LEMA_CURSO
 
+    def _crear_logo_lema(self, slide) -> None:
+        """Añade el logo del lema en la esquina inferior izquierda de la diapositiva."""
+        from pptx.enum.shapes import MSO_SHAPE
+        # Usar la imagen del lema desde la plantilla (image2.jpeg)
+        # Como la imagen ya está en la plantilla, la referenciamos
+        # Para simplificar, usamos un textbox con el lema como fallback
+        # hasta que implementemos la imagen completa
+        textbox = slide.shapes.add_textbox(
+            Inches(0.3), Inches(6.85), Inches(2.0), Inches(0.4)
+        )
+        tf = textbox.text_frame
+        tf.word_wrap = False
+        p = tf.paragraphs[0]
+        p.font.name = FUENTE_PRINCIPAL
+        p.font.size = Pt(12)
+        p.font.bold = True
+        p.font.color.rgb = RGBColor(0xE6, 0x1B, 0x23)  # Rojo escolapio
+        p.alignment = PP_ALIGN.LEFT
+        p.text = LEMA_CURSO
+
     def _color_fondo(self, color_fondo: str) -> RGBColor:
         """Resuelve el color de fondo a partir de su nombre."""
         return COLORES_LITURGICOS.get(color_fondo, COLORES_LITURGICOS["verde"])
@@ -221,6 +253,7 @@ class GeneradorPPTX:
         )
 
         self._crear_footer_lema(slide)
+        self._crear_logo_lema(slide)
         return slide
 
     def crear_diapositiva_lectura(
@@ -284,6 +317,7 @@ class GeneradorPPTX:
         )
 
         self._crear_footer_lema(slide)
+        self._crear_logo_lema(slide)
         return slide
 
     def crear_diapositiva_cancion(
@@ -360,6 +394,7 @@ class GeneradorPPTX:
         )
 
         self._crear_footer_lema(slide)
+        self._crear_logo_lema(slide)
         return slide
 
     def _precargar_canciones(
