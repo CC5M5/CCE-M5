@@ -448,6 +448,13 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 - Soporte para alteraciones (#, b) y extensiones (m, 7, maj7, sus4, dim, aug, add9, slash chords)
 - El componente sigue siendo puro Astro (sin React) para evitar problemas de hidratación
 
+
+13. **Lema del curso en presentaciones** — Añadido `LEMA_CURSO = "Somos uno"` en `src/generators/presentacion_fieles.py`; método `_crear_footer_lema` añade el lema en la parte inferior de cada diapositiva generada (portada, lecturas, canciones). URL de referencia: `https://escolappios.es/somos-uno-lema-del-curso-26-27/`
+14. **Título limpio de Ciudad Redonda** — El scraper elimina el prefijo "Evangelio y Lecturas de" al guardar `celebracion`, dejando solo "XXV Domingo del Tiempo Ordinario".
+15. **Presentación 2026-09-20 regenerada** — PPTX y PDF de músicos actualizados con lema correcto y lecturas de Ciudad Redonda (Is 55,6-9; Sal 144; Fil 1,20c-24.27a; Mt 20,1-16). Portada: "Evangelio y Lecturas de XXV Domingo del Tiempo Ordinario".
+
+**Nota técnica:** La plantilla PPTX base (`data/templates/274_Domingo_21_06_2026.pptx`) contiene 109 diapositivas preexistentes del cancionero. El generador añade diapositivas al final, resultando en ~126 slides. Para futuro, considerar usar una plantilla vacía o limpiar la base antes de generar.
+
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
