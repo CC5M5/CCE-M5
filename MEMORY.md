@@ -455,6 +455,19 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 
 **Nota técnica:** La plantilla PPTX base (`data/templates/274_Domingo_21_06_2026.pptx`) contiene 109 diapositivas preexistentes del cancionero. El generador añade diapositivas al final, resultando en ~126 slides. Para futuro, considerar usar una plantilla vacía o limpiar la base antes de generar.
 
+
+16. **Plantilla PPTX limpia** — El generador ahora elimina todas las slides existentes de la plantilla antes de generar (`_limpiar_slides_existentes`). La presentación del 20 de septiembre tiene 17 slides en vez de 126.
+17. **Imagen del lema en plantilla** — `image2.jpeg` en la plantilla reemplazada por el logo "Somos uno" (rojo, cruz + texto). Descargado desde `https://www.escolapiosbetania.org/Catalogo/Item/1984_Item/somos-uno-lema-del-curso-26-27.jpg`.
+18. **Logo del lema en diapositivas** — Método `_crear_logo_lema` añade el texto del lema en la esquina inferior izquierda (rojo escolapio). Para futuro: implementar como imagen real usando `slide.shapes.add_picture()`.
+
+**Nota para cambio anual de lema:**
+Para cambiar el lema en años futivos (ej. 2027-28):
+1. Reemplazar `LEMA_CURSO` en `src/generators/presentacion_fieles.py`
+2. Reemplazar `image2.jpeg` en `data/templates/274_Domingo_21_06_2026.pptx` con la nueva imagen
+3. Opcionalmente, actualizar `URL_LEMA_CURSO` con el enlace del nuevo lema
+
+**Pendiente:** Implementar `_crear_logo_lema` como imagen real (add_picture) en lugar de texto plano.
+
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
