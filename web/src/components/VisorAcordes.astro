@@ -1,5 +1,5 @@
 ---
-import { Eye, EyeOff, Play, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Play, ArrowLeft, Plus, Minus, RotateCcw } from 'lucide-react';
 
 interface Props {
   htmlVisual: string;
@@ -24,51 +24,91 @@ htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:
 
 <div class={`bg-white rounded-xl border border-slate-200 ${compact ? 'p-4' : 'p-6 md:p-8'} font-mono leading-relaxed`}>
   {!compact && (
-    <div class="flex flex-wrap items-center gap-3 mb-4 no-print">
-      <button
-        type="button"
-        data-toggle-acordes
-        class="btn-secondary text-sm inline-flex items-center gap-2"
-        aria-pressed="true"
-      >
-        <span data-icon="on"><EyeOff class="w-4 h-4" /></span>
-        <span data-icon="off" class="hidden"><Eye class="w-4 h-4" /></span>
-        <span data-text="on">Sin acordes</span>
-        <span data-text="off" class="hidden">Con acordes</span>
-      </button>
-
-      {tono && (
-        <span data-tono class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
-          Tono: {tono}
-        </span>
-      )}
-
-      {enlaceAudio ? (
-        <a
-          href={enlaceAudio}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn-secondary text-sm inline-flex items-center gap-2"
-        >
-          <Play class="w-4 h-4" /> Escuchar
-        </a>
-      ) : (
+    <div class="no-print mb-4">
+      {/* Fila 1: Toggle, Audio, Volver */}
+      <div class="flex flex-wrap items-center gap-3 mb-3">
         <button
           type="button"
-          disabled
-          class="btn-secondary text-sm opacity-50 cursor-not-allowed inline-flex items-center gap-2"
-          title="Audio no disponible"
+          data-toggle-acordes
+          class="btn-secondary text-sm inline-flex items-center gap-2"
+          aria-pressed="true"
         >
-          <Play class="w-4 h-4" /> Audio no disponible
+          <span data-icon="on"><EyeOff class="w-4 h-4" /></span>
+          <span data-icon="off" class="hidden"><Eye class="w-4 h-4" /></span>
+          <span data-text="on">Sin acordes</span>
+          <span data-text="off" class="hidden">Con acordes</span>
         </button>
-      )}
 
-      <a
-        href="/cancionero/"
-        class="btn-secondary text-sm inline-flex items-center gap-2"
-      >
-        <ArrowLeft class="w-4 h-4" /> Volver al cancionero
-      </a>
+        {enlaceAudio ? (
+          <a
+            href={enlaceAudio}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-secondary text-sm inline-flex items-center gap-2"
+          >
+            <Play class="w-4 h-4" /> Escuchar
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            class="btn-secondary text-sm opacity-50 cursor-not-allowed inline-flex items-center gap-2"
+            title="Audio no disponible"
+          >
+            <Play class="w-4 h-4" /> Audio no disponible
+          </button>
+        )}
+
+        <a
+          href="/cancionero/"
+          class="btn-secondary text-sm inline-flex items-center gap-2"
+        >
+          <ArrowLeft class="w-4 h-4" /> Volver al cancionero
+        </a>
+      </div>
+
+      {/* Fila 2: Tono, Transposición, Original */}
+      {tono && (
+        <div class="flex flex-wrap items-center gap-3">
+          <span
+            data-tono
+            data-tono-original={tono}
+            class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium"
+          >
+            Tono: <span data-tono-valor>{tono}</span>
+          </span>
+
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              data-transpose="down"
+              class="btn-secondary text-sm inline-flex items-center justify-center w-8 h-8 p-0"
+              title="Bajar medio tono"
+              aria-label="Bajar medio tono"
+            >
+              <Minus class="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              data-transpose="up"
+              class="btn-secondary text-sm inline-flex items-center justify-center w-8 h-8 p-0"
+              title="Subir medio tono"
+              aria-label="Subir medio tono"
+            >
+              <Plus class="w-4 h-4" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            data-transpose="reset"
+            class="btn-secondary text-sm inline-flex items-center gap-1"
+            title="Volver al tono original"
+          >
+            <RotateCcw class="w-3 h-3" /> Original
+          </button>
+        </div>
+      )}
     </div>
   )}
 
@@ -80,16 +120,22 @@ htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:
   />
 </div>
 
-<script define:vars={{ slug }}>
+<script define:vars={{ slug, tono }}>
   (function() {
     const container = document.getElementById('visor-acordes-' + slug);
-    const btn = document.querySelector('[data-toggle-acordes]');
+    const btnToggle = document.querySelector('[data-toggle-acordes]');
     const tonoBadge = document.querySelector('[data-tono]');
-    if (!container || !btn) return;
+    const tonoValor = document.querySelector('[data-tono-valor]');
+    const btnUp = document.querySelector('[data-transpose="up"]');
+    const btnDown = document.querySelector('[data-transpose="down"]');
+    const btnReset = document.querySelector('[data-transpose="reset"]');
 
+    if (!container || !btnToggle) return;
+
+    // --- Toggle acordes ---
     let conAcordes = true;
 
-    btn.addEventListener('click', function() {
+    btnToggle.addEventListener('click', function() {
       conAcordes = !conAcordes;
 
       if (conAcordes) {
@@ -100,13 +146,110 @@ htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:
         container.setAttribute('aria-label', container.getAttribute('aria-label').replace('con acordes', 'sin acordes'));
       }
 
-      // Toggle icons
-      btn.querySelectorAll('[data-icon]').forEach(el => el.classList.toggle('hidden'));
-      // Toggle text
-      btn.querySelectorAll('[data-text]').forEach(el => el.classList.toggle('hidden'));
-      // Toggle tono badge
-      if (tonoBadge) tonoBadge.classList.toggle('hidden', !conAcordes);
-      btn.setAttribute('aria-pressed', String(conAcordes));
+      btnToggle.querySelectorAll('[data-icon]').forEach(el => el.classList.toggle('hidden'));
+      btnToggle.querySelectorAll('[data-text]').forEach(el => el.classList.toggle('hidden'));
+      btnToggle.setAttribute('aria-pressed', String(conAcordes));
     });
+
+    // --- Transposición de tono ---
+    if (!tono || !btnUp || !btnDown || !btnReset) return;
+
+    const NOTAS = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si'];
+    const NOTAS_ALT = {
+      'Do#': 'Reb', 'Re#': 'Mib', 'Fa#': 'Solb',
+      'Sol#': 'Lab', 'La#': 'Sib', 'Si': 'Do',
+      'Reb': 'Do#', 'Mib': 'Re#', 'Solb': 'Fa#',
+      'Lab': 'Sol#', 'Sib': 'La#',
+    };
+
+    let semitonos = 0;
+    const tonoOriginal = tonoBadge?.dataset.tonoOriginal || tono;
+
+    function normalizarNota(n) {
+      const upper = n.charAt(0).toUpperCase() + n.slice(1).toLowerCase();
+      // Manejar bemoles explícitos
+      if (upper.includes('b') && !upper.startsWith('Si')) {
+        const base = upper.replace('b', '');
+        if (NOTAS_ALT[base + '#']) return NOTAS_ALT[base + '#'];
+      }
+      return upper;
+    }
+
+    function indiceNota(nota) {
+      const n = normalizarNota(nota);
+      let idx = NOTAS.indexOf(n);
+      if (idx === -1) {
+        // Probar alternativas (bemoles)
+        const alt = Object.entries(NOTAS_ALT).find(([k, v]) => v === n || k === n);
+        if (alt) {
+          idx = NOTAS.indexOf(alt[0]);
+        }
+      }
+      return idx;
+    }
+
+    function notaDesdeIndice(idx) {
+      const i = ((idx % 12) + 12) % 12;
+      return NOTAS[i];
+    }
+
+    function transponerAcorde(acorde, delta) {
+      // Patrón: nota base + resto (extensiones, slash chords)
+      // Ej: "Sol", "Mim", "Do7", "Re/Fa#", "Sol7"
+      const match = acorde.match(/^([A-Za-z][a-z]?)(#|b)?(.*)$/);
+      if (!match) return acorde;
+
+      const [, base, alteracion, resto] = match;
+      const notaCompleta = base + (alteracion || '');
+      const idx = indiceNota(notaCompleta);
+      if (idx === -1) return acorde;
+
+      const nuevoIdx = (idx + delta + 12) % 12;
+      const nuevaNota = notaDesdeIndice(nuevoIdx);
+      return nuevaNota + resto;
+    }
+
+    function aplicarTransposicion() {
+      if (!container) return;
+      const acordes = container.querySelectorAll('.acorde');
+      acordes.forEach(el => {
+        const original = el.dataset.acordeOriginal || el.textContent;
+        if (!el.dataset.acordeOriginal) {
+          el.dataset.acordeOriginal = original;
+        }
+        el.textContent = transponerAcorde(el.dataset.acordeOriginal, semitonos);
+      });
+
+      if (tonoValor) {
+        const idxTono = indiceNota(tonoOriginal);
+        if (idxTono !== -1) {
+          tonoValor.textContent = notaDesdeIndice((idxTono + semitonos + 12) % 12);
+        }
+      }
+    }
+
+    btnUp.addEventListener('click', function() {
+      semitonos++;
+      aplicarTransposicion();
+    });
+
+    btnDown.addEventListener('click', function() {
+      semitonos--;
+      aplicarTransposicion();
+    });
+
+    btnReset.addEventListener('click', function() {
+      semitonos = 0;
+      aplicarTransposicion();
+    });
+
+    // Guardar originales al cargar
+    if (container) {
+      container.querySelectorAll('.acorde').forEach(el => {
+        if (!el.dataset.acordeOriginal) {
+          el.dataset.acordeOriginal = el.textContent;
+        }
+      });
+    }
   })();
 </script>
