@@ -390,7 +390,7 @@ def generar_pptx(
     output_path = OUTPUT_DIR / f"{fecha_domingo}_celebracion.pptx"
 
     try:
-        from src.generators.presentacion_fieles import GeneradorPPTX
+        from src.generators.presentacion_master import GeneradorPPTXMaster
 
         gen = GeneradorPPTX(
             db_path=str(DB_PATH),
