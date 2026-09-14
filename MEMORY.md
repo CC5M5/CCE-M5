@@ -395,8 +395,28 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 | Context7 MCP | ✅ Instalado | mcporter configurado |
 | Integración end-to-end | ✅ Funcionando | `scripts/generar_semana.py` genera PPTX/PDF y registra en DB |
 
+### Correcciones Web del Cancionero (2026-09-14)
+**Commits:** `5555777`, `f979eea`, `2c82cca`
+
+**Problemas detectados y corregidos:**
+1. **Spam de metadatos** - Eliminado "escuchar", "/", "volver a lista de canciones" del HTML visual.
+2. **Toggle sin/con acordes** - Reimplementado con Astro + JS vanilla (antes React con hidratación problemática).
+3. **Posición del tono** - Badge "Tono: X" junto al botón toggle; se oculta automáticamente al quitar acordes.
+4. **Botón "Audio no disponible"** - Visible cuando `enlace_audio` es NULL.
+5. **Botón "Volver al cancionero"** - Enlace funcional a `/cancionero/`.
+6. **Alineación acordes-letra** - `white-space: nowrap` en `.linea-acordes` para que los acordes se muestren horizontalmente sobre la letra.
+7. **Título repetido** - Eliminado `<div class="letra-solo">TÍTULO</div>` del inicio del HTML visual; la canción empieza directamente con los acordes.
+
+**Cambios técnicos:**
+- `web/src/components/VisorAcordes.astro`: componente puro Astro reemplazando al React `.jsx`
+- `web/src/styles/global.css`: limpiado CSS duplicado, añadido `white-space: nowrap`, eliminado `white-space: pre` del contenedor
+- `web/tailwind.config.mjs`: safelist para clases de acordes
+- Parser v3: todas las canciones usan el mismo formato automáticamente
+
+**Nota:** El formato se aplica a TODAS las canciones automáticamente porque el componente `VisorAcordes.astro` es compartido por todas las páginas de canción.
+
 ### Próximos Pasos Pendientes
-- [ ] Corregir errores detectados en la web Astro (prioridad sobre nuevas funcionalidades)
+- [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente solo 9 canciones)
