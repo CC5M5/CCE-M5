@@ -25,7 +25,7 @@ export function getLatestPresentacion() {
         l.evangelio_cita, l.evangelio_texto
       FROM presentaciones p
       LEFT JOIN lecturas l ON p.lectura_id = l.id
-      WHERE p.estado = 'publicado'
+      WHERE p.estado IN ('publicado', 'generado')
       ORDER BY p.fecha_domingo DESC
       LIMIT 1`
     )
@@ -56,7 +56,7 @@ export function getRecentPresentaciones(limit = 6) {
       `SELECT p.id, p.fecha_domingo, l.domingo, l.temporada, l.color_liturgico
       FROM presentaciones p
       LEFT JOIN lecturas l ON p.lectura_id = l.id
-      WHERE p.estado = 'publicado'
+      WHERE p.estado IN ('publicado', 'generado')
       ORDER BY p.fecha_domingo DESC
       LIMIT ?`
     )
@@ -65,7 +65,7 @@ export function getRecentPresentaciones(limit = 6) {
 
 export function getAllPresentacionesFechas() {
   return getDb()
-    .prepare(`SELECT fecha_domingo FROM presentaciones WHERE estado = 'publicado' ORDER BY fecha_domingo DESC`)
+    .prepare(`SELECT fecha_domingo FROM presentaciones WHERE estado IN ('publicado', 'generado') ORDER BY fecha_domingo DESC`)
     .all()
     .map(r => r.fecha_domingo);
 }
@@ -158,7 +158,7 @@ export function getCancionesPresentacion(fecha) {
 
 export function getLatestPresentacionFecha() {
   const row = getDb()
-    .prepare(`SELECT fecha_domingo FROM presentaciones WHERE estado = 'publicado' ORDER BY fecha_domingo DESC LIMIT 1`)
+    .prepare(`SELECT fecha_domingo FROM presentaciones WHERE estado IN ('publicado', 'generado') ORDER BY fecha_domingo DESC LIMIT 1`)
     .get();
   return row ? row.fecha_domingo : null;
 }
