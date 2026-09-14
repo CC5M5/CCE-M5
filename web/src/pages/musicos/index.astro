@@ -1,0 +1,53 @@
+---
+import Layout from '@layouts/Layout.astro';
+import { getAllPresentacionesFechas, getPresentacionByFecha } from '@lib/db.js';
+import '../../styles/global.css';
+
+const base = import.meta.env.BASE_PATH || '/';
+const fechas = getAllPresentacionesFechas();
+---
+
+<Layout 
+  title="Músicos" 
+  description="Hojas de músicos con acordes para las celebraciones dominicales."
+>
+  <section class="container mx-auto px-4 py-10">
+    <div class="max-w-3xl mx-auto">
+      <nav aria-label="Migas de pan" class="text-sm text-slate-500 mb-4">
+        <a href={`${base}`} class="hover:text-liturgia-verde">Inicio</a>
+        <span class="mx-2">/</span>
+        <span class="text-slate-800" aria-current="page">Músicos</span>
+      </nav>
+
+      <h1 class="section-title">Hojas de músicos</h1>
+      <p class="text-lg text-slate-600 mb-8 font-body">
+        Descarga las hojas de músicos con acordes para las celebraciones dominicales.
+      </p>
+
+      {fechas.length > 0 ? (
+        <div class="space-y-4">
+          {fechas.map(fecha => {
+            const p = getPresentacionByFecha(fecha);
+            return (
+              <a href={`${base}musicos/${fecha}/`} class="card block hover:shadow-md transition">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h2 class="font-heading font-bold text-lg">{p?.domingo || 'Presentación'}</h2>
+                    <p class="text-sm text-slate-500">
+                      {new Date(fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  </div>
+                  <span class="text-liturgia-verde font-medium">Ver hoja →</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="card">
+          <p class="text-slate-600">No hay hojas de músicos disponibles.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>
