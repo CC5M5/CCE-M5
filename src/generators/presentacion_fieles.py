@@ -61,7 +61,8 @@ MOMENTOS: List[str] = [
 
 def _color_para_texto(color_fondo: RGBColor) -> RGBColor:
     """Devuelve blanco para fondos oscuros, negro/gris para fondos claros."""
-    r, g, b = color_fondo.r, color_fondo.g, color_fondo.b
+    # RGBColor es una namedtuple-like: accedemos por índice.
+    r, g, b = color_fondo[0], color_fondo[1], color_fondo[2]
     luminancia = (0.299 * r + 0.587 * g + 0.114 * b) / 255
     return COLOR_TEXTO_CLARO if luminancia < 0.5 else COLOR_TEXTO_OSCURO
 
@@ -306,10 +307,22 @@ class GeneradorPPTX:
             bold=True,
         )
 
-        # Letra
-        letra_limpia = _sanitizar_xml(letra)
-        if len(letra_limpia) > 800:
-            letra_limpia = letra_limpia[:800] + "..."
+        # Letra limpia: quitar metadatos del blogspot y líneas de acordes sueltas.
+        from src.parsers.acordes_parser_v3 import limpiar_texto_cancion, AcordesParser
+        letra_limpia = limpiar_texto_cancion(letra)
+        parser = AcordesParser()
+        lineas_letra: list[str] = []
+        for linea in parser.parsear_cancion_completa(letra_limpia):
+            if linea.tipo == "letra" and linea.letra.strip():
+                lineas_letra.append(linea.letra.strip())
+            elif linea.tipo == "acordes_letra" and linea.letra.strip():
+                lineas_letra.append(linea.letra.strip())
+            elif linea.tipo == "sección" and linea.texto.strip():
+                lineas_letra.append(f"[{linea.texto.strip().strip('[]')}]")
+        letra_visual = "\n".join(lineas_letra)
+        letra_visual = _sanitizar_xml(letra_visual)
+        if len(letra_visual) > 1200:
+            letra_visual = letra_visual[:1200] + "..."
 
         self._crear_textbox(
             slide,
@@ -317,7 +330,7 @@ class GeneradorPPTX:
             top=1.8,
             width=12.333,
             height=5.2,
-            texto=letra_limpia,
+            texto=letra_visual,
             color=color_texto,
             font_size=Pt(20),
             alignment=PP_ALIGN.CENTER,
