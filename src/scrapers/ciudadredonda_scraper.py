@@ -108,7 +108,10 @@ class CiudadRedondaParser:
         # Extraer título
         titulo = soup.find('h1', class_='mec-divi-simple-header')
         if titulo:
-            resultado['celebracion'] = titulo.get_text(strip=True)
+            titulo_texto = titulo.get_text(strip=True)
+            # Limpiar prefijo "Evangelio y Lecturas de" para dejar solo la celebración
+            titulo_texto = re.sub(r'^Evangelio\s+y\s+Lecturas\s+de\s*', '', titulo_texto, flags=re.IGNORECASE).strip()
+            resultado['celebracion'] = titulo_texto
 
         # Extraer secciones
         secciones = self._extraer_secciones(soup)

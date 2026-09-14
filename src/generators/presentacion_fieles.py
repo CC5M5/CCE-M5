@@ -45,6 +45,10 @@ COLOR_TEXTO_OSCURO = RGBColor(0x33, 0x33, 0x33)
 COLOR_CITA = RGBColor(0x66, 0x66, 0x66)
 COLOR_MOMENTO = RGBColor(0x99, 0x99, 0x99)
 
+# Lema del curso escolapio 2026-2027
+LEMA_CURSO = "Somos uno"
+URL_LEMA_CURSO = "https://escolappios.es/somos-uno-lema-del-curso-26-27/"
+
 # Tipografía y márgenes
 FUENTE_PRINCIPAL = "Calibri"
 MARGEN_LATERAL = Inches(0.5)
@@ -153,6 +157,22 @@ class GeneradorPPTX:
         )
         tf.paragraphs[0].text = _sanitizar_xml(texto)
 
+    def _crear_footer_lema(self, slide) -> None:
+        """Añade el lema del curso en la parte inferior de la diapositiva."""
+        textbox = slide.shapes.add_textbox(
+            Inches(0.5), Inches(6.85), Inches(12.333), Inches(0.4)
+        )
+        tf = textbox.text_frame
+        tf.word_wrap = False
+        p = tf.paragraphs[0]
+        p.font.name = FUENTE_PRINCIPAL
+        p.font.size = Pt(14)
+        p.font.bold = False
+        p.font.italic = True
+        p.font.color.rgb = RGBColor(0x80, 0x80, 0x80)
+        p.alignment = PP_ALIGN.RIGHT
+        p.text = LEMA_CURSO
+
     def _color_fondo(self, color_fondo: str) -> RGBColor:
         """Resuelve el color de fondo a partir de su nombre."""
         return COLORES_LITURGICOS.get(color_fondo, COLORES_LITURGICOS["verde"])
@@ -200,6 +220,7 @@ class GeneradorPPTX:
             alignment=PP_ALIGN.CENTER,
         )
 
+        self._crear_footer_lema(slide)
         return slide
 
     def crear_diapositiva_lectura(
@@ -262,6 +283,7 @@ class GeneradorPPTX:
             line_spacing=1.5,
         )
 
+        self._crear_footer_lema(slide)
         return slide
 
     def crear_diapositiva_cancion(
@@ -337,6 +359,7 @@ class GeneradorPPTX:
             line_spacing=1.5,
         )
 
+        self._crear_footer_lema(slide)
         return slide
 
     def _precargar_canciones(
