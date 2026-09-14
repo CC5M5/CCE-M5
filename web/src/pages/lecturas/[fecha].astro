@@ -54,6 +54,16 @@ const lecturas = [
               <div class="font-body leading-loose text-slate-800 whitespace-pre-line">{l.texto}</div>
             </article>
           ))}
+          
+          {p.fuente_scraping && (
+            <p class="text-xs text-slate-400 text-right mt-4">
+              Fuente: {p.fuente_scraping === 'ciudadredonda' 
+                ? <a href="https://www.ciudadredonda.org/" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">Ciudad Redonda</a>
+                : p.fuente_scraping === 'koinonia' 
+                  ? <a href="https://servicioskoinonia.org/" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">Koinonia</a>
+                  : p.fuente_scraping}
+            </p>
+          )}
         </div>
       ) : (
         <div class="card">
