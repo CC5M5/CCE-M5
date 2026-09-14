@@ -141,16 +141,27 @@ export function getCancionesPresentacion(fecha) {
   const presentacion = getPresentacionByFecha(fecha);
   if (!presentacion || !presentacion.canciones_json) return [];
   try {
-    const ids = JSON.parse(presentacion.canciones_json);
-    if (!Array.isArray(ids)) return [];
-    return getDb()
+    const parsed = JSON.parse(presentacion.canciones_json);
+    // Puede ser un array [id1, id2, ...] o un objeto {momento: id, ...}
+    const ids = Array.isArray(parsed) ? parsed : Object.values(parsed);
+    if (!ids.length) return [];
+    
+    // Eliminar duplicados manteniendo orden
+    const uniqueIds = [...new Set(ids)];
+    
+    const rows = getDb()
       .prepare(
         `SELECT id, titulo, momento_liturgico, tono, html_visual
         FROM canciones
-        WHERE id IN (${ids.map(() => '?').join(',')})
-        ORDER BY FIELD(id, ${ids.map(() => '?').join(',')})`
+        WHERE id IN (${uniqueIds.map(() => '?').join(',')})`
       )
-      .all(...ids, ...ids);
+      .all(...uniqueIds);
+    
+    // Ordenar según el orden original de ids (SQLite no tiene FIELD())
+    const orderMap = new Map(ids.map((id, idx) => [id, idx]));
+    rows.sort((a, b) => (orderMap.get(a.id) || 0) - (orderMap.get(b.id) || 0));
+    
+    return rows;
   } catch {
     return [];
   }
