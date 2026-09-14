@@ -12,11 +12,14 @@ interface Props {
 
 const { htmlVisual, titulo, slug, tono, enlaceAudio, compact = false } = Astro.props;
 
-// Sanitizar HTML básico para SSR
-const htmlSeguro = (htmlVisual || '')
+// Sanitizar HTML básico para SSR y eliminar título repetido al inicio
+let htmlSeguro = (htmlVisual || '')
   .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
   .replace(/javascript:/gi, '')
   .replace(/on\w+\s*=/gi, '');
+
+// Eliminar la primera línea de título si está al inicio (letra-solo seguida opcionalmente de linea-vacia)
+htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:<div class="linea-vacia"><\/div>\s*)?)/i, '');
 ---
 
 <div class={`bg-white rounded-xl border border-slate-200 ${compact ? 'p-4' : 'p-6 md:p-8'} font-mono leading-relaxed`}>
