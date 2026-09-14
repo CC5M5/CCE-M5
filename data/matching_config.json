@@ -1,0 +1,219 @@
+{
+  "db_path": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/db.sqlite3",
+  "score_minimo": 0.15,
+  "limite_resultados": 5,
+  "momento_liturgico_boost": 0.12,
+  "cache_activa": true,
+  "temas": {
+    "perdon": {
+      "palabras": [
+        "perdon",
+        "misericordia",
+        "pecado",
+        "culpa",
+        "reconciliacion",
+        "perdona"
+      ],
+      "peso": 1.5
+    },
+    "paz": {
+      "palabras": [
+        "paz",
+        "cordero",
+        "reconciliacion",
+        "unidad",
+        "hermanos",
+        "concordia"
+      ],
+      "peso": 1.2
+    },
+    "esperanza": {
+      "palabras": [
+        "esperanza",
+        "manana",
+        "futuro",
+        "nuevo",
+        "renovar",
+        "amanecer"
+      ],
+      "peso": 1.0
+    },
+    "amor": {
+      "palabras": [
+        "amor",
+        "caridad",
+        "entrega",
+        "querer",
+        "afecto"
+      ],
+      "peso": 1.3
+    },
+    "camino": {
+      "palabras": [
+        "camino",
+        "sendero",
+        "verdad",
+        "vida",
+        "seguir",
+        "andar",
+        "senda"
+      ],
+      "peso": 1.1
+    },
+    "luz": {
+      "palabras": [
+        "luz",
+        "brillar",
+        "oscuridad",
+        "iluminar",
+        "claridad",
+        "resplandor"
+      ],
+      "peso": 1.0
+    },
+    "agua": {
+      "palabras": [
+        "agua",
+        "beber",
+        "sed",
+        "manantial",
+        "rio",
+        "fuente",
+        "bautismo"
+      ],
+      "peso": 1.0
+    },
+    "pan": {
+      "palabras": [
+        "pan",
+        "comer",
+        "hambre",
+        "alimento",
+        "nutrir",
+        "mesa",
+        "cuerpo"
+      ],
+      "peso": 1.2
+    },
+    "maria": {
+      "palabras": [
+        "maria",
+        "virgen",
+        "amparo",
+        "proteccion",
+        "madre",
+        "magnificat"
+      ],
+      "peso": 1.4
+    },
+    "espiritu": {
+      "palabras": [
+        "espiritu",
+        "fuego",
+        "viento",
+        "pentecostes",
+        "consolador"
+      ],
+      "peso": 1.3
+    },
+    "alabanza": {
+      "palabras": [
+        "alabar",
+        "gloria",
+        "honor",
+        "santo",
+        "adorar",
+        "cantar",
+        "loar"
+      ],
+      "peso": 1.1
+    },
+    "servicio": {
+      "palabras": [
+        "servir",
+        "humilde",
+        "pobre",
+        "ayudar",
+        "dar",
+        "servicio",
+        "ministrar"
+      ],
+      "peso": 1.0
+    },
+    "fe": {
+      "palabras": [
+        "fe",
+        "creer",
+        "confiar",
+        "esperar",
+        "firmeza",
+        "conviccion"
+      ],
+      "peso": 1.2
+    },
+    "salvacion": {
+      "palabras": [
+        "salvar",
+        "salvacion",
+        "libertad",
+        "redimir",
+        "rescate",
+        "liberar"
+      ],
+      "peso": 1.3
+    }
+  },
+  "afinidad_momento_tema": {
+    "entrada": [
+      "alabanza",
+      "esperanza",
+      "camino"
+    ],
+    "perdon": [
+      "perdon"
+    ],
+    "gloria": [
+      "alabanza"
+    ],
+    "salmo": [
+      "agua",
+      "luz",
+      "camino",
+      "paz"
+    ],
+    "aleluya": [
+      "alabanza",
+      "espiritu"
+    ],
+    "ofertorio": [
+      "pan",
+      "servicio"
+    ],
+    "santo": [
+      "alabanza",
+      "amor"
+    ],
+    "padre_nuestro": [
+      "fe",
+      "perdon"
+    ],
+    "paz": [
+      "paz"
+    ],
+    "comunion": [
+      "pan",
+      "amor",
+      "espiritu",
+      "maria"
+    ],
+    "maria": [
+      "maria"
+    ],
+    "despedida": [
+      "camino",
+      "esperanza",
+      "paz"
+    ],
+    "general": []
+  }
+}
