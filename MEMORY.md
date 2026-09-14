@@ -466,6 +466,46 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 2. Reemplazar `image2.jpeg` en `data/templates/274_Domingo_21_06_2026.pptx` con la nueva imagen
 3. Opcionalmente, actualizar `URL_LEMA_CURSO` con el enlace del nuevo lema
 
+
+
+## Sesión 2026-09-14 - Trabajo realizado
+
+### Correcciones completadas
+
+19. **Plantilla PPTX recuperada** — Descargada `MASTER_PowerPoint Eucaristía.pptx` (40MB, 121 slides) del NAS (`192.168.1.177/homes/Rafa/Escolapios/11 Presentaciones PPT CCE M5/`). Contiene estilo artístico completo con imágenes de canciones, menús y transiciones.
+
+20. **Imagen lema "Somos uno" descargada** — Obtenida desde `https://www.escolapiosbetania.org/Catalogo/Item/1984_Item/somos-uno-lema-del-curso-26-27.jpg`. Guardada en `data/lemas/somos_uno.jpg`. Reemplazó temporalmente `image2.jpeg` en plantilla.
+
+21. **Configuración lema anual** — Creado `config/lema.py` con variables centralizadas: `LEMA_CURSO`, `URL_LEMA_CURSO`, `IMAGEN_LEMA_PATH`. Facilita cambio anual.
+
+22. **Generador `presentacion_master.py` creado** — Nuevo generador que copia slides específicas desde plantilla MASTER según canciones asignadas. Mapeo completo de ~100 canciones a slides. Método `_rebuild_pptx` reconstruye PPTX manteniendo solo slides seleccionadas.
+
+23. **Integración en `generar_semana.py`** — Generador principal ahora usa `GeneradorPPTXMaster` en lugar del generador antiguo.
+
+### Problemas identificados
+
+- **PPTX generado tiene demasiadas slides** (134 en vez de ~15-20). El método `_rebuild_pptx` no elimina correctamente las slides no usadas del XML de presentación.
+- **Slides de lecturas no implementadas** — Falta crear diapositivas de Primera Lectura, Salmo, Segunda Lectura y Evangelio con el estilo artístico de la plantilla.
+- **Esquema completo no implementado** — Faltan diapositivas de transición, portada, credo, y orden correcto según esquema litúrgico.
+- **Lema "Somos uno" no aparece en slides** — Solo se añadió como texto en generador anterior (ya descartado), no en el nuevo `presentacion_master.py`.
+- **Matching de canciones asigna todas "PREPARAD EL CAMINO"** — El motor de matching no funciona correctamente con las 9 canciones actuales. Necesita más canciones o lógica de fallback mejorada.
+
+### Próximos pasos pendientes (prioridad)
+
+1. **Corregir `_rebuild_pptx`** para eliminar slides correctamente y evitar duplicados
+2. **Implementar slides de lecturas** con estilo artístico (copiar estilo de slides existentes en MASTER)
+3. **Implementar esquema completo**: Portada → Entrada → Transición → Perdón → Transición → Gloria → Transición → Primera Lectura → Salmo → Aleluya → Transición → Credo → Transición → Ofertorio → Transición → Santo → Transición → Padre Nuestro → Transición → Paz → Transición → Comunión → Transición → Canto a María → Despedida
+4. **Integrar lema "Somos uno"** como imagen en esquina inferior de cada diapositiva
+5. **Arreglar matching de canciones** para que asigne canciones variadas según momento litúrgico
+6. **Migrar más canciones** desde Blogspot para tener variedad suficiente
+
+### Notas técnicas importantes
+
+- La plantilla MASTER (`274_Domingo_21_06_2026.pptx`) tiene 121 slides con TODO el cancionero. Cada canción tiene su propia slide con imagen de fondo y letra.
+- El generador antiguo (`presentacion_fieles.py`) fue descartado porque creaba slides de texto plano sin estilo.
+- El nuevo generador (`presentacion_master.py`) copia slides XML desde la plantilla MASTER. Requiere manipulación de XML del PPTX (presentation.xml, rels, etc.).
+- El lema cambia cada año. Para 2027-28: actualizar `config/lema.py` y reemplazar imagen en plantilla.
+
 **Pendiente:** Implementar `_crear_logo_lema` como imagen real (add_picture) en lugar de texto plano.
 
 ### Próximos Pasos Pendientes
