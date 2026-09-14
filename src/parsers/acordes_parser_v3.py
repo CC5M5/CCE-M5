@@ -29,10 +29,15 @@ from typing import Iterator, List, Optional
 # ---------------------------------------------------------------------------
 
 # Líneas de metadatos / navegación del blogspot del Cancionero CCE.
+# Se procesan sobre texto sin etiquetas HTML y con espacios normalizados.
 _METADATA_RES = [
     re.compile(r"^\s*escuchar\s*$", re.IGNORECASE),
     re.compile(r"^\s*volver\s+a\s+lista\s+de\s+canciones\s*$", re.IGNORECASE),
+    re.compile(r"^\s*volver\s+a\s+lista\s*$", re.IGNORECASE),
+    re.compile(r"^\s*volver\s+lista\s+de\s+canciones\s*$", re.IGNORECASE),
+    re.compile(r"^\s*volver\s+lista\s*$", re.IGNORECASE),
     re.compile(r"^\s*version\s+en\s+\w+\s*$", re.IGNORECASE),
+    re.compile(r"^\s*version\s+en\s*$", re.IGNORECASE),
     re.compile(r"^\s*/+\s*$"),
 ]
 
@@ -55,14 +60,16 @@ def limpiar_texto_cancion(texto: str) -> str:
     """
     lineas: List[str] = []
     for linea in texto.splitlines():
+        # Quitar etiquetas HTML (atributos incluidos) dejando su contenido.
+        linea = _HTML_TAG_RE.sub("", linea)
+        # Normalizar NBSP y espacios múltiples a un único espacio; esto evita
+        # desplazamientos en fuentes monoespaciadas y limpia líneas de metadatos
+        # que quedan con palabras unidas tras quitar etiquetas HTML.
+        linea = linea.replace("\u00a0", " ")
+        linea = re.sub(r"\s+", " ", linea).strip()
         # Descartar líneas que sean únicamente metadatos de navegación.
         if any(r.fullmatch(linea) for r in _METADATA_RES):
             continue
-        # Quitar etiquetas HTML (atributos incluidos) dejando su contenido.
-        linea = _HTML_TAG_RE.sub("", linea)
-        # Normalizar NBSP a espacio normal; no altera la alineación cuando la
-        # renderización es monoespaciada y evita desplazamientos inesperados.
-        linea = linea.replace("\u00a0", " ")
         lineas.append(linea)
     return "\n".join(lineas)
 

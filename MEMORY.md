@@ -334,8 +334,11 @@ python scripts/generar_semana.py --fecha 2026-09-13
 - 12 momentos litúrgicos con canciones asignadas.
 
 **Notas:**
-- El generador PPTX principal (`presentacion_fieles.py`) falla actualmente con el error `'RGBColor' object has no attribute 'r'` al aplicar color de fondo; el script end-to-end usa un fallback que genera un PPTX mínimo con el template real.
-- Se añadió la columna `celebracion` a la tabla `lecturas` para compatibilidad con `presentacion_fieles.py` y `matching_engine.py`.
+- ✅ Error `'RGBColor' object has no attribute 'r'` corregido en `presentacion_fieles.py` (RGBColor se accede por índice, no por `.r`/`.g`/`.b`).
+- ✅ Letra de las canciones en el PPTX ahora se limpia con `limpiar_texto_cancion`: no aparecen "escuchar" (como metadato), "volver a lista" ni "Version en".
+- ✅ `limpiar_texto_cancion` ahora normaliza NBSP y espacios múltiples, y filtra variantes de las líneas de metadatos del blogspot.
+- ✅ `src/db_manager.py` crea la columna `celebracion` en `lecturas` y migra tablas existentes automáticamente.
+- El generador PPTX principal produce presentaciones completas (126 diapositivas con template real).
 - Se corrigió import faltante `os` en `src/matching_engine.py`.
 
 ### Servidor Web Local Permanente ✅
@@ -389,7 +392,6 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 
 ### Próximos Pasos Pendientes
 - [ ] Fase 6: Refinamiento final
-  - [ ] Corregir error `'RGBColor' object has no attribute 'r'` en `presentacion_fieles.py`
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente solo 9 canciones)
   - [ ] Mejorar calidad de los mocks de Koinonia y tests del flujo end-to-end
