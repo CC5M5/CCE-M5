@@ -64,9 +64,9 @@ def find_slide_for_cancion(titulo: str) -> Optional[int]:
 class GeneradorPPTXMaster:
     """Generador de presentaciones usando plantilla MASTER."""
     
-    def __init__(self):
-        self.master_path = MASTER_PATH
-        self.output_dir = OUTPUT_DIR
+    def __init__(self, db_path=None, template_path=None, output_dir=None):
+        self.master_path = Path(template_path) if template_path else MASTER_PATH
+        self.output_dir = Path(output_dir) if output_dir else OUTPUT_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
     def _get_connection(self) -> sqlite3.Connection:
@@ -161,82 +161,72 @@ class GeneradorPPTXMaster:
             return False
     
     def _rebuild_pptx(self, temp_dir: Path, output_path: Path, slide_numbers: List[int]) -> bool:
-        """Rebuild PPTX with selected slides."""
+        """Rebuild PPTX manteniendo solo las slides especificadas."""
         try:
-            # Read presentation.xml
+            NS_P = 'http://schemas.openxmlformats.org/presentationml/2006/main'
+            NS_R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
+            
+            # Leer presentation.xml
             pres_path = temp_dir / "ppt" / "presentation.xml"
             pres_tree = ET.parse(pres_path)
             pres_root = pres_tree.getroot()
             
-            ns = {'p': 'http://schemas.openxmlformats.org/presentationml/2006/main'}
-            
-            # Find sldIdLst
-            sldIdLst = pres_root.find('.//p:sldIdLst', ns)
-            if sldIdLst is None:
-                print("ERROR: Could not find sldIdLst")
-                return False
-            
-            # Get all slide info
-            slides_info = []
-            for sldId in sldIdLst:
-                id_val = sldId.get('id')
-                r_id = sldId.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id')
-                slides_info.append({'id': id_val, 'rId': r_id, 'elem': sldId})
-            
-            # Read presentation rels
+            # Leer presentation.xml.rels
             pres_rels_path = temp_dir / "ppt" / "_rels" / "presentation.xml.rels"
             pres_rels_tree = ET.parse(pres_rels_path)
             pres_rels_root = pres_rels_tree.getroot()
             
-            # Map rId to slide filename
-            rId_to_slide = {}
-            for rel in pres_rels_root:
-                rid = rel.get('Id')
-                target = rel.get('Target')
-                if target and target.startswith('slides/slide'):
-                    rId_to_slide[rid] = target
+            # Encontrar sldIdLst
+            sldIdLst = pres_root.find(f'.//{{{NS_P}}}sldIdLst')
+            if sldIdLst is None:
+                print("ERROR: No se encontró sldIdLst")
+                return False
             
-            # Map slide number to rId
-            slide_num_to_rId = {}
-            for i, info in enumerate(slides_info, 1):
-                slide_num_to_rId[i] = info['rId']
+            # Mapear rId -> número de slide (por orden en sldIdLst)
+            rId_to_slide_num = {}
+            for i, sldId in enumerate(sldIdLst):
+                rId = sldId.get(f'{{{NS_R}}}id')
+                rId_to_slide_num[rId] = i + 1
             
-            # Determine which slides to keep
+            # Determinar qué rIds mantener
             keep_rIds = []
-            for num in slide_numbers:
-                if num in slide_num_to_rId:
-                    keep_rIds.append(slide_num_to_rId[num])
+            for rId, slide_num in rId_to_slide_num.items():
+                if slide_num in slide_numbers:
+                    keep_rIds.append(rId)
             
-            # Remove unwanted slides from sldIdLst
+            # ELIMINAR slides no deseadas del sldIdLst
             for sldId in list(sldIdLst):
-                r_id = sldId.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id')
-                if r_id not in keep_rIds:
+                rId = sldId.get(f'{{{NS_R}}}id')
+                if rId not in keep_rIds:
                     sldIdLst.remove(sldId)
             
-            # Remove unwanted relationships
+            # ELIMINAR relaciones no deseadas
             for rel in list(pres_rels_root):
                 rid = rel.get('Id')
-                if rid not in keep_rIds and rid in rId_to_slide:
+                target = rel.get('Target', '')
+                if target.startswith('slides/slide') and rid not in keep_rIds:
                     pres_rels_root.remove(rel)
             
-            # Save modified XMLs
+            # GUARDAR XMLs modificados
             pres_tree.write(pres_path, xml_declaration=True, encoding='UTF-8')
             pres_rels_tree.write(pres_rels_path, xml_declaration=True, encoding='UTF-8')
             
-            # Remove slide files we don't need
+            # ELIMINAR archivos de slides que no queremos
             slides_dir = temp_dir / "ppt" / "slides"
             rels_dir = temp_dir / "ppt" / "slides" / "_rels"
             
-            for i in range(1, len(slides_info) + 1):
-                if i not in slide_numbers:
-                    slide_file = slides_dir / f"slide{i}.xml"
-                    rels_file = rels_dir / f"slide{i}.xml.rels"
-                    if slide_file.exists():
+            for slide_file in slides_dir.glob("slide*.xml"):
+                try:
+                    slide_num = int(slide_file.stem.replace("slide", ""))
+                    if slide_num not in slide_numbers:
                         slide_file.unlink()
-                    if rels_file.exists():
-                        rels_file.unlink()
+                        rels_file = rels_dir / f"{slide_file.name}.rels"
+                        if rels_file.exists():
+                            rels_file.unlink()
+                except ValueError:
+                    pass
             
-            # Rebuild PPTX
+            # Reconstruir PPTX
             with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zf:
                 for root_dir, dirs, files in os.walk(temp_dir):
                     for file in files:
@@ -248,6 +238,8 @@ class GeneradorPPTXMaster:
             
         except Exception as e:
             print(f"Error rebuilding PPTX: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def generar_presentacion(
@@ -333,18 +325,265 @@ class GeneradorPPTXMaster:
                 filename = f"{fecha_domingo}_presentacion.pptx"
                 output_path = self.output_dir / filename
                 
-                if self._rebuild_pptx(temp_dir, output_path, slides_to_keep):
-                    print(f"✅ Presentación generada: {output_path}")
-                    print(f"   Slides: {len(slides_to_keep)}")
-                    return output_path
-                else:
+                if not self._rebuild_pptx(temp_dir, output_path, slides_to_keep):
                     print("ERROR: No se pudo generar la presentación")
                     return None
+                
+                # Abrir PPTX reconstruido y añadir slides adicionales
+                try:
+                    from pptx import Presentation
+                    prs = Presentation(str(output_path))
+                    
+                    color = lectura["color_liturgico"] or "verde"
+                    
+                    # 1. PORTADA al principio (la añadimos al final y luego movemos)
+                    # Nota: python-pptx no permite insertar en posición arbitraria
+                    # Por ahora, añadimos al final. En versión futura: reordenar XML
+                    
+                    # Añadimos slides adicionales al final por ahora
+                    # El orden será: canciones + lecturas + portada/transiciones
+                    # El usuario puede reordenar manualmente o lo haremos en v2
+                    
+                    # LECTURAS
+                    if lectura["primera_lectura_texto"]:
+                        self._crear_slide_lectura(prs, "Primera Lectura",
+                            lectura["primera_lectura_cita"] or "",
+                            lectura["primera_lectura_texto"], color)
+                        print("  Añadida: Primera Lectura")
+                    
+                    if lectura["salmo_texto"]:
+                        salmo_texto = f"Antífona: {lectura['salmo_antifona']}\n\n{lectura['salmo_texto']}" if lectura["salmo_antifona"] else lectura["salmo_texto"]
+                        self._crear_slide_lectura(prs, "Salmo Responsorial",
+                            lectura["salmo_cita"] or "", salmo_texto, color)
+                        print("  Añadida: Salmo Responsorial")
+                    
+                    if lectura["segunda_lectura_texto"]:
+                        self._crear_slide_lectura(prs, "Segunda Lectura",
+                            lectura["segunda_lectura_cita"] or "",
+                            lectura["segunda_lectura_texto"], color)
+                        print("  Añadida: Segunda Lectura")
+                    
+                    if lectura["evangelio_texto"]:
+                        self._crear_slide_lectura(prs, "Evangelio",
+                            lectura["evangelio_cita"] or "",
+                            lectura["evangelio_texto"], color)
+                        print("  Añadida: Evangelio")
+                    
+                    # TRANSICIONES
+                    transiciones = [
+                        "Liturgia de la Palabra",
+                        "Liturgia Eucarística", 
+                        "Rito de Conclusión",
+                    ]
+                    for t in transiciones:
+                        self._crear_slide_transicion(prs, t, color)
+                        print(f"  Añadida: Transición - {t}")
+                    
+                    # PORTADA al final (debería ser al principio, pero python-pptx limita)
+                    self._crear_slide_portada(prs, celebracion, fecha_domingo, color)
+                    print("  Añadida: Portada")
+                    
+                    prs.save(str(output_path))
+                    total_slides = len(prs.slides)
+                    print(f"✅ Presentación generada: {output_path}")
+                    print(f"   Total slides: {total_slides}")
+                    return output_path
+                    
+                except Exception as e:
+                    print(f"WARNING: Error añadiendo slides adicionales: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    return output_path
                 
         except Exception as e:
             print(f"ERROR: {e}")
             return None
 
+
+
+
+    def _add_lema_image(self, slide, prs) -> None:
+        """Añade la imagen del lema en la esquina inferior izquierda de la slide."""
+        from pptx.util import Inches
+        
+        lema_path = PROJECT_DIR / "data" / "lemas" / "somos_uno.jpg"
+        if not lema_path.exists():
+            return
+        
+        try:
+            # Añadir imagen en esquina inferior izquierda, pequeña
+            left = Inches(0.2)
+            top = Inches(6.5)
+            height = Inches(0.5)
+            
+            slide.shapes.add_picture(str(lema_path), left, top, height=height)
+        except Exception as e:
+            # Si falla, no es crítico
+            pass
+
+    def _crear_slide_portada(self, prs, celebracion: str, fecha: str, color: str = "verde") -> None:
+        """Crea slide de portada con celebración, fecha y lema."""
+        from pptx.util import Inches, Pt
+        from pptx.dml.color import RGBColor
+        from pptx.enum.text import PP_ALIGN
+        
+        colores = {
+            "verde": RGBColor(0x4C, 0xAF, 0x50),
+            "violeta": RGBColor(0x9C, 0x27, 0xB0),
+            "blanco": RGBColor(0xFF, 0xFF, 0xFF),
+            "rojo": RGBColor(0xF4, 0x43, 0x36),
+            "rosa": RGBColor(0xE9, 0x1E, 0x63),
+        }
+        
+        fondo = colores.get(color, colores["verde"])
+        texto_color = RGBColor(0xFF, 0xFF, 0xFF) if color != "blanco" else RGBColor(0x33, 0x33, 0x33)
+        
+        slide_layout = prs.slide_layouts[6]
+        slide = prs.slides.add_slide(slide_layout)
+        
+        background = slide.background
+        fill = background.fill
+        fill.solid()
+        fill.fore_color.rgb = fondo
+        
+        # Título celebración
+        title_box = slide.shapes.add_textbox(Inches(1), Inches(2), Inches(11), Inches(1.5))
+        tf = title_box.text_frame
+        p = tf.paragraphs[0]
+        p.text = celebracion
+        p.font.name = "Calibri"
+        p.font.size = Pt(48)
+        p.font.bold = True
+        p.font.color.rgb = texto_color
+        p.alignment = PP_ALIGN.CENTER
+        
+        # Fecha
+        fecha_box = slide.shapes.add_textbox(Inches(1), Inches(4), Inches(11), Inches(0.8))
+        tf = fecha_box.text_frame
+        p = tf.paragraphs[0]
+        p.text = fecha
+        p.font.name = "Calibri"
+        p.font.size = Pt(28)
+        p.font.color.rgb = RGBColor(0xCC, 0xCC, 0xCC) if color != "blanco" else RGBColor(0x66, 0x66, 0x66)
+        p.alignment = PP_ALIGN.CENTER
+        
+        # Lema
+        lema_box = slide.shapes.add_textbox(Inches(1), Inches(5.5), Inches(11), Inches(0.6))
+        tf = lema_box.text_frame
+        p = tf.paragraphs[0]
+        p.text = "Somos uno"
+        p.font.name = "Calibri"
+        p.font.size = Pt(18)
+        p.font.italic = True
+        p.font.color.rgb = RGBColor(0xE6, 0x1B, 0x23)  # Rojo escolapio
+        p.alignment = PP_ALIGN.CENTER
+        
+        # Añadir lema
+        self._add_lema_image(slide, prs)
+    
+    def _crear_slide_transicion(self, prs, momento: str, color: str = "verde") -> None:
+        """Crea slide de transición entre momentos litúrgicos."""
+        from pptx.util import Inches, Pt
+        from pptx.dml.color import RGBColor
+        from pptx.enum.text import PP_ALIGN
+        
+        colores = {
+            "verde": RGBColor(0x4C, 0xAF, 0x50),
+            "violeta": RGBColor(0x9C, 0x27, 0xB0),
+            "blanco": RGBColor(0xFF, 0xFF, 0xFF),
+            "rojo": RGBColor(0xF4, 0x43, 0x36),
+            "rosa": RGBColor(0xE9, 0x1E, 0x63),
+        }
+        
+        fondo = colores.get(color, colores["verde"])
+        texto_color = RGBColor(0xFF, 0xFF, 0xFF) if color != "blanco" else RGBColor(0x33, 0x33, 0x33)
+        
+        slide_layout = prs.slide_layouts[6]
+        slide = prs.slides.add_slide(slide_layout)
+        
+        background = slide.background
+        fill = background.fill
+        fill.solid()
+        fill.fore_color.rgb = fondo
+        
+        # Texto momento
+        text_box = slide.shapes.add_textbox(Inches(1), Inches(3), Inches(11), Inches(1))
+        tf = text_box.text_frame
+        p = tf.paragraphs[0]
+        p.text = momento.upper()
+        p.font.name = "Calibri"
+        p.font.size = Pt(44)
+        p.font.bold = True
+        p.font.color.rgb = texto_color
+        p.alignment = PP_ALIGN.CENTER
+
+    def _crear_slide_lectura(self, prs, titulo: str, cita: str, texto: str, color: str = "verde") -> None:
+        """Crea una slide de lectura con fondo de color litúrgico."""
+        from pptx import Presentation
+        from pptx.util import Inches, Pt
+        from pptx.dml.color import RGBColor
+        from pptx.enum.text import PP_ALIGN
+        
+        # Colores litúrgicos
+        colores = {
+            "verde": RGBColor(0x4C, 0xAF, 0x50),
+            "violeta": RGBColor(0x9C, 0x27, 0xB0),
+            "blanco": RGBColor(0xFF, 0xFF, 0xFF),
+            "rojo": RGBColor(0xF4, 0x43, 0x36),
+            "rosa": RGBColor(0xE9, 0x1E, 0x63),
+        }
+        
+        fondo = colores.get(color, colores["verde"])
+        texto_color = RGBColor(0xFF, 0xFF, 0xFF) if color != "blanco" else RGBColor(0x33, 0x33, 0x33)
+        
+        # Crear slide con layout en blanco
+        slide_layout = prs.slide_layouts[6]  # BLANK
+        slide = prs.slides.add_slide(slide_layout)
+        
+        # Fondo de color
+        background = slide.background
+        fill = background.fill
+        fill.solid()
+        fill.fore_color.rgb = fondo
+        
+        # Título de la lectura
+        title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.3), Inches(12.333), Inches(0.8))
+        tf = title_box.text_frame
+        p = tf.paragraphs[0]
+        p.text = titulo
+        p.font.name = "Calibri"
+        p.font.size = Pt(36)
+        p.font.bold = True
+        p.font.color.rgb = texto_color
+        p.alignment = PP_ALIGN.LEFT
+        
+        # Cita bíblica
+        if cita:
+            cita_box = slide.shapes.add_textbox(Inches(0.5), Inches(1.2), Inches(12.333), Inches(0.5))
+            tf = cita_box.text_frame
+            p = tf.paragraphs[0]
+            p.text = cita
+            p.font.name = "Calibri"
+            p.font.size = Pt(20)
+            p.font.italic = True
+            p.font.color.rgb = RGBColor(0xCC, 0xCC, 0xCC) if color != "blanco" else RGBColor(0x66, 0x66, 0x66)
+            p.alignment = PP_ALIGN.LEFT
+        
+        # Texto de la lectura (limitado a 500 caracteres por slide)
+        texto_limpio = texto[:500] if texto else "Texto no disponible."
+        if len(texto) > 500:
+            texto_limpio += "..."
+        
+        text_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.0), Inches(12.333), Inches(4.5))
+        tf = text_box.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.text = texto_limpio
+        p.font.name = "Calibri"
+        p.font.size = Pt(20)
+        p.font.color.rgb = texto_color
+        p.line_spacing = 1.5
+        p.alignment = PP_ALIGN.LEFT
 
 if __name__ == "__main__":
     gen = GeneradorPPTXMaster()
