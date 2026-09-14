@@ -22,7 +22,8 @@ export function getLatestPresentacion() {
         l.primera_lectura_cita, l.primera_lectura_texto,
         l.salmo_cita, l.salmo_antifona, l.salmo_texto,
         l.segunda_lectura_cita, l.segunda_lectura_texto,
-        l.evangelio_cita, l.evangelio_texto
+        l.evangelio_cita, l.evangelio_texto,
+        l.fuente_scraping
       FROM presentaciones p
       LEFT JOIN lecturas l ON p.lectura_id = l.id
       WHERE p.estado IN ('publicado', 'generado')
@@ -40,7 +41,8 @@ export function getPresentacionByFecha(fecha) {
         l.primera_lectura_cita, l.primera_lectura_texto,
         l.salmo_cita, l.salmo_antifona, l.salmo_texto,
         l.segunda_lectura_cita, l.segunda_lectura_texto,
-        l.evangelio_cita, l.evangelio_texto
+        l.evangelio_cita, l.evangelio_texto,
+        l.fuente_scraping
       FROM presentaciones p
       LEFT JOIN lecturas l ON p.lectura_id = l.id
       WHERE p.fecha_domingo = ?
