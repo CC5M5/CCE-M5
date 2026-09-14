@@ -415,6 +415,18 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 
 **Nota:** El formato se aplica a TODAS las canciones automáticamente porque el componente `VisorAcordes.astro` es compartido por todas las páginas de canción.
 
+8. **Página /musicos/ con formato** — Creado `musicos/index.astro` con listado de hojas de músicos disponibles, evitando el listado de directorio del servidor Python.
+9. **Página /presentacion/ con formato** — Creado `presentacion/index.astro` con listado de presentaciones disponibles, evitando el listado de directorio del servidor Python.
+10. **Fuente de lecturas visible** — Añadida atribución "Fuente: Ciudad Redonda" o "Fuente: Koinonia" al final de la página de lecturas, con enlace a la web origen.
+11. **Enlace Presentación en navegación** — Añadido "Presentación" al menú de navegación del header (entre Inicio y Cancionero).
+12. **Descarga de archivos PPTX/PDF** — Copia de archivos desde `presentaciones/` a `web/dist/presentaciones/` tras cada build para que `python -m http.server` pueda servirlos.
+
+**Cambios técnicos adicionales:**
+- `web/src/layouts/Layout.astro`: navLinks actualizado con Presentación
+- `web/src/lib/db.js`: `getPresentacionByFecha` ahora incluye `fuente_scraping` de la tabla lecturas
+- `web/src/pages/lecturas/[fecha].astro`: muestra fuente_scraping con enlace a ciudadredonda.org o servicioskoinonia.org
+- Nuevos archivos: `web/src/pages/musicos/index.astro`, `web/src/pages/presentacion/index.astro`
+
 ### Transposición de Tono (2026-09-14)
 **Commits:** `96e4c23`, `f2bd386`
 
