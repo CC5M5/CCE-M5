@@ -35,7 +35,7 @@ const htmlSeguro = (htmlVisual || '')
       </button>
 
       {tono && (
-        <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
+        <span data-tono class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
           Tono: {tono}
         </span>
       )}
@@ -81,6 +81,7 @@ const htmlSeguro = (htmlVisual || '')
   (function() {
     const container = document.getElementById('visor-acordes-' + slug);
     const btn = document.querySelector('[data-toggle-acordes]');
+    const tonoBadge = document.querySelector('[data-tono]');
     if (!container || !btn) return;
 
     let conAcordes = true;
@@ -100,6 +101,8 @@ const htmlSeguro = (htmlVisual || '')
       btn.querySelectorAll('[data-icon]').forEach(el => el.classList.toggle('hidden'));
       // Toggle text
       btn.querySelectorAll('[data-text]').forEach(el => el.classList.toggle('hidden'));
+      // Toggle tono badge
+      if (tonoBadge) tonoBadge.classList.toggle('hidden', !conAcordes);
       btn.setAttribute('aria-pressed', String(conAcordes));
     });
   })();

@@ -55,13 +55,10 @@
   .skip-link {
     @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-4 focus:py-2 focus:rounded-lg;
   }
-}
 
-@layer components {
   /* ─── Visor de acordes ─── */
   .cancion-con-acordes {
     font-family: "Courier New", Courier, monospace;
-    white-space: pre;
     line-height: 1.6;
   }
 
@@ -72,7 +69,8 @@
 
   .bloque-acordes-letra .linea-acordes {
     position: relative;
-    height: 1.2em;
+    height: 1.4em;
+    white-space: nowrap;
   }
 
   .bloque-acordes-letra .acorde {
@@ -98,6 +96,10 @@
     color: #2c3e50;
   }
 
+  .linea-vacia {
+    height: 0.6em;
+  }
+
   .seccion {
     font-weight: bold;
     margin-top: 1em;
@@ -120,77 +122,5 @@
 @layer utilities {
   .acordes-margen {
     word-spacing: 0.25em;
-  }
-
-
-
-  /* Bloques de acordes posicionados (parser v3) */
-  .bloque-acordes-letra {
-    position: relative;
-    margin-bottom: 0.2em;
-  }
-
-  .bloque-acordes-letra .linea-acordes {
-    position: relative;
-    height: 1.2em;
-  }
-
-  .bloque-acordes-letra .acorde {
-    position: absolute;
-    top: 0;
-    color: #c0392b;
-    font-weight: bold;
-  }
-
-  /* Líneas de acordes sueltas (formato antiguo de DB) */
-  .linea-acordes {
-    color: #c0392b;
-    font-weight: bold;
-    margin-bottom: 0.1em;
-  }
-
-  /* Bloques linea-mixta (formato antiguo de DB) */
-  .linea-mixta {
-    position: relative;
-    margin-bottom: 0.2em;
-  }
-
-  .linea-mixta .acordes-superior {
-    color: #c0392b;
-    font-weight: bold;
-    min-height: 1.2em;
-  }
-
-  .linea-mixta .letra-inferior {
-    color: #2c3e50;
-  }
-
-  .linea-letra,
-  .letra-solo,
-  .letra-inferior {
-    color: #2c3e50;
-  }
-
-  .seccion {
-    font-weight: bold;
-    margin-top: 1em;
-    color: #2980b9;
-  }
-
-  /* Modo "sin acordes": oculta TODAS las líneas de acordes */
-  .cancion-con-acordes.sin-acordes .linea-acordes,
-  .cancion-con-acordes.sin-acordes .linea-acordes-suelta,
-  .cancion-con-acordes.sin-acordes .acorde,
-  .cancion-con-acordes.sin-acordes .acordes-superior {
-    display: none !important;
-  }
-
-  /* Al ocultar acordes, quitar el margen extra de linea-mixta */
-  .cancion-con-acordes.sin-acordes .linea-mixta {
-    margin-bottom: 0;
-  }
-
-  .cancion-con-acordes.sin-acordes .bloque-acordes-letra {
-    margin-bottom: 0;
   }
 }
