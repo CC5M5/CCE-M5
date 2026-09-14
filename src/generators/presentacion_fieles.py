@@ -4,6 +4,7 @@ Generador de presentaciones PPTX para la asamblea (sin acordes)
 Formato 16:9 basado en 274 Domingo 21 06 2026.pptx
 """
 
+import os
 import logging
 import re
 import sqlite3
@@ -23,10 +24,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Constantes
-PROJECT_DIR = Path(__file__).parent.parent.parent
+DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
+PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 OUTPUT_DIR = PROJECT_DIR / "presentaciones"
-TEMPLATE_PATH = PROJECT_DIR / "presentaciones" / "274 Domingo 21 06 2026.pptx"
+TEMPLATE_PATH = PROJECT_DIR / "data" / "templates" / "274_Domingo_21_06_2026.pptx"
 
 # Colores litúrgicos
 COLORES_LITURGICOS = {
@@ -356,7 +358,8 @@ class GeneradorPPTX:
 
                 cursor.execute(
                     """
-                    SELECT celebracion, temporada, color_liturgico,
+                    SELECT COALESCE(celebracion, domingo) AS celebracion,
+                           temporada, color_liturgico,
                            primera_lectura_cita, primera_lectura_texto,
                            salmo_cita, salmo_antifona, salmo_texto,
                            segunda_lectura_cita, segunda_lectura_texto,

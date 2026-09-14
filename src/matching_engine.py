@@ -19,6 +19,7 @@ import logging
 import re
 import sqlite3
 from dataclasses import dataclass, field
+import os
 from pathlib import Path
 from typing import Any
 
@@ -28,7 +29,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-PROJECT_DIR = Path(__file__).parent.parent.parent
+DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
+PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 CONFIG_PATH = PROJECT_DIR / "data" / "matching_config.json"
 
@@ -510,7 +512,7 @@ class MatchingService:
                     """
                     SELECT primera_lectura_texto, salmo_texto,
                            segunda_lectura_texto, evangelio_texto,
-                           celebracion
+                           COALESCE(celebracion, domingo) AS celebracion
                     FROM lecturas WHERE id = ?
                     """,
                     (lectura_id,),
