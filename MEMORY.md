@@ -7,7 +7,7 @@
 ### Resumen
 Sistema automatizado para preparación semanal de presentaciones litúrgicas con cancionero escolapio, hoja para músicos con acordes, y web de publicación. Arquitectura híbrida: Mission Control + OpenCode + OpenClaw.
 
-**Estado actual:** FASE 2 completada (Matching + PPTX). Generador de presentaciones 16:9 funcionando.
+**Estado actual:** FASE 5 completada (Integración end-to-end). PPTX y PDF generados; pendiente corregir errores detectados en la web.
 
 ### Ubicación del Proyecto
 `~/proyectos/CCE-M5-Web-Presentaciones/`
@@ -197,6 +197,8 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - Preserva el texto de la letra sin modificarlo
 - Soporta bemoles, sostenidos dobles, extensiones y slash chords
 - HTML monoespaciado con spans posicionados en `ch`
+- Limpia etiquetas HTML y metadatos del blogspot (`escuchar`, `volver a lista`, `Version en`, `/`)
+- Normaliza NBSP y espacios múltiples
 - 4 tests incluidos, todos pasan
 
 **Archivos relacionados:**
@@ -225,6 +227,7 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - ✅ `PRAGMA integrity_check` al conectar
 - ✅ `create_connection()` con `row_factory=sqlite3.Row`, `timeout=30`, `isolation_level=DEFERRED`
 - ✅ Tabla `schema_version` para migraciones
+- ✅ Migración automática: añade columna `celebracion` a `lecturas` si falta
 - ✅ Índices faltantes en FK y campos de búsqueda
 - ✅ Logging en lugar de print
 - ✅ Carga `data/schema.sql` si existe
@@ -238,8 +241,10 @@ Sistema automatizado para preparación semanal de presentaciones litúrgicas con
 - ✅ Validación de inputs
 
 #### Generador PPTX (presentacion_fieles.py)
-- ✅ Carga template real `274 Domingo 21 06 2026.pptx`
+- ✅ Carga template real `274_Domingo_21_06_2026.pptx`
 - ✅ Bug corregido: `letra_limpia` ya no usa `texto` por error
+- ✅ Bug corregido: acceso a `RGBColor` por índice (no `.r`/`.g`/`.b`)
+- ✅ Letra de canciones en PPTX limpia de metadatos del blogspot
 - ✅ Color de fondo configurable con contraste automático de texto
 - ✅ Sanitización de nombres de archivo y texto XML
 - ✅ `sqlite3.Row` para acceso por nombre
@@ -391,6 +396,7 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 | Integración end-to-end | ✅ Funcionando | `scripts/generar_semana.py` genera PPTX/PDF y registra en DB |
 
 ### Próximos Pasos Pendientes
+- [ ] Corregir errores detectados en la web Astro (prioridad sobre nuevas funcionalidades)
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente solo 9 canciones)
