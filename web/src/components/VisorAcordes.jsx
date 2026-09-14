@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Play, ArrowLeft } from 'lucide-react';
 
 /**
  * Sanitiza HTML del contenido de canciones con acordes.
  * Evita inyección de scripts, estilos y handlers inline.
- * Permite solo las etiquetas/estilos de presentación necesarias para las letras.
+ * Permite solo las etiquetas/estilos de presentación necesarios para las letras.
  */
 function sanitizarHtml(html) {
   if (!html) return '';
@@ -30,7 +30,6 @@ function sanitizarHtml(html) {
           continue;
         }
         if (name === 'style') {
-          // Limpiar URLs potencialmente peligrosas (expression, javascript:, data:) y reglas no deseadas
           const value = attr.value
             .replace(/expression\s*\(/gi, '')
             .replace(/javascript\s*:/gi, '')
@@ -58,15 +57,18 @@ function sanitizarHtml(html) {
   return temp.innerHTML;
 }
 
-export default function VisorAcordes({ htmlVisual, titulo, slug, compact = false }) {
+export default function VisorAcordes({ htmlVisual, titulo, slug, tono, enlaceAudio, compact = false }) {
   const [conAcordes, setConAcordes] = useState(true);
 
   const htmlSeguro = useMemo(() => {
-    // El DOMParser solo existe en el cliente; en SSR devolvemos el HTML tal cual
-    // porque no se ejecuta JS en Astro SSG. No obstante, evitamos que se inyecte
-    // en el markup estático usando el escape inicial de React/Astro.
-    if (typeof document === 'undefined') return htmlVisual || '';
-    return sanitizarHtml(htmlVisual);
+    if (typeof document === 'undefined') {
+      // SSR: sanitización básica con regex (sin DOM)
+      return (htmlVisual || '')
+        .replace(/<script\b[^\<]*(?:(?!<\/script>)<[^\<]*)*<\/script>/gi, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+\s*=/gi, '');
+    }
+    return sanitizarHtml(htmlVisual || '');
   }, [htmlVisual]);
 
   const handleToggle = () => {
@@ -80,7 +82,7 @@ export default function VisorAcordes({ htmlVisual, titulo, slug, compact = false
   return (
     <div className={`bg-white rounded-xl border border-slate-200 ${compact ? 'p-4' : 'p-6 md:p-8'} font-mono leading-relaxed`}>
       {!compact && (
-        <div className="flex items-center gap-3 mb-4 no-print">
+        <div className="flex flex-wrap items-center gap-3 mb-4 no-print">
           <button
             type="button"
             onClick={handleToggle}
@@ -97,6 +99,39 @@ export default function VisorAcordes({ htmlVisual, titulo, slug, compact = false
               </>
             )}
           </button>
+
+          {tono && (
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
+              Tono: {tono}
+            </span>
+          )}
+
+          {enlaceAudio ? (
+            <a
+              href={enlaceAudio}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary text-sm"
+            >
+              <Play className="w-4 h-4" /> Escuchar
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="btn-secondary text-sm opacity-50 cursor-not-allowed"
+              title="Audio no disponible"
+            >
+              <Play className="w-4 h-4" /> Audio no disponible
+            </button>
+          )}
+
+          <a
+            href="/cancionero/"
+            className="btn-secondary text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" /> Volver al cancionero
+          </a>
         </div>
       )}
 
