@@ -438,6 +438,7 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
+- [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente solo 9 canciones)
