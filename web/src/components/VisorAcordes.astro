@@ -194,23 +194,34 @@ htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:
     }
 
     function transponerAcorde(acorde, delta) {
-      // Patrón: nota base + resto (extensiones, slash chords)
-      // Ej: "Sol", "Mim", "Do7", "Re/Fa#", "Sol7"
-      const match = acorde.match(/^([A-Za-z][a-z]?)(#|b)?(.*)$/);
-      if (!match) return acorde;
-
-      const [, base, alteracion, resto] = match;
-      const notaCompleta = base + (alteracion || '');
-      const idx = indiceNota(notaCompleta);
-      if (idx === -1) return acorde;
-
-      const nuevoIdx = (idx + delta + 12) % 12;
-      const nuevaNota = notaDesdeIndice(nuevoIdx);
-      return nuevaNota + resto;
+      // Búsqueda por prefijo: prueba notas de más a menos letras
+      // para que "Sol" se pruebe antes que "So"
+      const notasBase = ['Sol', 'Do', 'Re', 'Mi', 'Fa', 'La', 'Si', 'C', 'D', 'E', 'F', 'G', 'A', 'B'];
+      
+      for (const nota of notasBase) {
+        if (acorde.length < nota.length) continue;
+        if (acorde.substring(0, nota.length).toLowerCase() !== nota.toLowerCase()) continue;
+        
+        const resto = acorde.substring(nota.length);
+        // La siguiente parte debe ser alteración (#/b), extensión (m, 7, maj7...) o nada
+        if (resto === '' || /^[#b]/.test(resto) || /^\d/.test(resto) || /^m/.test(resto) || /^M/.test(resto) || /^sus/.test(resto) || /^dim/.test(resto) || /^aug/.test(resto) || /^add/.test(resto)) {
+          const notaCompleta = nota + (resto.startsWith('#') || resto.startsWith('b') ? resto.charAt(0) : '');
+          const extension = notaCompleta.length < acorde.length ? acorde.substring(notaCompleta.length) : '';
+          const idx = indiceNota(notaCompleta);
+          if (idx !== -1) {
+            const nuevoIdx = (idx + delta + 12) % 12;
+            const nuevaNota = notaDesdeIndice(nuevoIdx);
+            return nuevaNota + extension;
+          }
+        }
+      }
+      return acorde;
     }
 
     function aplicarTransposicion() {
       if (!container) return;
+      
+      // 1. Acordes en spans individuales (bloque-acordes-letra)
       const acordes = container.querySelectorAll('.acorde');
       acordes.forEach(el => {
         const original = el.dataset.acordeOriginal || el.textContent;
@@ -218,6 +229,18 @@ htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:
           el.dataset.acordeOriginal = original;
         }
         el.textContent = transponerAcorde(el.dataset.acordeOriginal, semitonos);
+      });
+
+      // 2. Acordes sueltos en div.linea-acordes-suelta (texto plano, no spans)
+      const lineasSueltas = container.querySelectorAll('.linea-acordes-suelta');
+      lineasSueltas.forEach(el => {
+        const original = el.dataset.acordesOriginal || el.textContent;
+        if (!el.dataset.acordesOriginal) {
+          el.dataset.acordesOriginal = original;
+        }
+        // Dividir por espacios, transponer cada token, recombinar
+        const transpuestos = original.split(/\s+/).map(token => transponerAcorde(token, semitonos));
+        el.textContent = transpuestos.join(' ');
       });
 
       if (tonoValor) {
@@ -248,6 +271,11 @@ htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:
       container.querySelectorAll('.acorde').forEach(el => {
         if (!el.dataset.acordeOriginal) {
           el.dataset.acordeOriginal = el.textContent;
+        }
+      });
+      container.querySelectorAll('.linea-acordes-suelta').forEach(el => {
+        if (!el.dataset.acordesOriginal) {
+          el.dataset.acordesOriginal = el.textContent;
         }
       });
     }
