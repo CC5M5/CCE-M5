@@ -415,6 +415,27 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 
 **Nota:** El formato se aplica a TODAS las canciones automáticamente porque el componente `VisorAcordes.astro` es compartido por todas las páginas de canción.
 
+### Transposición de Tono (2026-09-14)
+**Commits:** `96e4c23`, `f2bd386`
+
+**Funcionalidad añadida:**
+- Controles en dos filas: fila 1 (toggle, audio, volver) + fila 2 (tono, transposición)
+- Botones `+` / `−` suben/bajan un semitono todos los acordes de la canción
+- Badge "Tono: X" se actualiza dinámicamente reflejando el desplazamiento
+- Botón "Original" resetea al tono inicial (`semitonos = 0`)
+- Guardado de valores originales en `data-acorde-original` y `data-acordes-original` para poder resetear
+
+**Correcciones de la transposición:**
+1. **Notas de 3 letras (Sol)** — El patrón regex `([A-Za-z][a-z]?)` solo capturaba 2 letras, fallando con "Sol". Reemplazado por búsqueda por prefijo ordenado por longitud descendente.
+2. **Acordes sueltos (linea-acordes-suelta)** — Las líneas como "Sol La Re" no estaban en spans individuales; ahora también se transponen dividiendo por espacios.
+3. **Notas menores (Sim, Lam)** — El sufijo "m" de menor se preserva correctamente al transponer (Sim → Do#m, Lam → Si#m).
+
+**Implementación técnica:**
+- Array cromático español: `['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si']`
+- Función `transponerAcorde(token, delta)` busca la nota base más larga que coincida al inicio del token
+- Soporte para alteraciones (#, b) y extensiones (m, 7, maj7, sus4, dim, aug, add9, slash chords)
+- El componente sigue siendo puro Astro (sin React) para evitar problemas de hidratación
+
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [ ] Fase 6: Refinamiento final
