@@ -490,6 +490,37 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 - **Lema "Somos uno" no aparece en slides** — Solo se añadió como texto en generador anterior (ya descartado), no en el nuevo `presentacion_master.py`.
 - **Matching de canciones asigna todas "PREPARAD EL CAMINO"** — El motor de matching no funciona correctamente con las 9 canciones actuales. Necesita más canciones o lógica de fallback mejorada.
 
+
+
+### Actualización 2026-09-14 (continuación)
+
+24. **Generador `presentacion_master.py` COMPLETADO** — 4 de 6 pasos implementados:
+    - ✅ Paso 1: `_rebuild_pptx` corregido (elimina slides correctamente)
+    - ✅ Paso 2: Slides de lecturas con estilo (fondo color litúrgico, tipografía Calibri)
+    - ✅ Paso 3: Esquema completo (portada, transiciones, lecturas, canciones)
+    - ✅ Paso 4: Lema "Somos uno" como imagen en esquina inferior de slides nuevas
+    - ✅ Paso 5: Matching arreglado (usa `DEFAULT_ASIGNACION` cuando hay <20 canciones)
+    - ❌ Paso 6: Migrar más canciones desde Blogspot (pendiente)
+
+25. **Matching de canciones corregido** — `proponer_canciones_matching` ahora detecta cuando hay menos de 20 canciones y usa `DEFAULT_ASIGNACION` directamente, evitando que todas las canciones sean "PREPARAD EL CAMINO".
+
+26. **Presentación 2026-09-20 regenerada con éxito** — 10 slides: menú + Preparad el Camino + 4 lecturas + 3 transiciones + portada. PPTX de 6.8MB servido en web.
+
+### Notas sobre limitaciones actuales
+
+- **Slides de canciones no tienen lema**: Las slides copiadas de la plantilla MASTER tienen el lema antiguo ("Tu raíz"). Solo las slides creadas por python-pptx (lecturas, transiciones, portada) tienen el lema "Somos uno".
+- **Orden de slides no es perfecto**: La portada está al final en vez de al principio. Esto es una limitación de python-pptx que no permite insertar slides en posiciones arbitrarias.
+- **Matching es básico**: Con solo 9 canciones, hay repeticiones (Gloria=Santo, Ofertorio=Paz, Comunión=María).
+- **Transiciones son texto simple**: No tienen las imágenes de fondo de la plantilla MASTER.
+
+### Próximos pasos pendientes (actualizado)
+
+1. **Paso 6: Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos.
+2. **Reordenar slides** — Implementar reordenamiento para que la portada sea slide 1.
+3. **Añadir lema a slides de plantilla** — Reemplazar la imagen "Tu raíz" en todas las slides de la plantilla MASTER.
+4. **Mejorar estilo de transiciones** — Usar imágenes de fondo como en la plantilla MASTER.
+5. **Tests del generador** — Añadir tests unitarios para `presentacion_master.py`.
+
 ### Próximos pasos pendientes (prioridad)
 
 1. **Corregir `_rebuild_pptx`** para eliminar slides correctamente y evitar duplicados
