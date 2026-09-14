@@ -1,8 +1,8 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { getCancionBySlug, getAllCancionesSlugs } from '@lib/db.js';
-import VisorAcordes from '@components/VisorAcordes.jsx';
-import { Play, ExternalLink, Printer, Share2, Music } from 'lucide-react';
+import VisorAcordes from '@components/VisorAcordes.astro';
+import { Printer, Share2, Music } from 'lucide-react';
 import '../../styles/global.css';
 
 export async function getStaticPaths() {
@@ -41,7 +41,7 @@ const cancionSlug = slugify(cancion.titulo);
       </nav>
 
       <div class="flex items-start gap-3 mb-2">
-        <Music className="w-8 h-8 text-liturgia-verde mt-1" />
+        <Music class="w-8 h-8 text-liturgia-verde mt-1" />
         <h1 class="section-title mb-0">{cancion.titulo}</h1>
       </div>
       <hr class="border-slate-200 mb-6" />
@@ -53,53 +53,19 @@ const cancionSlug = slugify(cancion.titulo);
             <span class="font-medium">{cancion.momento_liturgico}</span>
           </div>
         )}
-        {cancion.tono && (
-          <div>
-            <span class="text-slate-500">Tono:</span>{' '}
-            <span class="font-medium">{cancion.tono}</span>
-          </div>
-        )}
       </div>
 
-      {(cancion.temas || cancion.referencias_biblicas) && (
-        <div class="bg-slate-50 rounded-lg p-4 mb-6 text-sm space-y-2">
-          {cancion.temas && (
-            <div>
-              <span class="font-semibold text-slate-700">Temas:</span>{' '}
-              <span class="text-slate-600">{cancion.temas}</span>
-            </div>
-          )}
-          {cancion.referencias_biblicas && (
-            <div>
-              <span class="font-semibold text-slate-700">Referencias:</span>{' '}
-              <span class="text-slate-600">{cancion.referencias_biblicas}</span>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div class="flex flex-wrap gap-3 mb-6">
-        {cancion.enlace_audio && (
-          <a href={cancion.enlace_audio} target="_blank" rel="noopener noreferrer" class="btn-secondary text-sm">
-            <Play className="w-4 h-4" /> Escuchar
-          </a>
-        )}
-        {cancion.enlace_alt && (
-          <a href={cancion.enlace_alt} target="_blank" rel="noopener noreferrer" class="btn-secondary text-sm">
-            <ExternalLink className="w-4 h-4" /> Versión alternativa
-          </a>
-        )}
-      </div>
-
-      <VisorAcordes client:load 
+      <VisorAcordes
         htmlVisual={cancion.html_visual || ''} 
         titulo={cancion.titulo}
         slug={cancionSlug}
+        tono={cancion.tono || undefined}
+        enlaceAudio={cancion.enlace_audio || undefined}
       />
 
       <div class="mt-8 flex flex-wrap gap-3 no-print">
         <button type="button" onclick="window.print()" class="btn-secondary">
-          <Printer className="w-4 h-4" /> Imprimir
+          <Printer class="w-4 h-4" /> Imprimir
         </button>
         <button 
           type="button" 
@@ -108,7 +74,7 @@ const cancionSlug = slugify(cancion.titulo);
           data-title={cancion.titulo}
           data-url={`${base}cancionero/${cancionSlug}/`}
         >
-          <Share2 className="w-4 h-4" /> Compartir
+          <Share2 class="w-4 h-4" /> Compartir
         </button>
       </div>
     </div>

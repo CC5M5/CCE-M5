@@ -1,0 +1,106 @@
+---
+import { Eye, EyeOff, Play, ArrowLeft } from 'lucide-react';
+
+interface Props {
+  htmlVisual: string;
+  titulo: string;
+  slug: string;
+  tono?: string;
+  enlaceAudio?: string;
+  compact?: boolean;
+}
+
+const { htmlVisual, titulo, slug, tono, enlaceAudio, compact = false } = Astro.props;
+
+// Sanitizar HTML básico para SSR
+const htmlSeguro = (htmlVisual || '')
+  .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+  .replace(/javascript:/gi, '')
+  .replace(/on\w+\s*=/gi, '');
+---
+
+<div class={`bg-white rounded-xl border border-slate-200 ${compact ? 'p-4' : 'p-6 md:p-8'} font-mono leading-relaxed`}>
+  {!compact && (
+    <div class="flex flex-wrap items-center gap-3 mb-4 no-print">
+      <button
+        type="button"
+        data-toggle-acordes
+        class="btn-secondary text-sm inline-flex items-center gap-2"
+        aria-pressed="true"
+      >
+        <span data-icon="on"><EyeOff class="w-4 h-4" /></span>
+        <span data-icon="off" class="hidden"><Eye class="w-4 h-4" /></span>
+        <span data-text="on">Sin acordes</span>
+        <span data-text="off" class="hidden">Con acordes</span>
+      </button>
+
+      {tono && (
+        <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium">
+          Tono: {tono}
+        </span>
+      )}
+
+      {enlaceAudio ? (
+        <a
+          href={enlaceAudio}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-secondary text-sm inline-flex items-center gap-2"
+        >
+          <Play class="w-4 h-4" /> Escuchar
+        </a>
+      ) : (
+        <button
+          type="button"
+          disabled
+          class="btn-secondary text-sm opacity-50 cursor-not-allowed inline-flex items-center gap-2"
+          title="Audio no disponible"
+        >
+          <Play class="w-4 h-4" /> Audio no disponible
+        </button>
+      )}
+
+      <a
+        href="/cancionero/"
+        class="btn-secondary text-sm inline-flex items-center gap-2"
+      >
+        <ArrowLeft class="w-4 h-4" /> Volver al cancionero
+      </a>
+    </div>
+  )}
+
+  <div
+    id={`visor-acordes-${slug}`}
+    class="cancion-con-acordes"
+    aria-label={`Letra con acordes de ${titulo}`}
+    set:html={htmlSeguro}
+  />
+</div>
+
+<script define:vars={{ slug }}>
+  (function() {
+    const container = document.getElementById('visor-acordes-' + slug);
+    const btn = document.querySelector('[data-toggle-acordes]');
+    if (!container || !btn) return;
+
+    let conAcordes = true;
+
+    btn.addEventListener('click', function() {
+      conAcordes = !conAcordes;
+
+      if (conAcordes) {
+        container.classList.remove('sin-acordes');
+        container.setAttribute('aria-label', container.getAttribute('aria-label').replace('sin acordes', 'con acordes'));
+      } else {
+        container.classList.add('sin-acordes');
+        container.setAttribute('aria-label', container.getAttribute('aria-label').replace('con acordes', 'sin acordes'));
+      }
+
+      // Toggle icons
+      btn.querySelectorAll('[data-icon]').forEach(el => el.classList.toggle('hidden'));
+      // Toggle text
+      btn.querySelectorAll('[data-text]').forEach(el => el.classList.toggle('hidden'));
+      btn.setAttribute('aria-pressed', String(conAcordes));
+    });
+  })();
+</script>
