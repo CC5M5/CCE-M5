@@ -558,6 +558,39 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 
 40. **Commit:** `4e3772c` — fix: blogspot_scraper compatible con acordes_parser_v3 y detección momento litúrgico.
 
+### Actualización 2026-09-15 (tarde)
+
+41. **Importación completa del cancionero Betania** — Se añadieron 98 canciones desde `https://betaniamusic.blogspot.com/2018/07/cancionero-escolapio.html`. Total en BD: 107 canciones.
+
+42. **Preprocesador Betania robusto** — El scraper ahora soporta múltiples formatos de publicación:
+    - Posts con URL `/YYYY/MM/slug.html` (no solo `/p/`).
+    - Acordes en spans de color rojo (`#c00000`) dentro de `<div>`, `<p>` o `<h1>`.
+    - Acordes pegados (`LamSol`, `DoFaDo`) separados automáticamente.
+    - Deduplicación de líneas causada por anidación de etiquetas.
+
+43. **Dos canciones problemáticas recuperadas**:
+    - `PADRE NUESTRO (Simon y Garfunquel)` → ID 73, tono Lam, momento ofertorio.
+    - `QUÉ TE PUEDO DAR` → ID 82, tono La, momento general.
+
+44. **Web Admin descartado** — El usuario prefiere editar los momentos litúrgicos manualmente.
+
+45. **Presentación 2026-09-20 regenerada con cancionero ampliado** — 21 slides, con asignación automática por matching:
+    - Entrada: PREPARAD EL CAMINO
+    - Perdón: OTRA OPORTUNIDAD
+    - Gloria: EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS
+    - Salmo: AQUÍ ESTOY, SEÑOR (SALMO 39)
+    - Aleluya: JESÚS RESUCITA HOY
+    - Ofertorio: PADRE NUESTRO DE LA VIDA
+    - Santo: QUIERO HACER LO MISMO
+    - Padre Nuestro: PADRE NUESTRO (Gallego)
+    - Paz: UNA NUEVA ESPERANZA
+    - Comunión: ORACIÓN DEL POBRE
+    - Canto a María: BENDIGAMOS AL SEÑOR
+    - Despedida: VEN JESÚS
+
+46. **Commits de la sesión:**
+    - `92b4ab7`: scraper Betania soporta h1, acordes pegados y spans rojos; importadas 98 canciones más
+
 ### Próximos pasos pendientes (actualizado)
 
 1. **Paso 6: Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos.
