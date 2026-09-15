@@ -412,7 +412,10 @@ Te damos gracias, Señor Dios, Rey celestial."""
         add(
             "credo",
             "CREDO",
-            "Creo en Dios, Padre todopoderoso, Creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor...",
+            """Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.
+Creo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.
+Desde allí ha de venir a juzgar a vivos y muertos.
+Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.""",
         )
         c = canciones.get("ofertorio")
         if c:
@@ -477,112 +480,229 @@ Hosanna en el cielo."""
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;600;700&display=swap');
+    
     :root {{
       --liturgia-from: {color_info['from']};
       --liturgia-to: {color_info['to']};
       --liturgia-acento: {color_info['acento']};
+      --oro: #A16207;
+      --morado: #7C3AED;
+      --blanco-tarjeta: rgba(255,255,255,0.94);
     }}
-    @import url('https://fonts.googleapis.com/css2?family=Calibri:wght@400;700&display=swap');
+    
     .reveal {{
-      font-family: 'Calibri', 'Carlito', sans-serif;
-      font-size: 32px;
-      color: #333;
+      font-family: 'Nunito', 'Open Sans', sans-serif;
+      font-size: 31px;
+      color: #2c3e50;
     }}
+    
     .reveal .slides {{
       text-align: left;
     }}
+    
     .reveal .slides section {{
       box-sizing: border-box;
-      padding: 40px 60px;
+      padding: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, var(--liturgia-from) 0%, var(--liturgia-to) 100%);
+      background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }}
+    
+    .reveal .slides section::before {{
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro), var(--liturgia-acento));
+      z-index: 20;
+    }}
+    
     .reveal h1, .reveal h2, .reveal h3 {{
-      font-family: 'Calibri', 'Carlito', sans-serif;
+      font-family: 'Fredoka', 'Montserrat', sans-serif;
       color: var(--liturgia-acento);
       text-transform: uppercase;
       margin-bottom: 0.3em;
-      line-height: 1.1;
+      line-height: 1.15;
+      font-weight: 600;
+      letter-spacing: -0.01em;
     }}
-    .reveal h1 {{ font-size: 1.4em; }}
-    .reveal h2 {{ font-size: 1.2em; }}
-    .reveal h3 {{ font-size: 1em; }}
+    
+    .reveal h1 {{ font-size: 1.55em; }}
+    .reveal h2 {{ font-size: 1.15em; font-weight: 400; text-transform: none; color: #555; }}
+    .reveal h3 {{ font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }}
+    
     .reveal p, .reveal li {{
-      line-height: 1.5;
-      margin-bottom: 0.6em;
-    }}
-    .reveal .cita {{
-      font-size: 0.85em;
-      color: #555;
-      font-weight: bold;
+      line-height: 1.55;
       margin-bottom: 0.5em;
     }}
+    
+    .reveal .tarjeta {{
+      background: var(--blanco-tarjeta);
+      border-radius: 24px;
+      padding: 38px 48px;
+      margin: 45px 60px;
+      box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(124, 58, 237, 0.12);
+      max-height: 82%;
+      overflow: auto;
+      position: relative;
+      z-index: 5;
+    }}
+    
+    .reveal .tarjeta::after {{
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
+      border-radius: 0 0 24px 24px;
+    }}
+    
+    .reveal .cita {{
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 0.6em;
+      padding: 0.25em 0.7em;
+      display: inline-block;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
+      color: white;
+      border-radius: 8px;
+    }}
+    
     .reveal .contenido {{
       white-space: pre-wrap;
-      max-height: 75%;
-      overflow: auto;
+      max-height: none;
+      overflow: visible;
+      font-size: 0.92em;
+      line-height: 1.5;
     }}
+    
     .reveal .logo-lema {{
       position: absolute;
-      bottom: 20px;
+      bottom: 22px;
       right: 30px;
-      height: 60px;
+      height: 55px;
       width: auto;
-      max-width: 200px;
+      max-width: 180px;
       z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }}
+    
     .reveal .ilustracion {{
       position: absolute;
-      top: 40px;
-      right: 60px;
-      max-width: 180px;
-      max-height: 180px;
-      opacity: 0.9;
-      z-index: 5;
-    }}
-    .reveal .ilustracion-bottom {{
-      position: absolute;
-      bottom: 100px;
+      top: auto;
+      bottom: 90px;
       right: 80px;
-      max-width: 220px;
-      max-height: 220px;
-      opacity: 0.9;
-      z-index: 5;
+      max-width: 320px;
+      max-height: 320px;
+      opacity: 0.98;
+      z-index: 6;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      object-fit: contain;
     }}
+    
+    section:has(.ilustracion) .tarjeta {{
+      margin-right: 380px;
+    }}
+    
+    .reveal .portada {{
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 40%, #7C3AED 70%, var(--oro) 100%);
+    }}
+    
+    .reveal .portada .tarjeta {{
+      background: rgba(255,255,255,0.96);
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }}
+    
     .reveal .portada h1 {{
       text-align: center;
-      font-size: 1.8em;
+      font-size: 2em;
       margin-top: 0;
     }}
+    
     .reveal .portada h2 {{
       text-align: center;
-      font-size: 1.1em;
+      font-size: 1.2em;
       color: #555;
       text-transform: none;
-      font-weight: normal;
+      font-weight: 400;
+      margin-top: 0.5em;
     }}
+    
+    .reveal .portada .ilustracion {{
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      max-width: 380px;
+      max-height: 380px;
+      margin: 0 auto 1em;
+    }}
+    
+    .reveal .transicion .tarjeta {{
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 55%;
+    }}
+    
     .reveal .transicion h1 {{
       text-align: center;
-      font-size: 2em;
+      font-size: 2.2em;
+      letter-spacing: 0.04em;
     }}
-    .reveal .transicion p {{
-      text-align: center;
-      font-size: 1.1em;
-      color: #555;
+    
+    .reveal .cancion .tarjeta {{
+      background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,255,0.96) 100%);
     }}
-    /* Scrollbars */
+    
+    .reveal .cancion .contenido {{
+      font-size: 0.92em;
+      line-height: 1.3;
+    }}
+    
+    .reveal .cancion .contenido br {{
+      display: block;
+      content: "";
+      margin-bottom: 0.1em;
+    }}
+    
+    @keyframes fadeInUp {{
+      from {{ opacity: 0; transform: translateY(20px); }}
+      to {{ opacity: 1; transform: translateY(0); }}
+    }}
+    
+    .reveal .slides section.present {{
+      animation: fadeInUp 0.5s ease-out;
+    }}
+    
     .reveal .contenido::-webkit-scrollbar {{
-      width: 8px;
+      width: 6px;
     }}
     .reveal .contenido::-webkit-scrollbar-thumb {{
       background: var(--liturgia-acento);
-      border-radius: 4px;
+      border-radius: 3px;
     }}
-    /* Print/PDF tweaks */
+    
     @media print {{
       .reveal .slides section {{
         page-break-after: always;
@@ -593,8 +713,13 @@ Hosanna en el cielo."""
         bottom: 20px;
         right: 30px;
       }}
-    }}
-  </style>
+      section:has(.ilustracion) .tarjeta {{
+        margin-right: 380px;
+      }}
+      .reveal .tarjeta {{
+        margin: 30px 40px;
+      }}
+    }}  </style>
 </head>
 <body>
   <div class="reveal">
@@ -618,7 +743,7 @@ Hosanna en el cielo."""
 </body>
 </html>"""
 
-    def _slide_to_html(self, slide: Dict[str, Any], color_info: Dict[str, str]) -> str:
+    def _slide_to_html(self, slide: Dict[str, Any], color_info: Dict[str, str], template: str = "liturgia") -> str:
         tipo = slide["tipo"]
         titulo = self._escape_html(slide["titulo"])
         contenido = self._escape_html(slide["contenido"])
@@ -628,6 +753,17 @@ Hosanna en el cielo."""
         imagen = slide.get("imagen", "")
 
         lema_img = "assets/lema_somos_uno.jpg"
+        inner = ""
+
+        if momento:
+            inner += f'  <h3>{momento}</h3>\n'
+        inner += f'  <h1>{titulo}</h1>\n'
+        if subtitulo:
+            inner += f'  <h2>{subtitulo}</h2>\n'
+        if cita:
+            inner += f'  <div class="cita">{cita}</div>\n'
+        if contenido:
+            inner += f'  <div class="contenido">{contenido}</div>\n'
 
         clase = tipo
         html = f'<section class="{clase}" data-transition="fade">\n'
@@ -635,16 +771,7 @@ Hosanna en el cielo."""
         if imagen:
             html += f'  <img class="ilustracion" src="{imagen}" alt="ilustración">\n'
 
-        if momento:
-            html += f'  <h3>{momento}</h3>\n'
-        html += f'  <h1>{titulo}</h1>\n'
-        if subtitulo:
-            html += f'  <h2>{subtitulo}</h2>\n'
-        if cita:
-            html += f'  <div class="cita">{cita}</div>\n'
-        if contenido:
-            html += f'  <div class="contenido">{contenido}</div>\n'
-
+        html += f'  <div class="tarjeta">\n{inner}  </div>\n'
         html += f'  <img class="logo-lema" src="{lema_img}" alt="Somos uno">\n'
         html += '</section>\n'
         return html
@@ -659,110 +786,202 @@ Hosanna en el cielo."""
         )
 
     # ------------------------------------------------------------------
-    # PPTX
+    # PPTX con estilo litúrgico mejorado
     # ------------------------------------------------------------------
 
     def _render_pptx(self, data: Dict[str, Any], pptx_path: Path, assets_dir: Path):
-        """Genera PPTX desde el JSON usando python-pptx con estilos propios."""
+        """Genera PPTX desde el JSON con estilo litúrgico visual mejorado."""
+        from pptx.util import Inches, Pt
+        from pptx.enum.shapes import MSO_SHAPE
+
         prs = Presentation()
         prs.slide_width = Inches(13.333)
         prs.slide_height = Inches(7.5)
-
-        # Layout en blanco
         blank_layout = prs.slide_layouts[6]
-        color = COLORES_LITURGICOS.get(data["meta"]["color_liturgico"].lower(), COLORES_LITURGICOS["verde"])
 
+        color = COLORES_LITURGICOS.get(data["meta"]["color_liturgico"].lower(), COLORES_LITURGICOS["verde"])
         lema_img_path = assets_dir / "lema_somos_uno.jpg"
+
+        # Theme tokens (inspired by pptx-designer church-religious-organization)
+        primary = (124, 58, 237)    # #7C3AED purple
+        accent_gold = (161, 98, 7)  # #A16207 gold
+        bg_light = (250, 245, 255)  # #FAF5FF
+        text_dark = (44, 62, 80)    # #2c3e50
+        text_muted = (85, 85, 85)
 
         for slide_data in data["slides"]:
             slide = prs.slides.add_slide(blank_layout)
-            self._apply_gradient_background(slide, color)
-            self._add_slide_content_pptx(slide, slide_data, color, assets_dir)
+            is_portada = slide_data["tipo"] == "portada"
+            has_image = bool(slide_data.get("imagen"))
+
+            # Background
+            self._apply_gradient_background(slide, color, is_portada, primary, bg_light)
+
+            # Top accent bar
+            self._add_top_bar(slide, primary, accent_gold)
+
+            # Lema
             if lema_img_path.exists():
                 self._add_lema_pptx(slide, str(lema_img_path))
 
+            # Illustration
+            if has_image:
+                self._add_illustration_pptx(slide, slide_data["imagen"], assets_dir, is_portada)
+
+            # Card + content
+            self._add_content_card_pptx(
+                slide, slide_data, primary, accent_gold, text_dark, text_muted, has_image, is_portada
+            )
+
         prs.save(str(pptx_path))
 
-    def _apply_gradient_background(self, slide, color: Dict[str, str]):
-        # python-pptx no soporta degradados fácilmente; usamos color sólido intermedio.
+    def _apply_gradient_background(self, slide, color: Dict[str, str], is_portada: bool, primary: Tuple[int, ...], bg_light: Tuple[int, ...]):
         fill = slide.background.fill
         fill.solid()
-        rgb = self._hex_to_rgb(color["from"])
-        fill.fore_color.rgb = RGBColor(*rgb)
+        if is_portada:
+            fill.fore_color.rgb = RGBColor(*primary)
+        else:
+            fill.fore_color.rgb = RGBColor(*bg_light)
 
-    def _add_slide_content_pptx(self, slide, slide_data: Dict[str, Any], color: Dict[str, str], assets_dir: Path):
+    def _add_top_bar(self, slide, primary: Tuple[int, ...], accent_gold: Tuple[int, ...]):
         from pptx.util import Inches, Pt
+        from pptx.enum.shapes import MSO_SHAPE
+        bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(0.12))
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = RGBColor(*primary)
+        bar.line.fill.background()
 
-        acento = self._hex_to_rgb(color["acento"])
-        left = Inches(0.7)
-        top = Inches(0.5)
-        width = Inches(12)
-
-        if slide_data.get("momento"):
-            box = slide.shapes.add_textbox(left, top, width, Inches(0.4))
-            tf = box.text_frame
-            p = tf.paragraphs[0]
-            p.text = slide_data["momento"]
-            p.font.size = Pt(20)
-            p.font.color.rgb = RGBColor(*acento)
-            p.font.bold = True
-            top += Inches(0.5)
-
-        # Título
-        box = slide.shapes.add_textbox(left, top, width, Inches(0.8))
-        tf = box.text_frame
-        p = tf.paragraphs[0]
-        p.text = slide_data["titulo"]
-        p.font.size = Pt(36)
-        p.font.bold = True
-        p.font.color.rgb = RGBColor(*acento)
-        p.alignment = PP_ALIGN.LEFT
-        top += Inches(1.0)
-
-        if slide_data.get("subtitulo"):
-            box = slide.shapes.add_textbox(left, top, width, Inches(0.4))
-            tf = box.text_frame
-            p = tf.paragraphs[0]
-            p.text = slide_data["subtitulo"]
-            p.font.size = Pt(22)
-            p.font.color.rgb = RGBColor(80, 80, 80)
-            top += Inches(0.5)
-
-        if slide_data.get("cita"):
-            box = slide.shapes.add_textbox(left, top, width, Inches(0.4))
-            tf = box.text_frame
-            p = tf.paragraphs[0]
-            p.text = slide_data["cita"]
-            p.font.size = Pt(18)
-            p.font.bold = True
-            p.font.color.rgb = RGBColor(100, 100, 100)
-            top += Inches(0.5)
-
-        if slide_data.get("contenido"):
-            remaining_height = Inches(5.5) - top
-            box = slide.shapes.add_textbox(left, top, Inches(10.5), remaining_height)
-            tf = box.text_frame
-            tf.word_wrap = True
-            p = tf.paragraphs[0]
-            p.text = slide_data["contenido"]
-            p.font.size = Pt(20)
-            p.font.color.rgb = RGBColor(60, 60, 60)
-            p.line_spacing = 1.3
-
-        # Ilustración (usar PNG/JPG para PPTX)
-        if slide_data.get("imagen"):
-            base_name = Path(slide_data["imagen"]).stem
-            for ext in (".png", ".jpg", ".jpeg"):
-                img_path = assets_dir / f"{base_name}{ext}"
-                if img_path.exists():
-                    slide.shapes.add_picture(str(img_path), Inches(10.8), Inches(0.5), height=Inches(2.2))
-                    break
+    def _add_illustration_pptx(self, slide, imagen: str, assets_dir: Path, is_portada: bool):
+        from pptx.util import Inches
+        base_name = Path(imagen).stem
+        for ext in (".png", ".jpg", ".jpeg"):
+            img_path = assets_dir / f"{base_name}{ext}"
+            if img_path.exists():
+                if is_portada:
+                    slide.shapes.add_picture(str(img_path), Inches(4.8), Inches(0.6), height=Inches(3.0))
+                else:
+                    slide.shapes.add_picture(str(img_path), Inches(9.9), Inches(1.2), height=Inches(3.4))
+                break
 
     def _add_lema_pptx(self, slide, lema_path: str):
+        from pptx.util import Inches
         try:
-            slide.shapes.add_picture(lema_path, Inches(0.3), Inches(6.6), height=Inches(0.7))
+            slide.shapes.add_picture(lema_path, Inches(0.4), Inches(6.55), height=Inches(0.75))
         except Exception:
             pass
+
+    def _add_content_card_pptx(
+        self, slide, slide_data: Dict[str, Any],
+        primary: Tuple[int, ...], accent_gold: Tuple[int, ...],
+        text_dark: Tuple[int, ...], text_muted: Tuple[int, ...],
+        has_image: bool, is_portada: bool
+    ):
+        from pptx.util import Inches, Pt
+        from pptx.enum.shapes import MSO_SHAPE
+        from pptx.enum.text import MSO_ANCHOR
+
+        # Card dimensions
+        if is_portada:
+            card_left = Inches(1.5)
+            card_top = Inches(3.9)
+            card_width = Inches(10.3)
+            card_height = Inches(2.8)
+        elif has_image:
+            card_left = Inches(0.7)
+            card_top = Inches(0.7)
+            card_width = Inches(8.8)
+            card_height = Inches(6.1)
+        else:
+            card_left = Inches(0.7)
+            card_top = Inches(0.7)
+            card_width = Inches(12.0)
+            card_height = Inches(6.1)
+
+        # Card shape
+        card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, card_left, card_top, card_width, card_height)
+        card.fill.solid()
+        if is_portada:
+            card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+        else:
+            card.fill.fore_color.rgb = RGBColor(255, 255, 255)
+        card.line.color.rgb = RGBColor(221, 214, 254)
+        card.line.width = Pt(1)
+        # Rounded corners adjustment
+        if hasattr(card, "adjustments"):
+            try:
+                card.adjustments[0] = 0.08
+            except Exception:
+                pass
+
+        # Bottom accent line
+        line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+            card_left, card_top + card_height - Inches(0.08), card_width, Inches(0.08))
+        line.fill.solid()
+        line.fill.fore_color.rgb = RGBColor(*primary)
+        line.line.fill.background()
+
+        # Text padding inside card
+        text_left = card_left + Inches(0.35)
+        text_top = card_top + Inches(0.25)
+        text_width = card_width - Inches(0.7)
+        text_height = card_height - Inches(0.45)
+
+        # Build text
+        full_text = ""
+        if slide_data.get("momento"):
+            full_text += f"{slide_data['momento'].upper()}\n"
+        full_text += f"{slide_data['titulo']}\n"
+        if slide_data.get("subtitulo"):
+            full_text += f"{slide_data['subtitulo']}\n"
+        if slide_data.get("cita"):
+            full_text += f"\n{slide_data['cita']}\n"
+        if slide_data.get("contenido"):
+            full_text += f"\n{slide_data['contenido']}"
+
+        box = slide.shapes.add_textbox(text_left, text_top, text_width, text_height)
+        tf = box.text_frame
+        tf.word_wrap = True
+        tf.margin_left = 0
+        tf.margin_right = 0
+        tf.margin_top = 0
+        tf.margin_bottom = 0
+        tf.vertical_anchor = MSO_ANCHOR.TOP
+
+        paragraphs = full_text.split("\n")
+        for i, para_text in enumerate(paragraphs):
+            if i == 0:
+                p = tf.paragraphs[0]
+            else:
+                p = tf.add_paragraph()
+            if not para_text.strip():
+                continue
+
+            run = p.add_run()
+            run.text = para_text
+
+            # Determine style based on position
+            if i == 0 and slide_data.get("momento"):
+                run.font.size = Pt(16)
+                run.font.bold = True
+                run.font.color.rgb = RGBColor(*primary)
+            elif (i == 0 and not slide_data.get("momento")) or (i == 1 and slide_data.get("momento")):
+                run.font.size = Pt(32 if is_portada else 28)
+                run.font.bold = True
+                run.font.color.rgb = RGBColor(*primary)
+            elif para_text.startswith(slide_data.get("cita", "")) and slide_data.get("cita"):
+                run.font.size = Pt(16)
+                run.font.bold = True
+                run.font.color.rgb = RGBColor(255, 255, 255)
+                # Add citation background
+                p.alignment = PP_ALIGN.LEFT
+                # We can't easily set per-paragraph background, so style with color
+                run.font.color.rgb = RGBColor(*primary)
+            else:
+                run.font.size = Pt(19)
+                run.font.color.rgb = RGBColor(*text_dark)
+                if slide_data["tipo"] == "cancion":
+                    run.font.size = Pt(18)
+                    p.line_spacing = 1.15
 
     def _hex_to_rgb(self, hex_color: str) -> Tuple[int, int, int]:
         hex_color = hex_color.lstrip("#")
