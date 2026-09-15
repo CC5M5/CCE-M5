@@ -1,93 +1,25 @@
 ---
-import Layout from '@layouts/Layout.astro';
-import { getAllPresentacionesFechas, getPresentacionByFecha, getCancionesPresentacion } from '@lib/db.js';
-import '../../styles/global.css';
-
-export async function getStaticPaths() {
-  const fechas = getAllPresentacionesFechas();
-  if (fechas.length === 0) return [];
-  return fechas.map(fecha => ({ params: { fecha } }));
+export function getStaticPaths() {
+  return [
+    { params: { fecha: "2026-09-20" } },
+  ];
 }
 
 const { fecha } = Astro.params;
-const base = import.meta.env.BASE_PATH || '/';
-const p = getPresentacionByFecha(fecha);
-
-if (!p) {
-  return Astro.redirect(`${base}404`);
-}
-
-const canciones = getCancionesPresentacion(fecha);
-const momentosOrden = [
-  'entrada', 'acto penitencial', 'gloria', 'salmo', 'aleluya', 'evangelio',
-  'credo', 'paz', 'comunion', 'comunión', 'accion de gracias', 'despedida'
-];
-const cancionesOrdenadas = [...canciones].sort((a, b) => {
-  const ia = momentosOrden.indexOf((a.momento_liturgico || '').toLowerCase());
-  const ib = momentosOrden.indexOf((b.momento_liturgico || '').toLowerCase());
-  return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
-});
-
-function slugify(text) {
-  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '').replace(/\-+/g, '-');
-}
 ---
 
-<Layout 
-  title={`Presentación · ${p.domingo || fecha}`} 
-  description={`Presentación litúrgica del ${p.domingo || fecha}. Lecturas y selección musical.`}
-  colorLiturgico={p.color_liturgico || 'verde'}
-  canonical={`presentacion/${fecha}/`}
->
-  <section class="container mx-auto px-4 py-10">
-    <div class="max-w-3xl mx-auto">
-      <nav aria-label="Migas de pan" class="text-sm text-slate-500 mb-4">
-        <a href={`${base}`} class="hover:text-liturgia-verde">Inicio</a>
-        <span class="mx-2">/</span>
-        <span class="text-slate-800" aria-current="page">Presentación</span>
-      </nav>
-
-      <h1 class="section-title">{p.domingo || 'Presentación'}</h1>
-      <p class="text-lg text-slate-600 mb-6 font-body">
-        {new Date(fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-      </p>
-
-      <div class="flex flex-wrap gap-3 mb-8">
-        {p.ruta_pptx && (
-          <a href={p.ruta_pptx.replace(/^.*presentaciones\//, '/presentaciones/')} class="btn-primary">⬇️ Descargar PPTX</a>
-        )}
-        {p.ruta_pdf_fieles && (
-          <a href={p.ruta_pdf_fieles.replace(/^.*presentaciones\//, '/presentaciones/')} class="btn-secondary">⬇️ Descargar PDF</a>
-        )}
-        <a href={`${base}lecturas/${fecha}/`} class="btn-secondary">📖 Ver lecturas</a>
-        <a href={`${base}musicos/${fecha}/`} class="btn-secondary">🎵 Hoja músicos</a>
-      </div>
-
-      <div class="card mb-8">
-        <h2 class="text-xl font-heading font-bold mb-4">🎶 Selección musical</h2>
-        {cancionesOrdenadas.length > 0 ? (
-          <ul class="space-y-3">
-            {cancionesOrdenadas.map(c => (
-              <li key={c.id} class="flex items-center justify-between border-b border-slate-100 pb-2 last:border-0">
-                <div>
-                  <span class="text-xs uppercase tracking-wide text-slate-500 block">{c.momento_liturgico || 'Canto'}</span>
-                  <a href={`${base}cancionero/${encodeURIComponent(slugify(c.titulo))}/`} class="font-heading font-semibold hover:text-liturgia-verde">{c.titulo}</a>
-                </div>
-                <span class="text-sm text-slate-500">{c.tono || ''}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p class="text-slate-600">No hay canciones asignadas.</p>
-        )}
-      </div>
-
-      {p.evento_especial && (
-        <div class="card">
-          <h2 class="text-xl font-heading font-bold mb-2">📝 Notas</h2>
-          <p class="text-slate-700">{p.evento_especial}</p>
-        </div>
-      )}
-    </div>
-  </section>
-</Layout>
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Presentación {fecha}</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #111; }
+      iframe { width: 100%; height: 100%; border: none; }
+    </style>
+  </head>
+  <body>
+    <iframe src={`/presentaciones_html/${fecha}_presentacion/index.html`} title={`Presentación ${fecha}`} allowfullscreen></iframe>
+  </body>
+</html>
