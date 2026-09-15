@@ -58,8 +58,8 @@ logger = logging.getLogger(__name__)
 # Configuracion con variable de entorno
 PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"))
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-BASE_URL = "https://ccem5music.blogspot.com/p/cancionero-escolapio.html"
-ALLOWED_HOSTS = {"ccem5music.blogspot.com"}
+DEFAULT_BASE_URL = "https://ccem5music.blogspot.com/p/cancionero-escolapio.html"
+DEFAULT_ALLOWED_HOSTS = {"ccem5music.blogspot.com"}
 PROGRESS_PATH = PROJECT_DIR / "data" / "scraper_progress.json"
 MAX_RESPONSE_SIZE = 10 * 1024 * 1024  # 10 MB
 
@@ -75,16 +75,16 @@ DANGEROUS_ATTRS_RE = re.compile(r'^(on|style|formaction|xlink:href|data|xmlns)',
 DANGEROUS_TAGS = {'script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea'}
 
 
-def _normalizar_url(url: str, base_url: str = BASE_URL) -> Optional[str]:
+def _normalizar_url(url: str, base_url: str = DEFAULT_BASE_URL, allowed_hosts: set = DEFAULT_ALLOWED_HOSTS) -> Optional[str]:
     url_completa = urljoin(base_url, url)
     parsed = urlparse(url_completa)
-    if parsed.scheme != 'https':
+    if parsed.scheme not in ('https', 'http'):
         return None
-    netloc = parsed.netloc.lower()
-    if netloc not in ALLOWED_HOSTS:
+    netloc = parsed.netloc.lower().replace('www.', '')
+    if netloc not in allowed_hosts:
         return None
     path = unquote(parsed.path)
-    url_normalizada = f"{parsed.scheme}://{netloc}{path}"
+    url_normalizada = f"https://{netloc}{path}"
     return url_normalizada.split('#')[0].split('?')[0].rstrip('/')
 
 
@@ -99,10 +99,130 @@ def _sanitize_html_visual(soup: BeautifulSoup) -> str:
     return str(soup)
 
 
+
+
+def _limpiar_metadata_betania(soup: BeautifulSoup) -> None:
+    """Elimina enlaces de metadata (escuchar, volver a lista, etc.)."""
+    for a in soup.find_all('a'):
+        t = a.get_text(strip=True).lower()
+        if t in ('escuchar', '/', 'volver a lista de canciones', 'volver a lista',
+                 'volver lista de canciones', 'volver lista', 'version en castellano',
+                 'version en español', 'version en ingles'):
+            a.decompose()
+
+
+def _es_span_acorde(tag) -> bool:
+    """Detecta spans de acordes por color rojo (#c00000)."""
+    if tag.name != 'span':
+        return False
+    style = tag.get('style', '')
+    return '#c00000' in style or '#C00000' in style or 'color: red' in style.lower()
+
+
+def _es_linea_de_acordes(texto: str) -> bool:
+    """Verifica si una línea está compuesta únicamente por acordes (pegados o separados)."""
+    texto = texto.strip()
+    if not texto:
+        return False
+    acorde_re = re.compile(r'^[A-G](b|#)?(m|M|maj|min|dim|aug|sus|add)?\d*(/[A-G](b|#)?)?$')
+    tokens = separar_acordes_pegados(texto).split()
+    if not tokens:
+        return False
+    return all(acorde_re.match(t) for t in tokens)
+
+
+ACORDE_TOKEN_RE = re.compile(r'([A-G])(#|b)?(m|M|maj|min|dim|aug|sus|add)?(\d+)?(/[A-G](#|b)?)?')
+
+
+def separar_acordes_pegados(texto: str) -> str:
+    """Separa acordes pegados como LamSol o DoFaDo en Lam Sol, Do Fa Do."""
+    # Encuentra todos los acordes reconocibles
+    partes = []
+    last_end = 0
+    for m in ACORDE_TOKEN_RE.finditer(texto):
+        if m.start() > last_end:
+            inter = texto[last_end:m.start()]
+            # Si entre dos acordes solo hay espacios, mantener un espacio
+            if inter.strip() == '':
+                partes.append(' ')
+            else:
+                partes.append(inter)
+        partes.append(m.group(0))
+        last_end = m.end()
+    if last_end < len(texto):
+        partes.append(texto[last_end:])
+    resultado = ''.join(partes).strip()
+    return re.sub(r'\s+', ' ', resultado)
+
+
+def _extraer_texto_betania(post_body) -> str:
+    """
+    Extrae texto de posts de Betania donde los acordes están en spans
+    de color rojo intercalados con líneas de letra.
+    Soporta múltiples estructuras: divs, h1-h6, p, spans sueltos.
+    Devuelve texto plano en formato línea_acordes + línea_letra.
+    """
+    _limpiar_metadata_betania(post_body)
+
+    lineas: list[tuple[str, bool]] = []
+    bloque_tags = ('div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span')
+
+    for elem in post_body.find_all(bloque_tags):
+        text = elem.get_text('\n').strip()
+        text = re.sub(r'\s+', ' ', text)
+        if not text:
+            continue
+        # Detect chord block: red span inside, or line made of chords
+        has_red_span = any(_es_span_acorde(span) for span in elem.find_all('span'))
+        is_chord = has_red_span or _es_linea_de_acordes(text)
+        # If it's a chord block, normalize spacing
+        if is_chord:
+            text = separar_acordes_pegados(text)
+        lineas.append((text, is_chord))
+
+    # Deduplicate: remove chord line immediately followed by identical chord line,
+    # and lyric line immediately followed by identical lyric line.
+    lineas_dedup: list[tuple[str, bool]] = []
+    for text, is_chord in lineas:
+        if lineas_dedup and lineas_dedup[-1][0] == text and lineas_dedup[-1][1] == is_chord:
+            continue
+        lineas_dedup.append((text, is_chord))
+
+    # Reconstruct: interleave chord lines and lyric lines into pairs
+    bloques: list[str] = []
+    i = 0
+    while i < len(lineas_dedup):
+        texto, es_acorde = lineas_dedup[i]
+        if es_acorde:
+            # Single chord line, next non-chord line is its lyric
+            acordes_lines = [texto]
+            j = i + 1
+            # In case there are consecutive chord-only lines, group them
+            while j < len(lineas_dedup) and lineas_dedup[j][1]:
+                acordes_lines.append(lineas_dedup[j][0])
+                j += 1
+            letra_lines = []
+            while j < len(lineas_dedup) and not lineas_dedup[j][1]:
+                letra_lines.append(lineas_dedup[j][0])
+                j += 1
+            bloques.append('\n'.join(acordes_lines))
+            bloques.append('\n'.join(letra_lines))
+            i = j
+        else:
+            bloques.append(texto)
+            i += 1
+
+    return '\n'.join(bloques)
+
+
 class CancioneroScraper:
     """Scraper robusto para el cancionero escolapio con reintentos y validacion."""
 
-    def __init__(self) -> None:
+    def __init__(self, base_url: str = DEFAULT_BASE_URL, allowed_hosts: set = None, fuente: str = None) -> None:
+        self.base_url = base_url
+        parsed = urlparse(base_url)
+        self.allowed_hosts = allowed_hosts or {parsed.netloc.lower().replace('www.', '')}
+        self.fuente = fuente or parsed.netloc.lower().replace('www.', '')
         self.session = requests.Session()
         retry = Retry(
             total=5,
@@ -193,6 +313,7 @@ class CancioneroScraper:
             return None
 
     def extraer_enlaces_canciones(self, html_bytes: bytes) -> list[dict[str, str]]:
+        base_url = self.base_url
         soup = BeautifulSoup(html_bytes, 'lxml')
         canciones: list[dict[str, str]] = []
         seen_urls: set[str] = set()
@@ -204,15 +325,16 @@ class CancioneroScraper:
             if not texto or len(texto) <= 2:
                 continue
 
-            url_normalizada = _normalizar_url(href)
+            url_normalizada = _normalizar_url(href, base_url, self.allowed_hosts)
             if not url_normalizada:
                 continue
 
             parsed = urlparse(url_normalizada)
-            if '/p/' not in parsed.path:
+            # Blogspot posts: /p/ slug (static page) or /YYYY/MM/slug.html (post)
+            if not ('/p/' in parsed.path or re.search(r'/20\d{2}/\d{2}/', parsed.path)):
                 continue
 
-            if url_normalizada == BASE_URL or '/cancionero-escolapio' in parsed.path:
+            if url_normalizada == self.base_url or '/cancionero-escolapio' in parsed.path:
                 continue
 
             if url_normalizada in seen_urls:
@@ -259,6 +381,11 @@ class CancioneroScraper:
         if not texto_completo or len(texto_completo) < 20:
             logger.warning(f"Cancion sin contenido suficiente en {url}")
             return None
+
+        # Detect Betania-style posts (red chord spans)
+        tiene_acordes_rojos = bool(post_body.find('span', style=re.compile(r'color:\s*#c00000', re.IGNORECASE)))
+        if tiene_acordes_rojos:
+            texto_completo = _extraer_texto_betania(post_body)
 
         try:
             parser = AcordesParser()
@@ -310,7 +437,7 @@ class CancioneroScraper:
             'html_original': html_original,
             'tono': tono,
             'momento_liturgico': momento_liturgico,
-            'fuente': 'blogspot'
+            'fuente': self.fuente
         }
 
     def guardar_lote(self, canciones: list[dict[str, Any]]) -> None:
@@ -338,7 +465,7 @@ class CancioneroScraper:
                     cancion.get('html_original', ''),
                     cancion.get('tono', ''),
                     cancion.get('momento_liturgico', ''),
-                    'blogspot',
+                    self.fuente,
                     url
                 ))
             else:
@@ -387,7 +514,7 @@ class CancioneroScraper:
         logger.info("SCRAPER CANCIONERO ESCOLAPIO - VERSION CON POSICIONAMIENTO")
         logger.info("=" * 70)
 
-        html = self._get_page(BASE_URL)
+        html = self._get_page(self.base_url)
         if not html:
             logger.error("ERROR: No se pudo obtener la pagina principal")
             return
@@ -443,7 +570,13 @@ class CancioneroScraper:
 
 
 def main() -> None:
-    with CancioneroScraper() as scraper:
+    import sys
+    if len(sys.argv) > 1:
+        url = sys.argv[1]
+        scraper = CancioneroScraper(base_url=url)
+    else:
+        scraper = CancioneroScraper()
+    with scraper:
         scraper.ejecutar()
 
 
