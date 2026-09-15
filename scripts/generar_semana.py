@@ -240,18 +240,18 @@ def _resolver_cancion_id(
 
 
 DEFAULT_ASIGNACION: Dict[str, int] = {
-    "entrada": 8,      # Preparad el camino
-    "perdon": 2,       # A tu amparo
-    "gloria": 9,       # Gloria te damos
-    "salmo": 3,        # Aquí estoy, Señor (Salmo 39)
-    "aleluya": 4,      # Cantad con gozo
-    "ofertorio": 6,    # Hoy como ayer
-    "santo": 9,        # Gloria te damos
-    "padre_nuestro": 5,# El Espíritu del Señor
-    "paz": 6,          # Hoy como ayer
-    "comunion": 7,     # María, música de Dios
-    "maria": 7,        # María, música de Dios
-    "despedida": 8,    # Preparad el camino
+    "entrada": 8,       # PREPARAD EL CAMINO
+    "perdon": 70,       # OTRA OPORTUNIDAD
+    "gloria": 9,        # GLORIA TE DAMOS GRACIAS, SEÑOR
+    "salmo": 3,         # AQUÍ ESTOY, SEÑOR (SALMO 39)
+    "aleluya": 47,      # JESÚS RESUCITA HOY
+    "ofertorio": 74,    # PADRE NUESTRO DE LA VIDA
+    "santo": 84,        # QUIERO HACER LO MISMO
+    "padre_nuestro": 72,# PADRE NUESTRO (Gallego)
+    "paz": 100,         # UNA NUEVA ESPERANZA
+    "comunion": 95,     # TODO MI SER
+    "maria": 7,         # MARÍA, MÚSICA DE DIOS
+    "despedida": 26,    # DE NOCHE IREMOS DE NOCHE
 }
 
 
@@ -274,8 +274,10 @@ def proponer_canciones_matching(
     - Se priorizan canciones cuyo momento_liturgico etiquetado coincida
       exactamente con el momento solicitado.
     - Si no hay coincidencia exacta, se prueba coincidencia parcial y
-      finalmente se recurre a DEFAULT_ASIGNACION para no repetir la misma
-      canción genérica en todos los huecos.
+      finalmente se recurre al score temático.
+    - Se evita repetir una misma canción en dos momentos distintos.
+    - Al final se asegura que todos los momentos tengan una canción,
+      buscando alternativas del mismo momento si el fallback ya está usado.
 
     Args:
         lectura_id: id de la lectura en la tabla lecturas.
@@ -299,28 +301,36 @@ def proponer_canciones_matching(
     from src.matching_engine import MatchingEngine
 
     engine = MatchingEngine(str(DB_PATH))
+
+    # Ranking global una sola vez; se reutiliza para fallback de alternativas.
+    matches = engine.encontrar_canciones_para_lectura(
+        lectura_id,
+        limite=count,
+        score_minimo=0.0,
+    )
+
     propuestas: Dict[str, int] = {}
+    usadas: set[int] = set()
 
     for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY):
+        seleccionada = None
         try:
-            matches = engine.encontrar_canciones_para_lectura(
-                lectura_id,
-                limite=limite_por_momento * 10,
-                score_minimo=0.0,
-            )
-            if not matches:
-                continue
-
-            seleccionada = None
-            # 1) Preferir canción cuyo momento litúrgico coincida exactamente.
+            # 1) Preferir canción cuyo momento litúrgico coincida exactamente
+            #    y que no se haya usado ya.
             for match in matches:
+                cancion_id = _cancion_id_de_match(match)
+                if cancion_id in usadas:
+                    continue
                 if (match.get("momento_liturgico") or "").strip().lower() == momento_key:
                     seleccionada = match
                     break
 
-            # 2) Coincidencia parcial en el momento litúrgico (p. ej. 'comunion' en 'comunion/entrada').
+            # 2) Coincidencia parcial en el momento litúrgico.
             if seleccionada is None:
                 for match in matches:
+                    cancion_id = _cancion_id_de_match(match)
+                    if cancion_id in usadas:
+                        continue
                     momento_cancion = (match.get("momento_liturgico") or "").strip().lower()
                     if momento_key in momento_cancion or momento_cancion in momento_key:
                         seleccionada = match
@@ -329,26 +339,81 @@ def proponer_canciones_matching(
             # 3) Título que sugiera el momento litúrgico.
             if seleccionada is None:
                 for match in matches:
+                    cancion_id = _cancion_id_de_match(match)
+                    if cancion_id in usadas:
+                        continue
                     titulo = (match.get("titulo", "") or "").lower()
                     if momento_key.replace("_", " ") in titulo or momento_es.lower() in titulo:
                         seleccionada = match
                         break
 
+            # 4) Último recurso antes del fallback: la de mayor score temático
+            #    no usada, pero solo si su momento litúrgico no contradice mucho
+            #    el solicitado (es decir, si es 'general' o el score es alto).
+            #    Para momentos específicos sin candidato, preferimos el fallback.
             if seleccionada is None:
-                continue
+                if momento_key in ("general",):
+                    for match in matches:
+                        cancion_id = _cancion_id_de_match(match)
+                        if cancion_id not in usadas:
+                            seleccionada = match
+                            break
 
-            cancion_id = seleccionada.get("cancion_id") or seleccionada.get("id")
+            cancion_id = _cancion_id_de_match(seleccionada) if seleccionada else None
             if _es_id_valido(cancion_id):
                 propuestas[momento_key] = int(cancion_id)
+                usadas.add(int(cancion_id))
         except Exception as exc:
             logger.warning("Matching falló para '%s': %s", momento_key, exc)
 
-    # Fallback: asegurar que todos los momentos tengan al menos una canción.
+    # Fallback: asegurar que todos los momentos tengan al menos una canción,
+    #    evitando repetir canciones ya usadas.
     for key in MOMENTOS_KEY:
         if key not in propuestas and key in DEFAULT_ASIGNACION:
-            propuestas[key] = DEFAULT_ASIGNACION[key]
+            fallback_id = DEFAULT_ASIGNACION[key]
+            if fallback_id not in usadas:
+                propuestas[key] = fallback_id
+                usadas.add(fallback_id)
+            else:
+                # Si el fallback por defecto ya está usado, buscar otra canción del
+                # mismo momento litúrgico que no se haya usado en el ranking global.
+                alternativa = None
+                for match in matches:
+                    cancion_id = _cancion_id_de_match(match)
+                    if cancion_id in usadas:
+                        continue
+                    if (match.get("momento_liturgico") or "").strip().lower() == key:
+                        alternativa = cancion_id
+                        break
+                if _es_id_valido(alternativa):
+                    propuestas[key] = int(alternativa)
+                    usadas.add(int(alternativa))
+                else:
+                    # Último recurso: cualquier canción del momento litúrgico en BD
+                    # que no esté usada, aunque no esté en el ranking temático.
+                    try:
+                        conn_fb = sqlite3.connect(str(DB_PATH))
+                        cur_fb = conn_fb.cursor()
+                        cur_fb.execute(
+                            "SELECT id FROM canciones WHERE lower(momento_liturgico) = ? AND id NOT IN ({})".format(
+                                ",".join("?" * len(usadas)) if usadas else "0"
+                            ),
+                            (key,) + tuple(usadas),
+                        )
+                        row_fb = cur_fb.fetchone()
+                        if row_fb:
+                            propuestas[key] = int(row_fb["id"])
+                            usadas.add(int(row_fb["id"]))
+                        conn_fb.close()
+                    except Exception as exc:
+                        logger.warning("Fallback alternativo BD falló para '%s': %s", key, exc)
 
     return propuestas
+
+
+def _cancion_id_de_match(match: Dict[str, Any]) -> Any:
+    """Devuelve el id de canción de un match del motor."""
+    return match.get("cancion_id") or match.get("id")
 
 
 def construir_asignacion_canciones(
