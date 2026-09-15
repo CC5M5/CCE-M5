@@ -513,6 +513,38 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 - **Matching es básico**: Con solo 9 canciones, hay repeticiones (Gloria=Santo, Ofertorio=Paz, Comunión=María).
 - **Transiciones son texto simple**: No tienen las imágenes de fondo de la plantilla MASTER.
 
+
+
+### Actualización 2026-09-15 (mañana)
+
+27. **Nuevo enfoque de presentaciones aprobado** — Se descarta el uso de la plantilla MASTER PPTX. El generador `presentacion_html.py` crea un formato intermedio JSON + HTML + PPTX con estilo propio.
+
+28. **Estilo visual "liturgia" aprobado** — Tipografía Fredoka/Nunito, colores púrpura/dorado, tarjetas redondeadas, barra decorativa superior, ilustraciones de Fano/Pati.te/Sara BG en esquina inferior derecha (uso pastoral no comercial). URLs de prueba:
+    - HTML/web: http://192.168.68.244:4321/presentacion/2026-09-20/
+    - PPTX descargable: http://192.168.68.244:4321/presentaciones_html/2026-09-20_presentacion/2026-09-20_presentacion.pptx
+    - PDF: http://192.168.68.244:4321/presentaciones_html/2026-09-20_presentacion/2026-09-20_presentacion.pdf
+
+29. **PPTX mejorado con estilo visual** — Tarjetas redondeadas, colores púrpura/dorado, imágenes grandes sin tapar texto, lema en esquina inferior. No se usa directamente `pptx-designer`; se usan sus tokens de color como inspiración.
+
+30. **Paginación automática** — Textos largos (lecturas, evangelio) se dividen en varias slides si exceden el espacio.
+
+31. **Credo completo** — Versión corta del Credo apostólico escrita entera.
+
+32. **Interlineado de canciones reducido** — Líneas más compactas, párrafos intermedios eliminados.
+
+33. **Playwright instalado** — Generación automática de PDF desde el HTML.
+
+34. **Ilustraciones reales integradas**:
+    - Fano: descargados 10 dibujos desde https://diocesismalaga.es/dibujos-fano
+    - Pati.te: láminas de la Virgen de Fátima desde https://www.patite.es/
+    - Sara BG: ilustración religiosa desde https://sarabg.com/
+
+35. **Canciones: política actual** — Por ahora, canciones solo en Entrada, Salmo, Ofertorio, Comunión y Despedida. Los demás momentos usan textos litúrgicos fijos. En el futuro, cuando haya más canciones importadas, se asignarán también a Perdón, Gloria, Aleluya, Santo, Padre Nuestro, Paz y Canto a María.
+
+36. **Commits de la sesión**:
+    - `21614ed`: generador presentacion_html con ilustraciones, paginación, PDF y web
+    - `ae03033`: mejora PPTX con estilo litúrgico visual
+
 ### Próximos pasos pendientes (actualizado)
 
 1. **Paso 6: Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos.
