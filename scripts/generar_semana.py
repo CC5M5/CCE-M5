@@ -255,15 +255,27 @@ DEFAULT_ASIGNACION: Dict[str, int] = {
 }
 
 
+def _es_id_valido(valor: Any) -> bool:
+    try:
+        return int(valor) > 0
+    except (TypeError, ValueError):
+        return False
+
+
 def proponer_canciones_matching(
     lectura_id: int,
     limite_por_momento: int = 5,
 ) -> Dict[str, int]:
     """
     Usa src.matching_engine para proponer canciones para cada momento.
-    
-    Si hay menos de 20 canciones en la base de datos, usa DEFAULT_ASIGNACION
-    directamente para evitar que todas las canciones sean la misma.
+
+    Estrategia:
+    - Para cada momento se pide un ranking amplio de candidatos.
+    - Se priorizan canciones cuyo momento_liturgico etiquetado coincida
+      exactamente con el momento solicitado.
+    - Si no hay coincidencia exacta, se prueba coincidencia parcial y
+      finalmente se recurre a DEFAULT_ASIGNACION para no repetir la misma
+      canción genérica en todos los huecos.
 
     Args:
         lectura_id: id de la lectura en la tabla lecturas.
@@ -273,19 +285,17 @@ def proponer_canciones_matching(
         Diccionario {momento_key: cancion_id} con una canción por momento.
     """
     import sqlite3
-    
-    # Verificar cuántas canciones hay en la BD
+
     conn = sqlite3.connect(str(DB_PATH))
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM canciones WHERE titulo IS NOT NULL AND titulo != ''")
     count = cursor.fetchone()[0]
     conn.close()
-    
-    # Si hay pocas canciones, usar DEFAULT_ASIGNACION directamente
+
     if count < 20:
         logger.info("Solo %s canciones en BD. Usando DEFAULT_ASIGNACION.", count)
         return dict(DEFAULT_ASIGNACION)
-    
+
     from src.matching_engine import MatchingEngine
 
     engine = MatchingEngine(str(DB_PATH))
@@ -295,26 +305,40 @@ def proponer_canciones_matching(
         try:
             matches = engine.encontrar_canciones_para_lectura(
                 lectura_id,
-                limite=limite_por_momento,
+                limite=limite_por_momento * 10,
                 score_minimo=0.0,
             )
             if not matches:
                 continue
 
-            # Priorizar canciones cuyo título sugiera el momento litúrgico.
             seleccionada = None
+            # 1) Preferir canción cuyo momento litúrgico coincida exactamente.
             for match in matches:
-                titulo = (match.get("titulo", "") or "").lower()
-                if momento_key.replace("_", " ") in titulo or (
-                    momento_es.lower() in titulo
-                ):
+                if (match.get("momento_liturgico") or "").strip().lower() == momento_key:
                     seleccionada = match
                     break
+
+            # 2) Coincidencia parcial en el momento litúrgico (p. ej. 'comunion' en 'comunion/entrada').
             if seleccionada is None:
-                seleccionada = matches[0]
+                for match in matches:
+                    momento_cancion = (match.get("momento_liturgico") or "").strip().lower()
+                    if momento_key in momento_cancion or momento_cancion in momento_key:
+                        seleccionada = match
+                        break
+
+            # 3) Título que sugiera el momento litúrgico.
+            if seleccionada is None:
+                for match in matches:
+                    titulo = (match.get("titulo", "") or "").lower()
+                    if momento_key.replace("_", " ") in titulo or momento_es.lower() in titulo:
+                        seleccionada = match
+                        break
+
+            if seleccionada is None:
+                continue
 
             cancion_id = seleccionada.get("cancion_id") or seleccionada.get("id")
-            if cancion_id:
+            if _es_id_valido(cancion_id):
                 propuestas[momento_key] = int(cancion_id)
         except Exception as exc:
             logger.warning("Matching falló para '%s': %s", momento_key, exc)
