@@ -22,6 +22,32 @@ from urllib3.util.retry import Retry
 
 from parsers.acordes_parser_v3 import AcordesParser
 
+# Detecci\u00f3n de momento lit\u00fargico basada en texto del cancionero
+PALABRAS_MOMENTO = {
+    "entrada": ["entrada", "abrir", "puertas", "preparad el camino"],
+    "perdon": ["perdon", "misericordia", "kyrie", "senor ten piedad", "cristo ten piedad"],
+    "gloria": ["gloria", "glorificamos", "alabanza", "gloria a dios"],
+    "salmo": ["salmo", "sal 39", "salmo 39", "aqui estoy"],
+    "aleluya": ["aleluya", "aleluya, aleluya"],
+    "ofertorio": ["ofertorio", "ofrenda", "pan", "vino"],
+    "santo": ["santo", "santo santo santo", "hosanna"],
+    "padre_nuestro": ["padre nuestro", "padrenuestro"],
+    "paz": ["paz", "senor dame tu paz", "paz y bien"],
+    "comunion": ["comunion", "cuerpo", "sangre", "pan de vida"],
+    "maria": ["maria", "ave maria", "madre", "magnificat"],
+    "despedida": ["despedida", "envia", "espiritu", "vayamos"],
+}
+
+
+def detectar_momento_liturgico(texto: str) -> str:
+    texto_lower = texto.lower()
+    conteos = {}
+    for momento, palabras in PALABRAS_MOMENTO.items():
+        conteos[momento] = sum(1 for p in palabras if p in texto_lower)
+    max_momento = max(conteos, key=conteos.get, default="")
+    return max_momento if conteos.get(max_momento, 0) > 0 else "general"
+
+
 # Configurar logging
 logging.basicConfig(
     level=logging.INFO,
@@ -248,23 +274,38 @@ class CancioneroScraper:
         try:
             tono = parser.detectar_tono(estructura)
             html_visual = parser.generar_html_visual(estructura)
-            momento_liturgico = parser.detectar_momento_liturgico(estructura)
+            momento_liturgico = detectar_momento_liturgico(texto_completo)
         except Exception:
             logger.exception(f"Error generando representacion visual de {url}")
             tono = ''
             html_visual = ''
             momento_liturgico = ''
 
+        lineas_letra = []
+        for linea in estructura:
+            if linea.tipo in ("letra", "acordes_letra"):
+                lineas_letra.append(linea.letra)
+            elif linea.tipo in ("sección",):
+                if linea.texto:
+                    lineas_letra.append(linea.texto)
+
         return {
             'titulo': titulo_pagina,
             'url': url,
             'letra_con_acordes': texto_completo,
-            'letra_sin_acordes': '\n'.join(
-                linea.get('texto', linea.get('letra', ''))
-                for linea in estructura
-                if linea.get('tipo') in ('letra', 'mixta')
+            'letra_sin_acordes': '\n'.join(lineas_letra),
+            'estructura_json': json.dumps(
+                [
+                    {
+                        "tipo": l.tipo,
+                        "acordes": [{"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes],
+                        "letra": l.letra,
+                        "texto": l.texto,
+                    }
+                    for l in estructura
+                ],
+                ensure_ascii=False,
             ),
-            'estructura_json': json.dumps(estructura, ensure_ascii=False),
             'html_visual': html_visual,
             'html_original': html_original,
             'tono': tono,
