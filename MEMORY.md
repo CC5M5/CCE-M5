@@ -545,6 +545,19 @@ Para cambiar el lema en años futivos (ej. 2027-28):
     - `21614ed`: generador presentacion_html con ilustraciones, paginación, PDF y web
     - `ae03033`: mejora PPTX con estilo litúrgico visual
 
+### Actualización 2026-09-15 (mediodía)
+
+37. **Scraper del cancionero reparado** — `blogspot_scraper.py` era incompatible con `acordes_parser_v3` (devuelve objetos `LineaCancion`, no diccionarios; eliminó `detectar_momento_liturgico`). Se actualizó para:
+    - Leer atributos del dataclass (`linea.tipo`, `linea.letra`, `linea.texto`).
+    - Convertir estructura a JSON serializable.
+    - Detectar momento litúrgico con función propia del scraper basada en palabras clave.
+
+38. **Scraper ejecutado con éxito** — 8/8 canciones del blogspot procesadas correctamente, 0 fallidas.
+
+39. **Límite real identificado** — El blog `ccem5music.blogspot.com` solo publica 8 canciones en su índice. Para ampliar el cancionero hará falta otra fuente (blog de Escolapios Betania, cancionero manual, etc.) o importación manual.
+
+40. **Commit:** `4e3772c` — fix: blogspot_scraper compatible con acordes_parser_v3 y detección momento litúrgico.
+
 ### Próximos pasos pendientes (actualizado)
 
 1. **Paso 6: Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos.
