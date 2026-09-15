@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { slugify } from './slug.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.resolve(__dirname, '../../../data/db.sqlite3');
@@ -85,16 +86,15 @@ export function getCanciones() {
 }
 
 export function getCancionBySlug(slug) {
-  const row = getDb()
+  const rows = getDb()
     .prepare(
       `SELECT id, titulo, titulo_url, tono, momento_liturgico, temas, referencias_biblicas,
         html_visual, letra_con_acordes, letra_sin_acordes, acordes_json, estructura_json
       FROM canciones
-      WHERE lower(replace(titulo, ' ', '-')) = lower(?) OR id = ?
-      LIMIT 1`
+      WHERE titulo IS NOT NULL AND titulo != ''`
     )
-    .get(slug, Number.isNaN(Number(slug)) ? 0 : Number(slug));
-  return row || null;
+    .all();
+  return rows.find(r => slugify(r.titulo) === slug) || null;
 }
 
 export function getCancionesByMomento(momento) {
@@ -121,9 +121,10 @@ export function getAllMomentos() {
 }
 
 export function getAllCancionesSlugs() {
-  return getDb()
-    .prepare(`SELECT id, lower(replace(titulo, ' ', '-')) as slug FROM canciones WHERE titulo IS NOT NULL AND titulo != ''`)
+  const rows = getDb()
+    .prepare(`SELECT id, titulo FROM canciones WHERE titulo IS NOT NULL AND titulo != ''`)
     .all();
+  return rows.map(r => ({ id: r.id, slug: slugify(r.titulo) }));
 }
 
 export function getComentariosAprobados(limit = 20) {
