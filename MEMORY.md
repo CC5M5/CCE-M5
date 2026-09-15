@@ -591,9 +591,39 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 46. **Commits de la sesión:**
     - `92b4ab7`: scraper Betania soporta h1, acordes pegados y spans rojos; importadas 98 canciones más
 
+### Actualización 2026-09-15 (tarde - correcciones)
+
+47. **Corrección de slugs del cancionero con tildes** — Las páginas de canciones con caracteres especiales no se generaban correctamente (p. ej. `a-tu-amparo-y-proteccin` en el listado apuntaba a una carpeta distinta de la que Astro creaba). Se centralizó la generación de slugs en `web/src/lib/slug.js` usando normalización Unicode NFD, eliminación de diacríticos, minúsculas y limpieza de caracteres no alfanuméricos. Se actualizaron `web/src/lib/db.js`, `web/src/pages/cancionero/[slug].astro`, `web/src/pages/cancionero/index.astro` e `index.astro` para usar el helper común. La URL de ejemplo `http://192.168.68.244:4321/cancionero/a-tu-amparo-y-proteccion/` ahora funciona.
+
+48. **Corrección del matching de canciones** — `scripts/generar_semana.py` asignaba la misma canción (`PREPARAD EL CAMINO`) a todos los momentos porque `proponer_canciones_matching` elegía siempre el primer resultado del ranking global. Se reescribió para:
+    - Pedir un ranking ampliado (10× candidatos).
+    - Priorizar canciones cuyo `momento_liturgico` coincida exactamente con el momento solicitado.
+    - Probar coincidencia parcial y título antes de recurrir al fallback.
+    - Usar `DEFAULT_ASIGNACION` como fallback en lugar de la canción genérica top-1.
+
+49. **Regeneración de la presentación 2026-09-20** — No existía fila en `presentaciones`; se generó de nuevo con lecturas de Ciudad Redonda (Koinonia caído) y matching corregido. Asignación final:
+    - Entrada: PREPARAD EL CAMINO
+    - Perdón: OTRA OPORTUNIDAD
+    - Gloria: EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS
+    - Salmo: AQUÍ ESTOY, SEÑOR (SALMO 39)
+    - Aleluya: JESÚS RESUCITA HOY
+    - Ofertorio: PADRE NUESTRO DE LA VIDA
+    - Santo: QUIERO HACER LO MISMO
+    - Padre Nuestro: PADRE NUESTRO (Gallego)
+    - Paz: UNA NUEVA ESPERANZA
+    - Comunión: MARÍA, MÚSICA DE DIOS
+    - Canto a María: MARÍA, MÚSICA DE DIOS
+    - Despedida: PREPARAD EL CAMINO
+
+50. **HTML/PPTX/PDF de la presentación regenerados** — Se ejecutó `src/generators/presentacion_html.py` para actualizar `presentaciones_html/2026-09-20_presentacion/` con JSON, HTML, PPTX y PDF. Luego se hizo `npm run build` en `web/` para servir la web actualizada.
+
+51. **Commits de la sesión (tarde):**
+    - `be0f243`: fix(web): normaliza slugs del cancionero para tildes y caracteres especiales
+    - `708f84d`: fix(generar): mejora matching por momento litúrgico y evita repetir misma canción
+
 ### Próximos pasos pendientes (actualizado)
 
-1. **Paso 6: Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos.
+1. **Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos (actualmente 107 canciones).
 2. **Reordenar slides** — Implementar reordenamiento para que la portada sea slide 1.
 3. **Añadir lema a slides de plantilla** — Reemplazar la imagen "Tu raíz" en todas las slides de la plantilla MASTER.
 4. **Mejorar estilo de transiciones** — Usar imágenes de fondo como en la plantilla MASTER.
@@ -605,7 +635,7 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 2. **Implementar slides de lecturas** con estilo artístico (copiar estilo de slides existentes en MASTER)
 3. **Implementar esquema completo**: Portada → Entrada → Transición → Perdón → Transición → Gloria → Transición → Primera Lectura → Salmo → Aleluya → Transición → Credo → Transición → Ofertorio → Transición → Santo → Transición → Padre Nuestro → Transición → Paz → Transición → Comunión → Transición → Canto a María → Despedida
 4. **Integrar lema "Somos uno"** como imagen en esquina inferior de cada diapositiva
-5. **Arreglar matching de canciones** para que asigne canciones variadas según momento litúrgico
+5. **Mejorar matching de canciones** — El matching ahora respeta momento litúrgico, pero sigue siendo básico; se puede refinar con más canciones y pesos por momento.
 6. **Migrar más canciones** desde Blogspot para tener variedad suficiente
 
 ### Notas técnicas importantes
@@ -614,6 +644,7 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 - El generador antiguo (`presentacion_fieles.py`) fue descartado porque creaba slides de texto plano sin estilo.
 - El nuevo generador (`presentacion_master.py`) copia slides XML desde la plantilla MASTER. Requiere manipulación de XML del PPTX (presentation.xml, rels, etc.).
 - El lema cambia cada año. Para 2027-28: actualizar `config/lema.py` y reemplazar imagen en plantilla.
+- El generador `presentacion_html.py` produce actualmente las presentaciones web (JSON + HTML + PPTX/PDF) con estilo propio, mientras `presentacion_master.py` queda como alternativa basada en plantilla PPTX.
 
 **Pendiente:** Implementar `_crear_logo_lema` como imagen real (add_picture) en lugar de texto plano.
 
@@ -622,5 +653,5 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 - [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
-  - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente solo 9 canciones)
+  - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente 107 canciones, parcialmente completo)
   - [ ] Mejorar calidad de los mocks de Koinonia y tests del flujo end-to-end
