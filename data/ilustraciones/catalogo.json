@@ -1,0 +1,88 @@
+{
+  "descripcion": "Catálogo de ilustraciones por tipo de slide. Se resuelve la primera imagen disponible en el orden indicado.",
+  "fuentes": {
+    "fano": "Dibujos de Patxi Velasco Fano (uso pastoral no comercial)",
+    "patite": "Ilustraciones de Pati.te (Patricia Trigo, uso pastoral no comercial)",
+    "sarabg": "Ilustraciones de Sara BG (uso pastoral no comercial)"
+  },
+  "imagenes": {
+    "portada": [
+      "fano/fano_25_domingo_vina.jpg",
+      "sarabg/IMG-1393.jpg",
+      "patite/virgen_fatima.jpg"
+    ],
+    "entrada": [
+      "fano/20140953.jpg",
+      "fano/fano_25_domingo_vina.jpg"
+    ],
+    "perdon": [
+      "fano/20140955.jpg",
+      "patite/virgen_fatima_2.png"
+    ],
+    "gloria": [
+      "fano/20140957.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "salmo": [
+      "fano/20140962.jpg",
+      "patite/virgen_fatima.jpg"
+    ],
+    "aleluya": [
+      "fano/20140957.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "transicion_palabra": [
+      "fano/20140961.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "primera_lectura": [
+      "fano/fano_25_domingo_vina.jpg",
+      "fano/20140961.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "segunda_lectura": [
+      "fano/20140960.jpg",
+      "fano/20140961.jpg"
+    ],
+    "evangelio": [
+      "fano/fano_25_domingo_vina.jpg",
+      "fano/20140960.jpg"
+    ],
+    "credo": [
+      "fano/20140957.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "ofertorio": [
+      "fano/20140959.jpg",
+      "patite/virgen_fatima_2.png"
+    ],
+    "santo": [
+      "fano/20140957.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "padre_nuestro": [
+      "fano/20140955.jpg",
+      "patite/virgen_fatima.jpg"
+    ],
+    "paz": [
+      "fano/20140958.jpg",
+      "sarabg/IMG-1393.jpg"
+    ],
+    "comunion": [
+      "fano/20140959.jpg",
+      "patite/virgen_fatima_2.png"
+    ],
+    "maria": [
+      "patite/virgen_fatima.jpg",
+      "patite/virgen_fatima_2.png"
+    ],
+    "despedida": [
+      "fano/20140953.jpg",
+      "fano/fano_25_domingo_vina.jpg"
+    ],
+    "transicion_eucaristia": [
+      "fano/20140959.jpg",
+      "sarabg/IMG-1393.jpg"
+    ]
+  }
+}

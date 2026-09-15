@@ -1,39 +1,25 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
+# Archivos temporales SQLite
+*.sqlite3-shm
+*.sqlite3-wal
 
-# Node
-node_modules/
-npm-debug.log*
-package-lock.json
+# Backups locales
+data/templates/*.backup
 
-# Build outputs
-web/dist/
-web/.astro/
-*.pptx
-*.pdf
-presentaciones/
+# Generados automáticamente (se regeneran en build)
+presentaciones_html/
+web/public/presentaciones_html/
+web/public/fano_preview.png
 
-# Environment
+# PNGs fallback generados de SVGs
+data/ilustraciones/*.png
+
+# Otros generados y locales
 .env
-.env.local
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-
-# Data (se genera dinamicamente)
-data/db.sqlite3
-data/cache/
+*.pyc
+__pycache__/
+.web/.astro/
+web/node_modules/
+web/dist/
+web/package-lock.json
+presentaciones/
+docs/INFORME_ESTRATEGICO_*.pdf
