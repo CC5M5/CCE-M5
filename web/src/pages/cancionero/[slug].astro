@@ -1,6 +1,7 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { getCancionBySlug, getAllCancionesSlugs } from '@lib/db.js';
+import { slugify } from '@lib/slug.js';
 import VisorAcordes from '@components/VisorAcordes.astro';
 import { Printer, Share2, Music } from 'lucide-react';
 import '../../styles/global.css';
@@ -16,10 +17,6 @@ const cancion = getCancionBySlug(slug);
 
 if (!cancion) {
   return Astro.redirect(`${base}404`);
-}
-
-function slugify(text) {
-  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '').replace(/\-+/g, '-');
 }
 
 const cancionSlug = slugify(cancion.titulo);

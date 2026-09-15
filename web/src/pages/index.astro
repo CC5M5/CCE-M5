@@ -6,6 +6,7 @@ import {
   getRecentPresentaciones,
   getLatestPresentacionFecha,
 } from '@lib/db.js';
+import { slugify } from '@lib/slug.js';
 import '../styles/global.css';
 
 const base = import.meta.env.BASE_PATH || '/';
@@ -126,7 +127,7 @@ const cancionesOrdenadas = [...canciones].sort((a, b) => {
                 <li class="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0">
                   <div>
                     <span class="text-sm uppercase tracking-wide text-slate-500 block">{c.momento_liturgico || 'Canto'}</span>
-                    <a href={`${base}cancionero/${encodeURIComponent(c.titulo.toLowerCase().replace(/\s+/g, '-'))}/`} class="font-heading font-semibold text-lg hover:text-liturgia-verde">
+                    <a href={`${base}cancionero/${slugify(c.titulo)}/`} class="font-heading font-semibold text-lg hover:text-liturgia-verde">
                       {c.titulo}
                     </a>
                   </div>
