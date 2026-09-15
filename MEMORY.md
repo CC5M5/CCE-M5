@@ -502,16 +502,9 @@ Para cambiar el lema en años futivos (ej. 2027-28):
     - ✅ Paso 5: Matching arreglado (usa `DEFAULT_ASIGNACION` cuando hay <20 canciones)
     - ❌ Paso 6: Migrar más canciones desde Blogspot (pendiente)
 
-25. **Matching de canciones corregido** — `proponer_canciones_matching` ahora detecta cuando hay menos de 20 canciones y usa `DEFAULT_ASIGNACION` directamente, evitando que todas las canciones sean "PREPARAD EL CAMINO".
+25. **Matching de canciones corregido (v1)** — `proponer_canciones_matching` ahora detecta cuando hay menos de 20 canciones y usa `DEFAULT_ASIGNACION` directamente, evitando que todas las canciones sean "PREPARAD EL CAMINO". Esta corrección fue mejorada más tarde el mismo día (punto 48).
 
-26. **Presentación 2026-09-20 regenerada con éxito** — 10 slides: menú + Preparad el Camino + 4 lecturas + 3 transiciones + portada. PPTX de 6.8MB servido en web.
-
-### Notas sobre limitaciones actuales
-
-- **Slides de canciones no tienen lema**: Las slides copiadas de la plantilla MASTER tienen el lema antiguo ("Tu raíz"). Solo las slides creadas por python-pptx (lecturas, transiciones, portada) tienen el lema "Somos uno".
-- **Orden de slides no es perfecto**: La portada está al final en vez de al principio. Esto es una limitación de python-pptx que no permite insertar slides en posiciones arbitrarias.
-- **Matching es básico**: Con solo 9 canciones, hay repeticiones (Gloria=Santo, Ofertorio=Paz, Comunión=María).
-- **Transiciones son texto simple**: No tienen las imágenes de fondo de la plantilla MASTER.
+26. **Presentación 2026-09-20 regenerada con éxito** — Con `presentacion_master.py`: 10 slides (menú + Preparad el Camino + 4 lecturas + 3 transiciones + portada). PPTX de 6.8MB servido en web. Más tarde se regeneró con `presentacion_html.py` (punto 49).
 
 
 
@@ -524,7 +517,7 @@ Para cambiar el lema en años futivos (ej. 2027-28):
     - PPTX descargable: http://192.168.68.244:4321/presentaciones_html/2026-09-20_presentacion/2026-09-20_presentacion.pptx
     - PDF: http://192.168.68.244:4321/presentaciones_html/2026-09-20_presentacion/2026-09-20_presentacion.pdf
 
-29. **PPTX mejorado con estilo visual** — Tarjetas redondeadas, colores púrpura/dorado, imágenes grandes sin tapar texto, lema en esquina inferior. No se usa directamente `pptx-designer`; se usan sus tokens de color como inspiración.
+29. **PPTX/HTML mejorado con estilo visual** — Tarjetas redondeadas, colores púrpura/dorado, imágenes grandes sin tapar texto, lema "Somos uno" como imagen en esquina inferior izquierda en HTML y PPTX. No se usa directamente `pptx-designer`; se usan sus tokens de color como inspiración.
 
 30. **Paginación automática** — Textos largos (lecturas, evangelio) se dividen en varias slides si exceden el espacio.
 
@@ -545,7 +538,7 @@ Para cambiar el lema en años futivos (ej. 2027-28):
     - `21614ed`: generador presentacion_html con ilustraciones, paginación, PDF y web
     - `ae03033`: mejora PPTX con estilo litúrgico visual
 
-### Actualización 2026-09-15 (mediodía)
+### Actualización 2026-09-15 (mediodía - scraper cancionero)
 
 37. **Scraper del cancionero reparado** — `blogspot_scraper.py` era incompatible con `acordes_parser_v3` (devuelve objetos `LineaCancion`, no diccionarios; eliminó `detectar_momento_liturgico`). Se actualizó para:
     - Leer atributos del dataclass (`linea.tipo`, `linea.letra`, `linea.texto`).
@@ -591,17 +584,17 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 46. **Commits de la sesión:**
     - `92b4ab7`: scraper Betania soporta h1, acordes pegados y spans rojos; importadas 98 canciones más
 
-### Actualización 2026-09-15 (tarde - correcciones)
+### Actualización 2026-09-15 (tarde - correcciones web y matching)
 
 47. **Corrección de slugs del cancionero con tildes** — Las páginas de canciones con caracteres especiales no se generaban correctamente (p. ej. `a-tu-amparo-y-proteccin` en el listado apuntaba a una carpeta distinta de la que Astro creaba). Se centralizó la generación de slugs en `web/src/lib/slug.js` usando normalización Unicode NFD, eliminación de diacríticos, minúsculas y limpieza de caracteres no alfanuméricos. Se actualizaron `web/src/lib/db.js`, `web/src/pages/cancionero/[slug].astro`, `web/src/pages/cancionero/index.astro` e `index.astro` para usar el helper común. La URL de ejemplo `http://192.168.68.244:4321/cancionero/a-tu-amparo-y-proteccion/` ahora funciona.
 
-48. **Corrección del matching de canciones** — `scripts/generar_semana.py` asignaba la misma canción (`PREPARAD EL CAMINO`) a todos los momentos porque `proponer_canciones_matching` elegía siempre el primer resultado del ranking global. Se reescribió para:
+48. **Corrección del matching de canciones (v2)** — `scripts/generar_semana.py` asignaba la misma canción (`PREPARAD EL CAMINO`) a todos los momentos porque `proponer_canciones_matching` elegía siempre el primer resultado del ranking global. Se reescribió para:
     - Pedir un ranking ampliado (10× candidatos).
     - Priorizar canciones cuyo `momento_liturgico` coincida exactamente con el momento solicitado.
     - Probar coincidencia parcial y título antes de recurrir al fallback.
     - Usar `DEFAULT_ASIGNACION` como fallback en lugar de la canción genérica top-1.
 
-49. **Regeneración de la presentación 2026-09-20** — No existía fila en `presentaciones`; se generó de nuevo con lecturas de Ciudad Redonda (Koinonia caído) y matching corregido. Asignación final:
+49. **Regeneración de la presentación 2026-09-20 con `presentacion_html.py`** — No existía fila en `presentaciones`; se generó de nuevo con lecturas de Ciudad Redonda (Koinonia caído) y matching corregido. El generador produce portada como slide 1 e incluye el logo del lema "Somos uno" en esquina inferior izquierda de todas las slides, tanto en HTML como en PPTX. Asignación final:
     - Entrada: PREPARAD EL CAMINO
     - Perdón: OTRA OPORTUNIDAD
     - Gloria: EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS
@@ -617,7 +610,7 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 
 50. **HTML/PPTX/PDF de la presentación regenerados** — Se ejecutó `src/generators/presentacion_html.py` para actualizar `presentaciones_html/2026-09-20_presentacion/` con JSON, HTML, PPTX y PDF. Luego se hizo `npm run build` en `web/` para servir la web actualizada.
 
-51. **Commits de la sesión (tarde):**
+51. **Commits de la sesión (tarde - correcciones):**
     - `be0f243`: fix(web): normaliza slugs del cancionero para tildes y caracteres especiales
     - `708f84d`: fix(generar): mejora matching por momento litúrgico y evita repetir misma canción
 
