@@ -1,6 +1,7 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { getCanciones, getAllMomentos } from '@lib/db.js';
+import { slugify } from '@lib/slug.js';
 import BuscadorCanciones from '@components/BuscadorCanciones.jsx';
 import FiltroMomentos from '@components/FiltroMomentos.jsx';
 import '../../styles/global.css';
@@ -8,10 +9,6 @@ import '../../styles/global.css';
 const base = import.meta.env.BASE_PATH || '/';
 const canciones = getCanciones();
 const momentos = getAllMomentos();
-
-function slugify(text) {
-  return text.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]/g, '').replace(/\-+/g, '-');
-}
 
 const cancionesConSlug = canciones.map(c => ({
   ...c,
@@ -50,7 +47,7 @@ const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 
           <ul class="space-y-3">
             {cancionesPorLetra[letra].map(c => (
               <li key={c.id} class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 rounded-lg hover:bg-slate-50 transition">
-                <a href={`${base}cancionero/${encodeURIComponent(c.slug)}/`} class="font-heading font-semibold text-lg text-slate-800 hover:text-liturgia-verde">
+                <a href={`${base}cancionero/${c.slug}/`} class="font-heading font-semibold text-lg text-slate-800 hover:text-liturgia-verde">
                   {c.titulo}
                 </a>
                 <div class="flex items-center gap-3 text-sm">
