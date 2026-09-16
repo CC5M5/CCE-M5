@@ -402,46 +402,114 @@ class AcordesParser:
         lineas_html: List[str] = []
         lineas_html.append('<div class="cancion-con-acordes">')
 
-        for linea in estructura:
+        # Heurística: detectar estribillo por cambio a MAYÚSCULAS.
+        # Si encontramos una línea de letra completamente en mayúsculas (salvo
+        # acentos, Ñ, Ç, signos) y la anterior estaba en minúsculas/mezcla,
+        # consideramos que empieza el estribillo. Vuelve a normal al bajar.
+        ultima_letra_mayuscula: Optional[bool] = None
+        en_estribillo = False
+
+        for idx, linea in enumerate(estructura):
             if linea.tipo == "vacía":
                 lineas_html.append('<div class="linea-vacia"></div>')
+                continue
 
-            elif linea.tipo == "sección":
+            if linea.tipo == "sección":
                 escapado = html.escape(linea.texto)
                 lineas_html.append(f'<div class="seccion">{escapado}</div>')
+                en_estribillo = re.search(r"(?i)estribillo|estrofa", linea.texto or "") is not None
+                continue
 
-            elif linea.tipo == "letra":
-                escapado = html.escape(linea.letra)
-                lineas_html.append(f'<div class="letra-solo">{escapado}</div>')
+            if linea.tipo in ("letra", "acordes_letra"):
+                texto = linea.letra if linea.tipo == "letra" else linea.letra
+                es_mayuscula = self._es_texto_mayuscula(texto)
 
-            elif linea.tipo == "acordes":
+                # Cambio a mayúsculas después de línea no mayúscula = estribillo
+                if es_mayuscula and ultima_letra_mayuscula is False:
+                    en_estribillo = True
+                # Cambio a minúsculas después de mayúsculas = fin estribillo
+                elif not es_mayuscula and ultima_letra_mayuscula is True:
+                    en_estribillo = False
+
+                if es_mayuscula is not None:
+                    ultima_letra_mayuscula = es_mayuscula
+
+                if linea.tipo == "letra":
+                    escapado = self._renderizar_texto_con_formato(texto, negrita=en_estribillo)
+                    lineas_html.append(f'<div class="letra-solo">{escapado}</div>')
+                else:
+                    lineas_html.append('<div class="bloque-acordes-letra">')
+                    acordes_raw = linea.acordes_raw or ""
+                    ancho_acordes = len(acordes_raw.rstrip())
+                    letra_padded = texto.ljust(ancho_acordes)
+
+                    def _envolver_acorde_en_raw(match: re.Match) -> str:
+                        acorde = match.group(1)
+                        acorde_esc = html.escape(self.normalizar_acorde(acorde))
+                        return f'<span class="acorde">{acorde_esc}</span>'
+
+                    linea_acordes_html = self._patron.sub(_envolver_acorde_en_raw, acordes_raw)
+                    lineas_html.append(f'  <div class="linea-acordes">{linea_acordes_html}</div>')
+                    lineas_html.append(f'  <div class="linea-letra">{self._renderizar_texto_con_formato(letra_padded, negrita=en_estribillo)}</div>')
+                    lineas_html.append('</div>')
+                continue
+
+            if linea.tipo == "acordes":
                 acordes_html = " ".join(
                     html.escape(self.normalizar_acorde(a.acorde))
                     for a in linea.acordes
                 )
                 lineas_html.append(f'<div class="linea-acordes-suelta">{acordes_html}</div>')
-
-            elif linea.tipo == "acordes_letra":
-                lineas_html.append('<div class="bloque-acordes-letra">')
-
-                # Usar la línea de acordes original con espacios de posicionamiento,
-                # envolviendo cada acorde en un span para que la transposición funcione.
-                acordes_raw = linea.acordes_raw or ""
-                ancho_acordes = len(acordes_raw.rstrip())
-                letra_padded = linea.letra.ljust(ancho_acordes)
-
-                def _envolver_acorde_en_raw(match: re.Match) -> str:
-                    acorde = match.group(1)
-                    acorde_esc = html.escape(self.normalizar_acorde(acorde))
-                    return f'<span class="acorde">{acorde_esc}</span>'
-
-                linea_acordes_html = self._patron.sub(_envolver_acorde_en_raw, acordes_raw)
-                lineas_html.append(f'  <div class="linea-acordes">{linea_acordes_html}</div>')
-                lineas_html.append(f'  <div class="linea-letra">{html.escape(letra_padded)}</div>')
-                lineas_html.append('</div>')
+                continue
 
         lineas_html.append('</div>')
         return "\n".join(lineas_html)
+
+    def _es_texto_mayuscula(self, texto: str) -> Optional[bool]:
+        """
+        Devuelve True si el texto es mayormente mayúsculas (letras), False si
+        tiene letras minúsculas, None si no tiene letras.
+        """
+        if not texto or not texto.strip():
+            return None
+        letras = re.findall(r"[A-Za-zÁÉÍÓÚÜÑáéíóúüñÇç]", texto)
+        if not letras:
+            return None
+        mayusculas = sum(1 for c in letras if c.isupper())
+        return mayusculas / len(letras) >= 0.85
+
+    def _renderizar_texto_con_formato(self, texto: str, negrita: bool = False) -> str:
+        """
+        Escapa HTML y aplica formato:
+        - **texto** -> <strong>texto</strong>
+        - Si negrita=True, envuelve todo el texto en <strong>.
+        """
+        if not texto:
+            return ""
+        partes: List[str] = []
+        i = 0
+        n = len(texto)
+        while i < n:
+            if texto.startswith("**", i):
+                fin = texto.find("**", i + 2)
+                if fin == -1:
+                    partes.append(html.escape(texto[i]))
+                    i += 1
+                else:
+                    contenido = texto[i + 2:fin]
+                    partes.append(f"<strong>{html.escape(contenido)}</strong>")
+                    i = fin + 2
+            else:
+                siguiente = texto.find("**", i)
+                if siguiente == -1:
+                    partes.append(html.escape(texto[i:]))
+                    break
+                partes.append(html.escape(texto[i:siguiente]))
+                i = siguiente
+        resultado = "".join(partes)
+        if negrita:
+            resultado = f"<strong>{resultado}</strong>"
+        return resultado
 
     def generar_html_completo(self, estructura: List[LineaCancion]) -> str:
         """Genera un documento HTML completo con CSS para visualización exacta."""
