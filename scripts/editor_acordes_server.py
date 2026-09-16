@@ -296,6 +296,7 @@ def editar(slug: str):
       Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
       <strong>El preview usa exactamente la misma fuente y espaciado que este editor.</strong>
       Si no coincide al guardar, pulsa Ctrl+F5 en la web.
+      <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
@@ -382,6 +383,7 @@ def guardar(slug: str):
       Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
       <strong>El preview usa exactamente la misma fuente y espaciado que este editor.</strong>
       Si no coincide al guardar, pulsa Ctrl+F5 en la web.
+      <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
