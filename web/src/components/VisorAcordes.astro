@@ -22,7 +22,7 @@ let htmlSeguro = (htmlVisual || '')
 htmlSeguro = htmlSeguro.replace(/^(\s*<div class="letra-solo">[^<]+<\/div>\s*(?:<div class="linea-vacia"><\/div>\s*)?)/i, '');
 ---
 
-<div class={`bg-white rounded-xl border border-slate-200 ${compact ? 'p-4' : 'p-6 md:p-8'} font-mono leading-relaxed`}>
+<div class={`bg-white rounded-xl border border-slate-200 ${compact ? 'p-4' : 'p-6 md:p-8'} font-mono leading-tight`}>
   {!compact && (
     <div class="no-print mb-4">
       {/* Fila 1: Toggle, Audio, Volver */}
