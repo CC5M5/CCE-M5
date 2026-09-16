@@ -68,16 +68,16 @@
   }
 
   .bloque-acordes-letra .linea-acordes {
-    position: relative;
-    height: 1.4em;
-    white-space: nowrap;
+    position: relative !important;
+    height: 1.4em !important;
+    white-space: nowrap !important;
   }
 
   .bloque-acordes-letra .acorde {
-    position: absolute;
-    top: 0;
-    color: #c0392b;
-    font-weight: bold;
+    position: absolute !important;
+    top: 0 !important;
+    color: #c0392b !important;
+    font-weight: bold !important;
   }
 
   .linea-acordes {
