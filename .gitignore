@@ -21,5 +21,7 @@ __pycache__/
 web/node_modules/
 web/dist/
 web/package-lock.json
-presentaciones/
+# La carpeta original de presentaciones SÍ debe estar en git (PPTX/PDF originales).
+# La copia en web/public/presentaciones/ se genera durante el build y no se sube.
+web/public/presentaciones/
 docs/INFORME_ESTRATEGICO_*.pdf
