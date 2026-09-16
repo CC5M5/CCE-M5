@@ -28,8 +28,10 @@ jobs:
         run: npm install
         working-directory: ./web
 
-      - name: Copy presentaciones to public
-        run: cp -r ../presentaciones ./public/presentaciones
+      - name: Copy presentaciones assets to public
+        run: |
+          cp -r ../presentaciones ./public/presentaciones
+          cp -r ../presentaciones_html ./public/presentaciones_html
         working-directory: ./web
 
       - name: Build site
