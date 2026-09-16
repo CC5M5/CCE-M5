@@ -197,7 +197,8 @@ class AcordesParser:
 
         Criterios:
         - No está vacía.
-        - Cada token no vacío coincide con un acorde válido.
+        - Cada token no vacío coincide con un acorde válido o es un indicador
+          de repetición entre paréntesis (BIS, x2, etc.).
         - No contiene signos de puntuación que indiquen letra (como ?, !, .).
         """
         if not linea or not linea.strip():
@@ -212,19 +213,30 @@ class AcordesParser:
         if _LINEA_ACORDE_VACIA_RE.fullmatch(linea):
             return False
 
-        tokens = linea.split()
+        # Partir en tokens teniendo en cuenta paréntesis de repetición como (Sol7 si BIS)
+        # Conservamos los paréntesis como delimitadores para tratarlos por separado.
+        tokens = re.findall(r"\([^)]*\)|[^\s()]+", linea)
         if not tokens:
             return False
 
+        # Necesitamos al menos un acorde real; si solo hay indicadores de repetición,
+        # no es una línea de acordes.
+        hay_acorde = False
         for token in tokens:
-            # Los paréntesis de repetición (Bis) no son acordes.
             token_limpio = token.strip("()[]")
             if not token_limpio:
                 continue
+            # Indicadores de repetición entre paréntesis (BIS, x2, x3, ...)
+            # o acompañando a acordes (Do si BIS, Sol7 si BIS, ...).
+            # Si el token contiene acordes+"si BIS", permitir todo el token si al
+            # menos una parte es acorde válido (evita que "si" sea falso acorde).
+            if re.search(r"(?i)\b(bis|x\d+|\*|\d+\s*veces?|repetir)\b", token_limpio):
+                continue
             if not self._patron.fullmatch(token_limpio):
                 return False
+            hay_acorde = True
 
-        return True
+        return hay_acorde
 
     def extraer_acordes_de_linea(self, linea: str) -> List[AcordePosicionado]:
         """Extrae acordes de una línea junto con su posición de inicio."""
