@@ -647,28 +647,32 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 **Pendiente:** Implementar `_crear_logo_lema` como imagen real (add_picture) en lugar de texto plano.
 
 ### Corrección de Acordes y Editor (2026-09-16)
-**Estado:** En progreso
+**Estado:** Completado
 
 **Decisiones tomadas:**
-- Se implementará un **editor web local** para ajustes manuales de acordes. Los cambios se guardan en SQLite y se commitean automáticamente al repo.
+- Se implementó un **editor web local** para ajustes manuales de acordes. Los cambios se guardan en SQLite y se commitean automáticamente al repo.
 - GitHub Pages será **solo lectura**; la edición se hace en el servidor local.
-- Se creará un **script de corrección masiva desde la web de origen** (`titulo_url`) que se ejecutará **una sola vez**, generará un informe comparativo para validación humana, y aplicará las correcciones validadas a la BD.
-- Formato de edición: **texto libre con acordes posicionados** (igual que el almacenado en `letra_con_acordes`).
+- Se ejecutó un **script de corrección masiva desde la web de origen** (`titulo_url`) **una sola vez**.
+- Formato de edición: texto libre con acordes posicionados (igual que `letra_con_acordes`).
 
 **Implementado:**
 - `scripts/corregir_acordes_desde_origen.py` — Corrección masiva desde web de origen.
   - Descarga HTML original conservando espacios de posicionamiento.
   - Genera informe comparativo en `docs/correcciones_acordes/informe_acordes.html`.
-  - Modo `--apply --ids N` regenera `html_visual`, `estructura_json`, `letra_sin_acordes`, `tono` y guarda en BD.
+  - Modo `--apply` regenera `html_visual`, `estructura_json`, `letra_sin_acordes`, `tono` y guarda en BD.
 - `scripts/editor_acordes_server.py` — Editor web local en http://localhost:4322.
   - Listado de 107 canciones.
   - Editor con textarea + preview visual.
   - Botón "Guardar y commitear" actualiza BD y hace `git commit` + `git push`.
 - Se instaló **Flask** en el entorno virtual.
 
-**Pendiente:**
-- Validar informe generado y aplicar correcciones masivas aprobadas.
-- Reconstruir web Astro tras aplicar correcciones para reflejar cambios en cancionero.
+**Corrección aplicada:**
+- 106 canciones corregidas desde web de origen (2026-09-16 10:17).
+- Backup previo: `data/db.sqlite3.backup.20260916_101753`.
+- Web Astro reconstruida y servida en http://192.168.68.244:4321.
+
+**Rollback:**
+- Para volver atrás: `cp data/db.sqlite3.backup.20260916_101753 data/db.sqlite3` y reconstruir la web.
 
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
