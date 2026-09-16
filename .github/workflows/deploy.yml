@@ -32,7 +32,7 @@ jobs:
         run: npm run build
         working-directory: ./web
         env:
-          BASE_PATH: ${{ vars.BASE_PATH || '/CCE-M5-Web-Presentaciones' }}
+          BASE_PATH: ${{ vars.BASE_PATH || '/CCE-M5/' }}
           SITE_URL: ${{ vars.SITE_URL || 'https://cc5m5.github.io' }}
 
       - name: Upload artifact
