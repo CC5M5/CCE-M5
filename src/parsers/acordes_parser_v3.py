@@ -358,7 +358,7 @@ class AcordesParser:
                     left = acorde_info.posicion
                     acorde_esc = html.escape(self.normalizar_acorde(acorde_info.acorde))
                     lineas_html.append(
-                        f'    <span class="acorde" style="left:{left}ch">{acorde_esc}</span>'
+                        f'    <span class="acorde" style="position:absolute;top:0;left:{left}ch">{acorde_esc}</span>'
                     )
 
                 lineas_html.append('  </div>')
