@@ -7,6 +7,7 @@ export function getStaticPaths() {
 }
 
 const { fecha } = Astro.params;
+const base = import.meta.env.BASE_PATH || "/";
 ---
 
 <!DOCTYPE html>
@@ -21,6 +22,6 @@ const { fecha } = Astro.params;
     </style>
   </head>
   <body>
-    <iframe src={`/presentaciones_html/${fecha}_presentacion/index.html`} title={`Presentación ${fecha}`} allowfullscreen></iframe>
+    <iframe src={`${base}presentaciones_html/${fecha}_presentacion/index.html`} title={`Presentación ${fecha}`} allowfullscreen></iframe>
   </body>
 </html>
