@@ -646,10 +646,29 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 
 **Pendiente:** Implementar `_crear_logo_lema` como imagen real (add_picture) en lugar de texto plano.
 
+### Corrección de Acordes y Editor (2026-09-16)
+**Estado:** En progreso
+
+**Decisiones tomadas:**
+- Se implementará un **editor web local** para ajustes manuales de acordes. Los cambios se guardan en SQLite y se commitean automáticamente al repo.
+- GitHub Pages será **solo lectura**; la edición se hace en el servidor local.
+- Se creará un **script de corrección masiva desde la web de origen** (`titulo_url`) que se ejecutará **una sola vez**, generará un informe comparativo para validación humana, y aplicará las correcciones validadas a la BD.
+- Formato de edición: **ChordPro** (acordes entre corchetes encima de la letra) por ser estándar y legible.
+
+**Archivos planeados:**
+- `web/src/pages/cancionero/[slug]/editar-acordes.astro` — Editor local ChordPro + preview.
+- `src/scripts/corregir_acordes_desde_origen.py` — Corrección masiva desde web de origen.
+- `src/scripts/editor_acordes_commit.py` — Guarda cambios en BD y hace `git commit`.
+
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
+- [x] Corregir centrado vertical de slides en Reveal.js (COMPLETADO 2026-09-16)
+- [x] Limpiar presentaciones duplicadas y del 27 de septiembre (COMPLETADO 2026-09-16)
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente 107 canciones, parcialmente completo)
   - [ ] Mejorar calidad de los mocks de Koinonia y tests del flujo end-to-end
+  - [ ] Sistema de corrección de acordes (edición local + commit automático)
+  - [ ] Script de corrección masiva desde web de origen (una sola vez, validación humana)
+  - [ ] Editor web local para ajustes manuales de acordes con commit automático
