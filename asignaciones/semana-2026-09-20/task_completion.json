@@ -1,0 +1,31 @@
+{
+  "task_id": "5e4b451c-5ec5-4ee9-aa1e-d0a8739bc1b7",
+  "title": "Generar asignación de canciones",
+  "status": "testing",
+  "completed_at": "2026-09-15T19:15:00+02:00",
+  "summary": "Generada asignación de canciones para XXV Domingo del Tiempo Ordinario (2026-09-20)",
+  "activities": [
+    {
+      "activity_type": "completed",
+      "message": "Generada asignación de canciones para XXV Domingo del Tiempo Ordinario (2026-09-20). Matching automático basado en lecturas de Ciudad Redonda. 12 canciones asignadas. Generados: presentación PPTX (12 slides), hoja PDF para músicos con acordes, y documento de asignación en Markdown.",
+      "timestamp": "2026-09-15T19:15:00+02:00"
+    }
+  ],
+  "deliverables": [
+    {
+      "deliverable_type": "file",
+      "title": "Asignación de canciones - XXV Domingo Ordinario",
+      "path": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/asignaciones/semana-2026-09-20/asignacion.md"
+    },
+    {
+      "deliverable_type": "file",
+      "title": "Presentación PPTX - Fieles",
+      "path": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/asignaciones/semana-2026-09-20/2026-09-20_presentacion.pptx"
+    },
+    {
+      "deliverable_type": "file",
+      "title": "Hoja de músicos - Acordes PDF",
+      "path": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/asignaciones/semana-2026-09-20/2026-09-20_hoja_musicos.pdf"
+    }
+  ]
+}

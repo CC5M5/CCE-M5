@@ -614,22 +614,27 @@ Para cambiar el lema en años futivos (ej. 2027-28):
     - `be0f243`: fix(web): normaliza slugs del cancionero para tildes y caracteres especiales
     - `708f84d`: fix(generar): mejora matching por momento litúrgico y evita repetir misma canción
 
+### Actualización 2026-09-15 (noche - pipeline Mission Control)
+
+52. **Pipeline semanal automatizado con Mission Control** — Se creó en Mission Control:
+    - Workspace `CCE-M5` (ID `908036db-88c7-451d-b758-fd57abfedeb6`, icono ⛪).
+    - Agente `Capillita` importado desde OpenClaw gateway (`gateway_agent_id: capillita`), rol `Liturgical Pipeline Operator`, master del workspace.
+    - Binding a Telegram (`accountId: 480498977`) para notificaciones.
+
+53. **Timer systemd** — `cce-m5-pipeline.timer` dispara cada lunes a las 08:00 el script `/home/pciath/.openclaw/capillita/bin/cce-m5-weekly-trigger.sh`, que crea en Mission Control la tarea `Generar presentación semana YYYY-MM-DD` para el domingo siguiente, asignada a Capillita.
+
+54. **Runbook de Capillita** — Escritos `SOUL.md`, `USER.md`, `MEMORY.md` e `IDENTITY.md` en `/home/pciath/.openclaw/capillita/` con las reglas del pipeline, verificaciones y limitaciones (no tocar Home Assistant, pedir confirmación antes de regenerar, reportar con tabla de checks).
+
+55. **Tareas de prueba limpiadas** — Se borraron todas las tareas previas del workspace CCE-M5 antes de dejar el timer en producción.
+
+56. **Próximo hito** — Lunes 21 de septiembre de 2026 a las 08:00: primera ejecución automática que creará la tarea para el domingo 27 de septiembre.
+
 ### Próximos pasos pendientes (actualizado)
 
-1. **Migrar más canciones desde Blogspot** — Extraer canciones del blog de Escolapios Betania y añadirlas a la base de datos (actualmente 107 canciones).
-2. **Reordenar slides** — Implementar reordenamiento para que la portada sea slide 1.
-3. **Añadir lema a slides de plantilla** — Reemplazar la imagen "Tu raíz" en todas las slides de la plantilla MASTER.
-4. **Mejorar estilo de transiciones** — Usar imágenes de fondo como en la plantilla MASTER.
-5. **Tests del generador** — Añadir tests unitarios para `presentacion_master.py`.
-
-### Próximos pasos pendientes (prioridad)
-
-1. **Corregir `_rebuild_pptx`** para eliminar slides correctamente y evitar duplicados
-2. **Implementar slides de lecturas** con estilo artístico (copiar estilo de slides existentes en MASTER)
-3. **Implementar esquema completo**: Portada → Entrada → Transición → Perdón → Transición → Gloria → Transición → Primera Lectura → Salmo → Aleluya → Transición → Credo → Transición → Ofertorio → Transición → Santo → Transición → Padre Nuestro → Transición → Paz → Transición → Comunión → Transición → Canto a María → Despedida
-4. **Integrar lema "Somos uno"** como imagen en esquina inferior de cada diapositiva
-5. **Mejorar matching de canciones** — El matching ahora respeta momento litúrgico, pero sigue siendo básico; se puede refinar con más canciones y pesos por momento.
-6. **Migrar más canciones** desde Blogspot para tener variedad suficiente
+1. **Validar ejecución automática del lunes 21 de septiembre** — Confirmar que el timer crea la tarea y Capillita ejecuta/ reporta el pipeline.
+2. **Migrar más canciones** — Si es necesario, ampliar el cancionero más allá de las 107 canciones actuales.
+3. **Configurar GitHub Pages** — Cuando se quiera desplegar fuera del servidor local.
+4. **Tests del flujo end-to-end** — Automatizar smoke tests tras el deploy.
 
 ### Notas técnicas importantes
 
