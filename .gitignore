@@ -6,9 +6,11 @@
 data/templates/*.backup
 
 # Generados automáticamente (se regeneran en build)
-# NOTA: presentaciones_html/ en la raíz contiene la fuente original; se copia a web/public/presentaciones_html/ durante el build.
+# NOTA: presentaciones_html/ en la raíz contiene la fuente original y se copia a web/public/presentaciones_html/ durante el build.
+# La copia en web/public/presentaciones_html/ no se sube a git.
 web/public/presentaciones_html/
 web/public/fano_preview.png
+web/public/presentaciones/
 
 # PNGs fallback generados de SVGs
 data/ilustraciones/*.png
