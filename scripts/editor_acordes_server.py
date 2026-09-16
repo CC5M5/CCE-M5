@@ -24,6 +24,7 @@ import re
 import sqlite3
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from flask import Flask, abort, request
@@ -107,6 +108,51 @@ def _git_commit(titulo: str) -> str:
         return m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
         return f"ERROR: {exc.stderr or exc.stdout}"
+
+
+def _rebuild_web() -> str:
+    """Reconstruye la web Astro y reinicia el servidor web principal."""
+    try:
+        env = os.environ.copy()
+        env["BASE_PATH"] = "/"
+        env["SITE_URL"] = "http://192.168.68.244:4321"
+        env["PATH"] = f"/home/pciath/.nvm/versions/node/v24.18.0/bin:{env.get('PATH', '')}"
+
+        # Build Astro
+        build_result = subprocess.run(
+            ["/home/pciath/.nvm/versions/node/v24.18.0/bin/npm", "run", "build"],
+            cwd=PROJECT_DIR / "web",
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+
+        # Reiniciar servidor web principal (mata proceso http.server en 4321)
+        subprocess.run(
+            "ps aux | grep 'http.server 4321' | grep -v grep | awk '{print $2}' | xargs -r kill 2>/dev/null",
+            shell=True,
+            check=False,
+            capture_output=True,
+        )
+        time.sleep(1)
+
+        # Iniciar nuevo servidor
+        subprocess.Popen(
+            ["/usr/bin/python3", "-m", "http.server", "4321",
+             "--directory", str(PROJECT_DIR / "web" / "dist"),
+             "--bind", "0.0.0.0"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True,
+        )
+
+        return "rebuild OK"
+    except subprocess.CalledProcessError as exc:
+        return f"ERROR rebuild: {exc.stderr or exc.stdout}"
+    except Exception as exc:
+        return f"ERROR rebuild: {exc}"
+
 
 
 def _slugify(titulo: str) -> str:
@@ -297,11 +343,16 @@ def guardar(slug: str):
     conn.close()
 
     commit_result = _git_commit(cancion["titulo"])
+    rebuild_result = _rebuild_web()
+
     if commit_result.startswith("ERROR"):
         mensaje = f"Guardado en BD, pero falló git: {commit_result}"
         clase = "err"
+    elif rebuild_result.startswith("ERROR"):
+        mensaje = f"✅ Guardado y commiteado: {commit_result}. ⚠️ Pero falló rebuild web: {rebuild_result}"
+        clase = "err"
     else:
-        mensaje = f"✅ Guardado y commiteado: {commit_result}"
+        mensaje = f"✅ Guardado, commiteado ({commit_result}) y web reconstruida."
         clase = "ok"
 
     canciones = _get_canciones()
