@@ -22,10 +22,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
         working-directory: ./web
 
       - name: Build site
@@ -33,7 +33,7 @@ jobs:
         working-directory: ./web
         env:
           BASE_PATH: ${{ vars.BASE_PATH || '/CCE-M5-Web-Presentaciones' }}
-          SITE_URL: ${{ vars.SITE_URL || 'https://cce-m5.github.io' }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://cc5m5.github.io' }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
