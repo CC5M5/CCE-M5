@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "fecha": "2026-09-13",
+    "celebracion": "Domingo XXIV del Tiempo Ordinario",
+    "color_liturgico": "verde",
+    "lema": "Somos uno",
+    "lema_imagen": "assets/lema_somos_uno.jpg",
+    "generado": "2026-09-16T09:49:55.488392"
+  },
+  "slides": [
+    {
+      "numero": 1,
+      "tipo": "portada",
+      "titulo": "DOMINGO XXIV DEL TIEMPO ORDINARIO",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "13 de septiembre de 2026",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 2,
+      "tipo": "entrada",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\n\nPREPARAD EL CAMINO AL SEÑOR\n\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\n\nVoz que clama en el desierto:\n\npreparad los caminos de Dios,\n\ndesterrad la mentira por siempre,\n\npreparad los caminos de Dios(Bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Canción de Entrada",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 3,
+      "tipo": "perdon",
+      "titulo": "ACTO PENITENCIAL",
+      "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 4,
+      "tipo": "perdon",
+      "titulo": "BENDICIÓN DEL AGUA",
+      "contenido": "(Se bendice el agua y se asperja sobre la asamblea)",
+      "cita": "",
+      "subtitulo": "Señor, Dios todopoderoso, que por medio del agua...",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 5,
+      "tipo": "gloria",
+      "titulo": "GLORIA",
+      "contenido": "Gloria a Dios en el cielo,\ny en la tierra paz a los hombres que ama el Señor.\nTe alabamos, te bendecimos, te adoramos, te glorificamos.\nTe damos gracias, Señor Dios, Rey celestial.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 6,
+      "tipo": "transicion_palabra",
+      "titulo": "LITURGIA DE LA PALABRA",
+      "contenido": "Escuchemos la Palabra de Dios",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140961.jpg"
+    },
+    {
+      "numero": 7,
+      "tipo": "primera_lectura",
+      "titulo": "PRIMERA LECTURA",
+      "contenido": "En el principio creó Dios el cielo y la tierra...",
+      "cita": "Gn 1, 1-10",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 8,
+      "tipo": "salmo",
+      "titulo": "SALMO RESPONSORIAL",
+      "contenido": "Antífona: El Señor es mi pastor.\n\nEl Señor es mi pastor, nada me falta...",
+      "cita": "Sal 23 (24)",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140962.jpg"
+    },
+    {
+      "numero": 9,
+      "tipo": "aleluya",
+      "titulo": "ALELUYA",
+      "contenido": "Mt 5, 1-12",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 10,
+      "tipo": "segunda_lectura",
+      "titulo": "SEGUNDA LECTURA",
+      "contenido": "Estad siempre alegres en el Señor...",
+      "cita": "Fil 4, 4-9",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140960.jpg"
+    },
+    {
+      "numero": 11,
+      "tipo": "evangelio",
+      "titulo": "EVANGELIO",
+      "contenido": "Viendo Jesús a la multitud, subió al monte...",
+      "cita": "Mt 5, 1-12",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 12,
+      "tipo": "transicion_eucaristia",
+      "titulo": "LITURGIA EUCARÍSTICA",
+      "contenido": "Preparémonos para la mesa del Señor",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 13,
+      "tipo": "credo",
+      "titulo": "CREDO",
+      "contenido": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\nDesde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 14,
+      "tipo": "ofertorio",
+      "titulo": "HOY COMO AYER",
+      "contenido": "HOY COMO AYER\n\nHoy como ayer calla quien no tiene voz,\n\naquél a quien nadie enseñó a decir su palabra.\n\nHoy como ayer quien sabe podrá dominar\n\ny el pobre tendrá que bajar otra vez la mirada.\n\nCORO\n\nCalasanz nos enseñó como hacer realidad\n\nun mañana de esperanza, una nueva humanidad\n\ndespertando la razón, la conciencia y dignidad,\n\neducando al hombre nuevo en amor y libertad.\n\nCalasanz nos enseñó como hacer realidad\n\nun mañana de esperanza, una nueva humanidad\n\nayudando a descubrir que Jesús de Nazaret\n\nsigue vivo y su camino juntos hay que recorrer.\n\nMira y verás que hay niños que nunca sabrán\n\nque tienen derecho a reír y a jugar en la plaza.\n\nMira y verás que muchos explotan sin fin\n\nla fuerza de la juventud para hacer su ganancia",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Ofertorio",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 15,
+      "tipo": "santo",
+      "titulo": "SANTO",
+      "contenido": "Santo, santo, santo es el Señor,\nDios del universo.\nLlenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo.\nBendito el que viene en nombre del Señor.\nHosanna en el cielo.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 16,
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO",
+      "contenido": "Padre nuestro, que estás en el cielo,\nsantificado sea tu nombre;\nvenga a nosotros tu reino;\nhágase tu voluntad en la tierra como en el cielo.\n\nDanos hoy nuestro pan de cada día;\nperdona nuestras ofensas,\ncomo también nosotros perdonamos a los que nos ofenden;\nno nos dejes caer en la tentación,\ny líbranos del mal.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 17,
+      "tipo": "paz",
+      "titulo": "RITO DE LA PAZ",
+      "contenido": "Señor Jesucristo, que dijiste a tus apóstoles:\n«La paz os dejo, mi paz os doy»,\nno tengas en cuenta nuestros pecados,\nsino la fe de tu Iglesia,\ny conforme a tu palabra concédele la paz y la unidad.\n\nTú que vives y reinas por los siglos de los siglos. Amén.\n\nLa paz del Señor esté siempre con vosotros.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140958.jpg"
+    },
+    {
+      "numero": 18,
+      "tipo": "comunion",
+      "titulo": "MARÍA, MÚSICA DE DIOS",
+      "contenido": "MARÍA, MÚSICA DE DIOS\n\nMe quedé sin voz con qué cantar\n\ny mi alma vacía dormía en sequedad\n\nY pensé para mí: me pondré en sus manos\n\nmanos de Madre, me dejaré en su amor\n\nY tú, María, házme música de Dios\n\nY tú, María, anima tú las cuerdas de mi alma\n\nAleluya, Amén\n\nY tú, María, házme música de Dios\n\nY tú, María, anima tú las cuerdas de mi alma\n\nAleluya, Amén\n\nMaría, acompaña tú mi caminar\n\nyo sola no puedo, ayúdame a andar\n\nY pensé para mí: me pondré en sus manos\n\nmanos de Madre, me dejaré en su amor\n\nY tú, María, házme música de Dios\n\nY tú, María, anima tú las cuerdas de mi alma\n\nAleluya, Amén\n\nY tú, María, házme música de Dios\n\nY tú, María, anima tú las cuerdas de mi alma\n\nAleluya, Amén",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Comunión",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 19,
+      "tipo": "maria",
+      "titulo": "CANTO A MARÍA",
+      "contenido": "Dios te salve, María;\nllena eres de gracia;\nel Señor es contigo.\nBendita tú eres entre todas las mujeres,\ny bendito es el fruto de tu vientre, Jesús.\n\nSanta María, Madre de Dios,\nruega por nosotros, pecadores,\nahora y en la hora de nuestra muerte. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/virgen_fatima.jpg"
+    },
+    {
+      "numero": 20,
+      "tipo": "despedida",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\n\nPREPARAD EL CAMINO AL SEÑOR\n\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\n\nVoz que clama en el desierto:\n\npreparad los caminos de Dios,\n\ndesterrad la mentira por siempre,\n\npreparad los caminos de Dios(Bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Despedida",
+      "imagen": "assets/20140953.jpg"
+    }
+  ]
+}

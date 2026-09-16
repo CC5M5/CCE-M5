@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "fecha": "2026-09-20",
+    "celebracion": "XXV Domingo del Tiempo Ordinario",
+    "color_liturgico": "verde",
+    "lema": "Somos uno",
+    "lema_imagen": "assets/lema_somos_uno.jpg",
+    "generado": "2026-09-16T09:50:07.918741"
+  },
+  "slides": [
+    {
+      "numero": 1,
+      "tipo": "portada",
+      "titulo": "XXV DOMINGO DEL TIEMPO ORDINARIO",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "20 de septiembre de 2026",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 2,
+      "tipo": "entrada",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\n\nPREPARAD EL CAMINO AL SEÑOR\n\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\n\nVoz que clama en el desierto:\n\npreparad los caminos de Dios,\n\ndesterrad la mentira por siempre,\n\npreparad los caminos de Dios(Bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Canción de Entrada",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 3,
+      "tipo": "perdon",
+      "titulo": "ACTO PENITENCIAL",
+      "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 4,
+      "tipo": "perdon",
+      "titulo": "BENDICIÓN DEL AGUA",
+      "contenido": "(Se bendice el agua y se asperja sobre la asamblea)",
+      "cita": "",
+      "subtitulo": "Señor, Dios todopoderoso, que por medio del agua...",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 5,
+      "tipo": "gloria",
+      "titulo": "GLORIA",
+      "contenido": "Gloria a Dios en el cielo,\ny en la tierra paz a los hombres que ama el Señor.\nTe alabamos, te bendecimos, te adoramos, te glorificamos.\nTe damos gracias, Señor Dios, Rey celestial.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 6,
+      "tipo": "transicion_palabra",
+      "titulo": "LITURGIA DE LA PALABRA",
+      "contenido": "Escuchemos la Palabra de Dios",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140961.jpg"
+    },
+    {
+      "numero": 7,
+      "tipo": "primera_lectura",
+      "titulo": "PRIMERA LECTURA",
+      "contenido": "Buscad al Señor mientras se le encuentra, invocadlo mientras esté cerca; que el malvado abandone su camino, y el criminal sus planes; que regrese al Señor, y él tendrá piedad; a nuestro Dios, que es rico en perdón. Mis planes no son vuestros planes, vuestros caminos no son mis caminos –oráculo del Señor–. Como el cielo es más alto que la tierra, mis caminos son más altos que los vuestros, mis planes que vuestros planes.",
+      "cita": "55, 6-9",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 8,
+      "tipo": "salmo",
+      "titulo": "SALMO RESPONSORIAL",
+      "contenido": "Antífona: Cerca está el Señor de los que lo invocan\n\nDía tras día, te bendeciré, Dios mío\n\ny alabaré tu nombre por siempre jamás.\n\nGrande es el Señor y merece toda alabanza,\n\nes incalculable su grandeza.\nEl Señor es clemente y misericordioso,\n\nlento a la cólera y rico en piedad;\n\nel Señor es bueno con todos,\n\nes cariñoso con todas sus criaturas.\nEl Señor es justo en todos sus caminos,\n\nes bondadoso en todas sus acciones;\n\ncerca está el Señor de los que lo invocan,\n\nde los que lo invocan sinceramente.",
+      "cita": "Sal 144",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140962.jpg"
+    },
+    {
+      "numero": 9,
+      "tipo": "aleluya",
+      "titulo": "ALELUYA",
+      "contenido": "20,1-16",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 10,
+      "tipo": "segunda_lectura",
+      "titulo": "SEGUNDA LECTURA",
+      "contenido": "Cristo será glorificado en mi cuerpo, sea por mi vida o por mi muerte. Para mí la vida es Cristo, y una ganancia el morir. Pero, si el vivir esta vida mortal me supone trabajo fructífero, no sé qué escoger. Me encuentro en ese dilema: por un lado, deseo partir para estar con Cristo, que es con mucho lo mejor; pero, por otro, quedarme en esta vida veo que es más necesario para vosotros. Lo importante es que vosotros llevéis una vida digna del Evangelio de Cristo.",
+      "cita": "1,20c-24.27a",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140960.jpg"
+    },
+    {
+      "numero": 11,
+      "tipo": "evangelio",
+      "titulo": "EVANGELIO (1/2)",
+      "contenido": "En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «El Reino de los Cielos se parece a un propietario que al amanecer salió a contratar jornaleros para su viña. Después de ajustarse con ellos en un denario por jornada, los mandó a la viña. Salió otra vez a media mañana, vio a otros que estaban en la plaza sin trabajo, y les dijo: «Id también vosotros a mi viña, y os pagaré lo debido.» Ellos fueron. Salió de nuevo hacia mediodía y a media tarde e hizo lo mismo. Salió al caer la tarde y encontró a otros, parados, y les dijo: «¿Cómo es que estáis aquí el día entero sin trabajar?» Le respondieron: «Nadie nos ha contratado.» Él les dijo: «Id también vosotros a mi viña.» Cuando oscureció, el dueño de la viña dijo al capataz: «Llama a los jornaleros y págales el jornal, empezando por los últimos y acabando por los primeros.» Vinieron los del atardecer y recibieron un denario cada uno. Cuando llegaron los primeros, pensaban que recibirían más, pero ellos también recibieron un denario cada uno.",
+      "cita": "20,1-16",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 12,
+      "tipo": "evangelio",
+      "titulo": "EVANGELIO (2/2)",
+      "contenido": "Entonces se pusieron a protestar contra el amo: «Estos últimos han trabajado sólo una hora, y los has tratado igual que a nosotros, que hemos aguantado el peso del día y el bochorno.» Él replicó a uno de ellos: «Amigo, no te hago ninguna injusticia. ¿No nos ajustamos en un denario? Toma lo tuyo y vete. Quiero darle a este último igual que a ti. ¿Es que no tengo libertad para hacer lo que quiera en mis asuntos? ¿O vas a tener tú envidia porque yo soy bueno?» Así, los últimos serán los primeros y los primeros los últimos.» Palabra del Señor",
+      "cita": "20,1-16",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 13,
+      "tipo": "transicion_eucaristia",
+      "titulo": "LITURGIA EUCARÍSTICA",
+      "contenido": "Preparémonos para la mesa del Señor",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 14,
+      "tipo": "credo",
+      "titulo": "CREDO",
+      "contenido": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\nDesde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 15,
+      "tipo": "ofertorio",
+      "titulo": "PADRE NUESTRO DE LA VIDA",
+      "contenido": "Padre nuestro de la vida,\n\nmío, de ése y de aquél\n\nque vive en toda criatura\n\ny ellos así han de creer.\n\nQuisiera realzar tu nombre\n\nviviendo aquí bajo el sol\n\ntu mensaje de aquel monte\n\nLam Si7 Mim SiM7m Mim\n\nde pobreza, paz y amor.\n\nDanos pan para vivir\n\nsólo el momento presente\n\nya que el día de mañana\n\nquizás aquí no me encuentre.\n\nNo mires lo que hice mal\n\nque yo no veré a mi deudor\n\ny en mi camino hacia ti\n\nLam Si7 Mim SiM7m Mim\n\nque no caiga en tentación.\n\nAmén, amén, que no caiga en tentación.\n\nLam Si7 Mim Mi Lam Si7 Mim SiM7m Mim\n\nAmén, amén, que sea así siempre Señor.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Ofertorio",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 16,
+      "tipo": "santo",
+      "titulo": "SANTO",
+      "contenido": "Santo, santo, santo es el Señor,\nDios del universo.\nLlenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo.\nBendito el que viene en nombre del Señor.\nHosanna en el cielo.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 17,
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO",
+      "contenido": "Padre nuestro, que estás en el cielo,\nsantificado sea tu nombre;\nvenga a nosotros tu reino;\nhágase tu voluntad en la tierra como en el cielo.\n\nDanos hoy nuestro pan de cada día;\nperdona nuestras ofensas,\ncomo también nosotros perdonamos a los que nos ofenden;\nno nos dejes caer en la tentación,\ny líbranos del mal.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 18,
+      "tipo": "paz",
+      "titulo": "RITO DE LA PAZ",
+      "contenido": "Señor Jesucristo, que dijiste a tus apóstoles:\n«La paz os dejo, mi paz os doy»,\nno tengas en cuenta nuestros pecados,\nsino la fe de tu Iglesia,\ny conforme a tu palabra concédele la paz y la unidad.\n\nTú que vives y reinas por los siglos de los siglos. Amén.\n\nLa paz del Señor esté siempre con vosotros.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140958.jpg"
+    },
+    {
+      "numero": 19,
+      "tipo": "comunion",
+      "titulo": "TODO MI SER",
+      "contenido": "Todo mi ser, todo lo que soy\n\nte pertenece sólo a ti.\n\nDesde mi pobreza,\n\nTú eres la fuerza.\n\nNada sé, sólo que caminaré.\n\nLLEGASTE A MI VIDA CON TU LUZ,\n\nCAMBIASTE MI MENTE CON TU AMOR,\n\nVACIASTE MI ALMA Y AHORA ESTÁS\n\nDENTRO DE MÍ.\n\nTodo mi ser, todo lo que soy,\n\nlo bueno y lo malo la pongo a tus pies.\n\nAunque a veces llegues a mi templo\n\ny lo encuentres ya lleno,\n\nno es verdad, sólo se llena\n\ncuando Tú moras en él.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Comunión",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 20,
+      "tipo": "maria",
+      "titulo": "CANTO A MARÍA",
+      "contenido": "Dios te salve, María;\nllena eres de gracia;\nel Señor es contigo.\nBendita tú eres entre todas las mujeres,\ny bendito es el fruto de tu vientre, Jesús.\n\nSanta María, Madre de Dios,\nruega por nosotros, pecadores,\nahora y en la hora de nuestra muerte. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/virgen_fatima.jpg"
+    },
+    {
+      "numero": 21,
+      "tipo": "despedida",
+      "titulo": "DE NOCHE IREMOS DE NOCHE",
+      "contenido": "De noche iremos, de noche, que para encontrar la fuente,\n\nSólo la sed nos alumbra, sólo la sed nos alumbra.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Despedida",
+      "imagen": "assets/20140953.jpg"
+    }
+  ]
+}

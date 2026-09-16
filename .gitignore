@@ -6,7 +6,7 @@
 data/templates/*.backup
 
 # Generados automáticamente (se regeneran en build)
-presentaciones_html/
+# NOTA: presentaciones_html/ en la raíz contiene la fuente original; se copia a web/public/presentaciones_html/ durante el build.
 web/public/presentaciones_html/
 web/public/fano_preview.png
 
