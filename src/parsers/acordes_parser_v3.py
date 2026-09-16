@@ -73,6 +73,27 @@ def limpiar_texto_cancion(texto: str) -> str:
         lineas.append(linea)
     return "\n".join(lineas)
 
+
+def limpiar_texto_preservando_espacios(texto: str) -> str:
+    """
+    Limpia etiquetas HTML y líneas de metadatos del blogspot, pero conserva
+    los espacios múltiples y saltos de línea usados para posicionar acordes.
+
+    Útil para generar la visualización HTML con fuente monoespaciada.
+    """
+    lineas: List[str] = []
+    for linea in texto.splitlines():
+        # Quitar etiquetas HTML.
+        linea = _HTML_TAG_RE.sub("", linea)
+        # Normalizar NBSP a espacio normal, pero conservar múltiples espacios.
+        linea = linea.replace("\u00a0", " ")
+        # Descartar líneas que sean únicamente metadatos de navegación.
+        linea_strip = linea.strip()
+        if any(r.fullmatch(linea_strip) for r in _METADATA_RES):
+            continue
+        lineas.append(linea.rstrip())
+    return "\n".join(lineas)
+
 # ---------------------------------------------------------------------------
 # Modelo de datos
 # ---------------------------------------------------------------------------
@@ -95,6 +116,7 @@ class LineaCancion:
     acordes: List[AcordePosicionado] = field(default_factory=list)
     letra: str = ""
     texto: str = ""  # Para líneas de metadatos/sección
+    acordes_raw: str = ""  # Línea de acordes original con espacios de posicionamiento
 
 
 # ---------------------------------------------------------------------------
@@ -235,14 +257,21 @@ class AcordesParser:
         El texto se limpia previamente de etiquetas HTML y líneas de metadatos
         del blogspot para que la letra resultante sea apta para vista PDF.
         """
-        texto = limpiar_texto_cancion(texto)
-        lineas = texto.splitlines()
+        texto_limpio = limpiar_texto_cancion(texto)
+        texto_preservado = limpiar_texto_preservando_espacios(texto)
+        lineas_limpias = texto_limpio.splitlines()
+        lineas_originales = texto_preservado.splitlines()
+
+        # Emparejar líneas limpias con originales por índice (después de eliminar metadatos).
+        # limpiar_texto_cancion y limpiar_texto_preservando_espacios eliminan las mismas líneas,
+        # por lo que los índices coinciden.
         resultado: List[LineaCancion] = []
         i = 0
-        n = len(lineas)
+        n = len(lineas_limpias)
 
         while i < n:
-            linea = lineas[i]
+            linea = lineas_limpias[i]
+            linea_raw = lineas_originales[i] if i < len(lineas_originales) else linea
 
             if not linea.strip():
                 resultado.append(LineaCancion(tipo="vacía"))
@@ -265,13 +294,14 @@ class AcordesParser:
                     continue
 
                 # Mira si la siguiente línea es letra.
-                siguiente = lineas[i + 1] if i + 1 < n else None
+                siguiente = lineas_limpias[i + 1] if i + 1 < n else None
                 if siguiente is not None and not self.es_linea_de_acordes(siguiente) and siguiente.strip():
                     # Emparejar acordes + letra.
                     resultado.append(LineaCancion(
                         tipo="acordes_letra",
                         acordes=acordes,
                         letra=siguiente,
+                        acordes_raw=linea_raw,
                     ))
                     i += 2
                 else:
@@ -279,6 +309,7 @@ class AcordesParser:
                     resultado.append(LineaCancion(
                         tipo="acordes",
                         acordes=acordes,
+                        acordes_raw=linea_raw,
                     ))
                     i += 1
             else:
@@ -341,29 +372,21 @@ class AcordesParser:
 
             elif linea.tipo == "acordes_letra":
                 lineas_html.append('<div class="bloque-acordes-letra">')
-                lineas_html.append('  <div class="linea-acordes">')
 
-                # Calcular el ancho necesario para que el acorde más lejano
-                # encaje exactamente. Usamos espacios no rompibles al final de
-                # la letra para mantener la posición sin modificar el texto visible.
-                max_fin = max(
-                    (a.posicion + len(a.acorde) for a in linea.acordes),
-                    default=0,
-                )
-                ancho_letra = len(linea.letra)
-                padding = max(0, max_fin - ancho_letra)
-                letra_visual = linea.letra + ("\u00a0" * padding)
+                # Usar la línea de acordes original con espacios de posicionamiento,
+                # envolviendo cada acorde en un span para que la transposición funcione.
+                acordes_raw = linea.acordes_raw or ""
+                ancho_acordes = len(acordes_raw.rstrip())
+                letra_padded = linea.letra.ljust(ancho_acordes)
 
-                for acorde_info in linea.acordes:
-                    left = acorde_info.posicion
-                    acorde_esc = html.escape(self.normalizar_acorde(acorde_info.acorde))
-                    lineas_html.append(
-                        f'    <span class="acorde" style="position:absolute;top:0;left:{left}ch">{acorde_esc}</span>'
-                    )
+                def _envolver_acorde_en_raw(match: re.Match) -> str:
+                    acorde = match.group(1)
+                    acorde_esc = html.escape(self.normalizar_acorde(acorde))
+                    return f'<span class="acorde">{acorde_esc}</span>'
 
-                lineas_html.append('  </div>')
-                letra_esc = html.escape(letra_visual)
-                lineas_html.append(f'  <div class="linea-letra">{letra_esc}</div>')
+                linea_acordes_html = self._patron.sub(_envolver_acorde_en_raw, acordes_raw)
+                lineas_html.append(f'  <div class="linea-acordes">{linea_acordes_html}</div>')
+                lineas_html.append(f'  <div class="linea-letra">{html.escape(letra_padded)}</div>')
                 lineas_html.append('</div>')
 
         lineas_html.append('</div>')
