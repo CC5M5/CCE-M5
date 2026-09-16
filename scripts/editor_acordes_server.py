@@ -216,23 +216,23 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
     aside a:hover {{ background: #f0f0f0; }}
     aside a.active {{ background: var(--accent); color: #fff; }}
     main {{ background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }}
-    textarea {{ width: 100%; min-height: 450px; font-family: monospace; font-size: 16px; line-height: 1.6; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }}
+    textarea {{ width: 100%; min-height: 450px; font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace; font-size: 16px; line-height: 1.35; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; white-space: pre; overflow-wrap: normal; overflow-x: auto; }}
     button {{ background: var(--accent); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; }}
     button:hover {{ opacity: 0.9; }}
-    .preview {{ padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; }}
+    .preview {{ padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; white-space: pre; }}
     .msg {{ padding: 12px; border-radius: 8px; margin-bottom: 15px; }}
     .msg.ok {{ background: #d1fae5; color: #065f46; }}
     .msg.err {{ background: #fee2e2; color: #991b1b; }}
     .meta {{ color: #666; font-size: 14px; margin-bottom: 15px; }}
     .two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
-    .cancion-con-acordes {{ font-family: "Courier New", monospace; line-height: 2; white-space: pre; }}
-    .linea-acordes {{ position: relative; height: 1.4em; color: #c0392b; font-weight: bold; }}
-    .acorde {{ position: absolute; top: 0; }}
+    .cancion-con-acordes {{ font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace; line-height: 1.35; white-space: pre; }}
+    .bloque-acordes-letra {{ margin-bottom: 0; }}
+    .linea-acordes {{ color: #c0392b; font-weight: bold; height: 1.35em; }}
     .linea-letra {{ color: #2c3e50; }}
-    .seccion {{ font-weight: bold; margin-top: 1em; color: #2980b9; }}
+    .seccion {{ font-weight: bold; margin-top: 0.6em; color: #2980b9; }}
     .linea-acordes-suelta {{ color: #c0392b; font-weight: bold; }}
     .letra-solo {{ color: #2c3e50; }}
-    .linea-vacia {{ height: 0.8em; }}
+    .linea-vacia {{ height: 0.4em; }}
     @media (max-width: 900px) {{
       .container {{ grid-template-columns: 1fr; }}
       .two-col {{ grid-template-columns: 1fr; }}
@@ -294,7 +294,8 @@ def editar(slug: str):
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
       <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
       Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
-      Lo que ves en este editor es exactamente lo que se mostrará en la web.
+      <strong>El preview usa exactamente la misma fuente y espaciado que este editor.</strong>
+      Si no coincide al guardar, pulsa Ctrl+F5 en la web.
     </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
@@ -379,7 +380,8 @@ def guardar(slug: str):
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
       <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
       Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
-      Lo que ves en este editor es exactamente lo que se mostrará en la web.
+      <strong>El preview usa exactamente la misma fuente y espaciado que este editor.</strong>
+      Si no coincide al guardar, pulsa Ctrl+F5 en la web.
     </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">

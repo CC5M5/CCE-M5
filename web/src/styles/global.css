@@ -58,20 +58,20 @@
 
   /* ─── Visor de acordes ─── */
   .cancion-con-acordes {
-    font-family: "Courier New", Courier, monospace;
-    line-height: 1.8;
+    font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace;
+    line-height: 1.2;
     white-space: pre;
   }
 
   .bloque-acordes-letra {
-    margin-bottom: 0.1em;
+    margin-bottom: 0;
   }
 
   .linea-acordes {
     color: #c0392b;
     font-weight: bold;
     white-space: pre;
-    height: 1.4em;
+    height: 1.35em;
   }
 
   .linea-letra,
@@ -88,12 +88,12 @@
   }
 
   .linea-vacia {
-    height: 0.6em;
+    height: 0.4em;
   }
 
   .seccion {
     font-weight: bold;
-    margin-top: 1em;
+    margin-top: 0.6em;
     color: #2980b9;
   }
 
