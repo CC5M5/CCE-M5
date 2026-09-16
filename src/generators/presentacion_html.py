@@ -498,21 +498,24 @@ Hosanna en el cielo."""
     }}
     
     .reveal .slides {{
-      text-align: center;
+      text-align: left;
     }}
     
     .reveal .slides section {{
-      box-sizing: border-box;
       padding: 0;
+      background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
+    }}
+    
+    .slide-wrapper {{
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
-      display: flex !important;
+      display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
       position: relative;
       overflow: hidden;
+      box-sizing: border-box;
     }}
     
     .reveal .slides section::before {{
@@ -618,7 +621,7 @@ Hosanna en el cielo."""
       margin-right: 380px;
     }}
     
-    .reveal .portada {{
+    .reveal .portada .slide-wrapper {{
       text-align: center;
       justify-content: center;
       align-items: center;
@@ -655,6 +658,11 @@ Hosanna en el cielo."""
       max-width: 380px;
       max-height: 380px;
       margin: 0 auto 1em;
+    }}
+    
+    .reveal .transicion .slide-wrapper {{
+      justify-content: center;
+      align-items: center;
     }}
     
     .reveal .transicion .tarjeta {{
@@ -709,12 +717,15 @@ Hosanna en el cielo."""
         page-break-after: always;
         height: 100vh;
       }}
+      .reveal .slides section .slide-wrapper {{
+        height: 100vh;
+      }}
       .reveal .logo-lema {{
         position: fixed;
         bottom: 20px;
         right: 30px;
       }}
-      section:has(.ilustracion) .tarjeta {{
+      .slide-wrapper:has(.ilustracion) .tarjeta {{
         margin-right: 380px;
       }}
       .reveal .tarjeta {{
@@ -769,12 +780,14 @@ Hosanna en el cielo."""
 
         clase = tipo
         html = f'<section class="{clase}" data-transition="fade">\n'
+        html += f'  <div class="slide-wrapper">\n'
 
         if imagen:
-            html += f'  <img class="ilustracion" src="{imagen}" alt="ilustración">\n'
+            html += f'    <img class="ilustracion" src="{imagen}" alt="ilustración">\n'
 
-        html += f'  <div class="tarjeta">\n{inner}  </div>\n'
-        html += f'  <img class="logo-lema" src="{lema_img}" alt="Somos uno">\n'
+        html += f'    <div class="tarjeta">\n{inner}    </div>\n'
+        html += f'    <img class="logo-lema" src="{lema_img}" alt="Somos uno">\n'
+        html += f'  </div>\n'
         html += '</section>\n'
         return html
 
