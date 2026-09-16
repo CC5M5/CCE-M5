@@ -291,6 +291,11 @@ def editar(slug: str):
       ID: {cancion['id']} |
       <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
     </div>
+    <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
+      <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
+      Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
+      Lo que ves en este editor es exactamente lo que se mostrará en la web.
+    </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
         <div>
@@ -370,6 +375,11 @@ def guardar(slug: str):
       Tono: {html_module.escape(derivados['tono'] or 'No detectado')} |
       ID: {cancion['id']} |
       <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
+    </div>
+    <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
+      <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
+      Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
+      Lo que ves en este editor es exactamente lo que se mostrará en la web.
     </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
