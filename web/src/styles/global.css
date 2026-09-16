@@ -59,7 +59,7 @@
   /* ─── Visor de acordes ─── */
   .cancion-con-acordes {
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace;
-    line-height: 1.05;
+    line-height: 0.5;
     white-space: pre;
   }
 
