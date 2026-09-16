@@ -225,9 +225,9 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
     .msg.err {{ background: #fee2e2; color: #991b1b; }}
     .meta {{ color: #666; font-size: 14px; margin-bottom: 15px; }}
     .two-col {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
-    .cancion-con-acordes {{ font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace; line-height: 1.35; white-space: pre; }}
+    .cancion-con-acordes {{ font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace; line-height: 0.35; white-space: pre; }}
     .bloque-acordes-letra {{ margin-bottom: 0; }}
-    .linea-acordes {{ color: #c0392b; font-weight: bold; height: 1.35em; }}
+    .linea-acordes {{ color: #c0392b; font-weight: bold; height: 0.6em; }}
     .linea-letra {{ color: #2c3e50; }}
     .seccion {{ font-weight: bold; margin-top: 0.6em; color: #2980b9; }}
     .linea-acordes-suelta {{ color: #c0392b; font-weight: bold; }}
