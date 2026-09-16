@@ -653,12 +653,22 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 - Se implementará un **editor web local** para ajustes manuales de acordes. Los cambios se guardan en SQLite y se commitean automáticamente al repo.
 - GitHub Pages será **solo lectura**; la edición se hace en el servidor local.
 - Se creará un **script de corrección masiva desde la web de origen** (`titulo_url`) que se ejecutará **una sola vez**, generará un informe comparativo para validación humana, y aplicará las correcciones validadas a la BD.
-- Formato de edición: **ChordPro** (acordes entre corchetes encima de la letra) por ser estándar y legible.
+- Formato de edición: **texto libre con acordes posicionados** (igual que el almacenado en `letra_con_acordes`).
 
-**Archivos planeados:**
-- `web/src/pages/cancionero/[slug]/editar-acordes.astro` — Editor local ChordPro + preview.
-- `src/scripts/corregir_acordes_desde_origen.py` — Corrección masiva desde web de origen.
-- `src/scripts/editor_acordes_commit.py` — Guarda cambios en BD y hace `git commit`.
+**Implementado:**
+- `scripts/corregir_acordes_desde_origen.py` — Corrección masiva desde web de origen.
+  - Descarga HTML original conservando espacios de posicionamiento.
+  - Genera informe comparativo en `docs/correcciones_acordes/informe_acordes.html`.
+  - Modo `--apply --ids N` regenera `html_visual`, `estructura_json`, `letra_sin_acordes`, `tono` y guarda en BD.
+- `scripts/editor_acordes_server.py` — Editor web local en http://localhost:4322.
+  - Listado de 107 canciones.
+  - Editor con textarea + preview visual.
+  - Botón "Guardar y commitear" actualiza BD y hace `git commit` + `git push`.
+- Se instaló **Flask** en el entorno virtual.
+
+**Pendiente:**
+- Validar informe generado y aplicar correcciones masivas aprobadas.
+- Reconstruir web Astro tras aplicar correcciones para reflejar cambios en cancionero.
 
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
