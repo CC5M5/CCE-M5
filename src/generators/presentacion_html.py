@@ -498,8 +498,7 @@ Hosanna en el cielo."""
     }}
     
     .reveal .slides {{
-      text-align: left;
-      align-items: center !important;
+      text-align: center;
     }}
     
     .reveal .slides section {{
@@ -508,14 +507,12 @@ Hosanna en el cielo."""
       width: 100%;
       height: 100%;
       background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
-      display: flex;
+      display: flex !important;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
       position: relative;
       overflow: hidden;
-      top: auto !important;
-      transform: none !important;
     }}
     
     .reveal .slides section::before {{
@@ -739,7 +736,8 @@ Hosanna en el cielo."""
       transition: 'slide',
       width: 1280,
       height: 720,
-      margin: 0,
+      center: true,
+      margin: 0.04,
       minScale: 0.2,
       maxScale: 2.0,
     }});
