@@ -59,41 +59,32 @@
   /* ─── Visor de acordes ─── */
   .cancion-con-acordes {
     font-family: "Courier New", Courier, monospace;
-    line-height: 1.6;
+    line-height: 1.8;
+    white-space: pre;
   }
 
   .bloque-acordes-letra {
-    position: relative;
-    margin-bottom: 0.2em;
-  }
-
-  .bloque-acordes-letra .linea-acordes {
-    position: relative !important;
-    height: 1.4em !important;
-    white-space: nowrap !important;
-  }
-
-  .bloque-acordes-letra .acorde {
-    position: absolute !important;
-    top: 0 !important;
-    color: #c0392b !important;
-    font-weight: bold !important;
+    margin-bottom: 0.1em;
   }
 
   .linea-acordes {
     color: #c0392b;
     font-weight: bold;
-  }
-
-  .linea-acordes-suelta {
-    color: #c0392b;
-    font-weight: bold;
+    white-space: pre;
+    height: 1.4em;
   }
 
   .linea-letra,
   .letra-solo,
   .letra-inferior {
     color: #2c3e50;
+    white-space: pre;
+  }
+
+  .linea-acordes-suelta {
+    color: #c0392b;
+    font-weight: bold;
+    white-space: pre;
   }
 
   .linea-vacia {
