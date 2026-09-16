@@ -58,7 +58,7 @@ const colorLiturgico = presentacion?.color_liturgico || 'verde';
           <Printer className="w-4 h-4" /> Imprimir
         </button>
         {presentacion.ruta_pdf_musicos && (
-          <a href={presentacion.ruta_pdf_musicos.replace(/^.*presentaciones\//, '/presentaciones/')} class="btn-secondary">
+          <a href={presentacion.ruta_pdf_musicos.replace(/^.*presentaciones\//, `${base}presentaciones/`)} class="btn-secondary">
             <Download className="w-4 h-4" /> Descargar PDF
           </a>
         )}
