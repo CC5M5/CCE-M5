@@ -205,8 +205,36 @@ class AcordesParser:
             return False
 
         # Descartar líneas con signos de puntuación típicos de letra.
-        if re.search(r"[.!?;:,]", linea):
+        # Se permite ':' cuando va seguido de una etiqueta de sección (Intro:, Estribillo:...)
+        # seguida de acordes. El ':' solo en etiquetas de sección no invalida la línea.
+        if re.search(r"[.!?;]", linea):
             return False
+
+        # Si hay ':' verificar que sea de etiqueta de sección seguida de acordes.
+        if ":" in linea:
+            parte_etiqueta, _, resto = linea.partition(":")
+            if not re.fullmatch(r"(?i)\s*(intro|estribillo|estrofa|puente|pre-coro|precoro|final|outro|solo|interludio)\s*\d*\s*", parte_etiqueta):
+                return False
+            if not resto.strip():
+                return False
+            # Reevaluar solo la parte de acordes.
+            return self.es_linea_de_acordes(resto.strip())
+
+        # Líneas como [Intro] Do Fa Sol: la etiqueta entre corchetes es una sección
+        # que va en su propia línea; si aparece junto a acordes, la tratamos como
+        # línea de acordes ignorando la etiqueta.
+        if linea.strip().startswith("[") and "]" in linea:
+            _, _, resto = linea.partition("]")
+            if resto.strip():
+                return self.es_linea_de_acordes(resto.strip())
+
+        # Líneas como [Intro] Do Fa Sol: la etiqueta entre corchetes es una sección
+        # que va en su propia línea; si aparece junto a acordes, la tratamos como
+        # línea de acordes ignorando la etiqueta.
+        if linea.strip().startswith("[") and "]" in linea:
+            _, _, resto = linea.partition("]")
+            if resto.strip():
+                return self.es_linea_de_acordes(resto.strip())
 
         # Descartar líneas que solo contienen espacios y paréntesis/asteriscos
         # de repetición; sin acordes reales no es una línea de acordes.
@@ -304,6 +332,17 @@ class AcordesParser:
                 if not acordes:
                     i += 1
                     continue
+
+                # Si la línea empieza con etiqueta de sección seguida de ':',
+                # emitir la etiqueta como bloque de sección y luego la línea de acordes.
+                etiqueta_seccion = None
+                if ":" in linea:
+                    parte_etiqueta, _, _ = linea.partition(":")
+                    if re.fullmatch(r"(?i)\s*(intro|estribillo|estrofa|puente|pre-coro|precoro|final|outro|solo|interludio)\s*\d*\s*", parte_etiqueta):
+                        etiqueta_seccion = parte_etiqueta.strip()
+
+                if etiqueta_seccion:
+                    resultado.append(LineaCancion(tipo="sección", texto=etiqueta_seccion))
 
                 # Mira si la siguiente línea es letra.
                 siguiente = lineas_limpias[i + 1] if i + 1 < n else None
