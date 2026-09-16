@@ -499,6 +499,7 @@ Hosanna en el cielo."""
     
     .reveal .slides {{
       text-align: left;
+      align-items: center !important;
     }}
     
     .reveal .slides section {{
@@ -510,8 +511,11 @@ Hosanna en el cielo."""
       display: flex;
       flex-direction: column;
       justify-content: center;
+      align-items: flex-start;
       position: relative;
       overflow: hidden;
+      top: auto !important;
+      transform: none !important;
     }}
     
     .reveal .slides section::before {{
