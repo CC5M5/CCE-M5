@@ -28,6 +28,7 @@ import argparse
 import json
 import logging
 import os
+import shutil
 import sqlite3
 import sys
 import traceback
@@ -273,11 +274,20 @@ def _resolver_cancion_id(
     conn: sqlite3.Connection,
     valor: Any,
 ) -> Optional[int]:
-    """Resuelve un identificador de canción (int o título) a id de BD."""
+    """Resuelve un identificador de canción (int o título) a id de BD.
+
+    Si el valor es None, False, 'null', 'N/A' o cadena vacía, se interpreta
+    como 'sin canción asignada' y se devuelve None.
+    """
+    if valor is None or valor is False:
+        return None
+    if isinstance(valor, str):
+        if not valor.strip() or valor.strip().lower() in {"null", "n/a", "none", "no", "-", "—"}:
+            return None
+        if valor.isdigit():
+            return int(valor)
     if isinstance(valor, int):
         return valor
-    if isinstance(valor, str) and valor.isdigit():
-        return int(valor)
     cur = conn.cursor()
     cur.execute(
         "SELECT id FROM canciones WHERE titulo LIKE ? LIMIT 1",
@@ -472,30 +482,33 @@ def construir_asignacion_canciones(
     Construye el diccionario final {momento_key: cancion_id}.
 
     - Si config_manual tiene asignaciones, las traduce a ids de BD.
-    - Los momentos no asignados se completan con el motor de matching.
+      Un valor None o "N/A" deja el momento explícitamente vacío; no se
+      completará con matching.
+    - Los momentos no presentes en config_manual se completan con el motor de matching.
     """
     with get_connection() as conn:
         asignacion: Dict[str, int] = {}
+        explicitamente_vacio: set[str] = set()
 
         if config_manual:
             for momento, valor in config_manual.items():
+                # La clave especial 'bendicion_agua' no es un momento musical.
+                if momento.lower() == "bendicion_agua":
+                    continue
                 key = MOMENTO_A_KEY.get(momento, momento.lower().replace(" ", "_"))
                 cancion_id = _resolver_cancion_id(conn, valor)
                 if cancion_id:
                     asignacion[key] = cancion_id
                 else:
-                    logger.warning(
-                        "Config manual: no se encontró canción '%s' para '%s'",
-                        valor,
-                        momento,
-                    )
+                    # El usuario dejó este momento explícitamente sin canción.
+                    explicitamente_vacio.add(key)
 
         lectura_id = leer_lectura_id(fecha_domingo)
         if lectura_id is None:
             logger.warning("No hay lectura_id en BD; no se puede ejecutar matching")
             return asignacion
 
-        faltantes = [k for k in MOMENTOS_KEY if k not in asignacion]
+        faltantes = [k for k in MOMENTOS_KEY if k not in asignacion and k not in explicitamente_vacio]
         if faltantes:
             propuestas = proponer_canciones_matching(lectura_id)
             for key in faltantes:
@@ -537,9 +550,10 @@ def generar_pptx(
     """
     Genera la presentación PPTX para fieles.
 
-    - Intenta usar src.generators.presentacion_fieles.GeneradorPPTX.
-    - Si falla la importación o la generación, genera un PPTX mínimo con
-      python-pptx usando el template real descargado del NAS.
+    Usa src.generators.presentacion_html.GeneradorPresentacionHTML, que genera
+    un bundle con HTML (Reveal.js), JSON, PPTX y PDF idénticos en contenido.
+    El PPTX resultante se copia también a la ruta tradicional
+    {fecha}_celebracion.pptx para compatibilidad con descargas.
     """
     output_dir = _directorio_salida(modo)
     output_path = output_dir / f"{fecha_domingo}_celebracion.pptx"
@@ -547,72 +561,34 @@ def generar_pptx(
         logger.warning("PPTX de destino ya existe: %s", output_path)
 
     try:
-        from src.generators.presentacion_master import GeneradorPPTXMaster
+        from src.generators.presentacion_html import GeneradorPresentacionHTML
 
-        gen = GeneradorPPTXMaster(
+        incluir_bendicion_agua = bool(canciones_ids.get("bendicion_agua"))
+        gen = GeneradorPresentacionHTML(
             db_path=str(DB_PATH),
-            template_path=str(TEMPLATE_PATH),
             output_dir=str(output_dir),
         )
-        ruta = gen.generar_presentacion(fecha_domingo, lectura_id, canciones_ids)
-        if ruta:
-            logger.info("PPTX generado con presentacion_fieles: %s", ruta)
-            return Path(ruta)
-    except Exception as exc:
-        logger.warning("Generador presentacion_fieles falló: %s", exc)
-
-    # Fallback: PPTX mínimo con template real.
-    try:
-        from pptx import Presentation
-        from pptx.dml.color import RGBColor
-        from pptx.enum.text import PP_ALIGN
-        from pptx.util import Inches, Pt
-
-        prs = Presentation(str(TEMPLATE_PATH))
-
-        # Diapositiva resumen con asignación.
-        blank_layout = prs.slide_layouts[6] if len(prs.slide_layouts) > 6 else prs.slide_layouts[-1]
-        slide = prs.slides.add_slide(blank_layout)
-        background = slide.background
-        fill = background.fill
-        fill.solid()
-        fill.fore_color.rgb = RGBColor(0x4C, 0xAF, 0x50)
-
-        tb = slide.shapes.add_textbox(
-            Inches(0.5), Inches(0.5), Inches(12.33), Inches(6.5)
+        bundle_dir = gen.generar(
+            fecha=fecha_domingo,
+            lectura_id=lectura_id,
+            canciones_ids={
+                k: v for k, v in canciones_ids.items()
+                if k in MOMENTOS_KEY or k == "bendicion_agua"
+            },
+            incluir_bendicion_agua=incluir_bendicion_agua,
         )
-        tf = tb.text_frame
-        tf.word_wrap = True
-        p = tf.paragraphs[0]
-        p.text = f"Celebración del Domingo\n{fecha_domingo}"
-        p.font.size = Pt(44)
-        p.font.bold = True
-        p.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        p.alignment = PP_ALIGN.CENTER
-
-        # Añadir diapositivas por cada canción asignada.
-        with get_connection() as conn:
-            nombres = nombre_canciones(conn, canciones_ids)
-        for momento_key, titulo in nombres.items():
-            slide = prs.slides.add_slide(blank_layout)
-            tb = slide.shapes.add_textbox(
-                Inches(0.5), Inches(0.5), Inches(12.33), Inches(6.5)
-            )
-            tf = tb.text_frame
-            tf.word_wrap = True
-            p = tf.paragraphs[0]
-            p.text = f"{momento_key.upper()}\n{titulo}"
-            p.font.size = Pt(36)
-            p.font.bold = True
-            p.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
-            p.alignment = PP_ALIGN.CENTER
-
-        prs.save(str(output_path))
-        logger.info("PPTX mínimo generado con template: %s", output_path)
-        return output_path
+        bundle_pptx = bundle_dir / f"{fecha_domingo}_presentacion.pptx"
+        if bundle_pptx.exists():
+            shutil.copy(str(bundle_pptx), str(output_path))
+            logger.info("PPTX generado con presentacion_html: %s", output_path)
+            return output_path
+        else:
+            logger.warning("No se encontró PPTX en el bundle: %s", bundle_dir)
     except Exception as exc:
-        logger.error("No se pudo generar PPTX ni siquiera de forma mínima: %s", exc)
-        return None
+        logger.error("Generador presentacion_html falló: %s", exc)
+        traceback.print_exc()
+
+    return None
 
 
 # ---------------------------------------------------------------------------
