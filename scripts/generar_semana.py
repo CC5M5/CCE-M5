@@ -3,7 +3,7 @@
 Script de integración end-to-end para CCE-M5-Web-Presentaciones.
 
 Para un domingo dado (--fecha YYYY-MM-DD):
-1. Obtiene lecturas de Koinonia (con cache y timeout; si falla, usa mock/parcial).
+1. Obtiene lecturas de Koinonia (con cache y timeout; si falla, usa fallback a Ciudad Redonda o mock).
 2. Si se provee --config, usa la asignación manual de canciones; si no, usa
    src.matching_engine para proponer canciones para los 12 momentos litúrgicos.
 3. Genera la presentación PPTX para fieles.
@@ -11,9 +11,15 @@ Para un domingo dado (--fecha YYYY-MM-DD):
 5. Registra el resultado en SQLite (tabla presentaciones).
 6. Imprime un resumen claro.
 
+Modos de operación:
+    --dry-run        Muestra lecturas, canciones propuestas y rutas SIN escribir archivos, BD ni commits.
+    --modo borrador  Genera archivos en borradores/ y marca estado='borrador' en BD.
+    --modo publicar  Genera en presentaciones/, marca estado='publicada' y es el comportamiento anterior.
+
 Uso:
-    python scripts/generar_semana.py --fecha 2026-09-13
-    python scripts/generar_semana.py --fecha 2026-09-13 --config config_manual.json
+    python scripts/generar_semana.py --fecha 2026-09-13 --dry-run
+    python scripts/generar_semana.py --fecha 2026-09-13 --modo borrador
+    python scripts/generar_semana.py --fecha 2026-09-13 --modo publicar --config config_manual.json
 """
 
 from __future__ import annotations
@@ -41,7 +47,29 @@ from src.generators.pdf_musicos import CancionNoEncontradaError, generar_hoja_mu
 logger = logging.getLogger("generar_semana")
 
 OUTPUT_DIR = PROJECT_DIR / "presentaciones"
+BORRADOR_DIR = PROJECT_DIR / "borradores"
 TEMPLATE_PATH = PROJECT_DIR / "data" / "templates" / "274_Domingo_21_06_2026.pptx"
+
+# ---------------------------------------------------------------------------
+# Modo de operación (borrador / publicar)
+# ---------------------------------------------------------------------------
+
+MODO_BORRADOR = "borrador"
+MODO_PUBLICAR = "publicar"
+
+
+def _directorio_salida(modo: str) -> Path:
+    """Devuelve el directorio de salida según el modo."""
+    if modo == MODO_BORRADOR:
+        BORRADOR_DIR.mkdir(parents=True, exist_ok=True)
+        return BORRADOR_DIR
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    return OUTPUT_DIR
+
+
+def _estado_presentacion(modo: str) -> str:
+    """Devuelve el estado de la presentación según el modo."""
+    return "borrador" if modo == MODO_BORRADOR else "publicada"
 
 MOMENTOS_ES: List[str] = [
     "Entrada",
@@ -206,6 +234,26 @@ def leer_lectura_id(fecha_domingo: str) -> Optional[int]:
     except sqlite3.Error as exc:
         logger.warning("No se pudo leer lectura_id: %s", exc)
         return None
+
+
+def lectura_existe_en_bd(fecha_domingo: str) -> bool:
+    """Comprueba si ya existen lecturas para la fecha."""
+    return leer_lectura_id(fecha_domingo) is not None
+
+
+def presentacion_existe_en_bd(fecha_domingo: str) -> bool:
+    """Comprueba si ya existe una presentación publicada para la fecha."""
+    try:
+        with get_connection() as conn:
+            cur = conn.cursor()
+            row = cur.execute(
+                "SELECT 1 FROM presentaciones WHERE fecha_domingo = ? AND estado = 'publicada' LIMIT 1",
+                (fecha_domingo,),
+            ).fetchone()
+            return bool(row)
+    except sqlite3.Error as exc:
+        logger.warning("No se pudo comprobar presentación existente: %s", exc)
+        return False
 
 
 # ---------------------------------------------------------------------------
@@ -484,6 +532,7 @@ def generar_pptx(
     fecha_domingo: str,
     lectura_id: int,
     canciones_ids: Dict[str, int],
+    modo: str = MODO_PUBLICAR,
 ) -> Optional[Path]:
     """
     Genera la presentación PPTX para fieles.
@@ -492,8 +541,10 @@ def generar_pptx(
     - Si falla la importación o la generación, genera un PPTX mínimo con
       python-pptx usando el template real descargado del NAS.
     """
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / f"{fecha_domingo}_celebracion.pptx"
+    output_dir = _directorio_salida(modo)
+    output_path = output_dir / f"{fecha_domingo}_celebracion.pptx"
+    if output_path.exists():
+        logger.warning("PPTX de destino ya existe: %s", output_path)
 
     try:
         from src.generators.presentacion_master import GeneradorPPTXMaster
@@ -501,7 +552,7 @@ def generar_pptx(
         gen = GeneradorPPTXMaster(
             db_path=str(DB_PATH),
             template_path=str(TEMPLATE_PATH),
-            output_dir=str(OUTPUT_DIR),
+            output_dir=str(output_dir),
         )
         ruta = gen.generar_presentacion(fecha_domingo, lectura_id, canciones_ids)
         if ruta:
@@ -573,10 +624,13 @@ def generar_pdf_musicos(
     canciones_ids: Dict[str, int],
     celebracion: str,
     notas: Optional[List[str]] = None,
+    modo: str = MODO_PUBLICAR,
 ) -> Optional[Path]:
     """Genera la hoja de músicos en PDF usando src.generators.pdf_musicos."""
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT_DIR / f"{fecha_domingo}_hoja_musicos.pdf"
+    output_dir = _directorio_salida(modo)
+    output_path = output_dir / f"{fecha_domingo}_hoja_musicos.pdf"
+    if output_path.exists():
+        logger.warning("PDF de destino ya existe: %s", output_path)
 
     # El generador espera claves con espacios como en MOMENTOS_ES.
     canciones_por_momento: Dict[str, int] = {}
@@ -617,6 +671,7 @@ def registrar_presentacion(
     pdf_path: Optional[Path],
     lecturas_json: str,
     notas: Optional[List[str]] = None,
+    estado: str = "publicada",
 ) -> Optional[int]:
     """Inserta o actualiza una fila en la tabla presentaciones."""
     try:
@@ -671,12 +726,12 @@ def registrar_presentacion(
                     lecturas_json,
                     str(pptx_path) if pptx_path else None,
                     str(pdf_path) if pdf_path else None,
-                    "generado",
+                    estado,
                 ),
             )
             conn.commit()
             presentacion_id = cur.lastrowid
-            logger.info("Presentación registrada con id=%s", presentacion_id)
+            logger.info("Presentación registrada con id=%s estado=%s", presentacion_id, estado)
             return presentacion_id
     except sqlite3.Error as exc:
         logger.error("Error al registrar presentación en BD: %s", exc)
@@ -698,16 +753,25 @@ class ResultadoGeneracion:
     pdf_path: Optional[Path]
     canciones: Dict[str, str] = field(default_factory=dict)
     notas: List[str] = field(default_factory=list)
+    modo: str = MODO_PUBLICAR
+    dry_run: bool = False
+    estado_presentacion: str = "publicada"
 
     def imprimir_resumen(self) -> None:
         """Imprime en consola un resumen legible del resultado."""
+        modo_str = "[DRY-RUN]" if self.dry_run else f"[modo: {self.modo}]"
         print("\n" + "=" * 60)
-        print(f"Resumen generación semana {self.fecha_domingo}")
+        print(f"Resumen generación semana {self.fecha_domingo} {modo_str}")
         print("=" * 60)
         print(f"Lectura ID:    {self.lectura_id or 'N/A'}")
         print(f"Presentación ID: {self.presentacion_id or 'N/A'}")
-        print(f"PPTX fieles:   {self.pptx_path or 'NO GENERADO'}")
-        print(f"PDF músicos:   {self.pdf_path or 'NO GENERADO'}")
+        print(f"Estado BD:     {self.estado_presentacion}")
+        if self.dry_run:
+            print("PPTX fieles:   (no se escribió)")
+            print("PDF músicos:   (no se escribió)")
+        else:
+            print(f"PPTX fieles:   {self.pptx_path or 'NO GENERADO'}")
+            print(f"PDF músicos:   {self.pdf_path or 'NO GENERADO'}")
         print("\nCanciones asignadas:")
         for es, key in zip(MOMENTOS_ES, MOMENTOS_KEY):
             titulo = self.canciones.get(key, "(sin asignar)")
@@ -717,6 +781,8 @@ class ResultadoGeneracion:
             for nota in self.notas:
                 print(f"  * {nota}")
         print("=" * 60 + "\n")
+        if self.dry_run:
+            print("ℹ️  Este fue un dry-run. No se escribieron archivos ni BD.\n")
 
 
 # ---------------------------------------------------------------------------
@@ -738,6 +804,23 @@ def main(argv: Optional[List[str]] = None) -> int:
         type=Path,
         default=None,
         help="Ruta a JSON con asignación manual de canciones por momento.",
+    )
+    parser.add_argument(
+        "--modo",
+        type=str,
+        choices=[MODO_BORRADOR, MODO_PUBLICAR],
+        default=MODO_BORRADOR,
+        help="Modo de generación: borrador (por defecto, no publica) o publicar (sobrescribe presentaciones/ y BD).",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Simula todo sin escribir archivos ni BD. Imprime resumen y sale.",
+    )
+    parser.add_argument(
+        "--forzar",
+        action="store_true",
+        help="Permite publicar incluso si ya existe una presentación publicada (sobrescribe).",
     )
     parser.add_argument(
         "--notas",
@@ -778,6 +861,25 @@ def main(argv: Optional[List[str]] = None) -> int:
         logger.error(str(exc))
         return 2
 
+    modo = args.modo
+    dry_run = args.dry_run
+
+    # Seguridad: por defecto, publicar solo si no existe ya una publicada o con --forzar.
+    if modo == MODO_PUBLICAR and not dry_run and not args.forzar:
+        if presentacion_existe_en_bd(fecha_domingo):
+            logger.error(
+                "Ya existe una presentación publicada para %s. "
+                "Usa --forzar para sobrescribir o --modo borrador para generar borrador.",
+                fecha_domingo,
+            )
+            print(
+                f"\n❌ Ya existe una presentación publicada para {fecha_domingo}.\n"
+                "Opciones:\n"
+                "  --modo borrador      Genera un borrador sin tocar la publicada.\n"
+                "  --forzar             Sobrescribe la publicada (CUIDADO).\n"
+            )
+            return 3
+
     notas: List[str] = []
     if args.notas:
         notas = [n.strip() for n in args.notas.split("|") if n.strip()]
@@ -786,7 +888,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.config:
         config_manual = cargar_config_manual(args.config)
 
-    logger.info("Iniciando generación end-to-end para %s", fecha_domingo)
+    if dry_run:
+        logger.info("DRY-RUN: no se escribirá ningún archivo ni BD para %s", fecha_domingo)
+    else:
+        logger.info("Iniciando generación end-to-end para %s [modo=%s]", fecha_domingo, modo)
 
     # 1. Lecturas
     lecturas = obtener_lecturas(
@@ -803,8 +908,29 @@ def main(argv: Optional[List[str]] = None) -> int:
     # 2. Asignación de canciones
     canciones_ids = construir_asignacion_canciones(config_manual, fecha_domingo)
 
+    # Nombres para resumen (necesarios en dry-run también)
+    with get_connection() as conn:
+        canciones_nombres = nombre_canciones(conn, canciones_ids)
+
+    if dry_run:
+        # En dry-run no se generan archivos ni se registra en BD.
+        resultado = ResultadoGeneracion(
+            fecha_domingo=fecha_domingo,
+            lectura_id=lectura_id,
+            presentacion_id=None,
+            pptx_path=None,
+            pdf_path=None,
+            canciones=canciones_nombres,
+            notas=notas,
+            modo=modo,
+            dry_run=True,
+            estado_presentacion=_estado_presentacion(modo),
+        )
+        resultado.imprimir_resumen()
+        return 0
+
     # 3. PPTX
-    pptx_path = generar_pptx(fecha_domingo, lectura_id or -1, canciones_ids)
+    pptx_path = generar_pptx(fecha_domingo, lectura_id or -1, canciones_ids, modo=modo)
 
     # 4. PDF músicos
     celebracion = lecturas.get("celebracion", f"Celebración del Domingo {fecha_domingo}")
@@ -813,9 +939,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         canciones_ids,
         celebracion,
         notas=notas,
+        modo=modo,
     )
 
     # 5. Registrar en BD
+    estado_bd = _estado_presentacion(modo)
     presentacion_id = registrar_presentacion(
         fecha_domingo=fecha_domingo,
         lectura_id=lectura_id,
@@ -824,11 +952,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         pdf_path=pdf_path,
         lecturas_json=lecturas_json,
         notas=notas,
+        estado=estado_bd,
     )
-
-    # Nombres para resumen
-    with get_connection() as conn:
-        canciones_nombres = nombre_canciones(conn, canciones_ids)
 
     resultado = ResultadoGeneracion(
         fecha_domingo=fecha_domingo,
@@ -838,6 +963,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         pdf_path=pdf_path,
         canciones=canciones_nombres,
         notas=notas,
+        modo=modo,
+        dry_run=False,
+        estado_presentacion=estado_bd,
     )
     resultado.imprimir_resumen()
 
