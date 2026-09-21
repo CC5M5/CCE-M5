@@ -3,6 +3,7 @@
 *.sqlite3-wal
 
 # Backups locales
+data/db.sqlite3.backup.*
 data/templates/*.backup
 
 # Generados automáticamente (se regeneran en build)
