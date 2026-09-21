@@ -1,9 +1,10 @@
 ---
-export function getStaticPaths() {
-  return [
-    { params: { fecha: "2026-09-13" } },
-    { params: { fecha: "2026-09-20" } },
-  ];
+import { getAllPresentacionesFechas } from '@lib/db.js';
+
+export async function getStaticPaths() {
+  const fechas = getAllPresentacionesFechas();
+  if (fechas.length === 0) return [];
+  return fechas.map(fecha => ({ params: { fecha } }));
 }
 
 const { fecha } = Astro.params;
