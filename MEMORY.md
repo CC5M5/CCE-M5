@@ -377,7 +377,30 @@ sudo systemctl stop cce-m5-web.service     # Detener
 sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 ```
 
-### Estado Actual del Proyecto
+### Pipeline CCE-M5: control humano y modo borrador
+
+<!-- observed: 2026-09-21 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+- Fallo detectado: el pipeline se ejecutó automáticamente para la semana 2026-09-27 sin pedir aprobación al usuario en ningún paso.
+- Causa: `scripts/generar_semana.py` no tenía modo borrador ni checkpoints; Capillita interpretó la tarea como ejecución directa.
+- Solución aplicada:
+  - `scripts/generar_semana.py` ahora soporta:
+    - `--dry-run`: muestra lecturas y canciones propuestas sin escribir nada.
+    - `--modo borrador`: genera archivos en `borradores/` y guarda estado `borrador` en BD.
+    - `--modo publicar --forzar`: publica solo tras aprobación explícita.
+  - Capillita: reglas actualizadas en `USER.md`, `SOUL.md` y `AGENTS.md` para exigir checkpoints de aprobación humana.
+  - Tareas de Mission Control 2026-09-27: todas cerradas a `done` tras consolidación.
+- Koinonia sigue como fuente principal; investigado que el servidor `91.226.177.137` (lilith.nodo50.org) rechaza conexiones en 443/80. Se mantiene fallback a Ciudad Redonda.
+
+### Flujo correcto a partir de ahora
+
+1. `generar_semana.py --fecha YYYY-MM-DD --dry-run` → mostrar propuesta.
+2. Agente presenta resumen al usuario y pregunta: **"¿Continúo con el borrador?"**.
+3. `generar_semana.py --fecha YYYY-MM-DD --modo borrador` → generar borrador.
+4. Agente envía enlaces a borradores y pregunta: **"¿Publico la presentación?"**.
+5. `generar_semana.py --fecha YYYY-MM-DD --modo publicar --forzar` → publicar.
+
+## Estado Actual del Proyecto
 
 | Componente | Estado | Notas |
 |-----------|--------|-------|
@@ -629,11 +652,25 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 
 56. **Próximo hito** — Lunes 21 de septiembre de 2026 a las 08:00: primera ejecución automática que creará la tarea para el domingo 27 de septiembre.
 
+### Actualización 2026-09-21: control humano y modo borrador
+
+57. **Pipeline ejecutado automáticamente sin aprobación** — Capillita generó lecturas, asignación, PPTX/PDF y web para el 2026-09-27 sin preguntar al usuario en ningún paso.
+
+58. **Solución implementada**:
+    - `scripts/generar_semana.py` soporta ahora `--dry-run`, `--modo borrador` y `--modo publicar --forzar`.
+    - Los borradores se generan en `borradores/` y se marcan como `borrador` en BD.
+    - La publicación requiere confirmación explícita; `--forzar` evita publicaciones accidentales.
+    - Capillita: reglas actualizadas en `USER.md`, `SOUL.md` y `AGENTS.md` para exigir checkpoints.
+
+59. **Koinonia sigue caída** — El servidor `91.226.177.137` (lilith.nodo50.org) rechaza conexiones en 443/80 desde este host. No es DNS, certificado ni user-agent. Se mantiene como fuente principal configurada y se usa Ciudad Redonda como fallback.
+
+60. **Tareas de Mission Control limpiadas** — Las 5 tareas `in_progress` fantasma del pipeline 2026-09-27 se cerraron a `done` tras consolidar el trabajo real.
+
 ### Próximos pasos pendientes (actualizado)
 
-1. **Validar ejecución automática del lunes 21 de septiembre** — Confirmar que el timer crea la tarea y Capillita ejecuta/ reporta el pipeline.
-2. **Migrar más canciones** — Si es necesario, ampliar el cancionero más allá de las 107 canciones actuales.
-3. **Configurar GitHub Pages** — Cuando se quiera desplegar fuera del servidor local.
+1. **Validar flujo con checkpoints** — En la siguiente semana, Capillita debe usar `--dry-run` → resumen → `--modo borrador` → aprobación → `--modo publicar --forzar`.
+2. **Revisitar Koinonia** — Cuando vuelva a estar accesible, verificar que el scraper sigue funcionando con la URL actual.
+3. **Migrar más canciones** — Si es necesario, ampliar el cancionero más allá de las 107 canciones actuales.
 4. **Tests del flujo end-to-end** — Automatizar smoke tests tras el deploy.
 
 ### Notas técnicas importantes
@@ -643,6 +680,7 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 - El nuevo generador (`presentacion_master.py`) copia slides XML desde la plantilla MASTER. Requiere manipulación de XML del PPTX (presentation.xml, rels, etc.).
 - El lema cambia cada año. Para 2027-28: actualizar `config/lema.py` y reemplazar imagen en plantilla.
 - El generador `presentacion_html.py` produce actualmente las presentaciones web (JSON + HTML + PPTX/PDF) con estilo propio, mientras `presentacion_master.py` queda como alternativa basada en plantilla PPTX.
+- **Nuevo:** `scripts/generar_semana.py` debe usarse siempre con `--dry-run` primero; la publicación requiere `--modo publicar --forzar`.
 
 **Pendiente:** Implementar `_crear_logo_lema` como imagen real (add_picture) en lugar de texto plano.
 
