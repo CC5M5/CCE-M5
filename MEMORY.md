@@ -712,11 +712,44 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 **Rollback:**
 - Para volver atrás: `cp data/db.sqlite3.backup.20260916_101753 data/db.sqlite3` y reconstruir la web.
 
+### Editor de Diapositivas CCE-M5 — Fase A (2026-09-22)
+**Estado:** Completado
+
+**Objetivo:** Crear catálogo maestro de diapositivas en base de datos e importar presentaciones existentes.
+
+**Decisiones tomadas:**
+- Las diapositivas son generales: modificar una base afecta a futuras presentaciones; las pasadas conservan su versión histórica (JSON/PPTX/PDF).
+- Cada slide base pertenece a un tipo canónico y a un subtipo: `general` para lecturas/textos, `cancion_<id>` para canciones vinculadas al cancionero, `texto_fijo` para textos litúrgicos fijos, y variantes específicas como `acto_penitencial` / `bendicion_agua`.
+- Se marca `es_default = 1` la primera variante por `(tipo, subtipo, color_liturgico)`; las demás quedan disponibles para elegir manualmente.
+
+**Archivos nuevos:**
+- `data/schema_slides.sql` — Esquema del catálogo: `slides_tipos`, `slides`, `presentacion_slides`.
+- `scripts/importar_slides_catalogo.py` — Lee JSON de `presentaciones_html/`, resuelve canciones por título, deduplica slides base y registra la composición histórica de cada presentación.
+
+**Resultados de la importación (3 presentaciones: 2026-09-13, 2026-09-20, 2026-09-27):**
+- 19 tipos canónicos en `slides_tipos`.
+- 37 slides base en `slides`.
+- 59 `presentacion_slides` (composición histórica).
+- 26 slides vinculadas a canciones del cancionero.
+- 29 slides de textos fijos / transiciones / lecturas.
+- 4 slides musicales sin canción encontrada (`sin_cancion`).
+
+**Validación realizada:**
+- Secuencia de slides consecutiva en cada presentación.
+- Tipos y subtipos consistentes con el esquema.
+- Canciones resueltas correctamente (p. ej. `PREPARAD EL CAMINO` → `cancion_8`).
+
+**Próxima fase (Fase B):** Crear el servidor Flask del editor en `scripts/editor_diapositivas_server.py` (puerto 4323) con listado de slides, edición de contenido, selector de imagen/color litúrgico y previsualización 4:3 real.
+
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
 - [x] Corregir centrado vertical de slides en Reveal.js (COMPLETADO 2026-09-16)
 - [x] Limpiar presentaciones duplicadas y del 27 de septiembre (COMPLETADO 2026-09-16)
+- [ ] Fase A: Catálogo de diapositivas + importación (COMPLETADO 2026-09-22)
+- [ ] Fase B: Servidor Flask del editor de diapositivas (puerto 4323)
+- [ ] Fase C: Generación de presentaciones desde el catálogo (PPTX/HTML/PDF)
+- [ ] Fase D: Commit automático al guardar y sincronización con la web
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente 107 canciones, parcialmente completo)
