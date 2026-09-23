@@ -549,10 +549,23 @@ def _generar_presentacion(fecha: str) -> str:
             sync_ok = f" | sincronizado a web/public/presentaciones_html/{fecha}_presentacion"
         except subprocess.CalledProcessError as exc:
             sync_ok = f" | ⚠️ sync falló: {exc.stderr or exc.stdout}"
+        # Marcar estado como publicado
+        try:
+            conn = _get_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE presentaciones SET estado = 'publicado' WHERE fecha_domingo = ?",
+                (fecha,),
+            )
+            conn.commit()
+            conn.close()
+            estado_ok = " | estado: publicado"
+        except Exception as e:
+            estado_ok = f" | ⚠️ estado falló: {e}"
         # Commit automático incluyendo bundle web
         try:
             subprocess.run(
-                ["git", "add", "presentaciones_html/", "web/public/presentaciones_html/", "data/db.sqlite3"],
+                ["git", "add", "presentaciones_html/", "data/db.sqlite3"],
                 cwd=PROJECT_DIR,
                 check=True,
                 capture_output=True,
@@ -578,7 +591,7 @@ def _generar_presentacion(fecha: str) -> str:
             commit_hash = m.group(1) if m else "commit OK"
         except subprocess.CalledProcessError as exc:
             commit_hash = f"ERROR: {exc.stderr or exc.stdout}"
-        return f"✅ Presentación generada en {bundle} {sync_ok} | {commit_hash}"
+        return f"✅ Presentación generada en {bundle} {sync_ok}{estado_ok} | {commit_hash}"
     except Exception as e:
         return f"⚠️ Error al generar: {e}"
 
@@ -830,8 +843,12 @@ def listar_presentaciones():
     sidebar = "\n".join(sidebar_parts)
 
     pres = _get_presentaciones()
+    def _badge_estado(estado):
+        color = {"borrador": "#f59e0b", "generado": "#10b981", "publicado": "#7c3aed"}.get(estado, "#64748b")
+        label = {"borrador": "🟡 Borrador", "generado": "🟢 Generado", "publicado": "🟣 Publicado"}.get(estado, estado)
+        return f'<span style="display:inline-block;padding:3px 8px;border-radius:6px;background:{color};color:#fff;font-size:12px;font-weight:600;">{label}</span>'
     filas = "\n".join(
-        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{html_module.escape(p["estado"] or "-")}</td></tr>'
+        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td></tr>'
         for p in pres
     )
     content = f"""<h2>Presentaciones semanales</h2>
@@ -901,11 +918,14 @@ def armar_presentacion(fecha: str):
         </tr>
         """)
 
+    estado = pres.get("estado") or "borrador"
+    estado_label = {"borrador": "🟡 Borrador", "generado": "🟢 Generado", "publicado": "🟣 Publicado"}.get(estado, f"⚪ {estado}")
+    gen_label = "🔄 Regenerar y publicar" if estado in ("generado", "publicado") else "⚡ Generar y publicar"
     content = f"""<h2>Armar presentación {fecha}</h2>
-    <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
+    <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")} | <span style="font-weight:600;">{estado_label}</span></p>
     <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
     <a href="/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
-    <a href="/presentacion/{fecha}/generar">⚡ Generar PPTX/HTML/PDF</a></p>
+    <a href="/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a></p>
     <form method="post" action="/presentacion/{fecha}/guardar">
       <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
         <thead>
