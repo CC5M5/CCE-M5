@@ -57,7 +57,11 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         conn = _get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT p.*, l.celebracion, l.color_liturgico
+            SELECT p.*, l.celebracion, l.color_liturgico,
+                   l.primera_lectura_cita, l.primera_lectura_texto,
+                   l.salmo_cita, l.salmo_antifona, l.salmo_texto,
+                   l.segunda_lectura_cita, l.segunda_lectura_texto,
+                   l.evangelio_cita, l.evangelio_texto
             FROM presentaciones p
             LEFT JOIN lecturas l ON l.id = p.lectura_id
             WHERE p.fecha_domingo = ?
@@ -85,6 +89,30 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         celebracion = pres.get("celebracion") or self._celebracion_from_fecha(fecha)
 
         fecha_formateada = self._formatear_fecha(fecha)
+
+        lecturas_data = {
+            "primera_lectura": {
+                "titulo": "PRIMERA LECTURA",
+                "contenido": pres.get("primera_lectura_texto") or "",
+                "cita": pres.get("primera_lectura_cita") or "",
+            },
+            "salmo": {
+                "titulo": "SALMO RESPONSORIAL",
+                "contenido": pres.get("salmo_texto") or "",
+                "cita": f"{pres.get('salmo_cita') or ''}{(' — ' + pres.get('salmo_antifona')) if pres.get('salmo_antifona') else ''}",
+            },
+            "segunda_lectura": {
+                "titulo": "SEGUNDA LECTURA",
+                "contenido": pres.get("segunda_lectura_texto") or "",
+                "cita": pres.get("segunda_lectura_cita") or "",
+            },
+            "evangelio": {
+                "titulo": "EVANGELIO",
+                "contenido": pres.get("evangelio_texto") or "",
+                "cita": pres.get("evangelio_cita") or "",
+            },
+        }
+
         slides: List[Slide] = []
         primera_portada = True
         for item in items:
@@ -104,6 +132,13 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                     primera_portada = False
                 else:
                     subtitulo = f"Somos uno · {fecha_formateada}" if subtitulo.lower().startswith("somos uno") else subtitulo
+
+            # Inyectar texto real de las lecturas del día
+            if tipo in lecturas_data and lecturas_data[tipo]["contenido"]:
+                titulo = lecturas_data[tipo]["titulo"]
+                contenido = lecturas_data[tipo]["contenido"]
+                cita = lecturas_data[tipo]["cita"]
+                subtitulo = ""
 
             # Expandir diapositivas de paso sin contenido
             if tipo == "paso":
