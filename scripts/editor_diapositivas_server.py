@@ -223,7 +223,10 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
     .preview-frame h2 {{ font-size: 12px; color: #555; margin: 0 0 6px; font-weight: 400; }}
     .preview-frame h3 {{ font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #777; margin: 0 0 4px; }}
     .preview-frame .cita {{ font-size: 10px; font-weight: 700; background: linear-gradient(90deg, var(--liturgia-acento), #A16207); color: white; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }}
-    .preview-frame .contenido {{ font-size: 11px; line-height: 1.35; color: #2c3e50; white-space: pre-wrap; }}
+    .preview-frame .contenido {{ font-size: 11px; line-height: 1.25; color: #2c3e50; white-space: pre-wrap; }}
+    .preview-frame .contenido br {{ display: block; content: ""; margin-bottom: 0.05em; }}
+    .preview-frame.cancion .contenido {{ line-height: 1.22; }}
+    .preview-frame.cancion .contenido br {{ margin-bottom: 0; }}
     .preview-frame .tarjeta {{ background: rgba(255,255,255,0.94); border-radius: 12px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(124,58,237,0.12); max-height: 86%; overflow: auto; z-index: 5; }}
     .preview-frame .ilustracion {{ position: absolute; bottom: 50px; right: 18px; max-width: 110px; max-height: 110px; opacity: 0.98; z-index: 6; border-radius: 8px; object-fit: contain; }}
     .preview-frame .logo-lema {{ position: absolute; bottom: 10px; right: 14px; height: 22px; width: auto; z-index: 10; }}
