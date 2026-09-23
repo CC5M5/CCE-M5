@@ -741,15 +741,48 @@ Para cambiar el lema en años futivos (ej. 2027-28):
 
 **Próxima fase (Fase B):** Crear el servidor Flask del editor en `scripts/editor_diapositivas_server.py` (puerto 4323) con listado de slides, edición de contenido, selector de imagen/color litúrgico y previsualización 4:3 real.
 
+### Editor de Diapositivas CCE-M5 — Fase B (2026-09-23)
+**Estado:** Completado
+
+**Objetivo:** Servidor web local para editar el catálogo maestro de diapositivas con previsualización real.
+
+**Decisiones tomadas:**
+- Editor local en Flask, puerto `4323`, bind `0.0.0.0`, accesible en `http://192.168.68.244:4323`.
+- GitHub Pages sigue siendo solo lectura; la edición se hace en servidor local.
+- El color litúrgico seleccionado en el editor es **solo para preview**; la generación final aplica el color del domingo correspondiente.
+- Las diapositivas base son generales; modificar una afecta a futuras presentaciones.
+- La marca `--- DIAPOSITIVA ---` en una línea aparte divide una diapositiva base en N slides numeradas en la preview y en la generación final.
+- Negrita en contenido con `**texto**` o `** texto **`.
+
+**Archivo nuevo:**
+- `scripts/editor_diapositivas_server.py`
+
+**Funcionalidades implementadas:**
+- Listado lateral de diapositivas agrupadas por tipo canónico.
+- Edición: tipo, subtipo/variante, título, subtítulo, contenido, cita, color litúrgico (preview), imagen, notas.
+- Checkbox `es_default` para marcar variante por defecto.
+- Botón "Dividir aquí" inserta `--- DIAPOSITIVA ---` donde está el cursor.
+- Preview 4:3 a la derecha, con el mismo interlineado compacto del generador (line-height 1.25 / 1.22 para canciones).
+- Preview divide automáticamente por `--- DIAPOSITIVA ---` mostrando `(1/N)`, `(2/N)`...
+- Selector de imagen con miniaturas desde `data/ilustraciones/catalogo.json`.
+- Selector de color litúrgico: verde, blanco, rojo, morado, rosa, negro.
+- Botón "Duplicar" crea una copia con subtipo `_copia`.
+- Guardar actualiza `data/db.sqlite3` y hace `git commit` + `push` automáticos.
+
+**Validación realizada:**
+- Preview de slide de gloria dividida correctamente en 2 slides.
+- Negrita renderizada en preview (`<strong>texto</strong>`).
+- Commit automático funciona (`chore(slides): editar diapositiva ...`).
+
 ### Próximos Pasos Pendientes
 - [x] Corregir errores detectados en la web Astro (COMPLETADO)
 - [x] Implementar scraper Ciudad Redonda como backup de Koinonia (COMPLETADO)
 - [x] Corregir centrado vertical de slides en Reveal.js (COMPLETADO 2026-09-16)
 - [x] Limpiar presentaciones duplicadas y del 27 de septiembre (COMPLETADO 2026-09-16)
-- [ ] Fase A: Catálogo de diapositivas + importación (COMPLETADO 2026-09-22)
-- [ ] Fase B: Servidor Flask del editor de diapositivas (puerto 4323)
-- [ ] Fase C: Generación de presentaciones desde el catálogo (PPTX/HTML/PDF)
-- [ ] Fase D: Commit automático al guardar y sincronización con la web
+- [x] Fase A: Catálogo de diapositivas + importación (COMPLETADO 2026-09-22)
+- [x] Fase B: Servidor Flask del editor de diapositivas (puerto 4323) (COMPLETADO 2026-09-23)
+- [ ] Fase C: Armado de presentación semanal desde el catálogo
+- [ ] Fase D: Generación final de presentaciones (PPTX/HTML/PDF) desde el catálogo
 - [ ] Fase 6: Refinamiento final
   - [ ] Configurar GitHub Pages en el repositorio remoto
   - [ ] Migrar todo el cancionero escolapio desde Blogspot (actualmente 107 canciones, parcialmente completo)
