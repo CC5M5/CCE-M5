@@ -270,7 +270,11 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
 <body>
   <header>
     <h1>🖼️ Editor de Diapositivas CCE-M5</h1>
-    <p>Edición local del catálogo de diapositivas. Preview 4:3 a la derecha.</p>
+    <p>Edición local del catálogo de diapositivas y presentaciones semanales.</p>
+    <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="/slides/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
+      <a href="/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
+    </nav>
   </header>
   <div class="container">
     <aside>
