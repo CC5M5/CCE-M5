@@ -8,7 +8,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "sync": "python3 ../scripts/sync_presentaciones_html.py"
   },
   "dependencies": {
     "@astrojs/react": "^3.6.2",
