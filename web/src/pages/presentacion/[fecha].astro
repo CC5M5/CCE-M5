@@ -1,5 +1,7 @@
 ---
 import { getAllPresentacionesFechas } from '@lib/db.js';
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 
 export async function getStaticPaths() {
   const fechas = getAllPresentacionesFechas();
@@ -9,6 +11,15 @@ export async function getStaticPaths() {
 
 const { fecha } = Astro.params;
 const base = import.meta.env.BASE_PATH || "/";
+
+// Timestamp de modificación del HTML embebido para evitar caché del navegador
+let cacheBust = Date.now();
+try {
+  const htmlPath = join(process.cwd(), 'public', 'presentaciones_html', `${fecha}_presentacion`, 'index.html');
+  cacheBust = Math.floor(statSync(htmlPath).mtimeMs);
+} catch {
+  // Si no existe el archivo, usamos Date.now()
+}
 ---
 
 <!DOCTYPE html>
@@ -23,6 +34,6 @@ const base = import.meta.env.BASE_PATH || "/";
     </style>
   </head>
   <body>
-    <iframe src={`${base}presentaciones_html/${fecha}_presentacion/index.html`} title={`Presentación ${fecha}`} allowfullscreen></iframe>
+    <iframe src={`${base}presentaciones_html/${fecha}_presentacion/index.html?v=${cacheBust}`} title={`Presentación ${fecha}`} allowfullscreen></iframe>
   </body>
 </html>
