@@ -5,13 +5,13 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-09-21T19:09:05.347123"
+    "generado": "2026-09-23T09:16:52.846216"
   },
   "slides": [
     {
       "numero": 1,
       "tipo": "portada",
-      "titulo": "L XXVI DOMINGO DEL TIEMPO ORDINARIO",
+      "titulo": "l XXVI Domingo del Tiempo Ordinario",
       "contenido": "",
       "cita": "",
       "subtitulo": "27 de septiembre de 2026",
@@ -21,15 +21,25 @@
     {
       "numero": 2,
       "tipo": "entrada",
-      "titulo": "HE VENIDO A SERVIR",
-      "contenido": "Quien quiera ser grande, quien quiera ser el primero, sea el esclavo de todos, sea el más pequeño.\nNo he venido a ser servido, que he venido a servir y a dar la vida por todos para que todos puedan vivir (2)\nen plenitud (3).",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
       "cita": "",
       "subtitulo": "",
-      "momento": "Canción de Entrada",
+      "momento": "",
       "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 3,
+      "tipo": "transicion_palabra",
+      "titulo": "LITURGIA DE LA PALABRA",
+      "contenido": "Escuchemos la Palabra de Dios",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140961.jpg"
+    },
+    {
+      "numero": 4,
       "tipo": "perdon",
       "titulo": "ACTO PENITENCIAL",
       "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
@@ -39,67 +49,97 @@
       "imagen": "assets/20140955.jpg"
     },
     {
-      "numero": 4,
-      "tipo": "gloria",
-      "titulo": "ALABO TU BONDAD",
-      "contenido": "Todo mi ser canta hoy por las cosas que hay en mí.\nGracias te doy mi Señor,\nTú me haces tan feliz.\nTú me has regalado tu amistad, confío en ti, me llenas de tu paz.\nTú me haces sentir tu gran bondad, yo cantaré por siempre tu fidelidad.\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\n**GLORIA, GLORIA, SIEMPRE CANTARÉ TU FIDELIDAD.**\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\n**GLORIA, GLORIA, (TÚ ME HACES SENTIR TU GRAN BONDAD. YO CANTARÉ)**\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\n(POR SIEMPRE TU FIDELIDAD)\nSiempre a tu lado estaré alabando tu bondad\nA mis hermanos diré el gran gozo que hallo en ti.\nEn ti podrán siempre encontrar fidelidad, confianza y amistad.\nNunca fallara tu gran amor, ni tu perdón. Me quieres tal como soy",
+      "numero": 5,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
       "cita": "",
       "subtitulo": "",
-      "momento": "Gloria",
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
+    },
+    {
+      "numero": 6,
+      "tipo": "gloria",
+      "titulo": "GLORIA TEST (1/2)",
+      "contenido": "Te damos gracias, Señor,\r\npor la tierra y el sol\r\npor la luna y las estrellas;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús,\r\npor el fuego y la luz,\r\npor la noche y por el día;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS!**\r\n(A él sea el poder),\r\n**¡GLORIA A DIOS!**\r\n él sea el honor).\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
       "imagen": "assets/20140957.jpg"
     },
     {
-      "numero": 5,
+      "numero": 7,
+      "tipo": "gloria",
+      "titulo": "GLORIA TEST (2/2)",
+      "contenido": "Te damos gracias, Señor,\r\npor los campos en flor,\r\npor la nieve de los montes;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús,\r\npor las olas del mar,\r\npor el canto de las aves;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS!**\r\n(A él sea el poder),\r\n**¡GLORIA A DIOS!**\r\n él sea el honor).\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 8,
       "tipo": "primera_lectura",
       "titulo": "PRIMERA LECTURA",
-      "contenido": "Así dice el Señor: «Comentáis: «No es justo el proceder del Señor». Escuchad, casa de Israel: ¿es injusto mi proceder?, ¿o no es vuestro proceder el que es injusto? Cuando el justo se aparta de su justicia, comete la maldad y muere, muere por la maldad que cometió. Y cuando el malvado se convierte de la maldad que hizo y practica el derecho y la justicia, él mismo salva su vida. Si recapacita y se convierte de los delitos cometidos, ciertamente vivirá y no morirá.»",
-      "cita": "18,25-28",
+      "contenido": "En el principio creó Dios el cielo y la tierra...",
+      "cita": "Gn 1, 1-10",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 6,
+      "numero": 9,
       "tipo": "salmo",
       "titulo": "SALMO RESPONSORIAL",
-      "contenido": "Antífona: Recuerda, Señor, que tu misericordia es eterna\n\nSeñor, enséñame tus caminos, instrúyeme en tus sendas: haz que camine con lealtad; enséñame, porque tú eres mi Dios y Salvador, y todo el día te estoy esperando.\n\nRecuerda, Señor, que tu ternura y tu misericordia son eternas; no te acuerdes de los pecados ni de las maldades de mi juventud; acuérdate de mí con misericordia, por tu bondad, Señor.\n\nEl Señor es bueno y es recto, y enseña el camino a los pecadores; hace caminar a los humildes con rectitud, enseña su camino a los humildes.",
-      "cita": "Sal 24,4",
+      "contenido": "Antífona: El Señor es mi pastor.\n\nEl Señor es mi pastor, nada me falta...",
+      "cita": "Sal 23 (24)",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/20140962.jpg"
     },
     {
-      "numero": 7,
+      "numero": 10,
       "tipo": "segunda_lectura",
       "titulo": "SEGUNDA LECTURA",
-      "contenido": "Si queréis darme el consuelo de Cristo y aliviarme con vuestro amor, si nos une el mismo Espíritu y tenéis entrañas compasivas, dadme esta gran alegría: manteneos unánimes y concordes con un mismo amor y un mismo sentir. No obréis por rivalidad ni por ostentación, dejaos guiar por la humildad y considerad siempre superiores a los demás. No os encerréis en vuestros intereses, sino buscad todos el interés de los demás. Tened entre vosotros los sentimientos propios de Cristo Jesús. Él, a pesar de su condición divina, no hizo alarde de su categoría de Dios; al contrario, se despojó de su rango y tomó la condición de esclavo, pasando por uno de tantos. Y así, actuando como un hombre cualquiera, se rebajó hasta someterse incluso a la muerte, y una muerte de cruz. Por eso Dios lo levantó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.",
-      "cita": "2,1-11",
+      "contenido": "Estad siempre alegres en el Señor...",
+      "cita": "Fil 4, 4-9",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/20140960.jpg"
     },
     {
-      "numero": 8,
+      "numero": 11,
       "tipo": "aleluya",
-      "titulo": "ALELUYA DE LA TIERRA",
-      "contenido": "¿Quién quiere resucitar a este mundo que se muere?\n¿Quién cantará el aleluya de esa nueva luz que viene?\n¿Quién cuando mire la tierra y las tragedias observe, sentirá en su corazón el dolor de quien se muere?\n¿Quién es capaz de salvar a este mundo decadente, y mantiene la esperanza de los muchos que la pierden?\n**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**\n**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**\n¿Quién bajará de la cruz a tanto cristo sufriente, mientras los hombres miramos, impasivos e indolentes?\n¿Quién grita desde el silencio de un ser que a su Dios retiene, porque se hace palabra que sin hablar se la entiende?\n¿Quién se torna en aleluya porque traduce la muerte, como el trigo que se pudre y de uno cientos vienen?\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**\n**Y LA TIERRA SONREIRÁ. ¡ALELUYA!**",
+      "titulo": "ALE, ALELUYA",
+      "contenido": "Ale, aleluya,\naleluya, aleluya,\naleluya, aleluya,\naleluya, aleluya.\nPasarán los cielos,\npasará la tierra,\nmas tus palabras no pasarán.\nAleluya, aleluya.",
       "cita": "",
       "subtitulo": "",
-      "momento": "Aleluya",
+      "momento": "",
       "imagen": "assets/20140957.jpg"
     },
     {
-      "numero": 9,
+      "numero": 12,
       "tipo": "evangelio",
       "titulo": "EVANGELIO",
-      "contenido": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.» Él le contestó: «No quiero.» Pero después recapacitó y fue. Se acercó al segundo y le dijo lo mismo. Él le contestó: «Voy, señor.» Pero no fue. ¿Quién de los dos hizo lo que quería el padre?»Contestaron: «El primero.»Jesús les dijo: «Os aseguro que los publicanos y las prostitutas os llevan la delantera en el camino del reino de Dios. Porque vino Juan a vosotros enseñándoos el camino de la justicia, y no le creísteis; en cambio, los publicanos y prostitutas le creyeron. Y, aun después de ver esto, vosotros no recapacitasteis ni le creísteis.»\nPalabra del Señor",
-      "cita": "21,28-32",
+      "contenido": "Viendo Jesús a la multitud, subió al monte...",
+      "cita": "Mt 5, 1-12",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 10,
+      "numero": 13,
+      "tipo": "transicion_eucaristia",
+      "titulo": "LITURGIA EUCARÍSTICA",
+      "contenido": "Preparémonos para la mesa del Señor",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 14,
       "tipo": "credo",
       "titulo": "CREDO",
       "contenido": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\nDesde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
@@ -109,77 +149,147 @@
       "imagen": "assets/20140957.jpg"
     },
     {
-      "numero": 11,
-      "tipo": "ofertorio",
-      "titulo": "QUE TE PUEDO DAR",
-      "contenido": "¿Qué te puedo dar que no me hayas dado Tú?\n¿Qué te puedo decir que no me hayas dicho Tú?\n¿Qué puedo hacer por ti, si yo no puedo hacer nada?\nSi yo no puedo hacer nada si no es por ti, mi Dios.\n**TODO LO QUE SE, TODO LO QUE SOY,**\nTODO LO QUE TENGO ES TUYO (bis)",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "Ofertorio",
-      "imagen": "assets/20140959.jpg"
-    },
-    {
-      "numero": 12,
-      "tipo": "santo",
-      "titulo": "SANTO JESUITA",
-      "contenido": "**SANTO, SANTO, SANTO-O-O,**\n**SANTO ES EL SEÑOR,**\n**DIOS DEL UNIVERSO-O,**\nDIOS DEL UNIVERSO-O (bis)\nLlenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo-o, hosanna en el cielo-o.\nBendito el que viene en nombre del Señor.\nHosanna en el cielo-o, hosanna en el cielo-o.\n**SANTO, SANTO, SANTO-O-O..**\n**SANTO, SANTO, SANTO-O-O,**\n**SANTO ES EL SEÑOR.**",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "Santo",
-      "imagen": "assets/20140957.jpg"
-    },
-    {
-      "numero": 13,
-      "tipo": "padre_nuestro",
-      "titulo": "PADRE NUESTRO",
-      "contenido": "Rellenar a mano",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "Padre Nuestro",
-      "imagen": "assets/20140955.jpg"
-    },
-    {
-      "numero": 14,
-      "tipo": "paz",
-      "titulo": "LA PAZ TE DOY",
-      "contenido": "La paz te doy a ti, mi hermano, la paz que Dios me regaló, y en un abrazo a ti te entrego la paz que llevo en mi corazón.\nRecíbela, recíbela, esta es la paz que el mundo no te puede dar.",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "Rito de la Paz",
-      "imagen": "assets/20140958.jpg"
-    },
-    {
       "numero": 15,
-      "tipo": "comunion",
-      "titulo": "BENDIGAMOS AL SEÑOR",
-      "contenido": "Bendigamos al Señor, Dios de toda la creación por habernos regalado su amor.\nSu bondad y su perdón, y su gran fidelidad por los siglos de los siglos durará.\n**EL ESPÍRITU DE DIOS HOY ESTÁ SOBRE MI.**\n**ÉL ES QUIEN ME HA UNGIDO A PROCLAMAR**\n**BUENA NUEVA A LOS MÁS POBRES,**\n**GRACIA DE SU SALVACIÓN. (BIS)**\nEnviados con poder y en el nombre de Jesús a sanar a los enfermos del dolor, a los ciegos dar visión, a los pobres la verdad y a los presos y oprimidos, libertad.\n**Con la fuerza de su amor y de la resurrección anunciamos: llega ya la salvación.**\n**Que ni el miedo, ni el temor, ni la duda o la opresión borrarán la paz de nuestro corazón.**",
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
       "cita": "",
       "subtitulo": "",
-      "momento": "Comunión",
-      "imagen": "assets/20140959.jpg"
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
     },
     {
       "numero": 16,
-      "tipo": "maria",
-      "titulo": "A TU AMPARO Y PROTECCIÓN",
-      "contenido": "**A TU AMPARO Y PROTECCIÓN,**\n**MADRE DE DIOS, ACUDIMOS.**\n**NO DESOIGAS NUESTROS RUEGOS**\n**Y DE TODOS LOS PELIGROS,**\n**VIRGEN GLORIOSA Y BENDITA,**\n**DEFIENDE SIEMPRE A TUS HIJOS**",
+      "tipo": "ofertorio",
+      "titulo": "PADRE NUESTRO DE LA VIDA",
+      "contenido": "Padre nuestro de la vida,\nmío, de ése y de aquél\nque vive en toda criatura\ny ellos así han de creer.\nQuisiera realzar tu nombre\nviviendo aquí bajo el sol\ntu mensaje de aquel monte\nSiM7m Mim\nde pobreza, paz y amor.\nDanos pan para vivir\nsólo el momento presente\nya que el día de mañana\nquizás aquí no me encuentre.\nNo mires lo que hice mal\nque yo no veré a mi deudor\ny en mi camino hacia ti\nSiM7m Mim\nque no caiga en tentación.\nAmén, amén, que no caiga en\ntentación.\nSiM7m Mim\nAmén, amén, que sea así siempre\nSeñor.",
       "cita": "",
       "subtitulo": "",
-      "momento": "Canto a María",
-      "imagen": "assets/virgen_fatima.jpg"
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
     },
     {
       "numero": 17,
-      "tipo": "despedida",
-      "titulo": "COMO CORRE UN RÍO",
-      "contenido": "Como corre un río dentro de mi ser (x2)\nasí yo confío en Cristo, mi Rey (x2)\n**COMO UN RÍO DE AGUA VIVA,**\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\nJesús está pasando por ahí\nJesús está pasando por ahí\nY cuando pasa todo lo transforma\nSe va la tristeza, viene la alegría\nY cuando pasa todo lo transforma\nViene la alegría para ti y para mí\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
       "cita": "",
       "subtitulo": "",
-      "momento": "Despedida",
-      "imagen": "assets/20140953.jpg"
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
     },
     {
       "numero": 18,
+      "tipo": "santo",
+      "titulo": "GRITO SANTO",
+      "contenido": "Hoy quiero proclamarte,\nquiero cantar a tu nombre\nsanto,\nquiero bailar ante tu presencia\nhasta morir.\nY bendecirte, mi Dios; amarte,\nno detenerme hasta encontrarte\nbuscar las sendas que me\nconducen\nhacia la luz.\nY GRITO SANTO, SANTO, SANTO.\nTÚ ERES SANTO, SANTO, SANTO.\nTÚ SIEMPRE SANTO, SANTO, SANTO;\nSANTO ERES TÚ. (Bis)\nSiento en mí tu mirada\nque me traspasa hasta lo más\nhondo\ncomo una fuerza que me arrastra\nhacia tu cruz.\nY allí me limpias, me\npurificas,\nsacas de mí el corazón de\npiedra\ny me transformas en criatura\nviva por ti.\nY GRITO SANTO…",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 19,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
+    },
+    {
+      "numero": 20,
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO (Gallego)",
+      "contenido": "En el mar he oído hoy\nSeñor tu voz que me llamó\ny me pidió que me entregara\na mis hermanos.\nEsa voz me transformó,\nmi vida entera ya cambió,\ny sólo pienso ahora Señor\nen repetirte:\nPADRE NUESTRO\nEN TI CREEMOS,\nPADRE NUESTRO\nTE OFRECEMOS,\nPADRE NUESTRO\nNUESTRAS MANOS\nDE HERMANOS.\nCuando vaya a otro lugar\ntendré Señor que abandonar\na mi familia a mis amigos\npor seguirte.\nPero sé que así algún día\npodré enseñar tu verdad,\nir a mi hermano y junto a él\nyo repetirte.\nPADRE NUESTRO…",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 21,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
+    },
+    {
+      "numero": 22,
+      "tipo": "paz",
+      "titulo": "RITO DE LA PAZ",
+      "contenido": "Señor Jesucristo, que dijiste a tus apóstoles:\n«La paz os dejo, mi paz os doy»,\nno tengas en cuenta nuestros pecados,\nsino la fe de tu Iglesia,\ny conforme a tu palabra concédele la paz y la unidad.\n\nTú que vives y reinas por los siglos de los siglos. Amén.\n\nLa paz del Señor esté siempre con vosotros.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140958.jpg"
+    },
+    {
+      "numero": 23,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
+    },
+    {
+      "numero": 24,
+      "tipo": "comunion",
+      "titulo": "TODO MI SER",
+      "contenido": "Todo mi ser, todo lo que soy\nte pertenece sólo a ti.\nDesde mi pobreza,\nTú eres la fuerza.\nNada sé, sólo que caminaré.\nLLEGASTE A MI VIDA CON TU LUZ,\nCAMBIASTE MI MENTE CON TU AMOR,\nVACIASTE MI ALMA Y AHORA ESTÁS\nDENTRO DE MÍ.\nTodo mi ser, todo lo que soy,\nlo bueno y lo malo la pongo a\ntus pies.\nAunque a veces llegues a mi\ntemplo\ny lo encuentres ya lleno,\nno es verdad, sólo se llena\ncuando Tú moras en él.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 25,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
+    },
+    {
+      "numero": 26,
+      "tipo": "maria",
+      "titulo": "CANTO A MARÍA",
+      "contenido": "Dios te salve, María;\nllena eres de gracia;\nel Señor es contigo.\nBendita tú eres entre todas las mujeres,\ny bendito es el fruto de tu vientre, Jesús.\n\nSanta María, Madre de Dios,\nruega por nosotros, pecadores,\nahora y en la hora de nuestra muerte. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/virgen_fatima.jpg"
+    },
+    {
+      "numero": 27,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/comunidad_oracion.png"
+    },
+    {
+      "numero": 28,
+      "tipo": "despedida",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 29,
       "tipo": "portada",
       "titulo": "¡ID EN PAZ!",
       "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
