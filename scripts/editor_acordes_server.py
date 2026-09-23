@@ -155,6 +155,41 @@ def _rebuild_web() -> str:
 
 
 
+
+# --- Momentos litúrgicos ---
+MOMENTOS_LITURGICOS = [
+    "entrada", "acto penitencial", "gloria", "primera_lectura", "salmo",
+    "segunda_lectura", "aleluya", "evangelio", "credo", "ofertorio", "santo",
+    "padre_nuestro", "paz", "comunion", "maria", "despedida", "general"
+]
+
+
+def _get_momentos_cancion(cancion_id: int) -> list[str]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
+        (cancion_id,),
+    )
+    rows = [r["momento_liturgico"] for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
+    for m in momentos:
+        m = m.strip().lower()
+        if m:
+            cursor.execute(
+                "INSERT OR IGNORE INTO cancion_momentos (cancion_id, momento_liturgico) VALUES (?, ?)",
+                (cancion_id, m),
+            )
+    conn.commit()
+    conn.close()
+
 def _slugify(titulo: str) -> str:
     import unicodedata
     t = unicodedata.normalize("NFD", titulo.lower())
@@ -185,7 +220,8 @@ def _get_cancion_by_slug(slug: str):
             row = cursor.fetchone()
             conn.close()
             if row:
-                return {
+                momentos = _get_momentos_cancion(row["id"])
+            return {
                     "id": row["id"],
                     "titulo": row["titulo"],
                     "titulo_url": row["titulo_url"],
@@ -193,6 +229,7 @@ def _get_cancion_by_slug(slug: str):
                     "texto": row["letra_con_acordes"] or "",
                     "preview": row["html_visual"] or "",
                     "tono": row["tono"],
+                    "momentos": momentos,
                 }
     return None
 
@@ -285,10 +322,15 @@ def editar(slug: str):
         for c, link in zip(canciones, sidebar_links.split("\n"))
     )
 
+    momentos_checks = "\n".join(
+        f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in cancion.get("momentos", []) else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
+        for m in MOMENTOS_LITURGICOS
+    )
     content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
     <div class="meta">
       Tono: {html_module.escape(cancion['tono'] or 'No detectado')} |
       ID: {cancion['id']} |
+      Momentos: {html_module.escape(", ".join(cancion.get("momentos", [])).title() or "(ninguno)")} |
       <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
     </div>
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
@@ -299,6 +341,10 @@ def editar(slug: str):
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
     <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
+      <div style="margin-bottom:12px;">
+        <label><strong>Momentos litúrgicos</strong></label><br>
+        {momentos_checks}
+      </div>
       <div class="two-col">
         <div>
           <label><strong>Texto con acordes</strong></label>
@@ -321,7 +367,14 @@ def guardar(slug: str):
         abort(404)
 
     nuevo_texto = request.form.get("texto", "")
+    nuevos_momentos = request.form.getlist("momentos")
     derivados = _regenerar_derivados(nuevo_texto)
+
+    # Actualizar momentos litúrgicos
+    _set_momentos_cancion(cancion["id"], nuevos_momentos)
+
+    # Actualizar el campo legacy con el primer momento (o vacío) para compatibilidad
+    momento_legacy = nuevos_momentos[0] if nuevos_momentos else ""
 
     conn = _get_connection()
     cursor = conn.cursor()
@@ -333,7 +386,8 @@ def guardar(slug: str):
             acordes_json = ?,
             estructura_json = ?,
             html_visual = ?,
-            tono = ?
+            tono = ?,
+            momento_liturgico = ?
         WHERE id = ?
         """,
         (
@@ -343,6 +397,7 @@ def guardar(slug: str):
             derivados["estructura_json"],
             derivados["html_visual"],
             derivados["tono"],
+            momento_legacy,
             cancion["id"],
         ),
     )

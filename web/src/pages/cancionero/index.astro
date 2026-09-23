@@ -14,6 +14,7 @@ const cancionesConSlug = canciones.map(c => ({
   ...c,
   slug: slugify(c.titulo),
   letraPreview: (c.letra_sin_acordes || '').slice(0, 120).replace(/\n/g, ' '),
+  momentos: c.momentos || (c.momento_liturgico ? [c.momento_liturgico] : []),
 }));
 
 const cancionesPorLetra = {};
@@ -50,8 +51,14 @@ const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 
                 <a href={`${base}cancionero/${c.slug}/`} class="font-heading font-semibold text-lg text-slate-800 hover:text-liturgia-verde">
                   {c.titulo}
                 </a>
-                <div class="flex items-center gap-3 text-sm">
-                  {c.momento_liturgico && <span class="px-2 py-1 rounded bg-liturgia-verde/10 text-liturgia-verde font-medium">{c.momento_liturgico}</span>}
+                <div class="flex items-center gap-3 text-sm flex-wrap">
+                  {c.momentos.length > 0 ? (
+                    c.momentos.map(m => (
+                      <span class="px-2 py-1 rounded bg-liturgia-verde/10 text-liturgia-verde font-medium">{m}</span>
+                    ))
+                  ) : (
+                    c.momento_liturgico && <span class="px-2 py-1 rounded bg-liturgia-verde/10 text-liturgia-verde font-medium">{c.momento_liturgico}</span>
+                  )}
                   {c.tono && <span class="text-slate-500">{c.tono}</span>}
                 </div>
               </li>
@@ -76,8 +83,9 @@ const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 
       const items = document.querySelectorAll('#listado-canciones li');
       items.forEach(li => {
         const texto = li.textContent.toLowerCase();
-        const momento = li.querySelector('.bg-liturgia-verde\\/10')?.textContent.toLowerCase() || '';
-        const match = (!q || texto.includes(q)) && (!m || momento.includes(m));
+        const momentos = Array.from(li.querySelectorAll('.bg-liturgia-verde\\/10')).map(el => el.textContent.toLowerCase());
+        const matchMomento = !m || momentos.some(mom => mom.includes(m));
+        const match = (!q || texto.includes(q)) && matchMomento;
         li.style.display = match ? '' : 'none';
       });
       document.querySelectorAll('#listado-canciones > div').forEach(div => {
