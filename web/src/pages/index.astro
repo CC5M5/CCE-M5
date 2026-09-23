@@ -71,12 +71,12 @@ const cancionesOrdenadas = [...canciones].sort((a, b) => {
                 ▶️ Ver presentación
               </a>
               {presentacion.ruta_pptx && (
-                <a href={presentacion.ruta_pptx.replace(/^.*presentaciones\//, `${base}presentaciones/`)} class="btn bg-white text-slate-900 hover:bg-slate-100">
+                <a href={presentacion.ruta_pptx.replace(/^.*presentaciones_html\//, `${base}presentaciones_html/`)} class="btn bg-white text-slate-900 hover:bg-slate-100">
                   ⬇️ Descargar PPTX
                 </a>
               )}
-              {presentacion.ruta_pdf_fieles && (
-                <a href={presentacion.ruta_pdf_fieles.replace(/^.*presentaciones\//, `${base}presentaciones/`)} class="btn bg-white text-slate-900 hover:bg-slate-100">
+              {presentacion.ruta_pdf && (
+                <a href={presentacion.ruta_pdf.replace(/^.*presentaciones_html\//, `${base}presentaciones_html/`)} class="btn bg-white text-slate-900 hover:bg-slate-100">
                   ⬇️ Descargar PDF
                 </a>
               )}
