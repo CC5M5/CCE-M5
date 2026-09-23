@@ -135,6 +135,11 @@ def _get_slide(id: int) -> Optional[Dict[str, Any]]:
     return dict(row)
 
 
+def _apply_bold_html(text: str) -> str:
+    """Convierte **texto** en <strong>texto</strong>, permitiendo espacios opcionales."""
+    return re.sub(r"\*\*\s*(.+?)\s*\*\*", r"<strong>\1</strong>", text)
+
+
 def _render_preview(slide: Dict[str, Any]) -> str:
     """Genera HTML que simula la diapositiva real 4:3, dividiendo si hay --- DIAPOSITIVA ---."""
     color = slide.get("color_liturgico") or "verde"
@@ -165,7 +170,7 @@ def _render_preview(slide: Dict[str, Any]) -> str:
 
     def _render_slide_mini(contenido_parte: str, idx: int, total: int) -> str:
         contenido = html_module.escape(contenido_parte)
-        contenido = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", contenido)
+        contenido = _apply_bold_html(contenido)
         contenido = contenido.replace("\n", "<br>")
 
         inner = ""
