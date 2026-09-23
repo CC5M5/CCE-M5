@@ -136,17 +136,13 @@ def _get_slide(id: int) -> Optional[Dict[str, Any]]:
 
 
 def _render_preview(slide: Dict[str, Any]) -> str:
-    """Genera un HTML que simula la diapositiva real 4:3."""
+    """Genera HTML que simula la diapositiva real 4:3, dividiendo si hay --- DIAPOSITIVA ---."""
     color = slide.get("color_liturgico") or "verde"
     color_info = COLORES_LITURGICOS.get(color, COLORES_LITURGICOS["verde"])
     tipo = slide.get("tipo", "")
     titulo = html_module.escape(slide.get("titulo") or "")
-    contenido_raw = slide.get("contenido") or ""
-    contenido = html_module.escape(contenido_raw)
-    contenido = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", contenido)
-    contenido = contenido.replace("\n", "<br>")
-    cita = html_module.escape(slide.get("cita") or "")
     subtitulo = html_module.escape(slide.get("subtitulo") or "")
+    cita = html_module.escape(slide.get("cita") or "")
     imagen = slide.get("imagen") or ""
 
     if imagen and not imagen.startswith(("http://", "https://", "/")):
@@ -156,34 +152,48 @@ def _render_preview(slide: Dict[str, Any]) -> str:
 
     lema_url = "/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
 
-    inner = ""
-    if slide.get("momento"):
-        inner += f'<h3>{html_module.escape(slide["momento"])}</h3>\n'
-    if titulo:
-        inner += f'<h1>{titulo}</h1>\n'
-    if subtitulo:
-        inner += f'<h2>{subtitulo}</h2>\n'
-    if cita:
-        inner += f'<div class="cita">{cita}</div>\n'
-    if contenido:
-        inner += f'<div class="contenido">{contenido}</div>\n'
-
     clase = tipo
     if tipo in ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"):
         clase += " cancion"
 
-    html = f"""
-    <div class="preview-frame {clase}" style="--liturgia-from:{color_info['from']};--liturgia-to:{color_info['to']};--liturgia-acento:{color_info['acento']};">
-      <div class="slide-wrapper">
-        {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ''}
-        <div class="tarjeta">
-          {inner}
+    # Dividir contenido por marca --- DIAPOSITIVA ---
+    contenido_raw = slide.get("contenido") or ""
+    partes = re.split(r"(?m)^\s*---\s*DIAPOSITIVA\s*---\s*$", contenido_raw)
+    partes = [p.strip() for p in partes if p.strip()]
+    if not partes:
+        partes = [""]
+
+    def _render_slide_mini(contenido_parte: str, idx: int, total: int) -> str:
+        contenido = html_module.escape(contenido_parte)
+        contenido = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", contenido)
+        contenido = contenido.replace("\n", "<br>")
+
+        inner = ""
+        if slide.get("momento"):
+            inner += f'<h3>{html_module.escape(slide["momento"])}{f" ({idx}/{total})" if total > 1 else ""}</h3>\n'
+        if titulo:
+            inner += f'<h1>{titulo}{f" ({idx}/{total})" if total > 1 else ""}</h1>\n'
+        if subtitulo:
+            inner += f'<h2>{subtitulo}</h2>\n'
+        if cita:
+            inner += f'<div class="cita">{cita}</div>\n'
+        if contenido:
+            inner += f'<div class="contenido">{contenido}</div>\n'
+
+        return f"""
+        <div class="preview-frame {clase}" style="--liturgia-from:{color_info['from']};--liturgia-to:{color_info['to']};--liturgia-acento:{color_info['acento']};">
+          <div class="slide-wrapper">
+            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ''}
+            <div class="tarjeta">
+              {inner}
+            </div>
+            {f'<img class="logo-lema" src="{lema_url}" alt="Somos uno">' if lema_url else ''}
+          </div>
         </div>
-        {f'<img class="logo-lema" src="{lema_url}" alt="Somos uno">' if lema_url else ''}
-      </div>
-    </div>
-    """
-    return html
+        """
+
+    slides_html = "\n".join(_render_slide_mini(parte, i + 1, len(partes)) for i, parte in enumerate(partes))
+    return f'<div style="display:flex;flex-direction:column;gap:12px;align-items:center;">{slides_html}</div>' if len(partes) > 1 else slides_html
 
 
 def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = "") -> str:
