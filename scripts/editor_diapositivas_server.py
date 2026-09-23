@@ -587,6 +587,21 @@ def _generar_presentacion(fecha: str) -> str:
             sync_ok = f" | sincronizado a web/public/presentaciones_html/{fecha}_presentacion"
         except subprocess.CalledProcessError as exc:
             sync_ok = f" | ⚠️ sync falló: {exc.stderr or exc.stdout}"
+        # Reconstruir cancionero web para actualizar web/dist/
+        try:
+            build_result = subprocess.run(
+                ["npm", "run", "build"],
+                cwd=str(PROJECT_DIR / "web"),
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            build_ok = " | web rebuild OK"
+        except subprocess.TimeoutExpired:
+            build_ok = " | ⚠️ web build timeout (5min)"
+        except subprocess.CalledProcessError as exc:
+            build_ok = f" | ⚠️ web build falló: {exc.stderr or exc.stdout}"
         # Marcar estado como publicado
         try:
             conn = _get_connection()
@@ -629,7 +644,7 @@ def _generar_presentacion(fecha: str) -> str:
             commit_hash = m.group(1) if m else "commit OK"
         except subprocess.CalledProcessError as exc:
             commit_hash = f"ERROR: {exc.stderr or exc.stdout}"
-        return f"✅ Presentación generada en {bundle} {sync_ok}{estado_ok} | {commit_hash}"
+        return f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
     except Exception as e:
         return f"⚠️ Error al generar: {e}"
 
