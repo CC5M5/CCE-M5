@@ -667,6 +667,19 @@ def _slide_para_momento(tipo: str, subtipo_sugerido: str) -> Optional[Dict[str, 
     return dict(row) if row else None
 
 
+
+
+def _formatear_fecha_preview(fecha: str) -> str:
+    try:
+        from datetime import datetime
+        dt = datetime.strptime(fecha, "%Y-%m-%d")
+        meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+        return f"{dt.day} de {meses[dt.month - 1]} de {dt.year}"
+    except Exception:
+        return fecha
+
+
 def _proponer_composicion(fecha: str) -> List[Dict[str, Any]]:
     """Genera la lista de items propuestos para una fecha."""
     pres = _get_presentacion_por_fecha(fecha)
@@ -838,7 +851,8 @@ def armar_presentacion(fecha: str):
 
     content = f"""<h2>Armar presentación {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
-    <p><a href="/presentacion/{fecha}/preview" target="_blank">🔍 Previsualizar presentación</a> |
+    <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
+    <a href="/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
     <a href="/presentacion/{fecha}/generar">⚡ Generar PPTX/HTML/PDF</a></p>
     <form method="post" action="/presentacion/{fecha}/guardar">
       <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
@@ -955,13 +969,16 @@ def preview_presentacion(fecha: str):
     for item in items:
         if not item.get("activo"):
             continue
+        subtitulo = item.get("subtitulo") or ""
+        if item["tipo"] == "portada":
+            subtitulo = _formatear_fecha_preview(fecha)
         slide_data = {
             "tipo": item["tipo"],
             "subtipo": item["subtipo"],
             "titulo": item.get("titulo") or "",
             "contenido": item.get("contenido") or item.get("slide_contenido") or "",
             "cita": item.get("cita") or "",
-            "subtitulo": item.get("subtitulo") or "",
+            "subtitulo": subtitulo,
             "momento": item.get("momento") or "",
             "imagen": item.get("imagen") or item.get("slide_imagen") or "",
             "color_liturgico": color,

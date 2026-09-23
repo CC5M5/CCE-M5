@@ -84,7 +84,9 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         color_info = self._color_info(color)
         celebracion = pres.get("celebracion") or self._celebracion_from_fecha(fecha)
 
+        fecha_formateada = self._formatear_fecha(fecha)
         slides: List[Slide] = []
+        primera_portada = True
         for item in items:
             contenido = item.get("contenido") or item.get("slide_contenido") or ""
             imagen = item.get("imagen") or item.get("slide_imagen") or ""
@@ -93,6 +95,15 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
             cita = item.get("cita") or ""
             subtitulo = item.get("subtitulo") or ""
             momento = item.get("momento") or ""
+
+            # Inyectar título y fecha reales en portadas
+            if tipo == "portada":
+                if primera_portada:
+                    titulo = celebracion
+                    subtitulo = fecha_formateada
+                    primera_portada = False
+                else:
+                    subtitulo = f"Somos uno · {fecha_formateada}" if subtitulo.lower().startswith("somos uno") else subtitulo
 
             # Expandir diapositivas de paso sin contenido
             if tipo == "paso":
