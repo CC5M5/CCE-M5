@@ -512,6 +512,17 @@ def lema(filename: str):
         return send_file(LEMA_PATH)
     abort(404)
 
+@app.route("/presentaciones_html/<path:filename>")
+def presentaciones_html_file(filename: str):
+    base = PROJECT_DIR / "presentaciones_html"
+    target = (base / filename).resolve()
+    if not str(target).startswith(str(base)):
+        abort(403)
+    if target.exists() and target.is_file():
+        from flask import send_file
+        return send_file(target)
+    abort(404)
+
 
 
 
@@ -949,6 +960,25 @@ def generar_presentacion(fecha: str):
         body, status = response, 200
     body = body.replace("<main>", f'<main>\n{msg_html}')
     return body, status
+
+
+@app.route("/presentaciones_html/<path:subpath>")
+def servir_presentacion_html(subpath: str):
+    """Sirve archivos estáticos generados (HTML, PDF, PPTX, imágenes, etc.)."""
+    from flask import send_from_directory
+    base = PROJECT_DIR / "presentaciones_html"
+    file_path = base / subpath
+    if not file_path.resolve().is_relative_to(base.resolve()):
+        abort(403)
+    if not file_path.exists():
+        abort(404)
+    if file_path.is_dir():
+        # Si es directorio sin index.html, servir index.html
+        idx = file_path / "index.html"
+        if idx.exists():
+            return send_from_directory(str(file_path), "index.html")
+        abort(404)
+    return send_from_directory(str(file_path.parent), file_path.name)
 
 
 @app.route("/presentacion/<fecha>/preview")
