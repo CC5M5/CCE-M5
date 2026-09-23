@@ -76,44 +76,50 @@ export function getAllPresentacionesFechas() {
 export function getCanciones() {
   return getDb()
     .prepare(
-      `SELECT id, titulo, titulo_url, tono, momento_liturgico, temas, referencias_biblicas,
-        html_visual, letra_sin_acordes
-      FROM canciones
-      WHERE titulo IS NOT NULL AND titulo != ''
-      ORDER BY titulo COLLATE NOCASE`
+      `SELECT c.id, c.titulo, c.titulo_url, c.tono, c.momento_liturgico, c.temas, c.referencias_biblicas,
+        c.html_visual, c.letra_sin_acordes,
+        (SELECT GROUP_CONCAT(cm.momento_liturgico, ',') FROM cancion_momentos cm WHERE cm.cancion_id = c.id) as momentos
+      FROM canciones c
+      WHERE c.titulo IS NOT NULL AND c.titulo != ''
+      ORDER BY c.titulo COLLATE NOCASE`
     )
-    .all();
+    .all()
+    .map(r => ({ ...r, momentos: r.momentos ? r.momentos.split(',') : (r.momento_liturgico ? [r.momento_liturgico] : []) }));
 }
 
 export function getCancionBySlug(slug) {
   const rows = getDb()
     .prepare(
-      `SELECT id, titulo, titulo_url, tono, momento_liturgico, temas, referencias_biblicas,
-        html_visual, letra_con_acordes, letra_sin_acordes, acordes_json, estructura_json
-      FROM canciones
-      WHERE titulo IS NOT NULL AND titulo != ''`
+      `SELECT c.id, c.titulo, c.titulo_url, c.tono, c.momento_liturgico, c.temas, c.referencias_biblicas,
+        c.html_visual, c.letra_con_acordes, c.letra_sin_acordes, c.acordes_json, c.estructura_json,
+        (SELECT GROUP_CONCAT(cm.momento_liturgico, ',') FROM cancion_momentos cm WHERE cm.cancion_id = c.id) as momentos
+      FROM canciones c
+      WHERE c.titulo IS NOT NULL AND c.titulo != ''`
     )
-    .all();
+    .all()
+    .map(r => ({ ...r, momentos: r.momentos ? r.momentos.split(',') : (r.momento_liturgico ? [r.momento_liturgico] : []) }));
   return rows.find(r => slugify(r.titulo) === slug) || null;
 }
 
 export function getCancionesByMomento(momento) {
   return getDb()
     .prepare(
-      `SELECT id, titulo, titulo_url, tono, momento_liturgico, temas, referencias_biblicas, html_visual
-      FROM canciones
-      WHERE lower(momento_liturgico) = lower(?)
-      ORDER BY titulo COLLATE NOCASE`
+      `SELECT c.id, c.titulo, c.titulo_url, c.tono, c.momento_liturgico, c.temas, c.referencias_biblicas, c.html_visual,
+        (SELECT GROUP_CONCAT(cm.momento_liturgico, ',') FROM cancion_momentos cm WHERE cm.cancion_id = c.id) as momentos
+      FROM canciones c
+      JOIN cancion_momentos cm ON cm.cancion_id = c.id
+      WHERE lower(cm.momento_liturgico) = lower(?)
+      ORDER BY c.titulo COLLATE NOCASE`
     )
-    .all(momento);
+    .all(momento)
+    .map(r => ({ ...r, momentos: r.momentos ? r.momentos.split(',') : (r.momento_liturgico ? [r.momento_liturgico] : []) }));
 }
 
 export function getAllMomentos() {
   return getDb()
     .prepare(
       `SELECT DISTINCT momento_liturgico as momento
-      FROM canciones
-      WHERE momento_liturgico IS NOT NULL AND momento_liturgico != ''
+      FROM cancion_momentos
       ORDER BY momento COLLATE NOCASE`
     )
     .all()
@@ -154,9 +160,10 @@ export function getCancionesPresentacion(fecha) {
     
     const rows = getDb()
       .prepare(
-        `SELECT id, titulo, momento_liturgico, tono, html_visual
-        FROM canciones
-        WHERE id IN (${uniqueIds.map(() => '?').join(',')})`
+        `SELECT c.id, c.titulo, c.momento_liturgico, c.tono, c.html_visual,
+          (SELECT GROUP_CONCAT(cm.momento_liturgico, ',') FROM cancion_momentos cm WHERE cm.cancion_id = c.id) as momentos
+        FROM canciones c
+        WHERE c.id IN (${uniqueIds.map(() => '?').join(',')})`
       )
       .all(...uniqueIds);
     

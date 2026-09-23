@@ -102,6 +102,41 @@ def _listar_ilustraciones() -> List[str]:
     return resultado
 
 
+
+# --- Momentos litúrgicos ---
+MOMENTOS_LITURGICOS = [
+    "entrada", "acto penitencial", "gloria", "primera_lectura", "salmo",
+    "segunda_lectura", "aleluya", "evangelio", "credo", "ofertorio", "santo",
+    "padre_nuestro", "paz", "comunion", "maria", "despedida", "general"
+]
+
+
+def _get_momentos_cancion(cancion_id: int) -> List[str]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
+        (cancion_id,),
+    )
+    rows = [r["momento_liturgico"] for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def _set_momentos_cancion(cancion_id: int, momentos: List[str]) -> None:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
+    for m in momentos:
+        m = m.strip().lower()
+        if m:
+            cursor.execute(
+                "INSERT OR IGNORE INTO cancion_momentos (cancion_id, momento_liturgico) VALUES (?, ?)",
+                (cancion_id, m),
+            )
+    conn.commit()
+    conn.close()
+
 def _tipos() -> List[Dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
@@ -753,8 +788,17 @@ def _proponer_composicion(fecha: str) -> List[Dict[str, Any]]:
     canciones = _canciones_asignadas(pres.get("canciones_json"))
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, titulo, momento_liturgico FROM canciones WHERE activa = 1")
-    canciones_info = {r["id"]: {"titulo": r["titulo"], "momento": r["momento_liturgico"]} for r in cursor.fetchall()}
+    cursor.execute("""
+        SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
+        FROM canciones c
+        LEFT JOIN cancion_momentos cm ON cm.cancion_id = c.id
+        WHERE c.activa = 1
+        GROUP BY c.id
+    """)
+    canciones_info = {
+        r["id"]: {"titulo": r["titulo"], "momento": r["momentos"].split(",")[0] if r["momentos"] else r["momento_liturgico"]}
+        for r in cursor.fetchall()
+    }
     conn.close()
 
     items: List[Dict[str, Any]] = []
@@ -1101,6 +1145,87 @@ def preview_presentacion(fecha: str):
 
 
 
+
+
+
+# ------------------------------------------------------------------
+# Edición de momentos litúrgicos de canciones
+# ------------------------------------------------------------------
+
+@app.route("/cancion/<int:cancion_id>/momentos")
+def editar_momentos_cancion(cancion_id: int):
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, titulo FROM canciones WHERE id = ?", (cancion_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        abort(404)
+
+    momentos_actuales = _get_momentos_cancion(cancion_id)
+    checkboxes = "\n".join(
+        f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in momentos_actuales else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
+        for m in MOMENTOS_LITURGICOS
+    )
+
+    tipos = _tipos()
+    sidebar_parts = []
+    for t in tipos:
+        slides = _get_slides(t["id"])
+        if not slides:
+            continue
+        links = "\n".join(
+            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            for s in slides
+        )
+        sidebar_parts.append(f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+    sidebar = "\n".join(sidebar_parts)
+
+    content = f"""<h2>Momentos litúrgicos: {html_module.escape(row["titulo"])}</h2>
+    <p>Momentos actuales: <strong>{html_module.escape(", ".join(momentos_actuales).title() or "(ninguno)")}</strong></p>
+    <form method="post" action="/cancion/{cancion_id}/momentos/guardar">
+      <div style="margin-bottom:15px;">
+        {checkboxes}
+      </div>
+      <button type="submit">💾 Guardar momentos</button>
+    </form>
+    <p><a href="/">← Volver al listado de slides</a></p>
+    """
+    return _render_base(f"Momentos - {row['titulo']}", sidebar, content)
+
+
+@app.route("/cancion/<int:cancion_id>/momentos/guardar", methods=["POST"])
+def guardar_momentos_cancion(cancion_id: int):
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, titulo FROM canciones WHERE id = ?", (cancion_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        abort(404)
+
+    nuevos_momentos = request.form.getlist("momentos")
+    _set_momentos_cancion(cancion_id, nuevos_momentos)
+
+    # Actualizar campo legacy
+    momento_legacy = nuevos_momentos[0] if nuevos_momentos else ""
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE canciones SET momento_liturgico = ? WHERE id = ?", (momento_legacy, cancion_id))
+    conn.commit()
+    conn.close()
+
+    commit_result = _git_commit(f"momentos litúrgicos {row['titulo']}")
+    clase = "ok" if not commit_result.startswith("ERROR") else "err"
+    mensaje = f"Momentos guardados y commiteados ({commit_result})." if not commit_result.startswith("ERROR") else f"Guardado, falló git: {commit_result}"
+
+    response = editar_momentos_cancion(cancion_id)
+    if isinstance(response, tuple):
+        body, status = response
+    else:
+        body, status = response, 200
+    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    return body, status
 
 def main():
     host = os.environ.get("EDITOR_HOST", "0.0.0.0")
