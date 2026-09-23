@@ -85,7 +85,10 @@ def _git_commit(mensaje: str) -> str:
         m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
         return m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
-        return f"ERROR: {exc.stderr or exc.stdout}"
+        err = exc.stderr or exc.stdout or ""
+        if "nothing to commit" in err or "working tree clean" in err or "No changes" in err:
+            return "sin cambios"
+        return f"ERROR: {err}"
 
 
 def _listar_ilustraciones() -> List[str]:
@@ -1034,8 +1037,14 @@ def guardar_presentacion(fecha: str):
     conn.close()
 
     commit_result = _git_commit(f"composición presentación {fecha}")
-    mensaje = f"✅ Composición guardada y commiteada ({commit_result})." if not commit_result.startswith("ERROR") else f"⚠️ Composición guardada, falló git: {commit_result}"
-    clase = "ok" if not commit_result.startswith("ERROR") else "err"
+    mensaje_comp = f"Composición guardada y commiteada ({commit_result})." if not commit_result.startswith("ERROR") else f"Composición guardada, falló git: {commit_result}"
+
+    # Regenerar automáticamente la presentación para actualizar previsualización
+    # _generar_presentacion ya hace commit+push del bundle, no es necesario otro commit
+    gen_msg = _generar_presentacion(fecha)
+
+    mensaje = f"✅ {mensaje_comp} {gen_msg}"
+    clase = "ok" if not commit_result.startswith("ERROR") and "✅" in gen_msg else "err"
 
     response = armar_presentacion(fecha)
     if isinstance(response, tuple):
