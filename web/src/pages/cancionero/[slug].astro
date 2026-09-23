@@ -20,11 +20,13 @@ if (!cancion) {
 }
 
 const cancionSlug = slugify(cancion.titulo);
+const momentos = cancion.momentos || (cancion.momento_liturgico ? [cancion.momento_liturgico] : []);
+const momentosTexto = momentos.join(', ') || 'varios';
 ---
 
 <Layout 
   title={cancion.titulo} 
-  description={`Letra y acordes de "${cancion.titulo}". Momento: ${cancion.momento_liturgico || 'varios'}. Tono: ${cancion.tono || '-'}.`}
+  description={`Letra y acordes de "${cancion.titulo}". Momentos: ${momentosTexto}. Tono: ${cancion.tono || '-'}.`}
   canonical={`cancionero/${cancionSlug}/`}
 >
   <section class="container mx-auto px-4 py-10">
@@ -44,10 +46,19 @@ const cancionSlug = slugify(cancion.titulo);
       <hr class="border-slate-200 mb-6" />
 
       <div class="flex flex-wrap gap-4 mb-6 text-sm">
-        {cancion.momento_liturgico && (
+        {momentos.length > 0 ? (
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-slate-500">Momentos:</span>
+            {momentos.map(m => (
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-liturgia-verde/10 text-liturgia-verde">
+                {m}
+              </span>
+            ))}
+          </div>
+        ) : (
           <div>
             <span class="text-slate-500">Momento:</span>{' '}
-            <span class="font-medium">{cancion.momento_liturgico}</span>
+            <span class="font-medium">{cancion.momento_liturgico || 'Sin asignar'}</span>
           </div>
         )}
       </div>
