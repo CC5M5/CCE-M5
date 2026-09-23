@@ -28,7 +28,9 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Optional
+
 
 from flask import Flask, abort, request
 
@@ -508,6 +510,23 @@ def lema(filename: str):
 
 
 
+
+# ------------------------------------------------------------------
+# Helper para generar presentación desde composición (Fase D)
+# ------------------------------------------------------------------
+
+def _generar_presentacion(fecha: str) -> str:
+    """Genera PPTX/HTML/PDF desde presentacion_slides. Devuelve mensaje de resultado."""
+    sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
+    try:
+        from generar_desde_composicion import GeneradorDesdeComposicion
+        gen = GeneradorDesdeComposicion()
+        bundle = gen.generar_desde_presentacion(fecha)
+        return f"✅ Presentación generada en {bundle}"
+    except Exception as e:
+        return f"⚠️ Error al generar: {e}"
+
+
 # ------------------------------------------------------------------
 # FASE C: Armado de presentación semanal desde el catálogo
 # ------------------------------------------------------------------
@@ -815,7 +834,8 @@ def armar_presentacion(fecha: str):
 
     content = f"""<h2>Armar presentación {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
-    <p><a href="/presentacion/{fecha}/preview" target="_blank">🔍 Previsualizar presentación</a></p>
+    <p><a href="/presentacion/{fecha}/preview" target="_blank">🔍 Previsualizar presentación</a> |
+    <a href="/presentacion/{fecha}/generar">⚡ Generar PPTX/HTML/PDF</a></p>
     <form method="post" action="/presentacion/{fecha}/guardar">
       <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
         <thead>
@@ -889,6 +909,27 @@ def guardar_presentacion(fecha: str):
     else:
         body, status = response, 200
     body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    return body, status
+
+
+@app.route("/presentacion/<fecha>/generar")
+def generar_presentacion(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+    if not _get_presentacion_por_fecha(fecha):
+        abort(404)
+    gen_msg = _generar_presentacion(fecha)
+    commit_result = _git_commit(f"generar presentación {fecha}")
+    if commit_result.startswith("ERROR"):
+        gen_msg += f" (git falló: {commit_result})"
+    clase = "ok" if "✅" in gen_msg else "err"
+    msg_html = f'<div class="msg {clase}">{html_module.escape(gen_msg)} | {html_module.escape(commit_result)}</div>'
+    response = armar_presentacion(fecha)
+    if isinstance(response, tuple):
+        body, status = response
+    else:
+        body, status = response, 200
+    body = body.replace("<main>", f'<main>\n{msg_html}')
     return body, status
 
 
