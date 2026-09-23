@@ -507,6 +507,448 @@ def lema(filename: str):
     abort(404)
 
 
+
+# ------------------------------------------------------------------
+# FASE C: Armado de presentación semanal desde el catálogo
+# ------------------------------------------------------------------
+
+ORDEN_MOMENTOS_C: List[tuple[str, str]] = [
+    ("portada", "general"),
+    ("entrada", ""),
+    ("transicion_palabra", "general"),
+    ("perdon", ""),
+    ("paso", "neutro"),
+    ("gloria", ""),
+    ("primera_lectura", "general"),
+    ("salmo", "general"),
+    ("segunda_lectura", "general"),
+    ("aleluya", ""),
+    ("evangelio", "general"),
+    ("transicion_eucaristia", "general"),
+    ("credo", "texto_fijo"),
+    ("paso", "neutro"),
+    ("ofertorio", ""),
+    ("paso", "neutro"),
+    ("santo", ""),
+    ("paso", "neutro"),
+    ("padre_nuestro", ""),
+    ("paso", "neutro"),
+    ("paz", ""),
+    ("paso", "neutro"),
+    ("comunion", ""),
+    ("paso", "neutro"),
+    ("maria", ""),
+    ("paso", "neutro"),
+    ("despedida", ""),
+    ("portada", "despedida"),
+]
+
+MOMENTOS_MUSICALES = ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida")
+
+
+def _get_presentaciones() -> List[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT p.id, p.fecha_domingo, p.estado, l.celebracion, l.color_liturgico,
+               (SELECT COUNT(*) FROM presentacion_slides ps WHERE ps.presentacion_id = p.id AND ps.activo = 1) AS num_slides
+        FROM presentaciones p
+        LEFT JOIN lecturas l ON l.id = p.lectura_id
+        ORDER BY p.fecha_domingo DESC
+    """)
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def _get_presentacion_por_fecha(fecha: str) -> Optional[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT p.*, l.celebracion, l.color_liturgico, l.primera_lectura_texto,
+               l.salmo_texto, l.segunda_lectura_texto, l.evangelio_texto
+        FROM presentaciones p
+        LEFT JOIN lecturas l ON l.id = p.lectura_id
+        WHERE p.fecha_domingo = ?
+    """, (fecha,))
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
+    """Devuelve {momento: cancion_id} desde el JSON de la presentación."""
+    if not canciones_json:
+        return {}
+    try:
+        data = json.loads(canciones_json)
+    except Exception:
+        return {}
+    if isinstance(data, dict):
+        # formato {momento: {"id": X}}
+        resultado = {}
+        for momento, info in data.items():
+            if isinstance(info, dict) and "id" in info:
+                resultado[momento] = int(info["id"])
+            elif isinstance(info, int):
+                resultado[momento] = info
+        return resultado
+    return {}
+
+
+def _get_slide_variantes(tipo: str) -> List[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, subtipo, titulo, es_default
+        FROM slides
+        WHERE tipo = ? AND activo = 1
+        ORDER BY es_default DESC, titulo
+    """, (tipo,))
+    rows = [{"id": r["id"], "subtipo": r["subtipo"], "titulo": r["titulo"], "es_default": r["es_default"]} for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def _slide_para_momento(tipo: str, subtipo_sugerido: str) -> Optional[Dict[str, Any]]:
+    """Busca la mejor slide del catálogo para un momento dado."""
+    conn = _get_connection()
+    cursor = conn.cursor()
+    # 1. subtipo exacto y default
+    cursor.execute("""
+        SELECT * FROM slides
+        WHERE tipo = ? AND subtipo = ? AND activo = 1
+        ORDER BY es_default DESC, id
+        LIMIT 1
+    """, (tipo, subtipo_sugerido))
+    row = cursor.fetchone()
+    if not row:
+        # 2. cualquier subtipo default
+        cursor.execute("""
+            SELECT * FROM slides
+            WHERE tipo = ? AND es_default = 1 AND activo = 1
+            ORDER BY id
+            LIMIT 1
+        """, (tipo,))
+        row = cursor.fetchone()
+    if not row:
+        # 3. cualquier slide activa del tipo
+        cursor.execute("""
+            SELECT * FROM slides
+            WHERE tipo = ? AND activo = 1
+            ORDER BY id
+            LIMIT 1
+        """, (tipo,))
+        row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def _proponer_composicion(fecha: str) -> List[Dict[str, Any]]:
+    """Genera la lista de items propuestos para una fecha."""
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        return []
+    canciones = _canciones_asignadas(pres.get("canciones_json"))
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, titulo, momento_liturgico FROM canciones WHERE activa = 1")
+    canciones_info = {r["id"]: {"titulo": r["titulo"], "momento": r["momento_liturgico"]} for r in cursor.fetchall()}
+    conn.close()
+
+    items: List[Dict[str, Any]] = []
+    numero = 1
+    for tipo, subtipo_default in ORDEN_MOMENTOS_C:
+        if tipo == "paso":
+            items.append({
+                "numero": numero,
+                "tipo": "paso",
+                "subtipo": f"paso_{subtipo_default}",
+                "titulo": "",
+                "slide_id": None,
+                "activo": 1,
+                "_es_paso": True,
+            })
+            numero += 1
+            continue
+
+        subtipo = subtipo_default
+        if tipo in MOMENTOS_MUSICALES and tipo in canciones:
+            cancion_id = canciones[tipo]
+            # Si existe variante específica de esa canción, preferirla
+            slide_pref = _slide_para_momento(tipo, f"cancion_{cancion_id}")
+            if slide_pref:
+                subtipo = f"cancion_{cancion_id}"
+            else:
+                slide_pref = _slide_para_momento(tipo, subtipo_default)
+        else:
+            slide_pref = _slide_para_momento(tipo, subtipo_default)
+
+        if not slide_pref:
+            items.append({
+                "numero": numero,
+                "tipo": tipo,
+                "subtipo": subtipo,
+                "titulo": f"[FALTA: {tipo}]",
+                "slide_id": None,
+                "activo": 1,
+                "_es_paso": False,
+            })
+        else:
+            items.append({
+                "numero": numero,
+                "tipo": tipo,
+                "subtipo": slide_pref["subtipo"],
+                "titulo": slide_pref["titulo"],
+                "slide_id": slide_pref["id"],
+                "activo": 1,
+                "_es_paso": False,
+            })
+        numero += 1
+    return items
+
+
+def _get_composicion_guardada(fecha: str) -> List[Dict[str, Any]]:
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        return []
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT ps.*, s.contenido AS slide_contenido, s.imagen AS slide_imagen, s.color_liturgico AS slide_color
+        FROM presentacion_slides ps
+        LEFT JOIN slides s ON s.id = ps.slide_id
+        WHERE ps.presentacion_id = ? AND ps.activo = 1
+        ORDER BY ps.numero
+    """, (pres["id"],))
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+@app.route("/presentaciones/")
+def listar_presentaciones():
+    tipos = _tipos()
+    sidebar_parts = []
+    for t in tipos:
+        slides = _get_slides(t["id"])
+        if not slides:
+            continue
+        links = "\n".join(
+            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            for s in slides
+        )
+        sidebar_parts.append(f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+    sidebar = "\n".join(sidebar_parts)
+
+    pres = _get_presentaciones()
+    filas = "\n".join(
+        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{html_module.escape(p["estado"] or "-")}</td></tr>'
+        for p in pres
+    )
+    content = f"""<h2>Presentaciones semanales</h2>
+    <p>Selecciona una fecha para armar la composición de diapositivas desde el catálogo.</p>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Fecha</th><th>Celebración</th><th>Color</th><th>Slides</th><th>Estado</th></tr>
+      </thead>
+      <tbody>{filas}</tbody>
+    </table>"""
+    return _render_base("Presentaciones", sidebar, content)
+
+
+@app.route("/presentacion/<fecha>/armar")
+def armar_presentacion(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        abort(404)
+
+    # Preferir composición guardada; si no, proponer
+    composicion = _get_composicion_guardada(fecha)
+    if not composicion:
+        composicion = _proponer_composicion(fecha)
+
+    # Cargar variantes para cada tipo usado
+    variantes_cache: Dict[str, List[Dict[str, Any]]] = {}
+    def variantes_para(tipo: str) -> List[Dict[str, Any]]:
+        if tipo not in variantes_cache:
+            variantes_cache[tipo] = _get_slide_variantes(tipo)
+        return variantes_cache[tipo]
+
+    tipos = _tipos()
+    sidebar_parts = []
+    for t in tipos:
+        slides = _get_slides(t["id"])
+        if not slides:
+            continue
+        links = "\n".join(
+            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            for s in slides
+        )
+        sidebar_parts.append(f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+    sidebar = "\n".join(sidebar_parts)
+
+    filas = []
+    for item in composicion:
+        variantes = variantes_para(item["tipo"])
+        opts = "\n".join(
+            f'<option value="{html_module.escape(v["subtipo"])}" {"selected" if v["subtipo"] == item["subtipo"] else ""}>'
+            f'{html_module.escape(v["titulo"])} ({html_module.escape(v["subtipo"])}{" ★" if v["es_default"] else ""})</option>'
+            for v in variantes
+        )
+        filas.append(f"""
+        <tr data-idx="{item["numero"]}">
+          <td>{item["numero"]}</td>
+          <td>{html_module.escape(item["tipo"])}</td>
+          <td>
+            <input type="hidden" name="tipos" value="{html_module.escape(item["tipo"])}">
+            <input type="hidden" name="nums" value="{item["numero"]}">
+            <select name="subtipos">{opts}</select>
+          </td>
+          <td>{html_module.escape(item["titulo"])}</td>
+          <td><input type="checkbox" name="activos" value="{item["numero"]}" {"checked" if item["activo"] else ""}></td>
+        </tr>
+        """)
+
+    content = f"""<h2>Armar presentación {fecha}</h2>
+    <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
+    <p><a href="/presentacion/{fecha}/preview" target="_blank">🔍 Previsualizar presentación</a></p>
+    <form method="post" action="/presentacion/{fecha}/guardar">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
+        <thead>
+          <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Nº</th><th>Tipo</th><th>Variante</th><th>Título</th><th>Activo</th></tr>
+        </thead>
+        <tbody>{"\n".join(filas)}</tbody>
+      </table>
+      <button type="submit">💾 Guardar composición y commitear</button>
+    </form>
+    <p><small>Consejo: para añadir o quitar diapositivas de paso, edita la secuencia desde el catálogo.</small></p>"""
+    return _render_base(f"Armar {fecha}", sidebar, content)
+
+
+@app.route("/presentacion/<fecha>/guardar", methods=["POST"])
+def guardar_presentacion(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        abort(404)
+
+    tipos = request.form.getlist("tipos")
+    nums = request.form.getlist("nums")
+    subtipos = request.form.getlist("subtipos")
+    activos_raw = set(int(x) for x in request.form.getlist("activos"))
+
+    # Construir items en orden recibido
+    items: List[Dict[str, Any]] = []
+    for i, tipo in enumerate(tipos):
+        numero = int(nums[i]) if i < len(nums) else i + 1
+        subtipo = subtipos[i] if i < len(subtipos) else "general"
+        activo = 1 if numero in activos_raw else 0
+        slide = _slide_para_momento(tipo, subtipo)
+        items.append({
+            "numero": i + 1,
+            "tipo": tipo,
+            "subtipo": subtipo,
+            "titulo": slide["titulo"] if slide else f"[FALTA: {tipo}]",
+            "slide_id": slide["id"] if slide else None,
+            "activo": activo,
+        })
+
+    conn = _get_connection()
+    cursor = conn.cursor()
+    # Borrar composición anterior
+    cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
+    # Insertar nueva
+    for item in items:
+        cursor.execute("""
+            INSERT INTO presentacion_slides (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
+            SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
+            FROM slides s
+            WHERE s.id = ?
+        """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["activo"], item["slide_id"]))
+        if cursor.rowcount == 0:
+            # Slide no encontrada: insertar item sin slide_id
+            cursor.execute("""
+                INSERT INTO presentacion_slides (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
+                VALUES (?, NULL, ?, ?, ?, ?, '', ?)
+            """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["titulo"], item["activo"]))
+    conn.commit()
+    conn.close()
+
+    commit_result = _git_commit(f"composición presentación {fecha}")
+    mensaje = f"✅ Composición guardada y commiteada ({commit_result})." if not commit_result.startswith("ERROR") else f"⚠️ Composición guardada, falló git: {commit_result}"
+    clase = "ok" if not commit_result.startswith("ERROR") else "err"
+
+    response = armar_presentacion(fecha)
+    if isinstance(response, tuple):
+        body, status = response
+    else:
+        body, status = response, 200
+    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    return body, status
+
+
+@app.route("/presentacion/<fecha>/preview")
+def preview_presentacion(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        abort(404)
+    color = pres.get("color_liturgico") or "verde"
+
+    items = _get_composicion_guardada(fecha)
+    if not items:
+        items = _proponer_composicion(fecha)
+
+    previews = []
+    numero_real = 1
+    for item in items:
+        if not item.get("activo"):
+            continue
+        slide_data = {
+            "tipo": item["tipo"],
+            "subtipo": item["subtipo"],
+            "titulo": item.get("titulo") or "",
+            "contenido": item.get("contenido") or item.get("slide_contenido") or "",
+            "cita": item.get("cita") or "",
+            "subtitulo": item.get("subtitulo") or "",
+            "momento": item.get("momento") or "",
+            "imagen": item.get("imagen") or item.get("slide_imagen") or "",
+            "color_liturgico": color,
+        }
+        # Expandir divisiones
+        partes = re.split(r"(?m)^\s*---\s*DIAPOSITIVA\s*---\s*$", slide_data["contenido"])
+        partes = [p.strip() for p in partes if p.strip()] or [""]
+        for idx, parte in enumerate(partes):
+            sd = dict(slide_data)
+            sd["contenido"] = parte
+            if len(partes) > 1:
+                sd["titulo"] = f"{sd['titulo']} ({idx + 1}/{len(partes)})"
+            previews.append(f'<div style="color:#aaa;font-size:12px;margin:8px 0 4px">Slide {numero_real}</div>{_render_preview(sd)}')
+            numero_real += 1
+
+    html = f"""<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><title>Preview {fecha}</title>
+    <style>
+      body {{ background:#111; color:#fff; font-family:system-ui; padding:20px; }}
+      .preview {{ display:flex; flex-direction:column; align-items:center; gap:10px; }}
+      .preview-frame {{ width:640px; height:480px; }}
+    </style>
+    </head><body>
+    <h1>Preview {fecha}</h1>
+    <p>{html_module.escape(pres.get("celebracion") or "")} | Color: {html_module.escape(color)}</p>
+    <div class="preview">{"\n".join(previews)}</div>
+    </body></html>"""
+    return html
+
+
+
+
 def main():
     host = os.environ.get("EDITOR_HOST", "0.0.0.0")
     port = int(os.environ.get("EDITOR_PORT", "4323"))
