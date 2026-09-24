@@ -292,11 +292,18 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
     .msg {{ padding: 12px; border-radius: 8px; margin-bottom: 15px; }}
     .msg.ok {{ background: #d1fae5; color: #065f46; }}
     .msg.err {{ background: #fee2e2; color: #991b1b; }}
-    .miniaturas {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; max-height: 200px; overflow: auto; padding: 8px; border: 1px solid #eee; border-radius: 8px; }}
-    .miniaturas label {{ display: flex; flex-direction: column; align-items: center; cursor: pointer; margin: 0; }}
-    .miniaturas img {{ width: 70px; height: 70px; object-fit: contain; border-radius: 6px; border: 2px solid transparent; }}
+    .miniaturas {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; max-height: 360px; overflow: auto; padding: 10px; border: 1px solid #eee; border-radius: 8px; }}
+    .miniaturas label {{ display: flex; flex-direction: column; align-items: center; cursor: pointer; margin: 0; padding: 6px; border-radius: 8px; position: relative; }}
+    .miniaturas label:hover {{ background: #f3f0ff; }}
+    .miniaturas img {{ width: 100px; height: 100px; object-fit: contain; border-radius: 8px; border: 2px solid transparent; background: #f8f8f8; }}
     .miniaturas input {{ display: none; }}
-    .miniaturas input:checked + img {{ border-color: var(--accent); }}
+    .miniaturas input:checked + img {{ border-color: var(--accent); background: #ede9fe; }}
+    .miniaturas small {{ font-size: 10px; color: #666; text-align: center; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+    .miniaturas label:hover small {{ white-space: normal; overflow: visible; position: absolute; bottom: 2px; left: 2px; right: 2px; background: rgba(255,255,255,0.95); padding: 3px; border-radius: 4px; z-index: 10; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }}
+    .filtros-imagenes {{ display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }}
+    .filtros-imagenes button {{ margin: 0; padding: 6px 12px; font-size: 13px; background: #e2e8f0; color: #334155; }}
+    .filtros-imagenes button.active {{ background: var(--accent); color: #fff; }}
+    .buscador-imagenes {{ width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }}
     .toolbar {{ display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }}
     @media (max-width: 1100px) {{
       .container {{ grid-template-columns: 1fr; }}
@@ -376,14 +383,25 @@ def editar(id: int):
 
     ilustraciones = _listar_ilustraciones()
     imagen_actual = slide.get("imagen") or ""
-    miniaturas = "\n".join(
-        f"""<label>
+    # Agrupar por artista para los filtros
+    artistas = sorted(set(Path(img).parts[0] for img in ilustraciones))
+    botones_filtro = " ".join(
+        f'<button type="button" class="{html_module.escape(a)}" data-filtro="{html_module.escape(a)}" onclick="filtrarImagenes(this.dataset.filtro)">{html_module.escape(a.upper())}</button>'
+        for a in artistas
+    )
+    botones_filtro = f'<button type="button" class="active" data-filtro="todos" onclick="filtrarImagenes(this.dataset.filtro)">TODOS</button>' + botones_filtro
+
+    def _miniatura(img: str) -> str:
+        artista = html_module.escape(Path(img).parts[0])
+        nombre = html_module.escape(Path(img).stem[:22])
+        nombre_completo = html_module.escape(Path(img).name)
+        return f"""<label data-artista="{artista}" data-nombre="{html_module.escape(Path(img).name.lower())}">
           <input type="radio" name="imagen" value="{html_module.escape(img)}" {"checked" if img == imagen_actual else ""}>
           <img src="/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
-          <small>{html_module.escape(Path(img).stem[:18])}</small>
+          <small title="{nombre_completo}">{nombre}</small>
         </label>"""
-        for img in ilustraciones[:60]
-    )
+
+    miniaturas = "\n".join(_miniatura(img) for img in ilustraciones)
 
     preview = _render_preview(slide)
 
@@ -419,6 +437,8 @@ def editar(id: int):
           </div>
 
           <label>Imagen</label>
+          <div class="filtros-imagenes">{botones_filtro}</div>
+          <input type="text" class="buscador-imagenes" placeholder="Buscar ilustración..." oninput="buscarImagenes(this.value)">
           <div class="miniaturas">{miniaturas}</div>
 
           <label>Notas internas</label>
@@ -446,6 +466,25 @@ def editar(id: int):
         ta.value = text.substring(0, start) + '--- DIAPOSITIVA ---' + text.substring(end);
         ta.focus();
         ta.setSelectionRange(start + '--- DIAPOSITIVA ---'.length, start + '--- DIAPOSITIVA ---'.length);
+      }}
+      function filtrarImagenes(filtro) {{
+        document.querySelectorAll('.filtros-imagenes button').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        const labels = document.querySelectorAll('.miniaturas label');
+        labels.forEach(lbl => {{
+          const artista = lbl.dataset.artista || '';
+          lbl.style.display = (filtro === 'todos' || artista === filtro) ? 'flex' : 'none';
+        }});
+      }}
+      function buscarImagenes(texto) {{
+        const q = texto.toLowerCase();
+        const labels = document.querySelectorAll('.miniaturas label');
+        labels.forEach(lbl => {{
+          const nombre = lbl.dataset.nombre || '';
+          const artista = lbl.dataset.artista || '';
+          const visible = q === '' || nombre.includes(q) || artista.toLowerCase().includes(q);
+          lbl.style.display = visible ? 'flex' : 'none';
+        }});
       }}
     </script>"""
     return _render_base(slide.get("titulo") or "Diapositiva", sidebar, content)
@@ -706,8 +745,11 @@ def _get_presentacion_por_fecha(fecha: str) -> Optional[Dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT p.*, l.celebracion, l.color_liturgico, l.primera_lectura_texto,
-               l.salmo_texto, l.segunda_lectura_texto, l.evangelio_texto
+        SELECT p.*, l.celebracion, l.color_liturgico,
+               l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
+               l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
+               l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
+               l.evangelio_libro, l.evangelio_cita, l.evangelio_texto
         FROM presentaciones p
         LEFT JOIN lecturas l ON l.id = p.lectura_id
         WHERE p.fecha_domingo = ?

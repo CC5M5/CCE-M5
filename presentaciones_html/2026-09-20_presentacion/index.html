@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;600;700&display=swap');
-    
+
     :root {
       --liturgia-from: #e8f5e9;
       --liturgia-to: #c8e6c9;
@@ -17,22 +17,22 @@
       --morado: #7C3AED;
       --blanco-tarjeta: rgba(255,255,255,0.94);
     }
-    
+
     .reveal {
       font-family: 'Nunito', 'Open Sans', sans-serif;
-      font-size: 31px;
+      font-size: 26px;
       color: #2c3e50;
     }
-    
+
     .reveal .slides {
       text-align: left;
     }
-    
+
     .reveal .slides section {
       padding: 0;
       background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
     }
-    
+
     .slide-wrapper {
       width: 100%;
       height: 100%;
@@ -44,7 +44,7 @@
       overflow: hidden;
       box-sizing: border-box;
     }
-    
+
     .reveal .slides section::before {
       content: '';
       position: absolute;
@@ -55,7 +55,7 @@
       background: linear-gradient(90deg, var(--liturgia-acento), var(--oro), var(--liturgia-acento));
       z-index: 20;
     }
-    
+
     .reveal h1, .reveal h2, .reveal h3 {
       font-family: 'Fredoka', 'Montserrat', sans-serif;
       color: var(--liturgia-acento);
@@ -65,30 +65,30 @@
       font-weight: 600;
       letter-spacing: -0.01em;
     }
-    
-    .reveal h1 { font-size: 1.55em; }
-    .reveal h2 { font-size: 1.15em; font-weight: 400; text-transform: none; color: #555; }
-    .reveal h3 { font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
-    
+
+    .reveal h1 { font-size: 1.35em; }
+    .reveal h2 { font-size: 0.95em; font-weight: 400; text-transform: none; color: #555; }
+    .reveal h3 { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
     .reveal p, .reveal li {
-      line-height: 1.55;
+      line-height: 1.5;
       margin-bottom: 0.5em;
     }
-    
+
     .reveal .tarjeta {
       background: var(--blanco-tarjeta);
       border-radius: 24px;
-      padding: 38px 48px;
-      margin: 45px 60px;
+      padding: 24px 32px;
+      margin: 30px 40px 80px 40px;
       box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(124, 58, 237, 0.12);
-      max-height: 82%;
+      max-height: 76%;
       overflow: auto;
       position: relative;
       z-index: 5;
     }
-    
+
     .reveal .tarjeta::after {
       content: '';
       position: absolute;
@@ -99,7 +99,7 @@
       background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
       border-radius: 0 0 24px 24px;
     }
-    
+
     .reveal .cita {
       font-size: 0.85em;
       font-weight: 700;
@@ -110,15 +110,15 @@
       color: white;
       border-radius: 8px;
     }
-    
+
     .reveal .contenido {
       white-space: pre-wrap;
       max-height: none;
       overflow: visible;
-      font-size: 0.92em;
-      line-height: 1.5;
+      font-size: 0.85em;
+      line-height: 1.25;
     }
-    
+
     .reveal .logo-lema {
       position: absolute;
       bottom: 22px;
@@ -129,69 +129,69 @@
       z-index: 10;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
-    
+
     .reveal .ilustracion {
       position: absolute;
       top: auto;
       bottom: 90px;
-      right: 80px;
-      max-width: 320px;
-      max-height: 320px;
+      right: 70px;
+      max-width: 280px;
+      max-height: 280px;
       opacity: 0.98;
       z-index: 6;
       border-radius: 20px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.12);
       object-fit: contain;
     }
-    
+
     section:has(.ilustracion) .tarjeta {
-      margin-right: 380px;
+      margin-right: 320px;
     }
-    
+
     .reveal .portada .slide-wrapper {
       text-align: center;
       justify-content: center;
       align-items: center;
       background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 40%, #7C3AED 70%, var(--oro) 100%);
     }
-    
+
     .reveal .portada .tarjeta {
       background: rgba(255,255,255,0.96);
-      max-width: 900px;
+      max-width: 760px;
       margin: 0 auto;
       text-align: center;
     }
-    
+
     .reveal .portada h1 {
       text-align: center;
-      font-size: 2em;
+      font-size: 1.8em;
       margin-top: 0;
     }
-    
+
     .reveal .portada h2 {
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1.1em;
       color: #555;
       text-transform: none;
       font-weight: 400;
       margin-top: 0.5em;
     }
-    
+
     .reveal .portada .ilustracion {
       position: relative;
       top: auto;
       right: auto;
       bottom: auto;
-      max-width: 380px;
-      max-height: 380px;
+      max-width: 320px;
+      max-height: 320px;
       margin: 0 auto 1em;
     }
-    
+
     .reveal .transicion .slide-wrapper {
       justify-content: center;
       align-items: center;
     }
-    
+
     .reveal .transicion .tarjeta {
       text-align: center;
       display: flex;
@@ -200,37 +200,37 @@
       align-items: center;
       min-height: 55%;
     }
-    
+
     .reveal .transicion h1 {
       text-align: center;
-      font-size: 2.2em;
+      font-size: 2.0em;
       letter-spacing: 0.04em;
     }
-    
+
     .reveal .cancion .tarjeta {
       background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,255,0.96) 100%);
     }
-    
+
     .reveal .cancion .contenido {
-      font-size: 0.92em;
-      line-height: 1.3;
+      font-size: 0.88em;
+      line-height: 1.25;
     }
-    
+
     .reveal .cancion .contenido br {
       display: block;
       content: "";
-      margin-bottom: 0.1em;
+      margin-bottom: 0.05em;
     }
-    
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     .reveal .slides section.present {
       animation: fadeInUp 0.5s ease-out;
     }
-    
+
     .reveal .contenido::-webkit-scrollbar {
       width: 6px;
     }
@@ -238,7 +238,7 @@
       background: var(--liturgia-acento);
       border-radius: 3px;
     }
-    
+
     @media print {
       .reveal .slides section {
         page-break-after: always;
@@ -253,12 +253,13 @@
         right: 30px;
       }
       .slide-wrapper:has(.ilustracion) .tarjeta {
-        margin-right: 380px;
+        margin-right: 340px;
       }
       .reveal .tarjeta {
         margin: 30px 40px;
       }
-    }  </style>
+    }
+  </style>
 </head>
 <body>
   <div class="reveal">
@@ -267,14 +268,14 @@
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
-  <h1>XXV DOMINGO DEL TIEMPO ORDINARIO</h1>
+  <h1>XXV Domingo del Tiempo Ordinario</h1>
   <h2>20 de septiembre de 2026</h2>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
 </section>
 
-<section class="entrada" data-transition="fade">
+<section class="entrada cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -293,6 +294,17 @@ preparad los caminos de Dios,
 desterrad la mentira por siempre,
 
 preparad los caminos de Dios(Bis)</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="transicion_palabra" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140961.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>LITURGIA DE LA PALABRA</h1>
+  <div class="contenido">Escuchemos la Palabra de Dios</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
@@ -328,7 +340,17 @@ que intercedáis por mí ante Dios, nuestro Señor.</div>
   </div>
 </section>
 
-<section class="gloria" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="gloria cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -342,23 +364,12 @@ Te damos gracias, Señor Dios, Rey celestial.</div>
   </div>
 </section>
 
-<section class="transicion_palabra" data-transition="fade">
-  <div class="slide-wrapper">
-    <img class="ilustracion" src="assets/20140961.jpg" alt="ilustración">
-    <div class="tarjeta">
-  <h1>LITURGIA DE LA PALABRA</h1>
-  <div class="contenido">Escuchemos la Palabra de Dios</div>
-    </div>
-    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
-  </div>
-</section>
-
 <section class="primera_lectura" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
   <h1>PRIMERA LECTURA</h1>
-  <div class="cita">55, 6-9</div>
+  <div class="cita">Isaías 55, 6-9</div>
   <div class="contenido">Buscad al Señor mientras se le encuentra, invocadlo mientras esté cerca; que el malvado abandone su camino, y el criminal sus planes; que regrese al Señor, y él tendrá piedad; a nuestro Dios, que es rico en perdón. Mis planes no son vuestros planes, vuestros caminos no son mis caminos –oráculo del Señor–. Como el cielo es más alto que la tierra, mis caminos son más altos que los vuestros, mis planes que vuestros planes.</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
@@ -370,10 +381,8 @@ Te damos gracias, Señor Dios, Rey celestial.</div>
     <img class="ilustracion" src="assets/20140962.jpg" alt="ilustración">
     <div class="tarjeta">
   <h1>SALMO RESPONSORIAL</h1>
-  <div class="cita">Sal 144</div>
-  <div class="contenido">Antífona: Cerca está el Señor de los que lo invocan
-
-Día tras día, te bendeciré, Dios mío
+  <div class="cita">Sal 144 — Cerca está el Señor de los que lo invocan</div>
+  <div class="contenido">Día tras día, te bendeciré, Dios mío
 
 y alabaré tu nombre por siempre jamás.
 
@@ -399,7 +408,19 @@ de los que lo invocan sinceramente.</div>
   </div>
 </section>
 
-<section class="aleluya" data-transition="fade">
+<section class="segunda_lectura" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140960.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>SEGUNDA LECTURA</h1>
+  <div class="cita">Filipenses 1,20c-24.27a</div>
+  <div class="contenido">Cristo será glorificado en mi cuerpo, sea por mi vida o por mi muerte. Para mí la vida es Cristo, y una ganancia el morir. Pero, si el vivir esta vida mortal me supone trabajo fructífero, no sé qué escoger. Me encuentro en ese dilema: por un lado, deseo partir para estar con Cristo, que es con mucho lo mejor; pero, por otro, quedarme en esta vida veo que es más necesario para vosotros. Lo importante es que vosotros llevéis una vida digna del Evangelio de Cristo.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="aleluya cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -410,13 +431,14 @@ de los que lo invocan sinceramente.</div>
   </div>
 </section>
 
-<section class="segunda_lectura" data-transition="fade">
+<section class="evangelio" data-transition="fade">
   <div class="slide-wrapper">
-    <img class="ilustracion" src="assets/20140960.jpg" alt="ilustración">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
-  <h1>SEGUNDA LECTURA</h1>
-  <div class="cita">1,20c-24.27a</div>
-  <div class="contenido">Cristo será glorificado en mi cuerpo, sea por mi vida o por mi muerte. Para mí la vida es Cristo, y una ganancia el morir. Pero, si el vivir esta vida mortal me supone trabajo fructífero, no sé qué escoger. Me encuentro en ese dilema: por un lado, deseo partir para estar con Cristo, que es con mucho lo mejor; pero, por otro, quedarme en esta vida veo que es más necesario para vosotros. Lo importante es que vosotros llevéis una vida digna del Evangelio de Cristo.</div>
+  <h1>EVANGELIO</h1>
+  <div class="cita">Mateo 20,1-16</div>
+  <div class="contenido">En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «El Reino de los Cielos se parece a un propietario que al amanecer salió a contratar jornaleros para su viña. Después de ajustarse con ellos en un denario por jornada, los mandó a la viña. Salió otra vez a media mañana, vio a otros que estaban en la plaza sin trabajo, y les dijo: «Id también vosotros a mi viña, y os pagaré lo debido.» Ellos fueron. Salió de nuevo hacia mediodía y a media tarde e hizo lo mismo. Salió al caer la tarde y encontró a otros, parados, y les dijo: «¿Cómo es que estáis aquí el día entero sin trabajar?» Le respondieron: «Nadie nos ha contratado.» Él les dijo: «Id también vosotros a mi viña.» Cuando oscureció, el dueño de la viña dijo al capataz: «Llama a los jornaleros y págales el jornal, empezando por los últimos y acabando por los primeros.» Vinieron los del atardecer y recibieron un denario cada uno. Cuando llegaron los primeros, pensaban que recibirían más, pero ellos también recibieron un denario cada uno. Entonces se pusieron a protestar contra el amo: «Estos últimos han trabajado sólo una hora, y los has tratado igual que a nosotros, que hemos aguantado el peso del día y el bochorno.» Él replicó a uno de ellos: «Amigo, no te hago ninguna injusticia. ¿No nos ajustamos en un denario? Toma lo tuyo y vete. Quiero darle a este último igual que a ti. ¿Es que no tengo libertad para hacer lo que quiera en mis asuntos? ¿O vas a tener tú envidia porque yo soy bueno?» Así, los últimos serán los primeros y los primeros los últimos.»
+Palabra del Señor</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
@@ -426,21 +448,10 @@ de los que lo invocan sinceramente.</div>
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
-  <h1>EVANGELIO (1/2)</h1>
-  <div class="cita">20,1-16</div>
-  <div class="contenido">En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «El Reino de los Cielos se parece a un propietario que al amanecer salió a contratar jornaleros para su viña. Después de ajustarse con ellos en un denario por jornada, los mandó a la viña. Salió otra vez a media mañana, vio a otros que estaban en la plaza sin trabajo, y les dijo: «Id también vosotros a mi viña, y os pagaré lo debido.» Ellos fueron. Salió de nuevo hacia mediodía y a media tarde e hizo lo mismo. Salió al caer la tarde y encontró a otros, parados, y les dijo: «¿Cómo es que estáis aquí el día entero sin trabajar?» Le respondieron: «Nadie nos ha contratado.» Él les dijo: «Id también vosotros a mi viña.» Cuando oscureció, el dueño de la viña dijo al capataz: «Llama a los jornaleros y págales el jornal, empezando por los últimos y acabando por los primeros.» Vinieron los del atardecer y recibieron un denario cada uno. Cuando llegaron los primeros, pensaban que recibirían más, pero ellos también recibieron un denario cada uno.</div>
-    </div>
-    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
-  </div>
-</section>
-
-<section class="evangelio" data-transition="fade">
-  <div class="slide-wrapper">
-    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
-    <div class="tarjeta">
-  <h1>EVANGELIO (2/2)</h1>
-  <div class="cita">20,1-16</div>
-  <div class="contenido">Entonces se pusieron a protestar contra el amo: «Estos últimos han trabajado sólo una hora, y los has tratado igual que a nosotros, que hemos aguantado el peso del día y el bochorno.» Él replicó a uno de ellos: «Amigo, no te hago ninguna injusticia. ¿No nos ajustamos en un denario? Toma lo tuyo y vete. Quiero darle a este último igual que a ti. ¿Es que no tengo libertad para hacer lo que quiera en mis asuntos? ¿O vas a tener tú envidia porque yo soy bueno?» Así, los últimos serán los primeros y los primeros los últimos.» Palabra del Señor</div>
+  <h1>EVANGELIO</h1>
+  <div class="cita">Mateo 20,1-16</div>
+  <div class="contenido">En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «El Reino de los Cielos se parece a un propietario que al amanecer salió a contratar jornaleros para su viña. Después de ajustarse con ellos en un denario por jornada, los mandó a la viña. Salió otra vez a media mañana, vio a otros que estaban en la plaza sin trabajo, y les dijo: «Id también vosotros a mi viña, y os pagaré lo debido.» Ellos fueron. Salió de nuevo hacia mediodía y a media tarde e hizo lo mismo. Salió al caer la tarde y encontró a otros, parados, y les dijo: «¿Cómo es que estáis aquí el día entero sin trabajar?» Le respondieron: «Nadie nos ha contratado.» Él les dijo: «Id también vosotros a mi viña.» Cuando oscureció, el dueño de la viña dijo al capataz: «Llama a los jornaleros y págales el jornal, empezando por los últimos y acabando por los primeros.» Vinieron los del atardecer y recibieron un denario cada uno. Cuando llegaron los primeros, pensaban que recibirían más, pero ellos también recibieron un denario cada uno. Entonces se pusieron a protestar contra el amo: «Estos últimos han trabajado sólo una hora, y los has tratado igual que a nosotros, que hemos aguantado el peso del día y el bochorno.» Él replicó a uno de ellos: «Amigo, no te hago ninguna injusticia. ¿No nos ajustamos en un denario? Toma lo tuyo y vete. Quiero darle a este último igual que a ti. ¿Es que no tengo libertad para hacer lo que quiera en mis asuntos? ¿O vas a tener tú envidia porque yo soy bueno?» Así, los últimos serán los primeros y los primeros los últimos.»
+Palabra del Señor</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
@@ -471,7 +482,17 @@ Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los sant
   </div>
 </section>
 
-<section class="ofertorio" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="ofertorio cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -523,7 +544,17 @@ Amén, amén, que sea así siempre Señor.</div>
   </div>
 </section>
 
-<section class="santo" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="santo cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -539,7 +570,17 @@ Hosanna en el cielo.</div>
   </div>
 </section>
 
-<section class="padre_nuestro" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="padre_nuestro cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140955.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -559,7 +600,17 @@ y líbranos del mal.</div>
   </div>
 </section>
 
-<section class="paz" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paz cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140958.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -578,7 +629,17 @@ La paz del Señor esté siempre con vosotros.</div>
   </div>
 </section>
 
-<section class="comunion" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="comunion cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -618,7 +679,17 @@ cuando Tú moras en él.</div>
   </div>
 </section>
 
-<section class="maria" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="maria cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/virgen_fatima.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -637,7 +708,17 @@ ahora y en la hora de nuestra muerte. Amén.</div>
   </div>
 </section>
 
-<section class="despedida" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="despedida cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -653,6 +734,7 @@ Sólo la sed nos alumbra, sólo la sed nos alumbra.</div>
 
     </div>
   </div>
+  <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno" style="display:none;">
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
   <script>
     Reveal.initialize({
@@ -660,7 +742,7 @@ Sólo la sed nos alumbra, sólo la sed nos alumbra.</div>
       slideNumber: 'c/t',
       transition: 'slide',
       width: 1280,
-      height: 720,
+      height: 960,
       center: true,
       margin: 0.04,
       minScale: 0.2,

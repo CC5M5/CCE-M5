@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;600;700&display=swap');
-    
+
     :root {
       --liturgia-from: #e8f5e9;
       --liturgia-to: #c8e6c9;
@@ -17,22 +17,22 @@
       --morado: #7C3AED;
       --blanco-tarjeta: rgba(255,255,255,0.94);
     }
-    
+
     .reveal {
       font-family: 'Nunito', 'Open Sans', sans-serif;
-      font-size: 31px;
+      font-size: 26px;
       color: #2c3e50;
     }
-    
+
     .reveal .slides {
       text-align: left;
     }
-    
+
     .reveal .slides section {
       padding: 0;
       background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
     }
-    
+
     .slide-wrapper {
       width: 100%;
       height: 100%;
@@ -44,7 +44,7 @@
       overflow: hidden;
       box-sizing: border-box;
     }
-    
+
     .reveal .slides section::before {
       content: '';
       position: absolute;
@@ -55,7 +55,7 @@
       background: linear-gradient(90deg, var(--liturgia-acento), var(--oro), var(--liturgia-acento));
       z-index: 20;
     }
-    
+
     .reveal h1, .reveal h2, .reveal h3 {
       font-family: 'Fredoka', 'Montserrat', sans-serif;
       color: var(--liturgia-acento);
@@ -65,30 +65,30 @@
       font-weight: 600;
       letter-spacing: -0.01em;
     }
-    
-    .reveal h1 { font-size: 1.55em; }
-    .reveal h2 { font-size: 1.15em; font-weight: 400; text-transform: none; color: #555; }
-    .reveal h3 { font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
-    
+
+    .reveal h1 { font-size: 1.35em; }
+    .reveal h2 { font-size: 0.95em; font-weight: 400; text-transform: none; color: #555; }
+    .reveal h3 { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
     .reveal p, .reveal li {
-      line-height: 1.55;
+      line-height: 1.5;
       margin-bottom: 0.5em;
     }
-    
+
     .reveal .tarjeta {
       background: var(--blanco-tarjeta);
       border-radius: 24px;
-      padding: 38px 48px;
-      margin: 45px 60px;
+      padding: 24px 32px;
+      margin: 30px 40px 80px 40px;
       box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(124, 58, 237, 0.12);
-      max-height: 82%;
+      max-height: 76%;
       overflow: auto;
       position: relative;
       z-index: 5;
     }
-    
+
     .reveal .tarjeta::after {
       content: '';
       position: absolute;
@@ -99,7 +99,7 @@
       background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
       border-radius: 0 0 24px 24px;
     }
-    
+
     .reveal .cita {
       font-size: 0.85em;
       font-weight: 700;
@@ -110,15 +110,15 @@
       color: white;
       border-radius: 8px;
     }
-    
+
     .reveal .contenido {
       white-space: pre-wrap;
       max-height: none;
       overflow: visible;
-      font-size: 0.92em;
-      line-height: 1.5;
+      font-size: 0.85em;
+      line-height: 1.25;
     }
-    
+
     .reveal .logo-lema {
       position: absolute;
       bottom: 22px;
@@ -129,69 +129,69 @@
       z-index: 10;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
     }
-    
+
     .reveal .ilustracion {
       position: absolute;
       top: auto;
       bottom: 90px;
-      right: 80px;
-      max-width: 320px;
-      max-height: 320px;
+      right: 70px;
+      max-width: 280px;
+      max-height: 280px;
       opacity: 0.98;
       z-index: 6;
       border-radius: 20px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.12);
       object-fit: contain;
     }
-    
+
     section:has(.ilustracion) .tarjeta {
-      margin-right: 380px;
+      margin-right: 320px;
     }
-    
+
     .reveal .portada .slide-wrapper {
       text-align: center;
       justify-content: center;
       align-items: center;
       background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 40%, #7C3AED 70%, var(--oro) 100%);
     }
-    
+
     .reveal .portada .tarjeta {
       background: rgba(255,255,255,0.96);
-      max-width: 900px;
+      max-width: 760px;
       margin: 0 auto;
       text-align: center;
     }
-    
+
     .reveal .portada h1 {
       text-align: center;
-      font-size: 2em;
+      font-size: 1.8em;
       margin-top: 0;
     }
-    
+
     .reveal .portada h2 {
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1.1em;
       color: #555;
       text-transform: none;
       font-weight: 400;
       margin-top: 0.5em;
     }
-    
+
     .reveal .portada .ilustracion {
       position: relative;
       top: auto;
       right: auto;
       bottom: auto;
-      max-width: 380px;
-      max-height: 380px;
+      max-width: 320px;
+      max-height: 320px;
       margin: 0 auto 1em;
     }
-    
+
     .reveal .transicion .slide-wrapper {
       justify-content: center;
       align-items: center;
     }
-    
+
     .reveal .transicion .tarjeta {
       text-align: center;
       display: flex;
@@ -200,37 +200,37 @@
       align-items: center;
       min-height: 55%;
     }
-    
+
     .reveal .transicion h1 {
       text-align: center;
-      font-size: 2.2em;
+      font-size: 2.0em;
       letter-spacing: 0.04em;
     }
-    
+
     .reveal .cancion .tarjeta {
       background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,255,0.96) 100%);
     }
-    
+
     .reveal .cancion .contenido {
-      font-size: 0.92em;
-      line-height: 1.3;
+      font-size: 0.88em;
+      line-height: 1.25;
     }
-    
+
     .reveal .cancion .contenido br {
       display: block;
       content: "";
-      margin-bottom: 0.1em;
+      margin-bottom: 0.05em;
     }
-    
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     .reveal .slides section.present {
       animation: fadeInUp 0.5s ease-out;
     }
-    
+
     .reveal .contenido::-webkit-scrollbar {
       width: 6px;
     }
@@ -238,7 +238,7 @@
       background: var(--liturgia-acento);
       border-radius: 3px;
     }
-    
+
     @media print {
       .reveal .slides section {
         page-break-after: always;
@@ -253,12 +253,13 @@
         right: 30px;
       }
       .slide-wrapper:has(.ilustracion) .tarjeta {
-        margin-right: 380px;
+        margin-right: 340px;
       }
       .reveal .tarjeta {
         margin: 30px 40px;
       }
-    }  </style>
+    }
+  </style>
 </head>
 <body>
   <div class="reveal">
@@ -267,14 +268,14 @@
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
-  <h1>DOMINGO XXIV DEL TIEMPO ORDINARIO</h1>
+  <h1>Domingo XXIV del Tiempo Ordinario</h1>
   <h2>13 de septiembre de 2026</h2>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
 </section>
 
-<section class="entrada" data-transition="fade">
+<section class="entrada cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -293,6 +294,17 @@ preparad los caminos de Dios,
 desterrad la mentira por siempre,
 
 preparad los caminos de Dios(Bis)</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="transicion_palabra" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140961.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>LITURGIA DE LA PALABRA</h1>
+  <div class="contenido">Escuchemos la Palabra de Dios</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
@@ -328,7 +340,17 @@ que intercedáis por mí ante Dios, nuestro Señor.</div>
   </div>
 </section>
 
-<section class="gloria" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="gloria cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -342,23 +364,12 @@ Te damos gracias, Señor Dios, Rey celestial.</div>
   </div>
 </section>
 
-<section class="transicion_palabra" data-transition="fade">
-  <div class="slide-wrapper">
-    <img class="ilustracion" src="assets/20140961.jpg" alt="ilustración">
-    <div class="tarjeta">
-  <h1>LITURGIA DE LA PALABRA</h1>
-  <div class="contenido">Escuchemos la Palabra de Dios</div>
-    </div>
-    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
-  </div>
-</section>
-
 <section class="primera_lectura" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
   <h1>PRIMERA LECTURA</h1>
-  <div class="cita">Gn 1, 1-10</div>
+  <div class="cita">Génesis Gn 1, 1-10</div>
   <div class="contenido">En el principio creó Dios el cielo y la tierra...</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
@@ -370,21 +381,8 @@ Te damos gracias, Señor Dios, Rey celestial.</div>
     <img class="ilustracion" src="assets/20140962.jpg" alt="ilustración">
     <div class="tarjeta">
   <h1>SALMO RESPONSORIAL</h1>
-  <div class="cita">Sal 23 (24)</div>
-  <div class="contenido">Antífona: El Señor es mi pastor.
-
-El Señor es mi pastor, nada me falta...</div>
-    </div>
-    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
-  </div>
-</section>
-
-<section class="aleluya" data-transition="fade">
-  <div class="slide-wrapper">
-    <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
-    <div class="tarjeta">
-  <h1>ALELUYA</h1>
-  <div class="contenido">Mt 5, 1-12</div>
+  <div class="cita">Sal 23 (24) — El Señor es mi pastor.</div>
+  <div class="contenido">El Señor es mi pastor, nada me falta...</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
@@ -395,8 +393,19 @@ El Señor es mi pastor, nada me falta...</div>
     <img class="ilustracion" src="assets/20140960.jpg" alt="ilustración">
     <div class="tarjeta">
   <h1>SEGUNDA LECTURA</h1>
-  <div class="cita">Fil 4, 4-9</div>
+  <div class="cita">Filipenses Fil 4, 4-9</div>
   <div class="contenido">Estad siempre alegres en el Señor...</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="aleluya cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ALELUYA</h1>
+  <div class="contenido">Mt 5, 1-12</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
   </div>
@@ -407,7 +416,7 @@ El Señor es mi pastor, nada me falta...</div>
     <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
     <div class="tarjeta">
   <h1>EVANGELIO</h1>
-  <div class="cita">Mt 5, 1-12</div>
+  <div class="cita">Mateo Mt 5, 1-12</div>
   <div class="contenido">Viendo Jesús a la multitud, subió al monte...</div>
     </div>
     <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
@@ -439,7 +448,17 @@ Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los sant
   </div>
 </section>
 
-<section class="ofertorio" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="ofertorio cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -485,7 +504,17 @@ la fuerza de la juventud para hacer su ganancia</div>
   </div>
 </section>
 
-<section class="santo" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="santo cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -501,7 +530,17 @@ Hosanna en el cielo.</div>
   </div>
 </section>
 
-<section class="padre_nuestro" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="padre_nuestro cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140955.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -521,7 +560,17 @@ y líbranos del mal.</div>
   </div>
 </section>
 
-<section class="paz" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paz cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140958.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -540,7 +589,17 @@ La paz del Señor esté siempre con vosotros.</div>
   </div>
 </section>
 
-<section class="comunion" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="comunion cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -592,7 +651,17 @@ Aleluya, Amén</div>
   </div>
 </section>
 
-<section class="maria" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="maria cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/virgen_fatima.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -611,7 +680,17 @@ ahora y en la hora de nuestra muerte. Amén.</div>
   </div>
 </section>
 
-<section class="despedida" data-transition="fade">
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/comunidad_oracion.svg" alt="ilustración">
+    <div class="tarjeta">
+  <h1></h1>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="despedida cancion" data-transition="fade">
   <div class="slide-wrapper">
     <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
     <div class="tarjeta">
@@ -637,6 +716,7 @@ preparad los caminos de Dios(Bis)</div>
 
     </div>
   </div>
+  <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno" style="display:none;">
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
   <script>
     Reveal.initialize({
@@ -644,7 +724,7 @@ preparad los caminos de Dios(Bis)</div>
       slideNumber: 'c/t',
       transition: 'slide',
       width: 1280,
-      height: 720,
+      height: 960,
       center: true,
       margin: 0.04,
       minScale: 0.2,
