@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-09-25T01:50:01.765518"
+    "generado": "2026-09-25T01:55:21.369568"
   },
   "slides": [
     {
@@ -132,11 +132,11 @@
       "numero": 13,
       "tipo": "credo",
       "titulo": "CREDO",
-      "contenido": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\nDesde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
+      "contenido": "Creo en Dios, Padre todopoderoso, \r\ncreador del cielo y de la tierra.\r\nCreo en Jesucristo, su único Hijo, nuestro Señor, \r\nque fue concebido por obra y gracia del Espíritu Santo; \r\nnació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; \r\nfue crucificado, muerto y sepultado; descendió a los infiernos; \r\nal tercer día resucitó de entre los muertos; \r\nsubió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\r\nDesde allí ha de venir a juzgar a vivos y muertos.\r\nCreo en el Espíritu Santo, la santa Iglesia católica, \r\nla comunión de los santos, el perdón de los pecados, \r\nla resurrección de la carne y la vida eterna. Amén.",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140957.jpg"
+      "imagen": "fano/20140954.jpg"
     },
     {
       "numero": 14,
