@@ -97,11 +97,96 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                 return cita
             if not cita:
                 return libro
-            # Evitar duplicar "Salmo" si la cita ya lo incluye
+            # Mapa de libros a abreviaturas comunes en citas litúrgicas
+            abreviaturas = {
+                "génesis": ["gn"],
+                "éxodo": ["ex"],
+                "levítico": ["lv"],
+                "números": ["nm"],
+                "deuteronomio": ["dt"],
+                "josúe": ["jos"],
+                "jueces": ["jue"],
+                "rut": ["rut"],
+                "1 samuel": ["1 s"],
+                "2 samuel": ["2 s"],
+                "1 reyes": ["1 r"],
+                "2 reyes": ["2 r"],
+                "1 crónicas": ["1 cr"],
+                "2 crónicas": ["2 cr"],
+                "esdras": ["esd"],
+                "nehemías": ["neh"],
+                "tobías": ["tb"],
+                "judit": ["jdt"],
+                "ester": ["est"],
+                "job": ["job"],
+                "salmo": ["sal"],
+                "salmos": ["sal"],
+                "proverbios": ["prv"],
+                "eclesiastés": ["eccl"],
+                "cantar de los cantares": ["cant"],
+                "sabiduría": ["sab"],
+                "sirácida": ["sir", "eclesiástico"],
+                "isaías": ["is"],
+                "jeremías": ["jer"],
+                "lamentaciones": ["lam"],
+                "baruc": ["bar"],
+                "ezequiel": ["ez"],
+                "daniel": ["dn"],
+                "oseas": ["os"],
+                "joel": ["jl"],
+                "amos": ["am"],
+                "abdías": ["abd"],
+                "jonás": ["jon"],
+                "miqueas": ["miq"],
+                "nahúm": ["nah"],
+                "habacuc": ["hab"],
+                "sofonías": ["sof"],
+                "ageo": ["ag"],
+                "zacarías": ["zac"],
+                "malaquías": ["mal"],
+                "1 macabeos": ["1 mc"],
+                "2 macabeos": ["2 mc"],
+                "mateo": ["mt"],
+                "marcos": ["mc"],
+                "lucas": ["lc"],
+                "juan": ["jn"],
+                "hechos": ["hch"],
+                "romanos": ["rom"],
+                "1 corintios": ["1 cor"],
+                "2 corintios": ["2 cor"],
+                "gálatas": ["gal"],
+                "efesios": ["ef"],
+                "filipenses": ["fil"],
+                "colosenses": ["col"],
+                "1 tesalonicenses": ["1 tes"],
+                "2 tesalonicenses": ["2 tes"],
+                "1 timoteo": ["1 tm"],
+                "2 timoteo": ["2 tm"],
+                "tito": ["tit"],
+                "filemón": ["flm"],
+                "hebreos": ["heb"],
+                "santiago": ["snt"],
+                "1 pedro": ["1 p"],
+                "2 pedro": ["2 p"],
+                "1 juan": ["1 jn"],
+                "2 juan": ["2 jn"],
+                "3 juan": ["3 jn"],
+                "judas": ["jud"],
+                "apocalipsis": ["ap"],
+            }
             libro_lower = libro.lower()
-            cita_lower = cita.lower()
-            if libro_lower in cita_lower or cita_lower.startswith("sal ") or cita_lower.startswith("salmo "):
+            # si la cita ya empieza por el libro completo, devolver cita
+            if cita.lower().startswith(libro_lower):
                 return cita
+            # si la cita empieza por alguna abreviatura del libro, devolver cita
+            abrevs = abreviaturas.get(libro_lower, [])
+            cita_first = cita.split()[0].lower().rstrip(",")
+            if cita_first in [a.lower().rstrip(",") for a in abrevs]:
+                return cita
+            if libro_lower in abreviaturas:
+                for abr in abrevs:
+                    if cita.lower().startswith(abr.lower()):
+                        return cita
             return f"{libro} {cita}"
 
         def _cita_salmo(libro: str, cita: str, antifona: Optional[str]) -> str:
