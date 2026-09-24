@@ -58,10 +58,10 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         cursor = conn.cursor()
         cursor.execute("""
             SELECT p.*, l.celebracion, l.color_liturgico,
-                   l.primera_lectura_cita, l.primera_lectura_texto,
-                   l.salmo_cita, l.salmo_antifona, l.salmo_texto,
-                   l.segunda_lectura_cita, l.segunda_lectura_texto,
-                   l.evangelio_cita, l.evangelio_texto
+                   l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
+                   l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
+                   l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
+                   l.evangelio_libro, l.evangelio_cita, l.evangelio_texto
             FROM presentaciones p
             LEFT JOIN lecturas l ON l.id = p.lectura_id
             WHERE p.fecha_domingo = ?
@@ -90,26 +90,46 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
 
         fecha_formateada = self._formatear_fecha(fecha)
 
+        def _cita_con_libro(libro: str, cita: str) -> str:
+            libro = (libro or "").strip()
+            cita = (cita or "").strip()
+            if not libro:
+                return cita
+            if not cita:
+                return libro
+            # Evitar duplicar "Salmo" si la cita ya lo incluye
+            libro_lower = libro.lower()
+            cita_lower = cita.lower()
+            if libro_lower in cita_lower or cita_lower.startswith("sal ") or cita_lower.startswith("salmo "):
+                return cita
+            return f"{libro} {cita}"
+
+        def _cita_salmo(libro: str, cita: str, antifona: Optional[str]) -> str:
+            cita = _cita_con_libro(libro, cita)
+            if antifona:
+                return f"{cita} — {antifona}"
+            return cita
+
         lecturas_data = {
             "primera_lectura": {
                 "titulo": "PRIMERA LECTURA",
                 "contenido": pres.get("primera_lectura_texto") or "",
-                "cita": pres.get("primera_lectura_cita") or "",
+                "cita": _cita_con_libro(pres.get("primera_lectura_libro"), pres.get("primera_lectura_cita")),
             },
             "salmo": {
                 "titulo": "SALMO RESPONSORIAL",
                 "contenido": pres.get("salmo_texto") or "",
-                "cita": f"{pres.get('salmo_cita') or ''}{(' — ' + pres.get('salmo_antifona')) if pres.get('salmo_antifona') else ''}",
+                "cita": _cita_salmo(pres.get("salmo_libro"), pres.get("salmo_cita"), pres.get("salmo_antifona")),
             },
             "segunda_lectura": {
                 "titulo": "SEGUNDA LECTURA",
                 "contenido": pres.get("segunda_lectura_texto") or "",
-                "cita": pres.get("segunda_lectura_cita") or "",
+                "cita": _cita_con_libro(pres.get("segunda_lectura_libro"), pres.get("segunda_lectura_cita")),
             },
             "evangelio": {
                 "titulo": "EVANGELIO",
                 "contenido": pres.get("evangelio_texto") or "",
-                "cita": pres.get("evangelio_cita") or "",
+                "cita": _cita_con_libro(pres.get("evangelio_libro"), pres.get("evangelio_cita")),
             },
         }
 
