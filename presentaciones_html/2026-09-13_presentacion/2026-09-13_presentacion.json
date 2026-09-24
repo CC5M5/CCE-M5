@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-09-25T01:28:49.251099"
+    "generado": "2026-09-25T01:32:24.884034"
   },
   "slides": [
     {
@@ -83,7 +83,7 @@
       "tipo": "primera_lectura",
       "titulo": "PRIMERA LECTURA",
       "contenido": "En el principio creó Dios el cielo y la tierra...",
-      "cita": "Génesis Gn 1, 1-10",
+      "cita": "Gn 1, 1-10",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/fano_25_domingo_vina.jpg"
@@ -103,7 +103,7 @@
       "tipo": "segunda_lectura",
       "titulo": "SEGUNDA LECTURA",
       "contenido": "Estad siempre alegres en el Señor...",
-      "cita": "Filipenses Fil 4, 4-9",
+      "cita": "Fil 4, 4-9",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/20140960.jpg"
@@ -123,7 +123,7 @@
       "tipo": "evangelio",
       "titulo": "EVANGELIO",
       "contenido": "Viendo Jesús a la multitud, subió al monte...",
-      "cita": "Mateo Mt 5, 1-12",
+      "cita": "Mt 5, 1-12",
       "subtitulo": "",
       "momento": "",
       "imagen": "assets/fano_25_domingo_vina.jpg"
