@@ -35,9 +35,36 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 }
 FECHA_CODIGO_RE = re.compile(r'^\d{8}$')
+# Libros bíblicos reconocidos (suficiente para lecturas dominicales)
+LIBROS_BIBLICOS = {
+    # Antiguo Testamento
+    'genesis', 'exodo', 'exodus', 'levitico', 'numeros', 'deuteronomio',
+    'josue', 'jueces', 'rut', '1 samuel', '2 samuel', '1 reyes', '2 reyes',
+    '1 cronicas', '2 cronicas', 'esdras', 'nehemias', 'tobias', 'judit',
+    'ester', 'job', 'salmos', 'salmo', 'proverbios', 'eclesiastes',
+    'cantar', 'sabiduria', 'siracida', 'eclesiastico', 'isaias', 'jeremias',
+    'lamentaciones', 'baruc', 'ezequiel', 'daniel', 'oseas', 'joel',
+    'amos', 'abdias', 'jonas', 'miqueas', 'nahum', 'habacuc', 'sofonias',
+    'ageo', 'zacarias', 'malaquias', '1 macabeos', '2 macabeos',
+    # Nuevo Testamento
+    'mateo', 'marcos', 'lucas', 'juan', 'hechos', 'romanos', '1 corintios',
+    '2 corintios', 'galatas', 'efesios', 'filipenses', 'colosenses',
+    '1 tesalonicenses', '2 tesalonicenses', '1 timoteo', '2 timoteo',
+    'tito', 'filemon', 'hebreos', 'santiago', '1 pedro', '2 pedro',
+    '1 juan', '2 juan', '3 juan', 'judas', 'apocalipsis',
+    # Abreviaturas comunes
+    'gn', 'ex', 'lv', 'nm', 'dt', 'jos', 'jue', 'rz', '1 s', '2 s', '1 r', '2 r',
+    '1 cr', '2 cr', 'esd', 'neh', 'tb', 'jdt', 'est', 'job', 'sal', 'prv', 'eccl',
+    'cant', 'sab', 'sir', 'is', 'jer', 'lam', 'bar', 'ez', 'dn', 'os', 'jl', 'am',
+    'abd', 'jon', 'miq', 'nah', 'hab', 'sof', 'ag', 'zac', 'mal', '1 mc', '2 mc',
+    'mt', 'mc', 'lc', 'jn', 'hch', 'rom', '1 cor', '2 cor', 'gal', 'ef', 'fil',
+    'col', '1 tes', '2 tes', '1 tm', '2 tm', 'tit', 'flm', 'heb', 'snt', '1 p',
+    '2 p', '1 jn', '2 jn', '3 jn', 'jud', 'ap',
+}
+
 CITA_RE = re.compile(
     r'(?:\d+(?:\.\s*\d+(?:\s*,\s*\d+[-–]\d+)?)?\s+)?'
-    r'[A-Z][a-zA-Z]{0,3}\s*\d+(?:,\s*\d+[-–]\d+|\.\s*\d+(?:,\s*\d+)?)?'
+    r'[A-ZÁÉÍÓÚÑa-záéíóúñ][a-zA-ZÁÉÍÓÚÑáéíóúñ.]{1,15}\s*\d+(?:,\s*\d+[-–]\d+|\.\s*\d+(?:,\s*\d+)?)?'
 )
 
 
@@ -118,22 +145,26 @@ class KoinoniaParser:
         primera = self._extraer_seccion(soup, ['primera lectura', 'lectura del día'])
         if primera:
             resultado['primera_lectura_cita'] = primera.get('cita')
+            resultado['primera_lectura_libro'] = primera.get('libro')
             resultado['primera_lectura_texto'] = primera.get('texto')
 
         salmo = self._extraer_seccion(soup, ['salmo', 'salmo responsorial'])
         if salmo:
             resultado['salmo_cita'] = salmo.get('cita')
+            resultado['salmo_libro'] = salmo.get('libro')
             resultado['salmo_antifona'] = salmo.get('antifona')
             resultado['salmo_texto'] = salmo.get('texto')
 
         segunda = self._extraer_seccion(soup, ['segunda lectura'])
         if segunda:
             resultado['segunda_lectura_cita'] = segunda.get('cita')
+            resultado['segunda_lectura_libro'] = segunda.get('libro')
             resultado['segunda_lectura_texto'] = segunda.get('texto')
 
         evangelio = self._extraer_seccion(soup, ['evangelio', 'lectura del evangelio'])
         if evangelio:
             resultado['evangelio_cita'] = evangelio.get('cita')
+            resultado['evangelio_libro'] = evangelio.get('libro')
             resultado['evangelio_texto'] = evangelio.get('texto')
 
         resultado.update(self._detectar_temporada(soup, resultado.get('celebracion', '')))
@@ -147,18 +178,67 @@ class KoinoniaParser:
             texto = tag.get_text(strip=True).lower()
             if any(titulo.lower() in texto for titulo in posibles_titulos):
                 siguiente = tag.find_next_sibling()
-                if siguiente:
-                    return {
-                        'cita': self._extraer_cita(tag),
-                        'texto': siguiente.get_text(strip=True),
-                    }
+                if not siguiente:
+                    continue
+                texto_completo = tag.get_text(strip=True)
+                # Buscar cita completa incluyendo libro en el título
+                cita_info = self._extraer_cita_y_libro(texto_completo)
+                if not cita_info['cita']:
+                    # Buscar en los primeros 200 caracteres del texto
+                    texto_siguiente = siguiente.get_text(strip=True)[:300]
+                    cita_info = self._extraer_cita_y_libro(texto_siguiente)
+                # Para el salmo, intentar extraer antifona
+                ant = self._extraer_antifona(siguiente.get_text(strip=True)) if 'salmo' in texto else None
+                return {
+                    'cita': cita_info.get('cita'),
+                    'libro': cita_info.get('libro'),
+                    'texto': siguiente.get_text(strip=True),
+                    'antifona': ant,
+                }
         return None
 
-    def _extraer_cita(self, tag: Tag) -> Optional[str]:
-        """Extrae la cita biblica real del titulo usando regex."""
-        texto = tag.get_text(strip=True)
+    def _extraer_cita_y_libro(self, texto: str) -> dict:
+        """Extrae la cita bíblica y el libro del texto."""
         match = CITA_RE.search(texto)
-        return match.group(0) if match else None
+        if not match:
+            return {'cita': None, 'libro': None}
+        cita_completa = match.group(0).strip()
+        # Intentar separar libro del resto
+        libro = self._extraer_libro(cita_completa)
+        cita = cita_completa
+        if libro:
+            # quitar el libro de la cita para no repetir
+            cita = cita_completa[len(libro):].strip()
+        return {'cita': cita, 'libro': libro}
+
+    def _extraer_libro(self, texto: str) -> Optional[str]:
+        """Identifica el nombre del libro bíblico al inicio de la cita."""
+        texto_limpio = texto.strip()
+        # Normalizar espacios
+        texto_limpio = re.sub(r'\s+', ' ', texto_limpio)
+        # Probar con prefijos numéricos (1 Reyes, 2 Corintios, etc.)
+        for pref in ['1 ', '2 ', '3 ']:
+            if texto_limpio.startswith(pref):
+                resto = texto_limpio[2:]
+                palabra = resto.split()[0] if resto.split() else ''
+                candidato = (pref.strip() + ' ' + palabra).lower()
+                if candidato in LIBROS_BIBLICOS:
+                    return pref.strip() + ' ' + palabra
+        # Probar primera palabra
+        palabras = texto_limpio.split()
+        if palabras:
+            primera = palabras[0].lower().rstrip('.')
+            if primera in LIBROS_BIBLICOS:
+                return palabras[0]
+        return None
+
+    def _extraer_antifona(self, texto: str) -> Optional[str]:
+        """Extrae la antífona del salmo si aparece entre comillas o marcada."""
+        # Buscar texto entre comillas al inicio
+        m = re.match(r'^[^"]*"([^"]+)"', texto)
+        if m:
+            return m.group(1).strip()
+        return None
 
     def _detectar_temporada(self, soup: BeautifulSoup, celebracion: str) -> dict:
         """Detecta la temporada liturgica de forma precisa."""
@@ -218,13 +298,17 @@ class KoinoniaRepository:
                         temporada TEXT NOT NULL,
                         ciclo TEXT,
                         color_liturgico TEXT NOT NULL,
+                        primera_lectura_libro TEXT,
                         primera_lectura_cita TEXT,
                         primera_lectura_texto TEXT,
+                        salmo_libro TEXT,
                         salmo_cita TEXT,
                         salmo_antifona TEXT,
                         salmo_texto TEXT,
+                        segunda_lectura_libro TEXT,
                         segunda_lectura_cita TEXT,
                         segunda_lectura_texto TEXT,
+                        evangelio_libro TEXT,
                         evangelio_cita TEXT,
                         evangelio_texto TEXT,
                         fuente_scraping TEXT DEFAULT 'koinonia',
@@ -235,24 +319,28 @@ class KoinoniaRepository:
                 cursor.execute('''
                     INSERT INTO lecturas
                     (fecha, domingo, temporada, ciclo, color_liturgico,
-                     primera_lectura_cita, primera_lectura_texto,
-                     salmo_cita, salmo_antifona, salmo_texto,
-                     segunda_lectura_cita, segunda_lectura_texto,
-                     evangelio_cita, evangelio_texto,
+                     primera_lectura_libro, primera_lectura_cita, primera_lectura_texto,
+                     salmo_libro, salmo_cita, salmo_antifona, salmo_texto,
+                     segunda_lectura_libro, segunda_lectura_cita, segunda_lectura_texto,
+                     evangelio_libro, evangelio_cita, evangelio_texto,
                      fuente_scraping)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(fecha) DO UPDATE SET
                         domingo = excluded.domingo,
                         temporada = excluded.temporada,
                         ciclo = excluded.ciclo,
                         color_liturgico = excluded.color_liturgico,
+                        primera_lectura_libro = excluded.primera_lectura_libro,
                         primera_lectura_cita = excluded.primera_lectura_cita,
                         primera_lectura_texto = excluded.primera_lectura_texto,
+                        salmo_libro = excluded.salmo_libro,
                         salmo_cita = excluded.salmo_cita,
                         salmo_antifona = excluded.salmo_antifona,
                         salmo_texto = excluded.salmo_texto,
+                        segunda_lectura_libro = excluded.segunda_lectura_libro,
                         segunda_lectura_cita = excluded.segunda_lectura_cita,
                         segunda_lectura_texto = excluded.segunda_lectura_texto,
+                        evangelio_libro = excluded.evangelio_libro,
                         evangelio_cita = excluded.evangelio_cita,
                         evangelio_texto = excluded.evangelio_texto,
                         fuente_scraping = excluded.fuente_scraping
@@ -262,13 +350,17 @@ class KoinoniaRepository:
                     lecturas.get('temporada', ''),
                     lecturas.get('ciclo', ''),
                     lecturas.get('color_liturgico', 'verde'),
+                    lecturas.get('primera_lectura_libro', ''),
                     lecturas.get('primera_lectura_cita', ''),
                     lecturas.get('primera_lectura_texto', ''),
+                    lecturas.get('salmo_libro', ''),
                     lecturas.get('salmo_cita', ''),
                     lecturas.get('salmo_antifona', ''),
                     lecturas.get('salmo_texto', ''),
+                    lecturas.get('segunda_lectura_libro', ''),
                     lecturas.get('segunda_lectura_cita', ''),
                     lecturas.get('segunda_lectura_texto', ''),
+                    lecturas.get('evangelio_libro', ''),
                     lecturas.get('evangelio_cita', ''),
                     lecturas.get('evangelio_texto', ''),
                     'koinonia',
