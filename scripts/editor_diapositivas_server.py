@@ -604,11 +604,52 @@ def presentaciones_html_file(filename: str):
 
 
 # ------------------------------------------------------------------
+# Helper para reconstruir composicion desde canciones asignadas
+# ------------------------------------------------------------------
+
+def _reconstruir_composicion_desde_canciones(fecha: str) -> str:
+    """Borra la composicion guardada y la reconstruye desde canciones_json."""
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        return f"No existe presentacion para {fecha}"
+    items = _proponer_composicion(fecha)
+    if not items:
+        return "No se pudo proponer composicion"
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
+    for item in items:
+        slide_id = item.get("slide_id")
+        if slide_id:
+            cursor.execute("""
+                INSERT INTO presentacion_slides
+                (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
+                SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
+                FROM slides s
+                WHERE s.id = ?
+            """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["activo"], slide_id))
+            if cursor.rowcount == 0:
+                slide_id = None
+        if not slide_id:
+            cursor.execute("""
+                INSERT INTO presentacion_slides
+                (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
+                VALUES (?, NULL, ?, ?, ?, ?, '', ?)
+            """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["titulo"], item["activo"]))
+    conn.commit()
+    conn.close()
+    return f"Composicion reconstruida ({len(items)} items)"
+
+# ------------------------------------------------------------------
 # Helper para generar presentación desde composición (Fase D)
 # ------------------------------------------------------------------
 
 def _generar_presentacion(fecha: str) -> str:
     """Genera PPTX/HTML/PDF desde presentacion_slides y sincroniza con la web."""
+    try:
+        reconstruccion = _reconstruir_composicion_desde_canciones(fecha)
+    except Exception as e:
+        reconstruccion = f"⚠️ reconstruccion fallo: {e}"
     sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
     try:
         from generar_desde_composicion import GeneradorDesdeComposicion
@@ -852,7 +893,6 @@ def _proponer_composicion(fecha: str) -> List[Dict[str, Any]]:
         SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
         FROM canciones c
         LEFT JOIN cancion_momentos cm ON cm.cancion_id = c.id
-        WHERE c.activa = 1
         GROUP BY c.id
     """)
     canciones_info = {
