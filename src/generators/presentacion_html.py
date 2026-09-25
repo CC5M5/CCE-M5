@@ -822,8 +822,22 @@ class GeneradorPresentacionHTML:
       color: #2c3e50;
     }}
 
+    .reveal {{
+      aspect-ratio: 4 / 3;
+      max-width: 100vw;
+      max-height: 100vh;
+      margin: auto;
+    }}
+
     .reveal .slides {{
       text-align: left;
+      aspect-ratio: 4 / 3;
+    }}
+
+    .reveal .slides section {{
+      aspect-ratio: 4 / 3;
+      width: 100%;
+      height: 100%;
     }}
 
     .reveal .slides section {{
