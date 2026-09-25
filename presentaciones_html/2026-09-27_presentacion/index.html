@@ -84,6 +84,12 @@
     .reveal h2 { font-size: 0.95em; font-weight: 400; text-transform: none; color: #555; }
     .reveal h3 { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
 
+    .reveal .lectura .tarjeta {
+      max-width: 82%;
+      margin: 30px auto 80px auto;
+      max-height: 78%;
+    }
+
     .reveal p, .reveal li {
       line-height: 1.5;
       margin-bottom: 0.5em;
@@ -234,6 +240,17 @@
       display: block;
       content: "";
       margin-bottom: 0.05em;
+    }
+
+    .reveal .salmo .contenido {
+      font-size: 0.95em;
+      line-height: 1.18;
+    }
+
+    .reveal .salmo .contenido br {
+      display: block;
+      content: "";
+      margin-bottom: 0.02em;
     }
 
     @keyframes fadeInUp {
@@ -804,23 +821,28 @@ Viene la alegría para ti y para mí
       maxScale: 2.0,
     });
 
-    // Ajustar tamaño de fuente de la tarjeta para llenar la diapositiva
+    // Ajustar tamaño de fuente de la tarjeta para llenar la diapositiva sin cortar
     function ajustarTexto(slide) {
       const tarjeta = slide.querySelector('.tarjeta');
       if (!tarjeta) return;
       const ilustracion = slide.querySelector('.ilustracion');
       const wrapper = slide.querySelector('.slide-wrapper');
-      let fontSize = 48; // tamaño base grande
+      let fontSize = 48;
       tarjeta.style.fontSize = fontSize + 'px';
+      const bottomReserve = 110;
       const maxWidth = ilustracion ? wrapper.clientWidth - 380 : wrapper.clientWidth - 80;
-      const maxHeight = wrapper.clientHeight - 120;
-      // Reducir hasta que quepa
+      const maxHeight = wrapper.clientHeight - bottomReserve;
       while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > 14) {
-        fontSize -= 1;
+        fontSize -= 0.5;
         tarjeta.style.fontSize = fontSize + 'px';
       }
+      if (slide.classList.contains('lectura')) {
+        while (tarjeta.scrollHeight > maxHeight && fontSize > 20) {
+          fontSize -= 0.5;
+          tarjeta.style.fontSize = fontSize + 'px';
+        }
+      }
     }
-
     Reveal.on('ready', event => ajustarTexto(event.currentSlide));
     Reveal.on('slidechanged', event => {
       ajustarTexto(event.currentSlide);
