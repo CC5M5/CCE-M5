@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-09-25T02:05:46.454887"
+    "generado": "2026-09-25T08:03:05.426737"
   },
   "slides": [
     {
@@ -54,9 +54,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 6,
@@ -66,7 +66,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+      "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
     },
     {
       "numero": 7,
@@ -76,7 +76,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+      "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
     },
     {
       "numero": 8,
@@ -116,7 +116,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
+      "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
     },
     {
       "numero": 12,
@@ -146,7 +146,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/20140954.jpg"
+      "imagen": "assets/20140954.jpg"
     },
     {
       "numero": 15,
@@ -154,9 +154,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 16,
@@ -166,7 +166,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140880_dadles_vosotros_de_comer.jpg"
+      "imagen": "assets/fano_20140880_dadles_vosotros_de_comer.jpg"
     },
     {
       "numero": 17,
@@ -174,9 +174,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 18,
@@ -186,7 +186,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140883_el_pan_que_os_daré_es_mi_propio_cuerpo.jpg"
+      "imagen": "assets/fano_20140883_el_pan_que_os_daré_es_mi_propio_cuerpo.jpg"
     },
     {
       "numero": 19,
@@ -194,9 +194,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 20,
@@ -214,9 +214,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 22,
@@ -226,7 +226,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
+      "imagen": "assets/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
     },
     {
       "numero": 23,
@@ -234,9 +234,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 24,
@@ -246,7 +246,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+      "imagen": "assets/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
     },
     {
       "numero": 25,
@@ -256,7 +256,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+      "imagen": "assets/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
     },
     {
       "numero": 26,
@@ -264,9 +264,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 27,
@@ -276,7 +276,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "patite/patite_ilustracion_52a3d8fa.jpeg"
+      "imagen": "assets/patite_ilustracion_52a3d8fa.jpeg"
     },
     {
       "numero": 28,
@@ -284,9 +284,9 @@
       "titulo": "",
       "contenido": "",
       "cita": "",
-      "subtitulo": "",
+      "subtitulo": "Mateo 21,28-32",
       "momento": "",
-      "imagen": "fano/20140953.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 29,
@@ -296,7 +296,7 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "fano/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
+      "imagen": "assets/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
     },
     {
       "numero": 30,
