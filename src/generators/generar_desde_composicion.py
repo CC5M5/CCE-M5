@@ -245,6 +245,10 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                 cita = lecturas_data[tipo]["cita"]
                 subtitulo = ""
 
+            # Diapositivas de paso: cita del Evangelio del día
+            if tipo == "paso" and "evangelio" in lecturas_data:
+                subtitulo = lecturas_data["evangelio"]["cita"]
+
             # Expandir diapositivas de paso sin contenido
             if tipo == "paso":
                 slides.append(
@@ -254,7 +258,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                         titulo="",
                         contenido="",
                         cita="",
-                        subtitulo="",
+                        subtitulo=subtitulo,
                         momento="",
                         imagen=imagen or self._ilustracion_para(tipo),
                     )
