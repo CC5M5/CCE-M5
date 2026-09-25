@@ -574,10 +574,12 @@ def editar_con_mensaje(id: int, mensaje: str, clase: str):
 
 @app.route("/__ilustraciones/<path:filename>")
 def ilustracion(filename: str):
-    safe = Path(filename).name
-    candidate = ILUSTRACIONES_DIR / filename
+    from flask import send_file
+    candidate = (ILUSTRACIONES_DIR / filename).resolve()
+    # Prevenir path traversal fuera del directorio de ilustraciones
+    if not str(candidate).startswith(str(ILUSTRACIONES_DIR.resolve())):
+        abort(403)
     if candidate.exists() and candidate.is_file():
-        from flask import send_file
         return send_file(candidate)
     abort(404)
 
