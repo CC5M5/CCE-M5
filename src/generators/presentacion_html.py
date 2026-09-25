@@ -1093,6 +1093,32 @@ class GeneradorPresentacionHTML:
       minScale: 0.2,
       maxScale: 2.0,
     }});
+
+    // Ajustar tamaño de fuente de la tarjeta para llenar la diapositiva
+    function ajustarTexto(slide) {{
+      const tarjeta = slide.querySelector('.tarjeta');
+      if (!tarjeta) return;
+      const ilustracion = slide.querySelector('.ilustracion');
+      const wrapper = slide.querySelector('.slide-wrapper');
+      let fontSize = 48; // tamaño base grande
+      tarjeta.style.fontSize = fontSize + 'px';
+      const maxWidth = ilustracion ? wrapper.clientWidth - 380 : wrapper.clientWidth - 80;
+      const maxHeight = wrapper.clientHeight - 120;
+      // Reducir hasta que quepa
+      while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > 14) {{
+        fontSize -= 1;
+        tarjeta.style.fontSize = fontSize + 'px';
+      }}
+    }}
+
+    Reveal.on('ready', event => ajustarTexto(event.currentSlide));
+    Reveal.on('slidechanged', event => {{
+      ajustarTexto(event.currentSlide);
+      if (event.previousSlide) {{
+        const prevTarjeta = event.previousSlide.querySelector('.tarjeta');
+        if (prevTarjeta) prevTarjeta.style.fontSize = '';
+      }}
+    }});
   </script>
 </body>
 </html>"""
@@ -1112,7 +1138,8 @@ class GeneradorPresentacionHTML:
 
         if momento:
             inner += f'  <h3>{momento}</h3>\n'
-        inner += f'  <h1>{titulo}</h1>\n'
+        if titulo or tipo != 'paso':
+            inner += f'  <h1>{titulo}</h1>\n'
         if subtitulo:
             inner += f'  <h2>{subtitulo}</h2>\n'
         if cita:
