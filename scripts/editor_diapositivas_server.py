@@ -646,10 +646,6 @@ def _reconstruir_composicion_desde_canciones(fecha: str) -> str:
 
 def _generar_presentacion(fecha: str) -> str:
     """Genera PPTX/HTML/PDF desde presentacion_slides y sincroniza con la web."""
-    try:
-        reconstruccion = _reconstruir_composicion_desde_canciones(fecha)
-    except Exception as e:
-        reconstruccion = f"⚠️ reconstruccion fallo: {e}"
     sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
     try:
         from generar_desde_composicion import GeneradorDesdeComposicion
@@ -1069,7 +1065,8 @@ def armar_presentacion(fecha: str):
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")} | <span style="font-weight:600;">{estado_label}</span></p>
     <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
     <a href="/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
-    <a href="/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a></p>
+    <a href="/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a> |
+    <a href="/presentacion/{fecha}/reconstruir" style="color:#b91c1c;font-weight:600;">🔄 Reconstruir desde canciones asignadas</a></p>
     <form method="post" action="/presentacion/{fecha}/guardar">
       <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
         <thead>
@@ -1143,6 +1140,31 @@ def guardar_presentacion(fecha: str):
     mensaje = f"✅ {mensaje_comp} {gen_msg}"
     clase = "ok" if not commit_result.startswith("ERROR") and "✅" in gen_msg else "err"
 
+    response = armar_presentacion(fecha)
+    if isinstance(response, tuple):
+        body, status = response
+    else:
+        body, status = response, 200
+    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    return body, status
+
+
+@app.route("/presentacion/<fecha>/reconstruir")
+def reconstruir_presentacion(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+    if not _get_presentacion_por_fecha(fecha):
+        abort(404)
+    msg = _reconstruir_composicion_desde_canciones(fecha)
+    commit_result = _git_commit(f"reconstruir composicion {fecha}")
+    if commit_result.startswith("ERROR"):
+        msg += f" (git falló: {commit_result})"
+    gen_msg = _generar_presentacion(fecha)
+    commit_result2 = _git_commit(f"generar presentacion {fecha}")
+    if commit_result2.startswith("ERROR"):
+        gen_msg += f" (git falló: {commit_result2})"
+    clase = "ok" if "✅" in gen_msg else "err"
+    mensaje = f"{msg} | {gen_msg}"
     response = armar_presentacion(fecha)
     if isinstance(response, tuple):
         body, status = response

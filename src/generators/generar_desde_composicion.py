@@ -282,18 +282,6 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         for i, s in enumerate(slides, 1):
             s.numero = i
 
-        data: Dict[str, Any] = {
-            "meta": {
-                "fecha": fecha,
-                "celebracion": celebracion,
-                "color_liturgico": color,
-                "lema": "Somos uno",
-                "lema_imagen": "assets/lema_somos_uno.jpg",
-                "generado": datetime.now().isoformat(),
-            },
-            "slides": [asdict(s) for s in slides],
-        }
-
         base_name = f"{fecha}_presentacion"
         bundle_dir = OUTPUT_DIR / base_name
         bundle_dir.mkdir(parents=True, exist_ok=True)
@@ -305,7 +293,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         if lema_src.exists():
             shutil.copy(lema_src, assets_dir / "lema_somos_uno.jpg")
 
-        svg_convertidos: Dict[str, str] = {}
+        rutas_normalizadas: Dict[str, str] = {}
         for slide in slides:
             if not slide.imagen:
                 continue
@@ -321,15 +309,31 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                 if src.suffix.lower() == ".svg":
                     png = _convertir_svg_a_png(src, assets_dir)
                     if png:
-                        svg_convertidos[slide.imagen] = f"assets/{png.name}"
+                        rutas_normalizadas[slide.imagen] = f"assets/{png.name}"
                     break
                 shutil.copy(src, assets_dir / src.name)
+                rutas_normalizadas[slide.imagen] = f"assets/{src.name}"
                 break
 
-        # Reemplazar rutas SVG por PNG convertido donde aplique
+        # Normalizar todas las rutas de imagen a assets/<nombre>
         for slide in slides:
-            if slide.imagen in svg_convertidos:
-                slide.imagen = svg_convertidos[slide.imagen]
+            if slide.imagen in rutas_normalizadas:
+                slide.imagen = rutas_normalizadas[slide.imagen]
+            elif slide.imagen:
+                # Si no se pudo copiar, al menos normalizar la ruta
+                slide.imagen = f"assets/{Path(slide.imagen).name}"
+
+        data: Dict[str, Any] = {
+            "meta": {
+                "fecha": fecha,
+                "celebracion": celebracion,
+                "color_liturgico": color,
+                "lema": "Somos uno",
+                "lema_imagen": "assets/lema_somos_uno.jpg",
+                "generado": datetime.now().isoformat(),
+            },
+            "slides": [asdict(s) for s in slides],
+        }
 
         json_path = bundle_dir / f"{base_name}.json"
         with open(json_path, "w", encoding="utf-8") as f:
