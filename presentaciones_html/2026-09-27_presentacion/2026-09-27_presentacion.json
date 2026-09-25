@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-09-25T01:55:21.369568"
+    "generado": "2026-09-25T02:04:26.639072"
   },
   "slides": [
     {
@@ -21,8 +21,8 @@
     {
       "numero": 2,
       "tipo": "entrada",
-      "titulo": "PREPARAD EL CAMINO",
-      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+      "titulo": "HE VENIDO A SERVIR",
+      "contenido": "Quien quiera ser grande,\nquien quiera ser el primero,\nsea el esclavo de todos,\nsea el más pequeño.\nNo he venido a ser servido,\nque he venido a servir\ny a dar la vida por todos\npara que todos puedan vivir (2)\nen\nplenitud (3).",
       "cita": "",
       "subtitulo": "",
       "momento": "",
@@ -56,20 +56,30 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
       "numero": 6,
       "tipo": "gloria",
-      "titulo": "NO PREGUNTÉIS PORQUÉ",
-      "contenido": "Re\n\nSol\n\nLa\n\nRe\n\nNo\npreguntéis porqué, os lo pide el Señor.\n\nSim\n\nMim\n\nLa\n\nRe La\n\nVamos\nhacia Jerusalén, ésta es su razón.\n\nRe\n\nSol La\n\nRe\n\nPorque\ndebéis saber que es tiempo de amor.\n\nSim\n\nMim\n\nLa\n\nRe La\n\nAsí\nnos lo ha dicho Él: ¡Alabad a Dios!\n\nRe\n\nSol\n\nLa\n\nRe\n\nHOSANNA, HOSANNA,\n\nSim\n\nMim\n\nGLORIA AL QUE VIENE\n\nLa\n\nRe La\n\nEN NOMBRE DEL SEÑOR (2).\n\nHoy\nme has hecho llorar, pobre Jerusalén.\n\nNo\npierdas la oportunidad que te da tu Dios.\n\nYa\nno temas Sión, mira tu rey está aquí,\n\nY su\nllanto convertirá en sonrisa y perdón.\n\nCómo\nhacemos callar, si es un canto de amor,\n\nY\nhasta las piedras gritarán: ¡Alabad a Dios!",
+      "titulo": "ALABO TU BONDAD (1/2)",
+      "contenido": "Todo mi ser canta hoy\r\npor las cosas que hay en mí.\r\nGracias te doy mi Señor,\r\nTú me haces tan feliz.\r\nTú me has regalado tu amistad,\r\nconfío en ti, me llenas de tu\r\nTú me haces sentir tu gran bondad,\r\nyo cantaré por siempre tu fidelidad.\r\n\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg"
+      "imagen": "fano/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
     },
     {
       "numero": 7,
+      "tipo": "gloria",
+      "titulo": "ALABO TU BONDAD (2/2)",
+      "contenido": "Siempre a tu lado estaré\r\nalabando tu bondad\r\nA mis hermanos diré\r\nel gran gozo que hallo en ti.\r\nEn ti podrán siempre encontrar\r\nfidelidad, confianza y amistad.\r\nNunca fallara tu gran amor,\r\nni tu perdón. Me quieres tal como soy\r\n\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "fano/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+    },
+    {
+      "numero": 8,
       "tipo": "primera_lectura",
       "titulo": "PRIMERA LECTURA",
       "contenido": "Así dice el Señor: «Comentáis: «No es justo el proceder del Señor». Escuchad, casa de Israel: ¿es injusto mi proceder?, ¿o no es vuestro proceder el que es injusto? Cuando el justo se aparta de su justicia, comete la maldad y muere, muere por la maldad que cometió. Y cuando el malvado se convierte de la maldad que hizo y practica el derecho y la justicia, él mismo salva su vida. Si recapacita y se convierte de los delitos cometidos, ciertamente vivirá y no morirá.»",
@@ -79,7 +89,7 @@
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 8,
+      "numero": 9,
       "tipo": "salmo",
       "titulo": "SALMO RESPONSORIAL",
       "contenido": "Señor, enséñame tus caminos,\n\ninstrúyeme en tus sendas:\n\nhaz que camine con lealtad;\n\nenséñame, porque tú eres mi Dios y Salvador,\n\ny todo el día te estoy esperando.\nRecuerda, Señor,\n\nque tu ternura y tu misericordia son eternas;\n\nno te acuerdes de los pecados\n\nni de las maldades de mi juventud;\n\nacuérdate de mí con misericordia,\n\npor tu bondad, Señor.\nEl Señor es bueno y es recto,\n\ny enseña el camino a los pecadores;\n\nhace caminar a los humildes con rectitud,\n\nenseña su camino a los humildes.",
@@ -89,7 +99,7 @@
       "imagen": "assets/20140962.jpg"
     },
     {
-      "numero": 9,
+      "numero": 10,
       "tipo": "segunda_lectura",
       "titulo": "SEGUNDA LECTURA",
       "contenido": "Si queréis darme el consuelo de Cristo y aliviarme con vuestro amor, si nos une el mismo Espíritu y tenéis entrañas compasivas, dadme esta gran alegría: manteneos unánimes y concordes con un mismo amor y un mismo sentir. No obréis por rivalidad ni por ostentación, dejaos guiar por la humildad y considerad siempre superiores a los demás. No os encerréis en vuestros intereses, sino buscad todos el interés de los demás. Tened entre vosotros los sentimientos propios de Cristo Jesús. Él, a pesar de su condición divina, no hizo alarde de su categoría de Dios; al contrario, se despojó de su rango y tomó la condición de esclavo, pasando por uno de tantos. Y así, actuando como un hombre cualquiera, se rebajó hasta someterse incluso a la muerte, y una muerte de cruz. Por eso Dios lo levantó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.",
@@ -99,17 +109,17 @@
       "imagen": "assets/20140960.jpg"
     },
     {
-      "numero": 10,
+      "numero": 11,
       "tipo": "aleluya",
-      "titulo": "ESCUCHA, TÚ",
-      "contenido": "Re\n\nLa\n\nSim\n\nSol\n\nEscucha tú la palabra de Dios,\n\nRe\n\nSim\n\nno sólo con tus oídos,\n\nMi\n\nLa\n\ntambién con el corazón.\n\nRe\n\nLa\n\nFa#\nSol\n\nEscucha tú la palabra de Dios,\n\nRe\n\nSim\n\nMim\n\nLa\n\nRe\n\ny estate siempre atento a su voz.\n\nLa\n\nSim\n\nSol\n\nLa\n\nRe\n\nDéjala entrar dentro de tu corazón,\n\nLa\n\nSim\n\nSol\n\nRe\n\npásala a tu mente y a tu situación.\n\nFa#m\n\nSim\n\nSol\n\nRe\n\nVívela, vívela, en tu realidad.\n\nLa\n\nSim Sol\n\nMi7\n\nLa\n\nHaz que por tu vida llegue a los demás.",
+      "titulo": "ALELUYA DE LA TIERRA",
+      "contenido": "EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,\r\nY OTROS SON ESPECTADORES, NO LO SIENTEN.\r\n\r\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**\r\n**Y LA TIERRA SONREIRÁ. ¡ALELUYA! (BIS)**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg"
+      "imagen": "fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
     },
     {
-      "numero": 11,
+      "numero": 12,
       "tipo": "evangelio",
       "titulo": "EVANGELIO",
       "contenido": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.» Él le contestó: «No quiero.» Pero después recapacitó y fue. Se acercó al segundo y le dijo lo mismo. Él le contestó: «Voy, señor.» Pero no fue. ¿Quién de los dos hizo lo que quería el padre?»Contestaron: «El primero.»Jesús les dijo: «Os aseguro que los publicanos y las prostitutas os llevan la delantera en el camino del reino de Dios. Porque vino Juan a vosotros enseñándoos el camino de la justicia, y no le creísteis; en cambio, los publicanos y prostitutas le creyeron. Y, aun después de ver esto, vosotros no recapacitasteis ni le creísteis.»\nPalabra del Señor",
@@ -119,7 +129,7 @@
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 12,
+      "numero": 13,
       "tipo": "transicion_eucaristia",
       "titulo": "LITURGIA EUCARÍSTICA",
       "contenido": "Preparémonos para la mesa del Señor",
@@ -129,7 +139,7 @@
       "imagen": "assets/20140959.jpg"
     },
     {
-      "numero": 13,
+      "numero": 14,
       "tipo": "credo",
       "titulo": "CREDO",
       "contenido": "Creo en Dios, Padre todopoderoso, \r\ncreador del cielo y de la tierra.\r\nCreo en Jesucristo, su único Hijo, nuestro Señor, \r\nque fue concebido por obra y gracia del Espíritu Santo; \r\nnació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; \r\nfue crucificado, muerto y sepultado; descendió a los infiernos; \r\nal tercer día resucitó de entre los muertos; \r\nsubió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\r\nDesde allí ha de venir a juzgar a vivos y muertos.\r\nCreo en el Espíritu Santo, la santa Iglesia católica, \r\nla comunión de los santos, el perdón de los pecados, \r\nla resurrección de la carne y la vida eterna. Amén.",
@@ -139,124 +149,114 @@
       "imagen": "fano/20140954.jpg"
     },
     {
-      "numero": 14,
+      "numero": 15,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
-    },
-    {
-      "numero": 15,
-      "tipo": "ofertorio",
-      "titulo": "PADRE NUESTRO DE LA VIDA",
-      "contenido": "Padre nuestro de la vida,\nmío, de ése y de aquél\nque vive en toda criatura\ny ellos así han de creer.\nQuisiera realzar tu nombre\nviviendo aquí bajo el sol\ntu mensaje de aquel monte\nSiM7m Mim\nde pobreza, paz y amor.\nDanos pan para vivir\nsólo el momento presente\nya que el día de mañana\nquizás aquí no me encuentre.\nNo mires lo que hice mal\nque yo no veré a mi deudor\ny en mi camino hacia ti\nSiM7m Mim\nque no caiga en tentación.\nAmén, amén, que no caiga en\ntentación.\nSiM7m Mim\nAmén, amén, que sea así siempre\nSeñor.",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/20140959.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
       "numero": 16,
-      "tipo": "paso",
-      "titulo": "",
-      "contenido": "",
+      "tipo": "ofertorio",
+      "titulo": "QUE TE PUEDO DAR",
+      "contenido": "¿Qué te puedo dar\r\nque no me hayas dado Tú?\r\n¿Qué te puedo decir que no me hayas dicho Tú?\r\n¿Qué puedo hacer por ti, si yo no puedo hacer nada?\r\nSi yo no puedo hacer nada si no es por ti, mi Dios.\r\n\r\n**TODO LO QUE SE, TODO LO QUE SOY,**\r\n**TODO LO QUE TENGO ES TUYO (bis)**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "fano/fano_20140880_dadles_vosotros_de_comer.jpg"
     },
     {
       "numero": 17,
-      "tipo": "santo",
-      "titulo": "QUIERO HACER LO MISMO",
-      "contenido": "Sol\n\nRe\n\nMim\n\nEs un sueño escondido del\nSeñor,\n\nDo\n\nRe\n\naunque ni él mismo lo\nsabe.\n\nSol\n\nRe\n\nMim\n\nÉl es un diamante, él es\nlo mejor,\n\nDo\n\nRe\n\naunque nadie se lo crea.\n\nDo\n\nLam\n\nRe\n\nSeñor, haz que alguien sí\nlo crea.\n\nJosé sólo buscaba un\npuesto mejor:\n\ntener, poder, valer… ya\nsabes.\n\nEn Roma tocaste su\ncorazón,\n\nhiciste que él lo creyera,\n\ny dio por él la vida\nentera.\n\nSol\n\nRe\n\nMim\n\nQUIERO\nHACER LO MISMO:\n\nSim\n\nDo\n\nSol\n\nFa\n\nRe\n\nVER\nEN UN NIÑO UN TESORO QUE HAY QUE CUIDAR.\n\nSol\n\nRe\n\nMim\n\nQUIERO\nANDAR LOS PASOS\n\nSim\n\nDo\n\nSol\n\nLam\n\nRe\n\nSol\n\nDEL\nSANTO VIEJO Y AMARLOS COMO LOS AMÓ CALASANZ.\n\nHoy aún hay millones de\nniños que\n\nviven la vida aplastados.\n\nNo dejes que la obra de\nCalasanz\n\nse cruce nunca de brazos,\n\nque aún hay muchos niños\nllorando.\n\nQUIERO\nHACER LO MISMO…\n\nDo\n\nRe\n\nSim\n\nYo me pondré junto a él de\nrodillas\n\nMim\n\nDo\n\ny buscaré dentro de sus\nojos la luz.\n\nRe\n\nSol\n\nSol7\n\nLe ayudaré con letras y\npiedad a vivir\n\nDo\n\nRe\n\nSim\n\nY él sentirá que lo estoy\namando,\n\nMim\n\nDo\n\ndescubrirá que nació para\nser feliz,\n\nRe\n\nSol\n\nRe\n\ny cambiará el mundo a\ngolpes de amor por ti.\n\nQUIERO\nHACER LO MISMO… (2)\n\nYo me pondré junto a él de\nrodillas…\n\nRe\n\nLam\n\ny cambiará el mundo a\ngolpes de amor por ti.\n\nRe\n\nLam\n\nCon letras y piedad a\nvivir.\n\nRe\n\nSol\n\nRe-Sol\n\nPorque nació para ser feliz.",
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140896_ii_domingo_de_adviento_dile_sí.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
       "numero": 18,
-      "tipo": "paso",
-      "titulo": "",
-      "contenido": "",
+      "tipo": "santo",
+      "titulo": "SANTO JESUITA",
+      "contenido": "**SANTO, SANTO, SANTO-O-O,**\r\n**SANTO ES EL SEÑOR,**\r\n**DIOS DEL UNIVERSO-O,**\r\n**DIOS DEL UNIVERSO-O (BIS)**\r\n\r\nLlenos están el cielo y la tierra de tu gloria.\r\nHosanna en el cielo-o, hosanna en el cielo-o.\r\nBendito el que viene en nombre del Señor.\r\nHosanna en el cielo-o, hosanna en el cielo-o.\r\n\r\n**ESTRIBILLO (BIS)**\r\n\r\n**SANTO, SANTO, SANTO-O-O,**\r\n**SANTO ES EL SEÑOR.**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "fano/fano_20140883_el_pan_que_os_daré_es_mi_propio_cuerpo.jpg"
     },
     {
       "numero": 19,
-      "tipo": "padre_nuestro",
-      "titulo": "PONGO MI VIDA EN TUS MANOS",
-      "contenido": "Do\n\nFa\n\nDo\n\nPongo mi vida en tus manos,\n\nFa\n\nSol\n\nPadre mío me abandono a ti.\n\nFa\n\nMi\n\nLam\n\nFa\n\nHaz de mi lo que quieras\n\nDo\n\nRem\n\nSol\n\nSol7\n\nestoy dispuesto a aceptarlo todo...\n\n(3)\n\nFa\n\nMi\n\nLam\n\nFa\n\n... con infinita confianza\n\nDo\n\nSol\n\nDo\n\nporque tú eres mi Padre.",
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
       "numero": 20,
-      "tipo": "paso",
-      "titulo": "",
-      "contenido": "",
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO (Gallego)",
+      "contenido": "En el mar he oído hoy\nSeñor tu voz que me llamó\ny me pidió que me entregara\na mis hermanos.\nEsa voz me transformó,\nmi vida entera ya cambió,\ny sólo pienso ahora Señor\nen repetirte:\nPADRE NUESTRO\nEN TI CREEMOS,\nPADRE NUESTRO\nTE OFRECEMOS,\nPADRE NUESTRO\nNUESTRAS MANOS\nDE HERMANOS.\nCuando vaya a otro lugar\ntendré Señor que abandonar\na mi familia a mis amigos\npor seguirte.\nPero sé que así algún día\npodré enseñar tu verdad,\nir a mi hermano y junto a él\nyo repetirte.\nPADRE NUESTRO…",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "assets/20140955.jpg"
     },
     {
       "numero": 21,
-      "tipo": "paz",
-      "titulo": "UNA NUEVA ESPERANZA",
-      "contenido": "Re\n\nLa\n\nUna nueva esperanza\n\nSim\n\nFa#m\n\nempieza en mí a nacer,\n\nSol\n\nRe\n\nme hablas del amor\n\nSol\n\nLa\n\ny casi sin darme cuenta\n\nRe\n\nLa\n\nSim\n\nFa#m\n\nmi corazón empieza a\nentusiasmarse\n\nSol\n\nLa\n\nRe\n\nLa\n\ny a comprender lo que es vivir.\n\nRe\n\nLa\n\nTÚ ALUMBRAS MI CAMINO\n\nSim\n\nFa#m\n\nCON TUS PALABRAS,\n\nSol\n\nMim\n\nLa\n\nLa7\n\nPUES ELLAS JAMÁS SE BORRARÁN.\n\nSol\n\nLa\n\nY AL CAMINAR JUNTOS\n\nFa#m\n\nSim\n\nME BRINDAS TU AMISTAD,\n\nSol\n\nMim\n\nLa\n\nEL GOZO, LA ALEGRÍA Y LA PAZ.\n\nSol\n\nLa\n\nPUES ¿QUÉ ES VIVIR?\n\nRe La Sim\n\n¡LA VIDA ES CRISTO!\n\nSol\n\nLa\n\nRe\n\nRe7\n\nY SU AMOR MI ÚNICA GANANCIA\n\nSol\n\nLa\n\nPUES ¿QUÉ ES VIVIR?\n\nRe La Sim\n\n¡LA VIDA ES CRISTO!\n\nSol\n\nLa\n\nRe\n\nY SU AMOR ME BASTA.\n\nSé que mucha gente\n\nno ha logrado saber\n\nque marchas a su lado,\n\nque compartes su vida entera.\n\nQuisiera ofrecerte lo que soy\n\npara anunciar lo que he visto\nen Ti.",
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140408_arranca_lo_que_te_impida_dar_frutos_de_amor_domingo_27_de_se.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
       "numero": 22,
-      "tipo": "paso",
-      "titulo": "",
-      "contenido": "",
+      "tipo": "paz",
+      "titulo": "LA PAZ TE DOY",
+      "contenido": "La paz te doy a ti, mi hermano,\r\nla paz que Dios me regaló,\r\ny en un abrazo a ti te entrego\r\nla paz que llevo en mi corazón. (BIS)\r\n\r\n**Recíbela, recíbela,**\r\n**esta es la paz**\r\n**que el mundo no te puede dar.**\r\n**(BIS)**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "fano/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
     },
     {
       "numero": 23,
-      "tipo": "comunion",
-      "titulo": "TODO MI SER",
-      "contenido": "Todo mi ser, todo lo que soy\nte pertenece sólo a ti.\nDesde mi pobreza,\nTú eres la fuerza.\nNada sé, sólo que caminaré.\nLLEGASTE A MI VIDA CON TU LUZ,\nCAMBIASTE MI MENTE CON TU AMOR,\nVACIASTE MI ALMA Y AHORA ESTÁS\nDENTRO DE MÍ.\nTodo mi ser, todo lo que soy,\nlo bueno y lo malo la pongo a\ntus pies.\nAunque a veces llegues a mi\ntemplo\ny lo encuentres ya lleno,\nno es verdad, sólo se llena\ncuando Tú moras en él.",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/20140959.jpg"
-    },
-    {
-      "numero": 24,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
-      "numero": 25,
-      "tipo": "maria",
-      "titulo": "CANTO A MARÍA",
-      "contenido": "Dios te salve, María;\nllena eres de gracia;\nel Señor es contigo.\nBendita tú eres entre todas las mujeres,\ny bendito es el fruto de tu vientre, Jesús.\n\nSanta María, Madre de Dios,\nruega por nosotros, pecadores,\nahora y en la hora de nuestra muerte. Amén.",
+      "numero": 24,
+      "tipo": "comunion",
+      "titulo": "BENDIGAMOS AL SEÑOR (1/2)",
+      "contenido": "Bendigamos al Señor, Dios de toda la creación\r\npor habernos regalado su amor.\r\nSu bondad y su perdón, y su gran fidelidad\r\npor los siglos de los siglos durará.\r\n\r\n**EL ESPÍRITU DE DIOS HOY ESTÁ SOBRE MI.**\r\n**ÉL ES QUIEN ME HA UNGIDO A PROCLAMAR**\r\n**BUENA NUEVA A LOS MÁS POBRES,**\r\n**GRACIA DE SU SALVACIÓN. (BIS)**\r\n\r\nEnviados con poder y en el nombre de Jesús\r\na sanar a los enfermos del dolor,\r\na los ciegos dar visión, a los pobres la verdad\r\ny a los presos y oprimidos, libertad.\r\n\r\n**ESTRIBILLO**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/virgen_fatima.jpg"
+      "imagen": "fano/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+    },
+    {
+      "numero": 25,
+      "tipo": "comunion",
+      "titulo": "BENDIGAMOS AL SEÑOR (2/2)",
+      "contenido": "Con la fuerza de su amor y de la resurrección\r\nanunciamos: llega ya la salvación.\r\nQue ni el miedo, ni el temor, ni la duda o la opresión\r\nborrarán la paz de nuestro corazón.\r\n\r\n**EL ESPÍRITU DE DIOS HOY ESTÁ SOBRE MI.**\r\n**ÉL ES QUIEN ME HA UNGIDO A PROCLAMAR**\r\n**BUENA NUEVA A LOS MÁS POBRES,**\r\n**GRACIA DE SU SALVACIÓN. (BIS)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "fano/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
     },
     {
       "numero": 26,
@@ -266,20 +266,40 @@
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "fano/20140953.jpg"
     },
     {
       "numero": 27,
-      "tipo": "despedida",
-      "titulo": "QUIERO VIVIR AMANDO",
-      "contenido": "Re Sim\n\nNo\nme resigno y busco siempre más,\n\nMim La\n\nno\nme conformo con ser un mediocre.\n\nRe Sim\n\nQuiero\ntenerte cerca al caminar\n\nMim La\n\nsólo\ncontigo brillaré en la noche.\n\nSol La Re Sim Sol La\nRe Sim\n\n\n  Si\n  NO HAY AMOR, TODO ES MENTIRA\n\n\nSol La Re Sim\n\n\n  Si\n  NO HAY AMOR,\n\n\nMim La\nRe Re\nLa Sim Sol Re La Sim Sol\n\nTODO\nLO QUE VIVO PIERDE SU\n\nCOLOR\n\nPodría\namontonar todo el saber,\n\ny\nser el tío más listo de la tierra.\n\nPodría\ndedicarme a resolver,\n\ntodos\nlos males y todas las guerras.\n\n\n  Si\n  NO HAY AMOR, TODO ES MENTIRA\n\n\n\n  Si\n  NO HAY AMOR,\n\n\nTODO\nLO QUE VIVO PIERDE SU COLOR\n\nRe La Sim\nSol Re La Sim Sol\n\nQUIERO VIVIR AMANDO, QUIERO VIVIR\n\n\n  Re La               Sim   Sol\n  Re La Sol….                  \n\n\nQUIERO VIVIR AMANDO, QUIERO VIVIR\n\nPodría\nquerer ser tu seguidor,\n\ndejarme\nquemar vivo a fuego lento\n\ny\nganar cada mes más de un millón\n\ny\nrepartirlo todo a los hambrientos.\n\n\n  Si\n  NO HAY AMOR, TODO ES MENTIRA\n\n\n\n  Si\n  NO HAY AMOR,\n\n\nTODO\nLO QUE VIVO PIERDE SU\nCOLOR\n\nRe La Sim\nSol Re La\nSim Sol\n\nQUIERO VIVIR AMANDO, QUIERO VIVIR\n\nRe La Sim\nSol Re La Solm\nLa\n\nQUIERO VIVIR AMANDO, QUIERO VIVIR O MORIR\n\nRe Sim\nMim La Re\n\nEl\namor es servicio y no lleva cuentas del mal\n\nSim\nMim La Re\n\nel\namor no presume, no es egoísta.\n\nSim\nMim\n\nEl\namor no se engríe,\n\nLa Re\n\nno\nse irrita ni te trata mal.\n\nSim Mim La\n\nTambién\nes comprensivo, no tiene envidia.\n\nFa# Sim\n\nDisculpa\ny cree sin límites.\n\nFa# Sim\n\nEspera\ny aguanta sin límites.\n\nSol La\n\nEl\namor nunca pasará.\n\n\n  Si\n  NO HAY AMOR, TODO ES MENTIRA\n\n\n\n  Si\n  NO HAY AMOR,\n\n\nTODO\nLO QUE VIVO PIERDE SU\nCOLOR\n\nQUIERO VIVIR AMANDO, QUIERO VIVIR\n\nQUIERO VIVIR AMANDO, QUIERO VIVIR\n\nRe La Sim Sol Re La Sim Sol\n\nQuiero vivir amando, porque el amor es Dios.\n\nReLaSim Sol\nRe La Sim Sol Re\n\nQuiero vivir amando, porque el amor es Dios.",
+      "tipo": "maria",
+      "titulo": "A TU AMPARO Y PROTECCIÓN",
+      "contenido": "A TU AMPARO Y PROTECCIÓN,\r\nMADRE DE DIOS, ACUDIMOS.\r\nNO DESOIGAS NUESTROS RUEGOS\r\nY DE TODOS LOS PELIGROS,\r\nVIRGEN GLORIOSA Y BENDITA,\r\nDEFIENDE SIEMPRE A TUS HIJOS",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140414_la_ternura_de_los_humildes_salva_al_mundo_domingo_8_de_novie.jpg"
+      "imagen": "patite/patite_ilustracion_52a3d8fa.jpeg"
     },
     {
       "numero": 28,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "fano/20140953.jpg"
+    },
+    {
+      "numero": 29,
+      "tipo": "despedida",
+      "titulo": "COMO CORRE UN RÍO",
+      "contenido": "Como corre un río dentro de mi ser (x2)\r\nasí yo confío en Cristo, mi Rey (x2)\r\n\r\n**COMO UN RÍO DE AGUA VIVA,**\r\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\r\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\r\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\r\n\r\n Jesús está pasando por ahí\r\nJesús está pasando por ahí\r\nY cuando pasa todo lo transforma\r\nSe va la tristeza, viene la alegría\r\nY cuando pasa todo lo transforma\r\nViene la alegría para ti y para mí\r\n\r\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "fano/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
+    },
+    {
+      "numero": 30,
       "tipo": "portada",
       "titulo": "¡ID EN PAZ!",
       "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
