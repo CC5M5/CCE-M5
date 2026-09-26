@@ -832,7 +832,7 @@ class GeneradorPresentacionHTML:
 
     .reveal {{
       font-family: 'Nunito', 'Open Sans', sans-serif;
-      font-size: 30px;
+      font-size: 34px;
       color: #2c3e50;
     }}
 
