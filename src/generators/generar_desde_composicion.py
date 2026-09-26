@@ -198,22 +198,22 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         lecturas_data = {
             "primera_lectura": {
                 "titulo": "PRIMERA LECTURA",
-                "contenido": pres.get("primera_lectura_texto") or "",
+                "contenido": self._compactar_salmo_o_lectura(pres.get("primera_lectura_texto") or ""),
                 "cita": _cita_con_libro(pres.get("primera_lectura_libro"), pres.get("primera_lectura_cita")),
             },
             "salmo": {
                 "titulo": "SALMO RESPONSORIAL",
-                "contenido": pres.get("salmo_texto") or "",
+                "contenido": self._compactar_salmo_o_lectura(pres.get("salmo_texto") or ""),
                 "cita": _cita_salmo(pres.get("salmo_libro"), pres.get("salmo_cita"), pres.get("salmo_antifona")),
             },
             "segunda_lectura": {
                 "titulo": "SEGUNDA LECTURA",
-                "contenido": pres.get("segunda_lectura_texto") or "",
+                "contenido": self._compactar_salmo_o_lectura(pres.get("segunda_lectura_texto") or ""),
                 "cita": _cita_con_libro(pres.get("segunda_lectura_libro"), pres.get("segunda_lectura_cita")),
             },
             "evangelio": {
                 "titulo": "EVANGELIO",
-                "contenido": pres.get("evangelio_texto") or "",
+                "contenido": self._compactar_salmo_o_lectura(pres.get("evangelio_texto") or ""),
                 "cita": _cita_con_libro(pres.get("evangelio_libro"), pres.get("evangelio_cita")),
             },
         }
