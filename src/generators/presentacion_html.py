@@ -832,7 +832,7 @@ class GeneradorPresentacionHTML:
 
     .reveal {{
       font-family: 'Nunito', 'Open Sans', sans-serif;
-      font-size: 24px;
+      font-size: 25px;
       color: #2c3e50;
     }}
 
@@ -1211,8 +1211,8 @@ class GeneradorPresentacionHTML:
                      || slide.classList.contains('evangelio')
                      || slide.classList.contains('lectura');
 
-      // Lecturas: reducir base para evitar scroll; si aun no cabe, _paginar_texto debe dividir
-      let fontSize = esLectura ? 38 : 48;
+      // Lecturas: tamaño intermedio para legibilidad sin scroll
+      let fontSize = esLectura ? 44 : 48;
       tarjeta.style.fontSize = fontSize + 'px';
 
       const logoHeight = logo ? logo.offsetHeight + 36 : 90;
@@ -1225,8 +1225,8 @@ class GeneradorPresentacionHTML:
 
       tarjeta.style.maxHeight = maxHeight + 'px';
 
-      // Reducir hasta que el texto quepa; para lecturas permitimos bajar mas
-      const minSize = esLectura ? 22 : 16;
+      // Reducir hasta que el texto quepa; para lecturas permitimos bajar hasta 26px
+      const minSize = esLectura ? 26 : 16;
       while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > minSize) {{
         fontSize -= 0.5;
         tarjeta.style.fontSize = fontSize + 'px';
