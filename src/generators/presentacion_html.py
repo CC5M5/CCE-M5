@@ -578,7 +578,18 @@ class GeneradorPresentacionHTML:
             parrafos.append("\n".join(actual))
         return "\n\n".join(parrafos)
 
-    def _paginar_texto(self, texto: str, max_chars: int = 1600) -> List[str]:
+    def _formatear_cita(self, libro: str, cita: str) -> str:
+        """Devuelve la cita completa incluyendo el libro de la Biblia."""
+        if not libro or not cita:
+            return cita or ""
+        libro = libro.strip()
+        cita = cita.strip()
+        # Evitar duplicados si la cita ya incluye el libro
+        if cita.lower().startswith(libro.lower()):
+            return cita
+        return f"{libro} {cita}"
+
+    def _paginar_texto(self, texto: str, max_chars: int = 1100) -> List[str]:
         """Divide un texto largo en fragmentos que quepan en una slide 4:3 real (33,87 cm × 25,4025 cm)."""
         if len(texto) <= max_chars:
             return [texto]
@@ -698,7 +709,7 @@ class GeneradorPresentacionHTML:
                     "primera_lectura",
                     f"PRIMERA LECTURA{sufijo}",
                     frag,
-                    cita=f"{lectura['primera_lectura_cita']}",
+                    cita=self._formatear_cita(lectura["primera_lectura_libro"], lectura["primera_lectura_cita"]),
                 )
 
         # 7. Salmo (compacto) + canción del salmo en la misma diapositiva
@@ -718,7 +729,7 @@ class GeneradorPresentacionHTML:
                     "salmo",
                     f"SALMO RESPONSORIAL{sufijo}",
                     frag,
-                    cita=f"{lectura['salmo_cita']}",
+                    cita=self._formatear_cita(lectura["salmo_libro"], lectura["salmo_cita"]),
                 )
 
         # 8. Segunda Lectura
@@ -730,7 +741,7 @@ class GeneradorPresentacionHTML:
                     "segunda_lectura",
                     f"SEGUNDA LECTURA{sufijo}",
                     frag,
-                    cita=f"{lectura['segunda_lectura_cita']}",
+                    cita=self._formatear_cita(lectura["segunda_lectura_libro"], lectura["segunda_lectura_cita"]),
                 )
 
         # 9. Aleluya: canción
@@ -745,7 +756,7 @@ class GeneradorPresentacionHTML:
                     "evangelio",
                     f"EVANGELIO{sufijo}",
                     frag,
-                    cita=f"{lectura['evangelio_cita']}",
+                    cita=self._formatear_cita(lectura["evangelio_libro"], lectura["evangelio_cita"]),
                 )
 
         # 11. Credo
@@ -952,13 +963,13 @@ class GeneradorPresentacionHTML:
     .reveal .primera_lectura .contenido,
     .reveal .segunda_lectura .contenido,
     .reveal .evangelio .contenido {{
-      font-size: 52px !important;
-      line-height: 1.18 !important;
+      font-size: 1em;
+      line-height: 1.18;
     }}
 
     .reveal .salmo .contenido {{
-      font-size: 44px !important;
-      line-height: 1.22 !important;
+      font-size: 0.95em;
+      line-height: 1.22;
     }}
 
     .reveal .primera_lectura .tarjeta,
@@ -1042,7 +1053,6 @@ class GeneradorPresentacionHTML:
     .reveal .paso .slide-wrapper {{
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 40%, #7C3AED 70%, var(--oro) 100%);
     }}
 
     .reveal .transicion .tarjeta,
@@ -1217,7 +1227,7 @@ class GeneradorPresentacionHTML:
       }}
 
       // Las lecturas deben tener letra grande, similar a canciones; no bajar de 34px
-      const minLectura = 34;
+      const minLectura = 28;
       if (esLectura && fontSize < minLectura) {{
         tarjeta.style.fontSize = minLectura + 'px';
       }}

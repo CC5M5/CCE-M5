@@ -18,11 +18,21 @@ if (!p) {
 }
 
 const lecturas = [
-  { label: 'Primera lectura', cita: p.primera_lectura_cita, texto: p.primera_lectura_texto },
-  { label: 'Salmo', cita: p.salmo_cita, texto: p.salmo_texto, antifona: p.salmo_antifona },
-  { label: 'Segunda lectura', cita: p.segunda_lectura_cita, texto: p.segunda_lectura_texto },
-  { label: 'Evangelio', cita: p.evangelio_cita, texto: p.evangelio_texto },
+  { label: 'Primera lectura', cita: p.primera_lectura_cita, texto: p.primera_lectura_texto, libro: p.primera_lectura_libro },
+  { label: 'Salmo', cita: p.salmo_cita, texto: p.salmo_texto, antifona: p.salmo_antifona, libro: p.salmo_libro },
+  { label: 'Segunda lectura', cita: p.segunda_lectura_cita, texto: p.segunda_lectura_texto, libro: p.segunda_lectura_libro },
+  { label: 'Evangelio', cita: p.evangelio_cita, texto: p.evangelio_texto, libro: p.evangelio_libro },
 ].filter(l => l.texto);
+
+const citaCompleta = (l) => {
+  const libro = l.libro ? l.libro.trim() : '';
+  const cita = l.cita ? l.cita.trim() : '';
+  if (!libro) return cita;
+  const citaLower = cita.toLowerCase();
+  const libroLower = libro.toLowerCase();
+  if (citaLower.startsWith(libroLower) || citaLower.startsWith('sal ')) return cita;
+  return `${libro} ${cita}`;
+};
 ---
 
 <Layout 
@@ -50,7 +60,7 @@ const lecturas = [
           {lecturas.map(l => (
             <article key={l.label} class="card">
               <h2 class="text-xl font-heading font-bold text-liturgia-verde mb-1">{l.label}</h2>
-              <p class="text-sm font-semibold text-slate-500 mb-4">{l.cita}{l.antifona ? ` — "${l.antifona}"` : ''}</p>
+              <p class="text-sm font-semibold text-slate-500 mb-4">{citaCompleta(l)}{l.antifona ? ` — "${l.antifona}"` : ''}</p>
               <div class="font-body leading-loose text-slate-800 whitespace-pre-line">{l.texto}</div>
             </article>
           ))}
