@@ -508,52 +508,55 @@ class GeneradorPresentacionHTML:
         """
         Compacta salmos y lecturas bíblicas.
 
-        El texto de Ciudad Redonda suele tener dobles saltos de línea entre
-        frases de un mismo verso. Esta función detecta los versos y une las
-        frases internas con comas/espacios, dejando un doble salto de línea
-        entre versos.
+        Respeta los párrafos/estrofas del texto original. Una estrofa nueva
+        se detecta cuando una línea empieza en mayúscula y la anterior termina
+        en punto fuerte. Dentro de cada estrofa se unen las frases cortas con
+        punto y coma para formar un párrafo continuo.
         """
         if not texto:
             return ""
 
         lineas = [l.strip() for l in texto.splitlines() if l.strip()]
-        versos: List[List[str]] = []
-        actual: List[str] = []
+        if not lineas:
+            return ""
 
-        def _empieza_verso(linea: str) -> bool:
+        estrofas: List[List[str]] = []
+        actual: List[str] = [lineas[0]]
+
+        def _empieza_nuevo_bloque(linea: str) -> bool:
             return bool(re.match(r"^[A-ZÁÉÍÓÚÑ]", linea))
 
-        for i, linea in enumerate(lineas):
-            if not actual:
-                actual.append(linea)
-                continue
-
+        for i in range(1, len(lineas)):
+            linea = lineas[i]
             ultima = actual[-1]
-            termina_verso = ultima.endswith((".", "!", "?", ":")) or _empieza_verso(linea)
-            # Si la línea anterior termina en punto fuerte o la nueva empieza en mayúscula,
-            # consideramos que empieza un nuevo verso.
-            if termina_verso and _empieza_verso(linea):
-                versos.append(actual)
+            # Nueva estrofa si la línea anterior termina en punto fuerte
+            # y la nueva empieza con mayúscula (invocación/sujeto nuevo)
+            if ultima.endswith((".", "!", "?", ":")) and _empieza_nuevo_bloque(linea):
+                estrofas.append(actual)
                 actual = [linea]
             else:
                 actual.append(linea)
 
         if actual:
-            versos.append(actual)
+            estrofas.append(actual)
 
         resultado: List[str] = []
-        for verso in versos:
-            unido = verso[0]
-            for frase in verso[1:]:
-                # Si la frase anterior termina en coma/punto y coma, unir con espacio.
-                # Si termina en punto, añadir espacio.
-                if unido[-1] in ",;":
+        for estrofa in estrofas:
+            unido = estrofa[0]
+            for frase in estrofa[1:]:
+                # Respetar guiones de separación silábica
+                if unido.endswith("-"):
+                    unido = unido[:-1] + frase
+                    continue
+                # Si la frase anterior termina en coma/punto y coma, unir con espacio
+                if unido[-1] in ",;:":
                     unido = f"{unido} {frase}"
                 else:
-                    unido = f"{unido} {frase}"
+                    unido = f"{unido}; {frase}"
             resultado.append(unido)
 
         return "\n\n".join(resultado)
+
 
     def _compactar_para_slide(self, texto: str) -> str:
         """
@@ -829,7 +832,7 @@ class GeneradorPresentacionHTML:
 
     .reveal {{
       font-family: 'Nunito', 'Open Sans', sans-serif;
-      font-size: 26px;
+      font-size: 24px;
       color: #2c3e50;
     }}
 
@@ -1208,7 +1211,8 @@ class GeneradorPresentacionHTML:
                      || slide.classList.contains('evangelio')
                      || slide.classList.contains('lectura');
 
-      let fontSize = esLectura ? 52 : 48;
+      // Lecturas: reducir base para evitar scroll; si aun no cabe, _paginar_texto debe dividir
+      let fontSize = esLectura ? 38 : 48;
       tarjeta.style.fontSize = fontSize + 'px';
 
       const logoHeight = logo ? logo.offsetHeight + 36 : 90;
@@ -1221,15 +1225,11 @@ class GeneradorPresentacionHTML:
 
       tarjeta.style.maxHeight = maxHeight + 'px';
 
-      while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > 16) {{
+      // Reducir hasta que el texto quepa; para lecturas permitimos bajar mas
+      const minSize = esLectura ? 22 : 16;
+      while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > minSize) {{
         fontSize -= 0.5;
         tarjeta.style.fontSize = fontSize + 'px';
-      }}
-
-      // Las lecturas deben tener letra grande, similar a canciones; no bajar de 34px
-      const minLectura = 28;
-      if (esLectura && fontSize < minLectura) {{
-        tarjeta.style.fontSize = minLectura + 'px';
       }}
     }}
     Reveal.on('ready', event => ajustarTexto(event.currentSlide));
