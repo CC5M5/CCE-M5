@@ -245,9 +245,9 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                 cita = lecturas_data[tipo]["cita"]
                 subtitulo = ""
 
-            # Diapositivas de paso: cita del Evangelio del día
+            # Diapositivas de paso: referencia al tiempo litúrgico y cita del Evangelio
             if tipo == "paso" and "evangelio" in lecturas_data:
-                subtitulo = lecturas_data["evangelio"]["cita"]
+                subtitulo = f"{celebracion} · {lecturas_data['evangelio']['cita']}"
 
             # Expandir diapositivas de paso sin contenido
             if tipo == "paso":

@@ -26,11 +26,21 @@ const domingo = presentacion?.domingo || 'Presentación semanal';
 const fecha = presentacion?.fecha_domingo || '';
 
 const lecturas = [
-  { label: 'Primera lectura', cita: presentacion?.primera_lectura_cita },
-  { label: 'Salmo', cita: presentacion?.salmo_cita, antifona: presentacion?.salmo_antifona },
-  { label: 'Segunda lectura', cita: presentacion?.segunda_lectura_cita },
-  { label: 'Evangelio', cita: presentacion?.evangelio_cita },
+  { label: 'Primera lectura', cita: presentacion?.primera_lectura_cita, libro: presentacion?.primera_lectura_libro },
+  { label: 'Salmo', cita: presentacion?.salmo_cita, antifona: presentacion?.salmo_antifona, libro: presentacion?.salmo_libro },
+  { label: 'Segunda lectura', cita: presentacion?.segunda_lectura_cita, libro: presentacion?.segunda_lectura_libro },
+  { label: 'Evangelio', cita: presentacion?.evangelio_cita, libro: presentacion?.evangelio_libro },
 ].filter(l => l.cita);
+
+const citaCompleta = (l) => {
+  const libro = l.libro ? l.libro.trim() : '';
+  const cita = l.cita ? l.cita.trim() : '';
+  if (!libro) return cita;
+  const citaLower = cita.toLowerCase();
+  const libroLower = libro.toLowerCase();
+  if (citaLower.startsWith(libroLower) || citaLower.startsWith('sal ')) return cita;
+  return `${libro} ${cita}`;
+};
 
 const momentosOrden = [
   'entrada', 'acto penitencial', 'gloria', 'salmo', 'aleluya', 'evangelio',
@@ -106,7 +116,7 @@ const cancionesOrdenadas = [...canciones].sort((a, b) => {
             {lecturas.map(l => (
               <li class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 border-b border-slate-100 pb-3 last:border-0">
                 <span class="text-sm font-semibold text-liturgia-verde min-w-[8rem]">{l.label}:</span>
-                <span class="font-body">{l.cita}{l.antifona ? ` — "${l.antifona}"` : ''}</span>
+                <span class="font-body">{citaCompleta(l)}{l.antifona ? ` — "${l.antifona}"` : ''}</span>
               </li>
             ))}
           </ul>
