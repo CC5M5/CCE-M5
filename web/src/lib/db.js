@@ -20,10 +20,10 @@ export function getLatestPresentacion() {
   const row = getDb()
     .prepare(
       `SELECT p.*, l.domingo, l.temporada, l.ciclo, l.color_liturgico,
-        l.primera_lectura_cita, l.primera_lectura_texto,
-        l.salmo_cita, l.salmo_antifona, l.salmo_texto,
-        l.segunda_lectura_cita, l.segunda_lectura_texto,
-        l.evangelio_cita, l.evangelio_texto,
+        l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
+        l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
+        l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
+        l.evangelio_libro, l.evangelio_cita, l.evangelio_texto,
         l.fuente_scraping
       FROM presentaciones p
       LEFT JOIN lecturas l ON p.lectura_id = l.id
@@ -39,10 +39,10 @@ export function getPresentacionByFecha(fecha) {
   const row = getDb()
     .prepare(
       `SELECT p.*, l.domingo, l.temporada, l.ciclo, l.color_liturgico,
-        l.primera_lectura_cita, l.primera_lectura_texto,
-        l.salmo_cita, l.salmo_antifona, l.salmo_texto,
-        l.segunda_lectura_cita, l.segunda_lectura_texto,
-        l.evangelio_cita, l.evangelio_texto,
+        l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
+        l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
+        l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
+        l.evangelio_libro, l.evangelio_cita, l.evangelio_texto,
         l.fuente_scraping
       FROM presentaciones p
       LEFT JOIN lecturas l ON p.lectura_id = l.id
