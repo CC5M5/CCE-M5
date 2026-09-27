@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-09-27T11:07:25.320917"
+    "generado": "2026-09-27T11:14:57.382177"
   },
   "slides": [
     {
@@ -21,8 +21,8 @@
     {
       "numero": 2,
       "tipo": "entrada",
-      "titulo": "PREPARAD EL CAMINO",
-      "contenido": "**PREPARAD EL CAMINO**\n**PREPARAD EL CAMINO AL SEÑOR**\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios, desterrad la mentira por siempre, preparad los caminos de Dios(Bis)",
+      "titulo": "HE VENIDO A SERVIR",
+      "contenido": "Quien quiera ser grande, quien quiera ser el primero, sea el esclavo de todos, sea el más pequeño.\nNo he venido a ser servido, que he venido a servir y a dar la vida por todos para que todos puedan vivir (2)\nen plenitud (3).",
       "cita": "",
       "subtitulo": "",
       "momento": "Canción de Entrada",
@@ -31,18 +31,18 @@
     {
       "numero": 3,
       "tipo": "perdon",
-      "titulo": "OTRA OPORTUNIDAD",
-      "contenido": "Me he perdido en mi caminar, tu camino quiero encontrar, porque sólo Tú eres Verdad.\nMas soy débil, fragilidad, y me olvido de tu verdad.\nDebes perdonar.\nDame otra oportunidad.",
+      "titulo": "ACTO PENITENCIAL",
+      "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
       "cita": "",
       "subtitulo": "",
-      "momento": "Acto Penitencial",
+      "momento": "",
       "imagen": "assets/fano_20140936_es_el_cordero_de_dios_que_limpia_el_pecado_del_mundo.jpg"
     },
     {
       "numero": 4,
       "tipo": "gloria",
-      "titulo": "NO PREGUNTÉIS PORQUÉ",
-      "contenido": "No preguntéis porqué, os lo pide el Señor.\nVamos hacia Jerusalén, ésta es su razón.\nPorque debéis saber que es tiempo de amor.\nAsí nos lo ha dicho Él: ¡Alabad a Dios!\n**HOSANNA, HOSANNA, GLORIA AL QUE VIENE**\n**EN NOMBRE DEL SEÑOR (2).**\nHoy me has hecho llorar, pobre Jerusalén.\nNo pierdas la oportunidad que te da tu Dios.\nYa no temas Sión, mira tu rey está aquí,\nY su llanto convertirá en sonrisa y perdón.\nCómo hacemos callar, si es un canto de amor,\nY hasta las piedras gritarán: ¡Alabad a Dios!",
+      "titulo": "ALABO TU BONDAD",
+      "contenido": "Todo mi ser canta hoy por las cosas que hay en mí.\nGracias te doy mi Señor,\nTú me haces tan feliz.\nTú me has regalado tu amistad, confío en ti, me llenas de tu paz.\nTú me haces sentir tu gran bondad, yo cantaré por siempre tu fidelidad.\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\n**GLORIA, GLORIA, SIEMPRE CANTARÉ TU FIDELIDAD.**\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\n**GLORIA, GLORIA, (TÚ ME HACES SENTIR TU GRAN BONDAD. YO CANTARÉ)**\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\n(POR SIEMPRE TU FIDELIDAD)\nSiempre a tu lado estaré alabando tu bondad\nA mis hermanos diré el gran gozo que hallo en ti.\nEn ti podrán siempre encontrar fidelidad, confianza y amistad.\nNunca fallará tu gran amor, ni tu perdón. Me quieres tal como soy",
       "cita": "",
       "subtitulo": "",
       "momento": "Gloria",
@@ -61,8 +61,8 @@
     {
       "numero": 6,
       "tipo": "salmo",
-      "titulo": "SALMO RESPONSORIAL (1/2)",
-      "contenido": "Antífona: Recuerda, Señor, que tu misericordia es eterna; Señor, enséñame tus caminos, instrúyeme en tus sendas: haz que camine con lealtad; enséñame, porque tú eres mi Dios y Salvador, y todo el día te estoy esperando.\n\nRecuerda, Señor, que tu ternura y tu misericordia son eternas; no te acuerdes de los pecados; ni de las maldades de mi juventud; acuérdate de mí con misericordia, por tu bondad, Señor.\n\nEl Señor es bueno y es recto, y enseña el camino a los pecadores; hace caminar a los humildes con rectitud, enseña su camino a los humildes.; --YA DE MAÑANA; Fam# Dom# Re Mi; Dom# YA DE MAÑANA OYES MI VOZ CUANDO ME PONGO ANTE TI, Fam# Re ESPERÁNDOTE SEÑOR; **PORQUE YA DE MAÑANA OYES MI VOZ,**; **PORQUE YA DE MAÑANA OYES MI VOZ.**; Dom# Fam# Dom#; Escucha mis palabras, oye mis lamentos, cuando presento mi súplica ante ti,¡ Oh mi rey y mi Dios !, La Dom# Fam#; Dom# Guíame oh Yahveh en tu justicia, allana también tu camino ante mí, ¡Oh mi rey y mi Dios !\n\nLos que aman tu nombre, los que a ti se acogen, se alegren, exulten por siempre y alborocen ¡ Oh mi rey y mi Dios !",
+      "titulo": "SALMO RESPONSORIAL",
+      "contenido": "Antífona: Recuerda, Señor, que tu misericordia es eterna\n\nSeñor, enséñame tus caminos, instrúyeme en tus sendas: haz que camine con lealtad; enséñame, porque tú eres mi Dios y Salvador, y todo el día te estoy esperando.\n\nRecuerda, Señor, que tu ternura y tu misericordia son eternas; no te acuerdes de los pecados; ni de las maldades de mi juventud; acuérdate de mí con misericordia, por tu bondad, Señor.\n\nEl Señor es bueno y es recto, y enseña el camino a los pecadores; hace caminar a los humildes con rectitud, enseña su camino a los humildes.",
       "cita": "Salmo Sal 24,4",
       "subtitulo": "",
       "momento": "",
@@ -70,16 +70,6 @@
     },
     {
       "numero": 7,
-      "tipo": "salmo",
-      "titulo": "SALMO RESPONSORIAL (2/2)",
-      "contenido": "Escucha mis palabras oye mis lamentos, cuando presento mi súplica ante ti, ¡ Oh mi rey y mi Dios !; ...Tú en la noche, tarde... oyes mi voz...",
-      "cita": "Salmo Sal 24,4",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/fano_20140360_recibimos_para_hacer_crecer.jpg"
-    },
-    {
-      "numero": 8,
       "tipo": "segunda_lectura",
       "titulo": "SEGUNDA LECTURA",
       "contenido": "Si queréis darme el consuelo de Cristo y aliviarme con vuestro amor, si nos une el mismo Espíritu y tenéis entrañas compasivas, dadme esta gran alegría: manteneos unánimes y concordes con un mismo amor y un mismo sentir. No obréis por rivalidad ni por ostentación, dejaos guiar por la humildad y considerad siempre superiores a los demás. No os encerréis en vuestros intereses, sino buscad todos el interés de los demás. Tened entre vosotros los sentimientos propios de Cristo Jesús. Él, a pesar de su condición divina, no hizo alarde de su categoría de Dios; al contrario, se despojó de su rango y tomó la condición de esclavo, pasando por uno de tantos. Y así, actuando como un hombre cualquiera, se rebajó hasta someterse incluso a la muerte, y una muerte de cruz. Por eso Dios lo levantó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.",
@@ -89,17 +79,17 @@
       "imagen": "assets/fano_20140941_aprende_a_elegir_el_pan_de_la_palabra.jpg"
     },
     {
-      "numero": 9,
+      "numero": 8,
       "tipo": "aleluya",
-      "titulo": "ESCUCHA, TÚ",
-      "contenido": "Escucha tú la palabra de Dios, no sólo con tus oídos, también con el corazón.\nEscucha tú la palabra de Dios, y estate siempre atento a su voz.\nDéjala entrar dentro de tu corazón, pásala a tu mente y a tu situación.\nVívela, vívela, en tu realidad.\nHaz que por tu vida llegue a los demás.",
+      "titulo": "ALELUYA DE LA TIERRA",
+      "contenido": "¿Quién quiere resucitar a este mundo que se muere?\n¿Quién cantará el aleluya de esa nueva luz que viene?\n¿Quién cuando mire la tierra y las tragedias observe, sentirá en su corazón el dolor de quien se muere?\n¿Quién es capaz de salvar a este mundo decadente, y mantiene la esperanza de los muchos que la pierden?\n**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**\n**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**\n¿Quién bajará de la cruz a tanto cristo sufriente, mientras los hombres miramos, impasivos e indolentes?\n¿Quién grita desde el silencio de un ser que a su Dios retiene, porque se hace palabra que sin hablar se la entiende?\n¿Quién se torna en aleluya porque traduce la muerte, como el trigo que se pudre y de uno cientos vienen?\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**\n**Y LA TIERRA SONREIRÁ. ¡ALELUYA!**",
       "cita": "",
       "subtitulo": "",
       "momento": "Aleluya",
       "imagen": "assets/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg"
     },
     {
-      "numero": 10,
+      "numero": 9,
       "tipo": "evangelio",
       "titulo": "EVANGELIO",
       "contenido": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.» Él le contestó: «No quiero.» Pero después recapacitó y fue. Se acercó al segundo y le dijo lo mismo. Él le contestó: «Voy, señor.» Pero no fue. ¿Quién de los dos hizo lo que quería el padre?»Contestaron: «El primero.»Jesús les dijo: «Os aseguro que los publicanos y las prostitutas os llevan la delantera en el camino del reino de Dios. Porque vino Juan a vosotros enseñándoos el camino de la justicia, y no le creísteis; en cambio, los publicanos y prostitutas le creyeron. Y, aun después de ver esto, vosotros no recapacitasteis ni le creísteis.»\nPalabra del Señor",
@@ -109,7 +99,7 @@
       "imagen": "assets/fano_20140639_sin_titulo.jpg"
     },
     {
-      "numero": 11,
+      "numero": 10,
       "tipo": "credo",
       "titulo": "CREDO",
       "contenido": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\nDesde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
@@ -119,80 +109,80 @@
       "imagen": "assets/fano_20140794_una_semillita_de_fe_es_un_sueño_de_amor_para_mí_siémbrala.jpg"
     },
     {
-      "numero": 12,
+      "numero": 11,
       "tipo": "ofertorio",
-      "titulo": "PADRE NUESTRO DE LA VIDA",
-      "contenido": "Padre nuestro de la vida, mío, de ése y de aquél que vive en toda criatura y ellos así han de creer.\nQuisiera realzar tu nombre viviendo aquí bajo el sol tu mensaje de aquel monte\nSiM7m Mim de pobreza, paz y amor.\nDanos pan para vivir sólo el momento presente ya que el día de mañana quizás aquí no me encuentre.\nNo mires lo que hice mal que yo no veré a mi deudor y en mi camino hacia ti\nSiM7m Mim que no caiga en tentación.\nAmén, amén, que no caiga en tentación.\nSiM7m Mim Amén, amén, que sea así siempre\nSeñor.",
+      "titulo": "QUE TE PUEDO DAR",
+      "contenido": "¿Qué te puedo dar que no me hayas dado Tú?\n¿Qué te puedo decir que no me hayas dicho Tú?\n¿Qué puedo hacer por ti, si yo no puedo hacer nada?\nSi yo no puedo hacer nada si no es por ti, mi Dios.\n**TODO LO QUE SE, TODO LO QUE SOY,**\nTODO LO QUE TENGO ES TUYO (bis)",
       "cita": "",
       "subtitulo": "",
       "momento": "Ofertorio",
       "imagen": "assets/fano_20140880_dadles_vosotros_de_comer.jpg"
     },
     {
-      "numero": 13,
+      "numero": 12,
       "tipo": "santo",
-      "titulo": "QUIERO HACER LO MISMO",
-      "contenido": "Es un sueño escondido del\nSeñor, aunque ni él mismo lo sabe.\nÉl es un diamante, él es lo mejor, aunque nadie se lo crea.\nSeñor, haz que alguien sí lo crea.\nJosé sólo buscaba un puesto mejor:\ntener, poder, valer… ya sabes.\nEn Roma tocaste su corazón, hiciste que él lo creyera, y dio por él la vida entera.\n**QUIERO HACER LO MISMO:**\n**VER EN UN NIÑO UN TESORO QUE HAY QUE CUIDAR.**\n**QUIERO ANDAR LOS PASOS**\n**DEL SANTO VIEJO Y AMARLOS COMO LOS AMÓ CALASANZ.**\nHoy aún hay millones de niños que viven la vida aplastados.\nNo dejes que la obra de\nCalasanz se cruce nunca de brazos, que aún hay muchos niños llorando.\n**QUIERO HACER LO MISMO…**\nYo me pondré junto a él de rodillas y buscaré dentro de sus ojos la luz.\nLe ayudaré con letras y piedad a vivir\nY él sentirá que lo estoy amando, descubrirá que nació para ser feliz, y cambiará el mundo a golpes de amor por ti.\n**QUIERO HACER LO MISMO… (2)**\nYo me pondré junto a él de rodillas… y cambiará el mundo a golpes de amor por ti.\nCon letras y piedad a vivir.\nRe-Sol Porque nació para ser feliz.",
+      "titulo": "SANTO JESUITA",
+      "contenido": "**SANTO, SANTO, SANTO-O-O,** **SANTO ES EL SEÑOR,** **DIOS DEL UNIVERSO-O,** **DIOS DEL UNIVERSO-O (bis) **\nLlenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo-o, hosanna en el cielo-o.\nBendito el que viene en nombre del Señor.\nHosanna en el cielo-o, hosanna en el cielo-o.\n**SANTO, SANTO,SANTO-O-O..**\n**SANTO, SANTO, SANTO-O-O,**\n**SANTO ES EL SEÑOR.**",
       "cita": "",
       "subtitulo": "",
       "momento": "Santo",
       "imagen": "assets/fano_20140896_ii_domingo_de_adviento_dile_sí.jpg"
     },
     {
-      "numero": 14,
+      "numero": 13,
       "tipo": "padre_nuestro",
-      "titulo": "PONGO MI VIDA EN TUS MANOS",
-      "contenido": "Pongo mi vida en tus manos,\nPadre mío me abandono a ti.\nHaz de mi lo que quieras estoy dispuesto a aceptarlo todo...\n(3)\n... con infinita confianza porque tú eres mi Padre.",
+      "titulo": "PADRE NUESTRO",
+      "contenido": "Rellenar a mano",
       "cita": "",
       "subtitulo": "",
       "momento": "Padre Nuestro",
       "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
     },
     {
-      "numero": 15,
+      "numero": 14,
       "tipo": "paz",
-      "titulo": "UNA NUEVA ESPERANZA",
-      "contenido": "Una nueva esperanza empieza en mí a nacer, me hablas del amor y casi sin darme cuenta mi corazón empieza a entusiasmarse y a comprender lo que es vivir.\n**TÚ ALUMBRAS MI CAMINO**\n**CON TUS PALABRAS,**\n**PUES ELLAS JAMÁS SE BORRARÁN.**\n**Y AL CAMINAR JUNTOS**\n**ME BRINDAS TU AMISTAD,**\n**EL GOZO, LA ALEGRÍA Y LA PAZ.**\n**PUES ¿QUÉ ES VIVIR?**\n**¡LA VIDA ES CRISTO!**\n**Y SU AMOR MI ÚNICA GANANCIA**\n**PUES ¿QUÉ ES VIVIR?**\n**¡LA VIDA ES CRISTO!**\n**Y SU AMOR ME BASTA.**\nSé que mucha gente no ha logrado saber que marchas a su lado, que compartes su vida entera.\nQuisiera ofrecerte lo que soy para anunciar lo que he visto en Ti.",
+      "titulo": "LA PAZ TE DOY",
+      "contenido": "La paz te doy a ti, mi hermano, la paz que Dios me regaló, y en un abrazo a ti te entrego la paz que llevo en mi corazón. (bis)\nRecíbela, recíbela, esta es la paz que el mundo no te puede dar. (bis)",
       "cita": "",
       "subtitulo": "",
       "momento": "Rito de la Paz",
       "imagen": "assets/fano_20140408_arranca_lo_que_te_impida_dar_frutos_de_amor_domingo_27_de_se.jpg"
     },
     {
-      "numero": 16,
+      "numero": 15,
       "tipo": "comunion",
-      "titulo": "TODO MI SER",
-      "contenido": "Todo mi ser, todo lo que soy te pertenece sólo a ti.\nDesde mi pobreza,\nTú eres la fuerza.\nNada sé, sólo que caminaré.\n**LLEGASTE A MI VIDA CON TU LUZ,**\n**CAMBIASTE MI MENTE CON TU AMOR,**\n**VACIASTE MI ALMA Y AHORA ESTÁS**\n**DENTRO DE MÍ.**\nTodo mi ser, todo lo que soy, lo bueno y lo malo la pongo a tus pies.\nAunque a veces llegues a mi templo y lo encuentres ya lleno, no es verdad, sólo se llena cuando Tú moras en él.",
+      "titulo": "BENDIGAMOS AL SEÑOR",
+      "contenido": "Bendigamos al Señor, Dios de toda la creación por habernos regalado su amor.\nSu bondad y su perdón, y su gran fidelidad por los siglos de los siglos durará.\n**EL ESPÍRITU DE DIOS HOY ESTÁ SOBRE MI.**\n**ÉL ES QUIEN ME HA UNGIDO A PROCLAMAR**\n**LA BUENA NUEVA A LOS MÁS POBRES,**\nSol Mim La La7 (2ª:Sol La Re)\n**LA GRACIA DE SU SALVACIÓN. (BIS)**\nEnviados con poder y en el nombre de Jesús a sanar a los enfermos del dolor, a los ciegos dar visión, a los pobres la verdad y a los presos y oprimidos, libertad.\n**Con la fuerza de su amor y de la resurrección anunciamos: llega ya la salvación.**\n**Que ni el miedo, ni el temor, ni la duda o la opresión borrarán la paz de nuestro corazón.**",
       "cita": "",
       "subtitulo": "",
       "momento": "Comunión",
       "imagen": "assets/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg"
     },
     {
-      "numero": 17,
+      "numero": 16,
       "tipo": "maria",
-      "titulo": "MARÍA, MÚSICA DE DIOS",
-      "contenido": "**MARÍA, MÚSICA DE DIOS**\nMe quedé sin voz con qué cantar y mi alma vacía dormía en sequedad\nY pensé para mí: me pondré en sus manos manos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén Y tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén María, acompaña tú mi caminar yo sola no puedo, ayúdame a andar\nY pensé para mí: me pondré en sus manos manos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén Y tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén",
+      "titulo": "A TU AMPARO Y PROTECCIÓN",
+      "contenido": "**A TU AMPARO Y PROTECCIÓN,**\n**MADRE DE DIOS, ACUDIMOS.**\n**NO DESOIGAS NUESTROS RUEGOS**\n**Y DE TODOS LOS PELIGROS,**\n**VIRGEN GLORIOSA Y BENDITA,**\n**DEFIENDE SIEMPRE A TUS HIJOS**",
       "cita": "",
       "subtitulo": "",
       "momento": "Canto a María",
       "imagen": "assets/fano_20140474_solemnidad_de_santa_maria_madre_de_dios_1_de_enero_de_2017_j.jpg"
     },
     {
-      "numero": 18,
+      "numero": 17,
       "tipo": "despedida",
-      "titulo": "QUIERO VIVIR AMANDO",
-      "contenido": "No me resigno y busco siempre más, no me conformo con ser un mediocre.\nQuiero tenerte cerca al caminar sólo contigo brillaré en la noche.\n**NO HAY AMOR, TODO ES MENTIRA**\n**NO HAY AMOR,**\n**TODO LO QUE VIVO PIERDE SU**\nCOLOR Podría amontonar todo el saber, y ser el tío más listo de la tierra.\nPodría dedicarme a resolver, todos los males y todas las guerras.\n**NO HAY AMOR, TODO ES MENTIRA**\n**NO HAY AMOR,**\n**TODO LO QUE VIVO PIERDE SU COLOR**\n**QUIERO VIVIR AMANDO, QUIERO VIVIR**\nRe La Sol….\n**QUIERO VIVIR AMANDO, QUIERO VIVIR**\nPodría querer ser tu seguidor, dejarme quemar vivo a fuego lento y ganar cada mes más de un millón y repartirlo todo a los hambrientos.\n**NO HAY AMOR, TODO ES MENTIRA**\n**NO HAY AMOR,**\n**TODO LO QUE VIVO PIERDE SU**\n**COLOR QUIERO VIVIR AMANDO, QUIERO VIVIR**\n**QUIERO VIVIR AMANDO, QUIERO VIVIR O MORIR**\nEl amor es servicio y no lleva cuentas del mal el amor no presume, no es egoísta.\nEl amor no se engríe, no se irrita ni te trata mal.\nTambién es comprensivo, no tiene envidia.\nDisculpa y cree sin límites.\nEspera y aguanta sin límites.\nEl amor nunca pasará.\n**NO HAY AMOR, TODO ES MENTIRA**\n**NO HAY AMOR,**\n**TODO LO QUE VIVO PIERDE SU**\n**COLOR QUIERO VIVIR AMANDO, QUIERO VIVIR**\n**QUIERO VIVIR AMANDO, QUIERO VIVIR**\nQuiero vivir amando, porque el amor es Dios.\nReLaSim Sol Quiero vivir amando, porque el amor es Dios.",
+      "titulo": "COMO CORRE UN RÍO",
+      "contenido": "Como corre un río dentro de mi ser (x2)\nasí yo confío en Cristo, mi Rey (x2)\n**COMO UN RÍO DE AGUA VIVA,**\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\nJesús está pasando por ahí\nJesús está pasando por ahí\nY cuando pasa todo lo transforma\nSe va la tristeza, viene la alegría\nY cuando pasa todo lo transforma\nViene la alegría para ti y para mí\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
       "cita": "",
       "subtitulo": "",
       "momento": "Despedida",
       "imagen": "assets/fano_20140414_la_ternura_de_los_humildes_salva_al_mundo_domingo_8_de_novie.jpg"
     },
     {
-      "numero": 19,
+      "numero": 18,
       "tipo": "portada",
       "titulo": "¡ID EN PAZ!",
-      "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
+      "contenido": "La paz del Señor esté siempre con vosotros.\n\n«»",
       "cita": "",
       "subtitulo": "Somos uno · 27 de septiembre de 2026",
       "momento": "",
