@@ -1435,6 +1435,8 @@ class GeneradorPresentacionHTML:
                 # Aplicar negrita a segmentos marcados con **texto**
                 self._add_formatted_run(p, para_text, is_cancion, is_portada, i, slide_data, primary)
 
+        prs.save(str(pptx_path))
+
     def _add_formatted_run(
         self,
         p,
