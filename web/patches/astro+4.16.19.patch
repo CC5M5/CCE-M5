@@ -1,0 +1,39 @@
+diff --git a/node_modules/astro/dist/core/build/generate.js b/node_modules/astro/dist/core/build/generate.js
+--- a/node_modules/astro/dist/core/build/generate.js
++++ b/node_modules/astro/dist/core/build/generate.js
+@@ -1,5 +1,6 @@
+ import fs from "node:fs";
+ import os from "node:os";
++import { pathToFileURL } from "node:url";
+ import { bgGreen, black, blue, bold, dim, green, magenta, red } from "kleur/colors";
+ import PLimit from "p-limit";
+ import PQueue from "p-queue";
+@@ -43,8 +44,8 @@
+     manifest = await BuildPipeline.retrieveManifest(options, internals);
+   } else {
+     const baseDirectory = getOutputDirectory(options.settings.config);
+-    const renderersEntryUrl = new URL("renderers.mjs", baseDirectory);
++    const renderersEntryUrl = pathToFileURL(new URL("renderers.mjs", baseDirectory).pathname);
+     const renderers = await import(renderersEntryUrl.toString());
+     const middleware = internals.middlewareEntryPoint ? await import(internals.middlewareEntryPoint.toString()).then((mod) => mod.onRequest) : NOOP_MIDDLEWARE_FN;
+     manifest = createBuildManifest(
+
+diff --git a/node_modules/astro/dist/core/build/pipeline.js b/node_modules/astro/dist/core/build/pipeline.js
+--- a/node_modules/astro/dist/core/build/pipeline.js
++++ b/node_modules/astro/dist/core/build/pipeline.js
+@@ -1,5 +1,6 @@
+ import { getOutputDirectory } from "../../prerender/utils.js";
+ import { BEFORE_HYDRATION_SCRIPT_ID, PAGE_SCRIPT_ID } from "../../vite-plugin-scripts/index.js";
++import { pathToFileURL } from "node:url";
+ import { routeIsFallback, routeIsRedirect } from "../redirects/helpers.js";
+ import { RedirectSinglePageBuiltModule } from "../redirects/index.js";
+ import { Pipeline } from "../render/index.js";
+@@ -100,7 +101,7 @@
+       "Astro couldn't find the emitted manifest. This is an internal error, please file an issue."
+       );
+     }
+-    const renderersEntryUrl = new URL(`renderers.mjs?time=${Date.now()}`, baseDirectory);
++    const renderersEntryUrl = pathToFileURL(new URL(`renderers.mjs?time=${Date.now()}`, baseDirectory).pathname);
+     const renderers = await import(renderersEntryUrl.toString());
+     const middleware = internals.middlewareEntryPoint ? await import(internals.middlewareEntryPoint.toString()).then((mod) => {
+       return function() {
