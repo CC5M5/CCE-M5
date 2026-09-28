@@ -28,6 +28,7 @@ from src.web_admin.auth import (
 )
 from src.web_admin import models as m
 from src.web_admin.database import (
+    WORKFLOW_STEPS,
     add_workflow_log,
     count_admins,
     create_workflow_run,
@@ -37,9 +38,11 @@ from src.web_admin.database import (
     get_user_by_id,
     get_workflow_logs,
     get_workflow_run,
+    goto_workflow_step,
     init_admin_schema,
     list_users,
     list_workflow_runs,
+    next_step,
     set_user_password,
     supersede_workflow_run,
     update_user,
@@ -307,6 +310,35 @@ async def workflow_create(
         can_advance=True,
         next_step_name="fetch_lectures",
         warning=warning,
+    )
+
+
+@app.post("/workflows/{workflow_id}/goto-step", response_model=m.WorkflowResponse)
+async def workflow_goto_step(
+    workflow_id: int,
+    payload: m.WorkflowGotoStep,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    """Mueve el workflow a un paso arbitrario para permitir re-edición o re-publicación."""
+    wf = get_workflow_run(workflow_id)
+    if not wf:
+        raise HTTPException(status_code=404, detail="Workflow no encontrado")
+    if payload.workflow_id != workflow_id:
+        raise HTTPException(status_code=400, detail="workflow_id inconsistente")
+
+    if payload.step not in WORKFLOW_STEPS:
+        raise HTTPException(status_code=400, detail=f"Paso no válido: {payload.step}")
+
+    goto_workflow_step(workflow_id, payload.step)
+    add_workflow_log(workflow_id, payload.step, f"Movido manualmente al paso {payload.step} por {current_user['username']}")
+    updated = get_workflow_run(workflow_id)
+    logs = get_workflow_logs(workflow_id)
+    can_advance = updated["current_step"] != "done" and next_step(updated["current_step"]) is not None
+    return m.WorkflowResponse(
+        workflow=m.WorkflowRun(**updated),
+        logs=[m.WorkflowLogEntry(**r) for r in logs],
+        can_advance=can_advance,
+        next_step_name=next_step(updated["current_step"]),
     )
 
 
