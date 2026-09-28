@@ -26,11 +26,7 @@ const momentosOrden = [
   'entrada', 'acto penitencial', 'gloria', 'salmo', 'aleluya', 'evangelio',
   'credo', 'paz', 'comunion', 'comunión', 'accion de gracias', 'despedida'
 ];
-const cancionesOrdenadas = [...canciones].sort((a, b) => {
-  const ia = momentosOrden.indexOf((a.momento_liturgico || '').toLowerCase());
-  const ib = momentosOrden.indexOf((b.momento_liturgico || '').toLowerCase());
-  return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
-});
+const cancionesOrdenadas = canciones;
 
 const colorLiturgico = presentacion?.color_liturgico || 'verde';
 ---
