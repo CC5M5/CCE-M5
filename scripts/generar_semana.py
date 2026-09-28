@@ -560,13 +560,18 @@ def generar_pptx(
     if output_path.exists():
         logger.warning("PPTX de destino ya existe: %s", output_path)
 
+    # El bundle HTML/PPTX/PDF debe vivir en presentaciones_html/ para poder
+    # sincronizarlo a web/public durante el rebuild del sitio Astro.
+    bundle_base_dir = PROJECT_DIR / "presentaciones_html"
+    bundle_base_dir.mkdir(parents=True, exist_ok=True)
+
     try:
         from src.generators.presentacion_html import GeneradorPresentacionHTML
 
         incluir_bendicion_agua = bool(canciones_ids.get("bendicion_agua"))
         gen = GeneradorPresentacionHTML(
             db_path=str(DB_PATH),
-            output_dir=str(output_dir),
+            output_dir=str(bundle_base_dir),
         )
         bundle_dir = gen.generar(
             fecha=fecha_domingo,
