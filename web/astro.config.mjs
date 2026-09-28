@@ -40,7 +40,7 @@ export default defineConfig({
   ],
   vite: {
     ssr: {
-      external: ['better-sqlite3'],
+      external: [],
     },
   },
 });
