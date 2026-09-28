@@ -256,6 +256,26 @@ def next_step(step: str) -> Optional[str]:
     return WORKFLOW_STEPS[idx + 1]
 
 
+def goto_workflow_step(
+    workflow_id: int,
+    target_step: str,
+    db_path: Optional[Path] = None,
+) -> None:
+    """Mueve el workflow a un paso arbitrario conservando steps_data."""
+    if target_step not in WORKFLOW_STEPS:
+        raise ValueError(f"Paso no válido: {target_step}")
+    with _connection(db_path) as conn:
+        with conn:
+            conn.execute(
+                """
+                UPDATE workflow_runs
+                SET status = ?, current_step = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (target_step, target_step, _now(), workflow_id),
+            )
+
+
 def create_workflow_run(
     fecha_domingo: str,
     created_by: Optional[str] = None,
