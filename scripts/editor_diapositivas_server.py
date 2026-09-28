@@ -67,6 +67,17 @@ def _git_commit(mensaje: str) -> str:
             capture_output=True,
             text=True,
         )
+        # Si no hay nada staged, no hay nada que commitear (p. ej. BD sin cambios reales)
+        diff_check = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=PROJECT_DIR,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if diff_check.returncode == 0:
+            return "sin cambios"
+
         result = subprocess.run(
             ["git", "commit", "-m", f"chore(slides): {mensaje}",
              "-m", "Actualización manual desde editor local de diapositivas."],
@@ -86,7 +97,7 @@ def _git_commit(mensaje: str) -> str:
         return m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
         err = exc.stderr or exc.stdout or ""
-        if "nothing to commit" in err or "working tree clean" in err or "No changes" in err:
+        if "nothing to commit" in err or "working tree clean" in err or "No changes" in err or "sin cambios agregados" in err:
             return "sin cambios"
         return f"ERROR: {err}"
 
