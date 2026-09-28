@@ -35,7 +35,10 @@ jobs:
         working-directory: ./web
 
       - name: Build site
-        run: npm run build
+        run: |
+          # Excluir el panel de administración del build estático de GitHub Pages.
+          rm -rf ./src/pages/admin ./src/pages/admin.astro
+          npm run build
         working-directory: ./web
         env:
           BASE_PATH: ${{ vars.BASE_PATH || '/CCE-M5/' }}

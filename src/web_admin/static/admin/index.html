@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Administrador · CCE M5</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f8fafc;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #1e293b;
+      }
+      header {
+        background: #1e5631;
+        color: #fff;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header .brand { display: flex; align-items: center; gap: 0.75rem; }
+      header h1 { margin: 0; font-size: 1.1rem; }
+      header p { margin: 0.1rem 0 0; font-size: 0.75rem; opacity: 0.85; }
+      header .badge {
+        font-size: 0.8rem;
+        background: rgba(255,255,255,0.15);
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+      }
+      header button {
+        background: rgba(255,255,255,0.12);
+        color: #fff;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.4rem;
+        cursor: pointer;
+      }
+      main { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+      .card {
+        background: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+      }
+      .card h2 { margin: 0 0 1rem; font-size: 1.15rem; }
+      .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+      .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.3rem; color: #475569; }
+      input[type="date"], input[type="number"], input[type="text"] {
+        padding: 0.55rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.45rem;
+        font-size: 0.95rem;
+      }
+      button.primary {
+        background: #1e5631;
+        color: #fff;
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 0.45rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button.primary:hover { background: #164226; }
+      button.primary:disabled { opacity: 0.6; cursor: wait; }
+      button.secondary {
+        background: #fff;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        padding: 0.6rem 1rem;
+        border-radius: 0.45rem;
+        cursor: pointer;
+      }
+      button.secondary:hover { background: #f1f5f9; }
+      .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 0.45rem;
+        font-size: 0.9rem;
+        margin-top: 0.75rem;
+        display: none;
+      }
+      .alert.error { background: #fef2f2; color: #991b1b; }
+      .alert.warn { background: #fffbeb; color: #92400e; }
+      .stepper {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-bottom: 1.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+      .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 5.5rem;
+      }
+      .step .dot {
+        width: 2rem; height: 2rem;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; font-weight: 700;
+        background: #e2e8f0; color: #64748b;
+      }
+      .step.done .dot { background: #1e5631; color: #fff; }
+      .step.active .dot { background: #d97706; color: #fff; box-shadow: 0 0 0 4px rgba(217,119,6,0.2); }
+      .step label { margin-top: 0.35rem; font-size: 0.7rem; color: #64748b; text-align: center; }
+      .stepper .line { flex: 1; height: 2px; background: #e2e8f0; min-width: 1rem; }
+      .status-pill {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .status-pill.done { background: #dcfce7; color: #166534; }
+      .status-pill.pending { background: #fef3c7; color: #92400e; }
+      .status-pill.superseded { background: #f1f5f9; color: #64748b; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+      th, td { text-align: left; padding: 0.6rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
+      th { color: #64748b; font-weight: 500; }
+      .field { margin-bottom: 0.75rem; }
+      .field label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; color: #334155; }
+      .field input, .field textarea {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.4rem;
+        font-size: 0.9rem;
+      }
+      .field textarea { min-height: 4rem; resize: vertical; }
+      .song-row { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem; }
+      .song-row .momento { width: 8rem; font-size: 0.85rem; font-weight: 500; }
+      .song-row input { width: 6rem; }
+      .logs { max-height: 14rem; overflow-y: auto; font-size: 0.85rem; }
+      .log { border-left: 3px solid #1e5631; padding: 0.35rem 0.6rem; margin-bottom: 0.4rem; background: #f8fafc; }
+      .log.error { border-color: #ef4444; background: #fef2f2; }
+      .log time { color: #94a3b8; font-size: 0.75rem; }
+      dialog {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        padding: 1.5rem;
+        max-width: 360px;
+      }
+      dialog::backdrop { background: rgba(15,23,42,0.45); }
+      .dialog-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div style="font-size:1.8rem;">🎵</div>
+        <div>
+          <h1>Panel de administración</h1>
+          <p>CCE M5 · Workflow de presentaciones</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span id="user-pill" class="badge">—</span>
+        <button id="logout-btn">Salir</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>📅 Nueva gestión</h2>
+        <div class="row">
+          <div class="form-group">
+            <label for="fecha-input">Fecha del domingo</label>
+            <input type="date" id="fecha-input" />
+          </div>
+          <button id="create-btn" class="primary">Crear workflow</button>
+        </div>
+        <p style="font-size:0.85rem;color:#64748b;margin:0.75rem 0 0;">
+          Si ya existe una presentación para esa fecha, se pedirá confirmación y se creará un backup.
+        </p>
+        <div id="create-alert" class="alert"></div>
+      </section>
+
+      <section id="workflow-panel" style="display:none;">
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.25rem;">
+          <div>
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h2>Workflow <span id="wf-date" style="color:#1e5631;"></span></h2>
+                <span id="wf-status" class="status-pill pending">—</span>
+              </div>
+              <div id="stepper" class="stepper"></div>
+              <div id="step-content"></div>
+              <div style="display:flex;gap:0.75rem;margin-top:1rem;padding-top:1rem;border-top:1px solid #e2e8f0;">
+                <button id="advance-btn" class="primary" style="display:none;">Validar y continuar →</button>
+                <button id="rollback-btn" class="secondary" style="display:none;">← Retroceder</button>
+                <span id="advance-hint" style="font-size:0.85rem;color:#64748b;align-self:center;"></span>
+              </div>
+              <div id="step-alert" class="alert"></div>
+            </div>
+            <div class="card">
+              <h2>📝 Logs</h2>
+              <div id="logs" class="logs"><p style="color:#64748b;">Sin logs.</p></div>
+            </div>
+          </div>
+          <aside>
+            <div class="card">
+              <h2>💾 Backups</h2>
+              <div id="backups"><p style="color:#64748b;font-size:0.85rem;">No hay backups.</p></div>
+            </div>
+            <div class="card">
+              <h2>📂 Publicadas</h2>
+              <ul id="published-list" style="font-size:0.85rem;padding-left:1.2rem;"></ul>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Workflows recientes</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Paso</th>
+              <th>Actualizado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="workflows-tbody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <dialog id="confirm-dialog">
+      <h3 style="margin:0 0 0.5rem;">¿Regenerar presentación?</h3>
+      <p style="font-size:0.9rem;color:#475569;margin:0;">
+        Ya existe una gestión para esta fecha. Se creará una copia de seguridad y la nueva versión será la válida.
+      </p>
+      <div class="dialog-actions">
+        <button id="confirm-cancel" class="secondary">Cancelar</button>
+        <button id="confirm-ok" class="primary">Continuar</button>
+      </div>
+    </dialog>
+
+    <script>
+      const API_BASE = window.location.origin.replace(':4321', ':4324');
+      const STEPS = [
+        { key: 'init', label: 'Inicio' },
+        { key: 'fetch_lectures', label: 'Lecturas' },
+        { key: 'verify_lectures', label: 'Verificar' },
+        { key: 'propose_songs', label: 'Canciones' },
+        { key: 'verify_songs', label: 'Asignar' },
+        { key: 'generate_assets', label: 'Generar' },
+        { key: 'publish', label: 'Publicar' },
+        { key: 'done', label: 'Listo' },
+      ];
+      let currentWorkflow = null;
+      let pendingForce = false;
+
+      function token() { return localStorage.getItem('cce_admin_token'); }
+      function headers() { return { 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' }; }
+      function show(id, text, kind) {
+        const el = document.getElementById(id);
+        el.textContent = text;
+        el.style.display = 'block';
+        el.className = 'alert ' + kind;
+      }
+      function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+      async function api(path, opts) {
+        const res = await fetch(`${API_BASE}${path}`, {
+          ...opts,
+          headers: { ...headers(), ...(opts.headers || {}) },
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('cce_admin_token');
+          window.location.href = '/admin/login.html';
+          throw new Error('Sesión expirada');
+        }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+        return data;
+      }
+
+      function renderStepper(currentStep) {
+        const idx = STEPS.findIndex(s => s.key === currentStep);
+        const box = document.getElementById('stepper');
+        box.innerHTML = '';
+        STEPS.forEach((s, i) => {
+          const step = document.createElement('div');
+          step.className = 'step' + (i < idx ? ' done' : i === idx ? ' active' : '');
+          step.innerHTML = `<div class="dot">${i + 1}</div><label>${s.label}</label>`;
+          box.appendChild(step);
+          if (i < STEPS.length - 1) {
+            const line = document.createElement('div');
+            line.className = 'line';
+            box.appendChild(line);
+          }
+        });
+      }
+
+      function renderStepContent(wf) {
+        const step = wf.current_step;
+        const data = wf.steps_data || {};
+        const box = document.getElementById('step-content');
+        let html = '';
+        if (step === 'init') {
+          html = `<p>Workflow creado para <strong>${wf.fecha_domingo}</strong>. Pulsa "Validar y continuar" para empezar.</p>`;
+        } else if (step === 'fetch_lectures') {
+          html = `<p>Se obtendrán las lecturas del domingo <strong>${wf.fecha_domingo}</strong>.</p>`;
+          if (data.lecturas_fuente) html += `<p style="font-size:0.85rem;color:#64748b;">Última fuente: ${data.lecturas_fuente}</p>`;
+        } else if (step === 'verify_lectures') {
+          const l = data.lecturas || {};
+          const fields = [
+            ['domingo','Domingo'],['temporada','Temporada'],['ciclo','Ciclo'],['color_liturgico','Color litúrgico'],
+            ['primera_lectura_cita','Primera lectura (cita)'],['primera_lectura_texto','Primera lectura (texto)',true],
+            ['salmo_cita','Salmo (cita)'],['salmo_antifona','Salmo (antífona)'],['salmo_texto','Salmo (texto)',true],
+            ['segunda_lectura_cita','Segunda lectura (cita)'],['segunda_lectura_texto','Segunda lectura (texto)',true],
+            ['evangelio_cita','Evangelio (cita)'],['evangelio_texto','Evangelio (texto)',true],
+          ];
+          html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">';
+          for (const [key, label, long] of fields) {
+            const val = (l[key] || '').replace(/"/g, '&quot;');
+            if (long) {
+              html += `<div class="field" style="grid-column:1 / -1;"><label>${label}</label><textarea data-field="${key}">${val}</textarea></div>`;
+            } else {
+              html += `<div class="field"><label>${label}</label><input type="text" data-field="${key}" value="${val}" /></div>`;
+            }
+          }
+          html += '</div>';
+        } else if (step === 'propose_songs') {
+          html = `<p>Se generarán propuestas de canciones automáticas para los momentos litúrgicos.</p>`;
+        } else if (step === 'verify_songs') {
+          const prop = data.canciones_propuestas || {};
+          html = '<p>Revisa y ajusta la asignación de canciones.</p><div style="margin-top:0.75rem;">';
+          for (const [momento, info] of Object.entries(prop)) {
+            const cid = info?.cancion_id || '';
+            html += `<div class="song-row"><span class="momento">${momento}</span><input type="number" data-song="${momento}" value="${cid}" placeholder="ID" /></div>`;
+          }
+          html += '</div>';
+        } else if (step === 'generate_assets') {
+          html = `<p>Se generarán PPTX, PDF de músicos y HTML estático para <strong>${wf.fecha_domingo}</strong>.</p>`;
+        } else if (step === 'publish') {
+          html = `<p>Se reconstruirá el sitio web con la nueva presentación.</p>`;
+        } else if (step === 'done') {
+          html = `<p style="color:#1e5631;font-weight:700;">🎉 Workflow completado. La presentación ha sido publicada.</p>`;
+        }
+        box.innerHTML = html;
+      }
+
+      function gatherData() {
+        const step = currentWorkflow?.current_step;
+        const data = {};
+        if (step === 'verify_lectures') {
+          data.lecturas = {};
+          document.querySelectorAll('[data-field]').forEach(el => data.lecturas[el.dataset.field] = el.value);
+        } else if (step === 'verify_songs') {
+          data.canciones = {};
+          document.querySelectorAll('[data-song]').forEach(el => data.canciones[el.dataset.song] = parseInt(el.value, 10) || null);
+        }
+        return data;
+      }
+
+      async function loadWorkflow(id) {
+        const payload = await api(`/workflows/${id}`, { method: 'GET' });
+        currentWorkflow = payload.workflow;
+        document.getElementById('workflow-panel').style.display = 'block';
+        document.getElementById('wf-date').textContent = payload.workflow.fecha_domingo;
+        const status = document.getElementById('wf-status');
+        status.textContent = payload.workflow.status;
+        status.className = 'status-pill ' + (payload.workflow.status === 'done' ? 'done' : payload.workflow.status === 'superseded' ? 'superseded' : 'pending');
+        renderStepper(payload.workflow.current_step);
+        renderStepContent(payload.workflow);
+        document.getElementById('advance-btn').style.display = payload.can_advance && payload.workflow.current_step !== 'done' ? 'inline-block' : 'none';
+        document.getElementById('rollback-btn').style.display = (payload.workflow.current_step !== 'init' && payload.workflow.current_step !== 'done') ? 'inline-block' : 'none';
+        document.getElementById('advance-hint').textContent = payload.can_advance ? `Siguiente: ${payload.next_step_name || 'finalizar'}` : '';
+        hide('step-alert');
+        renderLogs(payload.logs);
+        loadBackups(id);
+      }
+
+      function renderLogs(logs) {
+        const box = document.getElementById('logs');
+        if (!logs.length) { box.innerHTML = '<p style="color:#64748b;">Sin logs.</p>'; return; }
+        box.innerHTML = logs.map(l => `<div class="log ${l.level === 'error' ? 'error' : ''}"><time>${new Date(l.created_at).toLocaleString()}</time> · ${l.message}</div>`).join('');
+      }
+
+      async function loadBackups(wid) {
+        const data = await api(`/workflows/${wid}/backups`, { method: 'GET' });
+        const box = document.getElementById('backups');
+        if (!data.backups?.length) { box.innerHTML = '<p style="color:#64748b;font-size:0.85rem;">No hay backups.</p>'; return; }
+        box.innerHTML = data.backups.map(b => `<div style="border:1px solid #e2e8f0;border-radius:0.4rem;padding:0.5rem;margin-bottom:0.4rem;"><div style="font-weight:600;font-size:0.85rem;">${new Date(b.created_at).toLocaleString()}</div><div style="font-size:0.75rem;color:#64748b;word-break:break-all;">${b.backup_path}</div></div>`).join('');
+      }
+
+      async function listWorkflows() {
+        const data = await api('/workflows?limit=20', { method: 'GET' });
+        const tbody = document.getElementById('workflows-tbody');
+        tbody.innerHTML = data.workflows.map(w => `<tr>
+          <td>${w.fecha_domingo}</td>
+          <td><span class="status-pill ${w.status === 'done' ? 'done' : w.status === 'superseded' ? 'superseded' : 'pending'}">${w.status}</span></td>
+          <td style="color:#475569;">${w.current_step}</td>
+          <td style="color:#64748b;font-size:0.8rem;">${new Date(w.updated_at).toLocaleString()}</td>
+          <td><button class="secondary" data-load="${w.id}" style="padding:0.3rem 0.6rem;font-size:0.8rem;">Ver</button></td>
+        </tr>`).join('');
+        tbody.querySelectorAll('[data-load]').forEach(btn => btn.addEventListener('click', () => loadWorkflow(parseInt(btn.dataset.load, 10))));
+      }
+
+      async function loadPublished() {
+        const data = await api('/presentacion/fechas', { method: 'GET' });
+        const list = document.getElementById('published-list');
+        list.innerHTML = data.fechas.length ? data.fechas.map(f => `<li><a href="/presentacion/${f}/" style="color:#1e5631;" target="_blank">${f}</a></li>`).join('') : '<li style="color:#64748b;">Ninguna aún.</li>';
+      }
+
+      async function createWorkflow(force) {
+        hide('create-alert');
+        const fecha = document.getElementById('fecha-input').value;
+        if (!fecha) { show('create-alert', 'Selecciona una fecha', 'error'); return; }
+        try {
+          const payload = await api('/workflows', {
+            method: 'POST',
+            body: JSON.stringify({ fecha_domingo: fecha, force }),
+          });
+          pendingForce = false;
+          currentWorkflow = payload.workflow;
+          await listWorkflows();
+          await loadWorkflow(payload.workflow.id);
+          if (payload.warning) show('create-alert', payload.warning, 'warn');
+        } catch (err) {
+          if (err.message.includes('Ya existe')) {
+            pendingForce = true;
+            document.getElementById('confirm-dialog').showModal();
+            return;
+          }
+          show('create-alert', err.message, 'error');
+        }
+      }
+
+      async function advance() {
+        hide('step-alert');
+        if (!currentWorkflow) return;
+        const data = gatherData();
+        try {
+          const payload = await api(`/workflows/${currentWorkflow.id}/advance`, {
+            method: 'POST',
+            body: JSON.stringify({ workflow_id: currentWorkflow.id, action: 'next', data }),
+          });
+          currentWorkflow = payload.workflow;
+          await loadWorkflow(payload.workflow.id);
+          await listWorkflows();
+        } catch (err) { show('step-alert', err.message, 'error'); }
+      }
+
+      async function rollback() {
+        hide('step-alert');
+        if (!currentWorkflow) return;
+        try {
+          const payload = await api(`/workflows/${currentWorkflow.id}/advance`, {
+            method: 'POST',
+            body: JSON.stringify({ workflow_id: currentWorkflow.id, action: 'rollback' }),
+          });
+          currentWorkflow = payload.workflow;
+          await loadWorkflow(payload.workflow.id);
+        } catch (err) { show('step-alert', err.message, 'error'); }
+      }
+
+      document.getElementById('create-btn').addEventListener('click', () => createWorkflow(false));
+      document.getElementById('advance-btn').addEventListener('click', advance);
+      document.getElementById('rollback-btn').addEventListener('click', rollback);
+      document.getElementById('confirm-ok').addEventListener('click', () => { document.getElementById('confirm-dialog').close(); if (pendingForce) createWorkflow(true); });
+      document.getElementById('confirm-cancel').addEventListener('click', () => { pendingForce = false; document.getElementById('confirm-dialog').close(); });
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('cce_admin_token');
+        localStorage.removeItem('cce_admin_user');
+        window.location.href = '/admin/login.html';
+      });
+
+      (function auth() {
+        if (!token()) window.location.href = '/admin/login.html';
+        const user = JSON.parse(localStorage.getItem('cce_admin_user') || '{}');
+        document.getElementById('user-pill').textContent = user.full_name || user.username || 'admin';
+      })();
+
+      listWorkflows();
+      loadPublished();
+    </script>
+  </body>
+</html>
