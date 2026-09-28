@@ -83,14 +83,20 @@ def _get_slide_variantes(tipo: str) -> List[Dict[str, Any]]:
 
 
 def _slide_para_momento(tipo: str, subtipo_sugerido: str) -> Optional[Dict[str, Any]]:
-    """Busca la mejor slide del catálogo para un momento dado."""
+    """Busca la mejor slide del catálogo para un momento dado.
+
+    Prioridad:
+    1. subtipo exacto (cualquier estado default).
+    2. subtipo default del tipo.
+    3. cualquier slide activa del tipo.
+    """
     conn = _get_connection()
     cursor = conn.cursor()
-    # 1. subtipo exacto y default
+    # 1. subtipo exacto (primera coincidencia por id)
     cursor.execute("""
         SELECT * FROM slides
         WHERE tipo = ? AND subtipo = ? AND activo = 1
-        ORDER BY es_default DESC, id
+        ORDER BY id
         LIMIT 1
     """, (tipo, subtipo_sugerido))
     row = cursor.fetchone()
@@ -228,26 +234,48 @@ def guardar_composicion(fecha: str, items: List[Dict[str, Any]]) -> None:
 
 
 def asegurar_composicion(fecha: str, canciones_json: Optional[str] = None) -> bool:
-    """Crea una composición por defecto si no existe. Devuelve True si se creó."""
+    """Crea o regenera la composición por defecto para una fecha.
+
+    Si se pasa canciones_json y difiere del guardado, se regenera la composición
+    para reflejar la nueva selección de canciones.
+    """
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
         return False
+
+    # Normalizar canciones_json para comparación
+    def _normalizar(cj):
+        if not cj:
+            return {}
+        try:
+            data = json.loads(cj)
+        except Exception:
+            return {}
+        return {k: v for k, v in data.items() if v is not None}
+
+    json_actual = _normalizar(pres.get("canciones_json"))
+    json_nuevo = _normalizar(canciones_json)
+
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) AS n FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
     count = cursor.fetchone()["n"]
-    conn.close()
-    if count > 0:
-        return False
-    # Crear composición por defecto; si se pasa canciones_json actualizar presentaciones primero
-    if canciones_json is not None:
-        conn = _get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"]))
-        conn.commit()
+
+    if count == 0 or (canciones_json is not None and json_actual != json_nuevo):
+        # Actualizar canciones_json si se proporcionó
+        if canciones_json is not None:
+            cursor.execute("UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"]))
+            conn.commit()
+        # Si ya existía composición, borrarla para regenerar
+        if count > 0:
+            cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
+            conn.commit()
         conn.close()
-    items = proponer_composicion(fecha)
-    if items:
-        guardar_composicion(fecha, items)
-        return True
+        items = proponer_composicion(fecha)
+        if items:
+            guardar_composicion(fecha, items)
+            return True
+        return False
+
+    conn.close()
     return False

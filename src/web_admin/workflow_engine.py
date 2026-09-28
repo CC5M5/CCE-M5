@@ -617,11 +617,16 @@ def handle_generate_assets(
     if pdf_src.exists():
         shutil.copy2(pdf_src, pdf_fieles_dst)
 
+    # Asegurar que pdf_musicos sea string (puede ser Path)
+    pdf_musicos_path = result_pdf if isinstance(result_pdf, (str, Path)) else None
+    if pdf_musicos_path:
+        pdf_musicos_path = str(pdf_musicos_path)
+
     steps_data["assets"] = {
         "bundle_dir": str(bundle_dir),
         "pptx": str(pptx_dst) if pptx_src.exists() else None,
         "pdf_fieles": str(pdf_fieles_dst) if pdf_src.exists() else None,
-        "pdf_musicos": result_pdf if isinstance(result_pdf, str) else None,
+        "pdf_musicos": pdf_musicos_path,
     }
 
     logs = [
