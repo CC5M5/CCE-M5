@@ -231,8 +231,45 @@
           <tbody id="workflows-tbody"></tbody>
         </table>
       </section>
+      <section id="users-section" class="card" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2>👤 Usuarios</h2>
+          <button id="user-create-btn" class="primary" style="font-size:0.85rem;">Nuevo usuario</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Nombre</th>
+              <th>Rol</th>
+              <th>Activo</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+        <div id="users-alert" class="alert"></div>
+      </section>
     </main>
 
+    <dialog id="user-dialog">
+      <h3 style="margin:0 0 0.75rem;">Nuevo usuario</h3>
+      <div class="field"><label>Usuario</label><input type="text" id="user-username" required /></div>
+      <div class="field"><label>Nombre completo</label><input type="text" id="user-fullname" /></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="user-password" required /></div>
+      <div class="field">
+        <label>Rol</label>
+        <select id="user-role" style="padding:0.5rem;border:1px solid #cbd5e1;border-radius:0.4rem;">
+          <option value="viewer">Viewer</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="dialog-actions">
+        <button id="user-cancel" class="secondary">Cancelar</button>
+        <button id="user-ok" class="primary">Crear</button>
+      </div>
+      <div id="user-form-alert" class="alert" style="margin-top:0.75rem;"></div>
+    </dialog>
     <dialog id="confirm-dialog">
       <h3 style="margin:0 0 0.5rem;">¿Regenerar presentación?</h3>
       <p style="font-size:0.9rem;color:#475569;margin:0;">
@@ -513,6 +550,75 @@
         if (!token()) window.location.href = '/admin/login.html';
         const user = JSON.parse(localStorage.getItem('cce_admin_user') || '{}');
         document.getElementById('user-pill').textContent = user.full_name || user.username || 'admin';
+      })();
+
+
+      function currentUser() {
+        try { return JSON.parse(localStorage.getItem('cce_admin_user') || '{}'); } catch { return {}; }
+      }
+
+      async function loadUsers() {
+        if (currentUser().role !== 'admin') return;
+        document.getElementById('users-section').style.display = 'block';
+        hide('users-alert');
+        try {
+          const data = await api('/users', { method: 'GET' });
+          const tbody = document.getElementById('users-tbody');
+          tbody.innerHTML = (data || []).map(u => `<tr>
+            <td>${escapeHtml(u.username)}</td>
+            <td>${escapeHtml(u.full_name || '')}</td>
+            <td><span class="status-pill ${u.role === 'admin' ? 'done' : 'pending'}">${u.role}</span></td>
+            <td>${u.is_active ? 'Sí' : 'No'}</td>
+            <td><button class="secondary" data-delete="${u.id}" ${u.id === currentUser().id ? 'disabled' : ''} style="padding:0.3rem 0.6rem;font-size:0.8rem;">Eliminar</button></td>
+          </tr>`).join('');
+          tbody.querySelectorAll('[data-delete]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const id = parseInt(btn.dataset.delete, 10);
+              if (!confirm('¿Eliminar este usuario?')) return;
+              try {
+                await api(`/users/${id}`, { method: 'DELETE' });
+                await loadUsers();
+              } catch (err) { show('users-alert', err.message, 'error'); }
+            });
+          });
+        } catch (err) { show('users-alert', err.message, 'error'); }
+      }
+
+      async function createUser() {
+        hide('users-alert');
+        const payload = {
+          username: document.getElementById('user-username').value.trim(),
+          password: document.getElementById('user-password').value,
+          full_name: document.getElementById('user-fullname').value.trim() || null,
+          role: document.getElementById('user-role').value,
+        };
+        if (!payload.username || !payload.password) {
+          show('user-form-alert', 'Usuario y contraseña son obligatorios', 'error'); return;
+        }
+        try {
+          await api('/users', { method: 'POST', body: JSON.stringify(payload) });
+          document.getElementById('user-dialog').close();
+          document.getElementById('user-username').value = '';
+          document.getElementById('user-password').value = '';
+          document.getElementById('user-fullname').value = '';
+          await loadUsers();
+        } catch (err) { show('user-form-alert', err.message, 'error'); }
+      }
+
+      document.getElementById('user-create-btn')?.addEventListener('click', () => {
+        hide('user-form-alert');
+        document.getElementById('user-dialog').showModal();
+      });
+      document.getElementById('user-cancel')?.addEventListener('click', () => {
+        document.getElementById('user-dialog').close();
+      });
+      document.getElementById('user-ok')?.addEventListener('click', createUser);
+
+      (function initUserSection() {
+        if (currentUser().role === 'admin') {
+          document.getElementById('users-section').style.display = 'block';
+          loadUsers();
+        }
       })();
 
       listWorkflows();

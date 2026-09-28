@@ -25,6 +25,25 @@ class UserProfile(BaseModel):
     username: str
     full_name: Optional[str]
     role: str
+    is_active: int = 1
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    full_name: Optional[str] = None
+    role: str = "viewer"
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    role: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str
 
 
 class WorkflowCreate(BaseModel):

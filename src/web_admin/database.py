@@ -143,6 +143,81 @@ def create_user(
             return int(cur.lastrowid)
 
 
+def get_user_by_id(user_id: int, db_path: Optional[Path] = None) -> Optional[User]:
+    with _connection(db_path) as conn:
+        row = conn.execute(
+            "SELECT * FROM admin_users WHERE id = ?", (user_id,)
+        ).fetchone()
+        if not row:
+            return None
+        return User(
+            id=row["id"],
+            username=row["username"],
+            password_hash=row["password_hash"],
+            full_name=row["full_name"],
+            role=row["role"],
+            is_active=bool(row["is_active"]),
+        )
+
+
+def update_user(
+    user_id: int,
+    full_name: Optional[str] = None,
+    role: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    db_path: Optional[Path] = None,
+) -> None:
+    with _connection(db_path) as conn:
+        with conn:
+            fields = []
+            values = []
+            if full_name is not None:
+                fields.append("full_name = ?")
+                values.append(full_name)
+            if role is not None:
+                fields.append("role = ?")
+                values.append(role)
+            if is_active is not None:
+                fields.append("is_active = ?")
+                values.append(1 if is_active else 0)
+            if not fields:
+                return
+            fields.append("updated_at = ?")
+            values.append(_now())
+            values.append(user_id)
+            conn.execute(
+                f"UPDATE admin_users SET {', '.join(fields)} WHERE id = ?",
+                values,
+            )
+
+
+def set_user_password(
+    user_id: int,
+    password_hash: str,
+    db_path: Optional[Path] = None,
+) -> None:
+    with _connection(db_path) as conn:
+        with conn:
+            conn.execute(
+                "UPDATE admin_users SET password_hash = ?, updated_at = ? WHERE id = ?",
+                (password_hash, _now(), user_id),
+            )
+
+
+def delete_user(user_id: int, db_path: Optional[Path] = None) -> None:
+    with _connection(db_path) as conn:
+        with conn:
+            conn.execute("DELETE FROM admin_users WHERE id = ?", (user_id,))
+
+
+def count_admins(db_path: Optional[Path] = None) -> int:
+    with _connection(db_path) as conn:
+        row = conn.execute(
+            "SELECT COUNT(*) AS c FROM admin_users WHERE role = 'admin' AND is_active = 1"
+        ).fetchone()
+        return row["c"] if row else 0
+
+
 def list_users(db_path: Optional[Path] = None) -> List[Dict[str, Any]]:
     with _connection(db_path) as conn:
         rows = conn.execute(
