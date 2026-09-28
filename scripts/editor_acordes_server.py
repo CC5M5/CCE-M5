@@ -130,23 +130,13 @@ def _rebuild_web() -> str:
         env = os.environ.copy()
         env["BASE_PATH"] = "/"
         env["SITE_URL"] = "http://192.168.68.244:4321"
-        env["PATH"] = f"/home/pciath/.nvm/versions/node/v24.18.0/bin:{env.get('PATH', '')}"
-
-        # Asegurar parche de Astro aplicado (Node 24 + Astro 4.16)
-        patch_script = PROJECT_DIR / "web" / "scripts" / "apply-astro-patch.sh"
-        if patch_script.exists():
-            subprocess.run(
-                ["bash", str(patch_script)],
-                cwd=PROJECT_DIR / "web",
-                check=False,
-                capture_output=True,
-                text=True,
-                env=env,
-            )
+        # Node 22 evita bug de import ESM de Astro 4.16/4.19 con Node 24
+        node_bin = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
+        env["PATH"] = f"{node_bin}:{env.get('PATH', '')}"
 
         # Build Astro
         build_result = subprocess.run(
-            ["/home/pciath/.nvm/versions/node/v24.18.0/bin/npm", "run", "build"],
+            [f"{node_bin}/npm", "run", "build"],
             cwd=PROJECT_DIR / "web",
             check=True,
             capture_output=True,
