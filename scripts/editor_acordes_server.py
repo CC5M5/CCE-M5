@@ -89,6 +89,17 @@ def _git_commit(titulo: str) -> str:
             capture_output=True,
             text=True,
         )
+        # Si no hay nada staged, no hay nada que commitear
+        diff_check = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=PROJECT_DIR,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if diff_check.returncode == 0:
+            return "sin cambios"
+
         result = subprocess.run(
             ["git", "commit", "-m", f"chore(acordes): editar {titulo}",
              "-m", "Actualización manual desde editor local de acordes."],
@@ -107,7 +118,10 @@ def _git_commit(titulo: str) -> str:
         m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
         return m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
-        return f"ERROR: {exc.stderr or exc.stdout}"
+        err = exc.stderr or exc.stdout or ""
+        if "nothing to commit" in err or "working tree clean" in err or "No changes" in err or "sin cambios agregados" in err:
+            return "sin cambios"
+        return f"ERROR: {err}"
 
 
 def _rebuild_web() -> str:
