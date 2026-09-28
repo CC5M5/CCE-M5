@@ -132,6 +132,18 @@ def _rebuild_web() -> str:
         env["SITE_URL"] = "http://192.168.68.244:4321"
         env["PATH"] = f"/home/pciath/.nvm/versions/node/v24.18.0/bin:{env.get('PATH', '')}"
 
+        # Asegurar parche de Astro aplicado (Node 24 + Astro 4.16)
+        patch_script = PROJECT_DIR / "web" / "scripts" / "apply-astro-patch.sh"
+        if patch_script.exists():
+            subprocess.run(
+                ["bash", str(patch_script)],
+                cwd=PROJECT_DIR / "web",
+                check=False,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+
         # Build Astro
         build_result = subprocess.run(
             ["/home/pciath/.nvm/versions/node/v24.18.0/bin/npm", "run", "build"],
@@ -163,7 +175,10 @@ def _rebuild_web() -> str:
 
         return "rebuild OK"
     except subprocess.CalledProcessError as exc:
-        return f"ERROR rebuild: {exc.stderr or exc.stdout}"
+        err = exc.stderr or exc.stdout or ""
+        # Incluir solo la última línea relevante del error
+        err_short = err.strip().splitlines()[-1] if err else "error desconocido"
+        return f"ERROR rebuild: {err_short}"
     except Exception as exc:
         return f"ERROR rebuild: {exc}"
 
