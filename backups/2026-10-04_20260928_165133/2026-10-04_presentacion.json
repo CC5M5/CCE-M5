@@ -1,0 +1,312 @@
+{
+  "meta": {
+    "fecha": "2026-10-04",
+    "celebracion": "l XXVII Domingo del Tiempo Ordinario",
+    "color_liturgico": "verde",
+    "lema": "Somos uno",
+    "lema_imagen": "assets/lema_somos_uno.jpg",
+    "generado": "2026-09-28T08:08:06.122115"
+  },
+  "slides": [
+    {
+      "numero": 1,
+      "tipo": "portada",
+      "titulo": "l XXVII Domingo del Tiempo Ordinario",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "4 de octubre de 2026",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 2,
+      "tipo": "entrada",
+      "titulo": "HE VENIDO A SERVIR",
+      "contenido": "Quien quiera ser grande,\r\nquien quiera ser el primero,\r\nsea el esclavo de todos,\r\nsea el más pequeño.\r\nNo he venido a ser servido,\r\nque he venido a servir\r\ny a dar la vida por todos\r\npara que todos puedan vivir (2)\r\nen\r\nplenitud (3).",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 3,
+      "tipo": "transicion_palabra",
+      "titulo": "LITURGIA DE LA PALABRA",
+      "contenido": "Escuchemos la Palabra de Dios",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140961.jpg"
+    },
+    {
+      "numero": 4,
+      "tipo": "perdon",
+      "titulo": "ACTO PENITENCIAL",
+      "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 5,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 6,
+      "tipo": "gloria",
+      "titulo": "ALABO TU BONDAD (1/2)",
+      "contenido": "Todo mi ser canta hoy\r\npor las cosas que hay en mí.\r\nGracias te doy mi Señor,\r\nTú me haces tan feliz.\r\nTú me has regalado tu amistad,\r\nconfío en ti, me llenas de tu\r\nTú me haces sentir tu gran bondad,\r\nyo cantaré por siempre tu fidelidad.\r\n\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+    },
+    {
+      "numero": 7,
+      "tipo": "gloria",
+      "titulo": "ALABO TU BONDAD (2/2)",
+      "contenido": "Siempre a tu lado estaré\r\nalabando tu bondad\r\nA mis hermanos diré\r\nel gran gozo que hallo en ti.\r\nEn ti podrán siempre encontrar\r\nfidelidad, confianza y amistad.\r\nNunca fallara tu gran amor,\r\nni tu perdón. Me quieres tal como soy\r\n\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\r\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\r\n**GLORIA, GLORIA,**\r\n**SIEMPRE CANTARÉ TU FIDELIDAD.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+    },
+    {
+      "numero": 8,
+      "tipo": "primera_lectura",
+      "titulo": "PRIMERA LECTURA",
+      "contenido": "Voy a cantar en nombre de mi amigo un canto de amor a su viña. Mi amigo tenía una viña en fértil collado. La entrecavó, la descantó, y plantó buenas cepas; construyó en medio una atalaya y cavó un lagar. Y esperó que diese uvas, pero dio agrazones. Pues ahora, habitantes de Jerusalén, hombres de Judá, por favor, sed jueces entre mí y mi viña. ¿Qué más cabía hacer por mi viña que yo no lo haya hecho? ¿Por qué, esperando que diera uvas, dio agrazones? Pues ahora os diré a vosotros lo que voy a hacer con mi viña: quitar su valla para que sirva de pasto, derruir su tapia para que la pisoteen. La dejaré arrasada: no la podarán ni la escardarán, crecerán zarzas y cardos; prohibiré a las nubes que lluevan sobre ella. La viña del Señor de los ejércitos es la casa de Israel; son los hombres de Judá su plantel preferido. Esperó de ellos derecho, y ahí tenéis: asesinatos; esperó justicia, y ahí tenéis: lamentos.",
+      "cita": "5,1-7",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 9,
+      "tipo": "salmo",
+      "titulo": "SALMO RESPONSORIAL",
+      "contenido": "Sacaste una vid de Egipto, expulsaste a los gentiles, y la trasplantaste.\n\nExtendió sus sarmientos hasta el mar, y sus brotes hasta el Gran Río.; ¿Por qué has derribado su cerca; para que la saqueen los viandantes, la pisoteen los jabalíes; y se la coman las alimañas?\n\nDios de los ejércitos, vuélvete: mira desde el cielo, fíjate, ven a visitar tu viña, la cepa que tu diestra plantó; y que tú hiciste vigorosa.\n\nNo nos alejaremos de ti: danos vida, para que invoquemos tu nombre.\n\nSeñor, Dios de los ejércitos, restáuranos, que brille tu rostro y nos salve.",
+      "cita": "Sal 79,9 — La viña del Señor es la casa de Israel",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140962.jpg"
+    },
+    {
+      "numero": 10,
+      "tipo": "segunda_lectura",
+      "titulo": "SEGUNDA LECTURA",
+      "contenido": "Nada os preocupe; sino que, en toda ocasión, en la oración y súplica con acción de gracias, vuestras peticiones sean presentadas a Dios. Y la paz de Dios, que sobrepasa todo juicio, custodiará vuestros corazones y vuestros pensamientos en Cristo Jesús. Finalmente, hermanos, todo lo que es verdadero, noble, justo, puro, amable, laudable, todo lo que es virtud o mérito, tenedlo en cuenta. Y lo que aprendisteis, recibisteis, oísteis, visteis en mí, ponedlo por obra. Y el Dios de la paz estará con vosotros.",
+      "cita": "4,6-9",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140960.jpg"
+    },
+    {
+      "numero": 11,
+      "tipo": "aleluya",
+      "titulo": "ALELUYA DE LA TIERRA",
+      "contenido": "EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,\r\nY OTROS SON ESPECTADORES, NO LO SIENTEN.\r\n\r\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**\r\n**Y LA TIERRA SONREIRÁ. ¡ALELUYA! (BIS)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
+    },
+    {
+      "numero": 12,
+      "tipo": "evangelio",
+      "titulo": "EVANGELIO",
+      "contenido": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «Escuchad otra parábola: Había un propietario que plantó una viña, la rodeó con una cerca, cavó en ella un lagar, construyó la casa del guarda, la arrendó a unos labradores y se marchó de viaje. Llegado el tiempo de la vendimia, envió sus criados a los labradores, para percibir los frutos que le correspondían. Pero los labradores, agarrando a los criados, apalearon a uno, mataron a otro, y a otro lo apedrearon. Envió de nuevo otros criados, más que la primera vez, e hicieron con ellos lo mismo. Por último les mandó a su hijo, diciéndose: «Tendrán respeto a mi hijo.» Pero los labradores, al ver al hijo, se dijeron: «Éste es el heredero, venid, lo matamos y nos quedamos con su herencia.» Y, agarrándolo, lo empujaron fuera de la viña y lo mataron. Y ahora, cuando vuelva el dueño de la viña, ¿qué hará con aquellos labradores?»Le contestaron: «Hará morir de mala muerte a esos malvados y arrendará la viña a otros labradores, que le entreguen los frutos a sus tiempos.»Y Jesús les dice: «¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?» Por eso os digo que se os quitará a vosotros el reino de Dios y se dará a un pueblo que produzca sus frutos.»; Palabra del Señor",
+      "cita": "21,33-43",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 13,
+      "tipo": "transicion_eucaristia",
+      "titulo": "LITURGIA EUCARÍSTICA",
+      "contenido": "Preparémonos para la mesa del Señor",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 14,
+      "tipo": "credo",
+      "titulo": "CREDO",
+      "contenido": "Creo en Dios, Padre todopoderoso, \r\ncreador del cielo y de la tierra.\r\nCreo en Jesucristo, su único Hijo, nuestro Señor, \r\nque fue concebido por obra y gracia del Espíritu Santo; \r\nnació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; \r\nfue crucificado, muerto y sepultado; descendió a los infiernos; \r\nal tercer día resucitó de entre los muertos; \r\nsubió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\r\nDesde allí ha de venir a juzgar a vivos y muertos.\r\nCreo en el Espíritu Santo, la santa Iglesia católica, \r\nla comunión de los santos, el perdón de los pecados, \r\nla resurrección de la carne y la vida eterna. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140954.jpg"
+    },
+    {
+      "numero": 15,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 16,
+      "tipo": "ofertorio",
+      "titulo": "QUE TE PUEDO DAR",
+      "contenido": "¿Qué te puedo dar\r\nque no me hayas dado Tú?\r\n¿Qué te puedo decir que no me hayas dicho Tú?\r\n¿Qué puedo hacer por ti, si yo no puedo hacer nada?\r\nSi yo no puedo hacer nada si no es por ti, mi Dios.\r\n\r\n**TODO LO QUE SE, TODO LO QUE SOY,**\r\n**TODO LO QUE TENGO ES TUYO (bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140880_dadles_vosotros_de_comer.jpg"
+    },
+    {
+      "numero": 17,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 18,
+      "tipo": "santo",
+      "titulo": "SANTO JESUITA",
+      "contenido": "**SANTO, SANTO, SANTO-O-O,**\r\n**SANTO ES EL SEÑOR,**\r\n**DIOS DEL UNIVERSO-O,**\r\n**DIOS DEL UNIVERSO-O (BIS)**\r\n\r\nLlenos están el cielo y la tierra de tu gloria.\r\nHosanna en el cielo-o, hosanna en el cielo-o.\r\nBendito el que viene en nombre del Señor.\r\nHosanna en el cielo-o, hosanna en el cielo-o.\r\n\r\n**ESTRIBILLO (BIS)**\r\n\r\n**SANTO, SANTO, SANTO-O-O,**\r\n**SANTO ES EL SEÑOR.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140883_el_pan_que_os_daré_es_mi_propio_cuerpo.jpg"
+    },
+    {
+      "numero": 19,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 20,
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO (Gallego)",
+      "contenido": "En el mar he oído hoy\nSeñor tu voz que me llamó\ny me pidió que me entregara\na mis hermanos.\nEsa voz me transformó,\nmi vida entera ya cambió,\ny sólo pienso ahora Señor\nen repetirte:\nPADRE NUESTRO\nEN TI CREEMOS,\nPADRE NUESTRO\nTE OFRECEMOS,\nPADRE NUESTRO\nNUESTRAS MANOS\nDE HERMANOS.\nCuando vaya a otro lugar\ntendré Señor que abandonar\na mi familia a mis amigos\npor seguirte.\nPero sé que así algún día\npodré enseñar tu verdad,\nir a mi hermano y junto a él\nyo repetirte.\nPADRE NUESTRO…",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 21,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 22,
+      "tipo": "paz",
+      "titulo": "LA PAZ TE DOY",
+      "contenido": "La paz te doy a ti, mi hermano,\r\nla paz que Dios me regaló,\r\ny en un abrazo a ti te entrego\r\nla paz que llevo en mi corazón. (BIS)\r\n\r\n**Recíbela, recíbela,**\r\n**esta es la paz**\r\n**que el mundo no te puede dar.**\r\n**(BIS)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
+    },
+    {
+      "numero": 23,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 24,
+      "tipo": "comunion",
+      "titulo": "BENDIGAMOS AL SEÑOR (1/2)",
+      "contenido": "Bendigamos al Señor, Dios de toda la creación\r\npor habernos regalado su amor.\r\nSu bondad y su perdón, y su gran fidelidad\r\npor los siglos de los siglos durará.\r\n\r\n**EL ESPÍRITU DE DIOS HOY ESTÁ SOBRE MI.**\r\n**ÉL ES QUIEN ME HA UNGIDO A PROCLAMAR**\r\n**BUENA NUEVA A LOS MÁS POBRES,**\r\n**GRACIA DE SU SALVACIÓN. (BIS)**\r\n\r\nEnviados con poder y en el nombre de Jesús\r\na sanar a los enfermos del dolor,\r\na los ciegos dar visión, a los pobres la verdad\r\ny a los presos y oprimidos, libertad.\r\n\r\n**ESTRIBILLO**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+    },
+    {
+      "numero": 25,
+      "tipo": "comunion",
+      "titulo": "BENDIGAMOS AL SEÑOR (2/2)",
+      "contenido": "Con la fuerza de su amor y de la resurrección\r\nanunciamos: llega ya la salvación.\r\nQue ni el miedo, ni el temor, ni la duda o la opresión\r\nborrarán la paz de nuestro corazón.\r\n\r\n**EL ESPÍRITU DE DIOS HOY ESTÁ SOBRE MI.**\r\n**ÉL ES QUIEN ME HA UNGIDO A PROCLAMAR**\r\n**BUENA NUEVA A LOS MÁS POBRES,**\r\n**GRACIA DE SU SALVACIÓN. (BIS)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+    },
+    {
+      "numero": 26,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 27,
+      "tipo": "maria",
+      "titulo": "A TU AMPARO Y PROTECCIÓN",
+      "contenido": "A TU AMPARO Y PROTECCIÓN,\r\nMADRE DE DIOS, ACUDIMOS.\r\nNO DESOIGAS NUESTROS RUEGOS\r\nY DE TODOS LOS PELIGROS,\r\nVIRGEN GLORIOSA Y BENDITA,\r\nDEFIENDE SIEMPRE A TUS HIJOS",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/patite_ilustracion_52a3d8fa.jpeg"
+    },
+    {
+      "numero": 28,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVII Domingo del Tiempo Ordinario · 21,33-43",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 29,
+      "tipo": "despedida",
+      "titulo": "COMO CORRE UN RÍO",
+      "contenido": "Como corre un río dentro de mi ser (x2)\r\nasí yo confío en Cristo, mi Rey (x2)\r\n\r\n**COMO UN RÍO DE AGUA VIVA,**\r\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\r\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\r\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\r\n\r\n Jesús está pasando por ahí\r\nJesús está pasando por ahí\r\nY cuando pasa todo lo transforma\r\nSe va la tristeza, viene la alegría\r\nY cuando pasa todo lo transforma\r\nViene la alegría para ti y para mí\r\n\r\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
+    },
+    {
+      "numero": 30,
+      "tipo": "portada",
+      "titulo": "¡ID EN PAZ!",
+      "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
+      "cita": "",
+      "subtitulo": "Somos uno · 4 de octubre de 2026",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    }
+  ]
+}
