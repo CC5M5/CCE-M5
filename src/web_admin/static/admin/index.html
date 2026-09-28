@@ -191,10 +191,15 @@
               </div>
               <div id="stepper" class="stepper"></div>
               <div id="step-content"></div>
-              <div style="display:flex;gap:0.75rem;margin-top:1rem;padding-top:1rem;border-top:1px solid #e2e8f0;">
+              <div style="display:flex;gap:0.75rem;margin-top:1rem;padding-top:1rem;border-top:1px solid #e2e8f0;flex-wrap:wrap;align-items:center;">
                 <button id="advance-btn" class="primary" style="display:none;">Validar y continuar →</button>
                 <button id="rollback-btn" class="secondary" style="display:none;">← Retroceder</button>
                 <span id="advance-hint" style="font-size:0.85rem;color:#64748b;align-self:center;"></span>
+                <div style="display:flex;gap:0.5rem;align-items:center;margin-left:auto;flex-wrap:wrap;">
+                  <label for="goto-step" style="font-size:0.8rem;color:#64748b;">Ir al paso:</label>
+                  <select id="goto-step" style="padding:0.45rem 0.6rem;border:1px solid #cbd5e1;border-radius:0.4rem;font-size:0.85rem;"></select>
+                  <button id="goto-btn" class="secondary" style="padding:0.45rem 0.7rem;">Mover</button>
+                </div>
               </div>
               <div id="step-alert" class="alert"></div>
             </div>
@@ -443,6 +448,7 @@
         status.className = 'status-pill ' + (payload.workflow.status === 'done' ? 'done' : payload.workflow.status === 'superseded' ? 'superseded' : 'pending');
         renderStepper(payload.workflow.current_step);
         renderStepContent(payload.workflow);
+        populateGotoStep(payload.workflow.current_step);
         document.getElementById('advance-btn').style.display = payload.can_advance && payload.workflow.current_step !== 'done' ? 'inline-block' : 'none';
         document.getElementById('rollback-btn').style.display = (payload.workflow.current_step !== 'init' && payload.workflow.current_step !== 'done') ? 'inline-block' : 'none';
         document.getElementById('advance-hint').textContent = payload.can_advance ? `Siguiente: ${payload.next_step_name || 'finalizar'}` : '';
@@ -507,6 +513,38 @@
         }
       }
 
+      async function gotoStep() {
+        hide('step-alert');
+        if (!currentWorkflow) return;
+        const step = document.getElementById('goto-step').value;
+        if (!step) return;
+        if (!confirm(`¿Mover el workflow al paso "${STEPS.find(s => s.key === step)?.label || step}"?`)) return;
+        try {
+          const payload = await api(`/workflows/${currentWorkflow.id}/goto-step`, {
+            method: 'POST',
+            body: JSON.stringify({ workflow_id: currentWorkflow.id, step }),
+          });
+          currentWorkflow = payload.workflow;
+          await loadWorkflow(payload.workflow.id);
+          await listWorkflows();
+        } catch (err) { show('step-alert', err.message, 'error'); }
+      }
+
+      function populateGotoStep(currentStep) {
+        const select = document.getElementById('goto-step');
+        select.innerHTML = '';
+        const currentIdx = STEPS.findIndex(s => s.key === currentStep);
+        for (const s of STEPS) {
+          const option = document.createElement('option');
+          option.value = s.key;
+          option.textContent = s.label;
+          if (s.key === currentStep) option.disabled = true;
+          select.appendChild(option);
+        }
+        // Preseleccionar el paso actual para facilitar lectura
+        select.value = currentStep;
+      }
+
       async function advance() {
         hide('step-alert');
         if (!currentWorkflow) return;
@@ -538,6 +576,7 @@
       document.getElementById('create-btn').addEventListener('click', () => createWorkflow(false));
       document.getElementById('advance-btn').addEventListener('click', advance);
       document.getElementById('rollback-btn').addEventListener('click', rollback);
+      document.getElementById('goto-btn').addEventListener('click', gotoStep);
       document.getElementById('confirm-ok').addEventListener('click', () => { document.getElementById('confirm-dialog').close(); if (pendingForce) createWorkflow(true); });
       document.getElementById('confirm-cancel').addEventListener('click', () => { pendingForce = false; document.getElementById('confirm-dialog').close(); });
       document.getElementById('logout-btn').addEventListener('click', () => {

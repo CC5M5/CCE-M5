@@ -57,6 +57,11 @@ class WorkflowAdvance(BaseModel):
     data: Optional[Dict[str, Any]] = None
 
 
+class WorkflowGotoStep(BaseModel):
+    workflow_id: int
+    step: str = Field(..., pattern=r"^(init|fetch_lectures|verify_lectures|propose_songs|verify_songs|generate_assets|publish|done)$")
+
+
 class WorkflowRun(BaseModel):
     id: int
     fecha_domingo: str
