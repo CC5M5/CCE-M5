@@ -46,11 +46,7 @@ const momentosOrden = [
   'entrada', 'acto penitencial', 'gloria', 'salmo', 'aleluya', 'evangelio',
   'credo', 'paz', 'comunion', 'comunión', 'accion de gracias', 'despedida'
 ];
-const cancionesOrdenadas = [...canciones].sort((a, b) => {
-  const ia = momentosOrden.indexOf((a.momento_liturgico || '').toLowerCase());
-  const ib = momentosOrden.indexOf((b.momento_liturgico || '').toLowerCase());
-  return (ia >= 0 ? ia : 999) - (ib >= 0 ? ib : 999);
-});
+const cancionesOrdenadas = canciones;
 ---
 
 <Layout 
@@ -85,8 +81,8 @@ const cancionesOrdenadas = [...canciones].sort((a, b) => {
                   ⬇️ Descargar PPTX
                 </a>
               )}
-              {presentacion.ruta_pdf && (
-                <a href={presentacion.ruta_pdf.replace(/^.*presentaciones_html\//, `${base}presentaciones_html/`)} class="btn bg-white text-slate-900 hover:bg-slate-100">
+              {presentacion.ruta_pdf_fieles && (
+                <a href={presentacion.ruta_pdf_fieles.replace(/^.*presentaciones\//, `${base}presentaciones/`)} class="btn bg-white text-slate-900 hover:bg-slate-100">
                   ⬇️ Descargar PDF
                 </a>
               )}
