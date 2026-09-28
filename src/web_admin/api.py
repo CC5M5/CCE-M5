@@ -231,6 +231,20 @@ async def workflow_advance(
     )
 
 
+
+
+@app.get("/canciones")
+async def list_canciones(
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Devuelve todas las canciones con id, título y momento litúrgico."""
+    from src.db_manager import get_connection
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT id, titulo, momento_liturgico FROM canciones ORDER BY titulo COLLATE NOCASE"
+        ).fetchall()
+    return {"canciones": [dict(r) for r in rows]}
+
 @app.get("/workflows/{workflow_id}/backups")
 async def workflow_backups(
     workflow_id: int,
