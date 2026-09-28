@@ -35,6 +35,18 @@ from typing import Any, Dict, List, Optional
 from flask import Flask, abort, request
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
+
+from src.generators.composicion_catalogo import (
+    _canciones_asignadas,
+    _get_presentacion_por_fecha,
+    _get_slide_variantes,
+    _slide_para_momento,
+    guardar_composicion,
+    proponer_composicion,
+)
+
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
 CATALOGO_PATH = ILUSTRACIONES_DIR / "catalogo.json"
@@ -625,32 +637,10 @@ def _reconstruir_composicion_desde_canciones(fecha: str) -> str:
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
         return f"No existe presentacion para {fecha}"
-    items = _proponer_composicion(fecha)
+    items = proponer_composicion(fecha)
     if not items:
         return "No se pudo proponer composicion"
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
-    for item in items:
-        slide_id = item.get("slide_id")
-        if slide_id:
-            cursor.execute("""
-                INSERT INTO presentacion_slides
-                (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
-                SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
-                FROM slides s
-                WHERE s.id = ?
-            """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["activo"], slide_id))
-            if cursor.rowcount == 0:
-                slide_id = None
-        if not slide_id:
-            cursor.execute("""
-                INSERT INTO presentacion_slides
-                (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
-                VALUES (?, NULL, ?, ?, ?, ?, '', ?)
-            """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["titulo"], item["activo"]))
-    conn.commit()
-    conn.close()
+    guardar_composicion(fecha, items)
     return f"Composicion reconstruida ({len(items)} items)"
 
 # ------------------------------------------------------------------
@@ -741,225 +731,6 @@ def _generar_presentacion(fecha: str) -> str:
 # ------------------------------------------------------------------
 # FASE C: Armado de presentación semanal desde el catálogo
 # ------------------------------------------------------------------
-
-ORDEN_MOMENTOS_C: List[tuple[str, str]] = [
-    ("portada", "general"),
-    ("entrada", ""),
-    ("transicion_palabra", "general"),
-    ("perdon", ""),
-    ("paso", "neutro"),
-    ("gloria", ""),
-    ("primera_lectura", "general"),
-    ("salmo", "general"),
-    ("segunda_lectura", "general"),
-    ("aleluya", ""),
-    ("evangelio", "general"),
-    ("transicion_eucaristia", "general"),
-    ("credo", "texto_fijo"),
-    ("paso", "neutro"),
-    ("ofertorio", ""),
-    ("paso", "neutro"),
-    ("santo", ""),
-    ("paso", "neutro"),
-    ("padre_nuestro", ""),
-    ("paso", "neutro"),
-    ("paz", ""),
-    ("paso", "neutro"),
-    ("comunion", ""),
-    ("paso", "neutro"),
-    ("maria", ""),
-    ("paso", "neutro"),
-    ("despedida", ""),
-    ("portada", "despedida"),
-]
-
-MOMENTOS_MUSICALES = ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida")
-
-
-def _get_presentaciones() -> List[Dict[str, Any]]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT p.id, p.fecha_domingo, p.estado, l.celebracion, l.color_liturgico,
-               (SELECT COUNT(*) FROM presentacion_slides ps WHERE ps.presentacion_id = p.id AND ps.activo = 1) AS num_slides
-        FROM presentaciones p
-        LEFT JOIN lecturas l ON l.id = p.lectura_id
-        ORDER BY p.fecha_domingo DESC
-    """)
-    rows = [dict(r) for r in cursor.fetchall()]
-    conn.close()
-    return rows
-
-
-def _get_presentacion_por_fecha(fecha: str) -> Optional[Dict[str, Any]]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT p.*, l.celebracion, l.color_liturgico,
-               l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
-               l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
-               l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
-               l.evangelio_libro, l.evangelio_cita, l.evangelio_texto
-        FROM presentaciones p
-        LEFT JOIN lecturas l ON l.id = p.lectura_id
-        WHERE p.fecha_domingo = ?
-    """, (fecha,))
-    row = cursor.fetchone()
-    conn.close()
-    return dict(row) if row else None
-
-
-def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
-    """Devuelve {momento: cancion_id} desde el JSON de la presentación."""
-    if not canciones_json:
-        return {}
-    try:
-        data = json.loads(canciones_json)
-    except Exception:
-        return {}
-    if isinstance(data, dict):
-        # formato {momento: {"id": X}}
-        resultado = {}
-        for momento, info in data.items():
-            if isinstance(info, dict) and "id" in info:
-                resultado[momento] = int(info["id"])
-            elif isinstance(info, int):
-                resultado[momento] = info
-        return resultado
-    return {}
-
-
-def _get_slide_variantes(tipo: str) -> List[Dict[str, Any]]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT id, subtipo, titulo, es_default
-        FROM slides
-        WHERE tipo = ? AND activo = 1
-        ORDER BY es_default DESC, titulo
-    """, (tipo,))
-    rows = [{"id": r["id"], "subtipo": r["subtipo"], "titulo": r["titulo"], "es_default": r["es_default"]} for r in cursor.fetchall()]
-    conn.close()
-    return rows
-
-
-def _slide_para_momento(tipo: str, subtipo_sugerido: str) -> Optional[Dict[str, Any]]:
-    """Busca la mejor slide del catálogo para un momento dado."""
-    conn = _get_connection()
-    cursor = conn.cursor()
-    # 1. subtipo exacto y default
-    cursor.execute("""
-        SELECT * FROM slides
-        WHERE tipo = ? AND subtipo = ? AND activo = 1
-        ORDER BY es_default DESC, id
-        LIMIT 1
-    """, (tipo, subtipo_sugerido))
-    row = cursor.fetchone()
-    if not row:
-        # 2. cualquier subtipo default
-        cursor.execute("""
-            SELECT * FROM slides
-            WHERE tipo = ? AND es_default = 1 AND activo = 1
-            ORDER BY id
-            LIMIT 1
-        """, (tipo,))
-        row = cursor.fetchone()
-    if not row:
-        # 3. cualquier slide activa del tipo
-        cursor.execute("""
-            SELECT * FROM slides
-            WHERE tipo = ? AND activo = 1
-            ORDER BY id
-            LIMIT 1
-        """, (tipo,))
-        row = cursor.fetchone()
-    conn.close()
-    return dict(row) if row else None
-
-
-
-
-def _formatear_fecha_preview(fecha: str) -> str:
-    try:
-        from datetime import datetime
-        dt = datetime.strptime(fecha, "%Y-%m-%d")
-        meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-        return f"{dt.day} de {meses[dt.month - 1]} de {dt.year}"
-    except Exception:
-        return fecha
-
-
-def _proponer_composicion(fecha: str) -> List[Dict[str, Any]]:
-    """Genera la lista de items propuestos para una fecha."""
-    pres = _get_presentacion_por_fecha(fecha)
-    if not pres:
-        return []
-    canciones = _canciones_asignadas(pres.get("canciones_json"))
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
-        FROM canciones c
-        LEFT JOIN cancion_momentos cm ON cm.cancion_id = c.id
-        GROUP BY c.id
-    """)
-    canciones_info = {
-        r["id"]: {"titulo": r["titulo"], "momento": r["momentos"].split(",")[0] if r["momentos"] else ""}
-        for r in cursor.fetchall()
-    }
-    conn.close()
-
-    items: List[Dict[str, Any]] = []
-    numero = 1
-    for tipo, subtipo_default in ORDEN_MOMENTOS_C:
-        if tipo == "paso":
-            items.append({
-                "numero": numero,
-                "tipo": "paso",
-                "subtipo": f"paso_{subtipo_default}",
-                "titulo": "",
-                "slide_id": None,
-                "activo": 1,
-                "_es_paso": True,
-            })
-            numero += 1
-            continue
-
-        subtipo = subtipo_default
-        if tipo in MOMENTOS_MUSICALES and tipo in canciones:
-            cancion_id = canciones[tipo]
-            # Si existe variante específica de esa canción, preferirla
-            slide_pref = _slide_para_momento(tipo, f"cancion_{cancion_id}")
-            if slide_pref:
-                subtipo = f"cancion_{cancion_id}"
-            else:
-                slide_pref = _slide_para_momento(tipo, subtipo_default)
-        else:
-            slide_pref = _slide_para_momento(tipo, subtipo_default)
-
-        if not slide_pref:
-            items.append({
-                "numero": numero,
-                "tipo": tipo,
-                "subtipo": subtipo,
-                "titulo": f"[FALTA: {tipo}]",
-                "slide_id": None,
-                "activo": 1,
-                "_es_paso": False,
-            })
-        else:
-            items.append({
-                "numero": numero,
-                "tipo": tipo,
-                "subtipo": slide_pref["subtipo"],
-                "titulo": slide_pref["titulo"],
-                "slide_id": slide_pref["id"],
-                "activo": 1,
-                "_es_paso": False,
-            })
-        numero += 1
-    return items
 
 
 def _get_composicion_guardada(fecha: str) -> List[Dict[str, Any]]:
@@ -1122,26 +893,7 @@ def guardar_presentacion(fecha: str):
             "activo": activo,
         })
 
-    conn = _get_connection()
-    cursor = conn.cursor()
-    # Borrar composición anterior
-    cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
-    # Insertar nueva
-    for item in items:
-        cursor.execute("""
-            INSERT INTO presentacion_slides (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
-            SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
-            FROM slides s
-            WHERE s.id = ?
-        """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["activo"], item["slide_id"]))
-        if cursor.rowcount == 0:
-            # Slide no encontrada: insertar item sin slide_id
-            cursor.execute("""
-                INSERT INTO presentacion_slides (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
-                VALUES (?, NULL, ?, ?, ?, ?, '', ?)
-            """, (pres["id"], item["numero"], item["tipo"], item["subtipo"], item["titulo"], item["activo"]))
-    conn.commit()
-    conn.close()
+    guardar_composicion(fecha, items)
 
     commit_result = _git_commit(f"composición presentación {fecha}")
     mensaje_comp = f"Composición guardada y commiteada ({commit_result})." if not commit_result.startswith("ERROR") else f"Composición guardada, falló git: {commit_result}"
