@@ -449,6 +449,10 @@ def obtener_lecturas_ciudadredonda(fecha: str, db_path: Optional[Path] = None) -
         
         # Paso 3: Parsear y guardar
         resultado = parser.parse_lecturas(lecturas_html, fecha)
+        # Normalizar campos para que coincidan con el resto del workflow
+        resultado['fuente_scraping'] = resultado.get('fuente', 'ciudadredonda')
+        if not resultado.get('domingo') and resultado.get('celebracion'):
+            resultado['domingo'] = resultado['celebracion']
         repo.guardar(resultado)
         
         return resultado
