@@ -258,7 +258,26 @@
       ];
       let currentWorkflow = null;
       let pendingForce = false;
+      let allCanciones = [];
 
+      const MOMENTO_A_KEY = {
+        'Entrada': 'entrada', 'Perdón': 'perdon', 'Gloria': 'gloria', 'Salmo': 'salmo',
+        'Aleluya': 'aleluya', 'Ofertorio': 'ofertorio', 'Santo': 'santo',
+        'Padre Nuestro': 'padre_nuestro', 'Paz': 'paz', 'Comunión': 'comunion',
+        'Canto a María': 'maria', 'Despedida': 'despedida'
+      };
+
+      async function loadCanciones() {
+        if (allCanciones.length) return;
+        const res = await api('/canciones', { method: 'GET' });
+        allCanciones = (res.canciones || []).map(c => ({ ...c, titulo: (c.titulo || '').trim() }));
+        allCanciones.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es', { sensitivity: 'base' }));
+      }
+
+      function escapeHtml(str) {
+        if (str == null) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
       function token() { return localStorage.getItem('cce_admin_token'); }
       function headers() { return { 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' }; }
       function show(id, text, kind) {
@@ -334,10 +353,21 @@
           html = `<p>Se generarán propuestas de canciones automáticas para los momentos litúrgicos.</p>`;
         } else if (step === 'verify_songs') {
           const prop = data.canciones_propuestas || {};
-          html = '<p>Revisa y ajusta la asignación de canciones.</p><div style="margin-top:0.75rem;">';
+          html = '<p>Revisa y ajusta la asignación de canciones. Se muestran solo las canciones del momento litúrgico (más las de uso general).</p><div style="margin-top:0.75rem;">';
           for (const [momento, info] of Object.entries(prop)) {
             const cid = info?.cancion_id || '';
-            html += `<div class="song-row"><span class="momento">${momento}</span><input type="number" data-song="${momento}" value="${cid}" placeholder="ID" /></div>`;
+            const key = MOMENTO_A_KEY[momento] || momento.toLowerCase().replace(/ /g, '_').replace(/ó/g,'o').replace(/í/g,'i').replace(/á/g,'a').replace(/é/g,'e').replace(/ú/g,'u').replace(/ñ/g,'n');
+            const filtered = allCanciones.filter(c => {
+              const m = (c.momento_liturgico || '').toLowerCase().trim();
+              return m === key || m === 'general' || m === '';
+            });
+            html += `<div class="song-row"><span class="momento">${momento}</span><select data-song="${momento}" style="flex:1;min-width:12rem;padding:0.5rem;border:1px solid #cbd5e1;border-radius:0.45rem;">`;
+            html += `<option value="">(sin canción)</option>`;
+            for (const c of filtered) {
+              const selected = String(c.id) === String(cid) ? ' selected' : '';
+              html += `<option value="${c.id}"${selected}>${escapeHtml(c.id + ' - ' + c.titulo)}</option>`;
+            }
+            html += '</select></div>';
           }
           html += '</div>';
         } else if (step === 'generate_assets') {
@@ -366,6 +396,9 @@
       async function loadWorkflow(id) {
         const payload = await api(`/workflows/${id}`, { method: 'GET' });
         currentWorkflow = payload.workflow;
+        if (currentWorkflow?.current_step === 'verify_songs') {
+          await loadCanciones();
+        }
         document.getElementById('workflow-panel').style.display = 'block';
         document.getElementById('wf-date').textContent = payload.workflow.fecha_domingo;
         const status = document.getElementById('wf-status');
