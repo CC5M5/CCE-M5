@@ -629,14 +629,35 @@ def handle_generate_assets(
 
 
 def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, Any]:
-    """Publica la presentación: sync HTML a web/dist y build de Astro."""
+    """Publica la presentación: guarda en BD, exporta JSON, sync HTML y build de Astro."""
     fecha = workflow["fecha_domingo"]
     steps_data = dict(workflow["steps_data"])
 
+    # 1. Guardar en tabla presentaciones
     try:
-        # Ejecutar sync de HTML a web/dist
+        _save_presentacion_to_db(workflow, steps_data)
+    except Exception as exc:
+        return {"success": False, "error": f"Error guardando presentación en BD: {exc}"}
+
+    try:
         import subprocess
 
+        # 2. Exportar datos de SQLite a JSON para Astro
+        export_script = PROJECT_DIR / "scripts" / "export_data_for_web.py"
+        result = subprocess.run(
+            ["python3", str(export_script)],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            return {
+                "success": False,
+                "error": f"export_data_for_web falló: {result.stderr}",
+            }
+
+        # 3. Ejecutar sync de HTML a web/dist
         sync_script = PROJECT_DIR / "scripts" / "sync_presentaciones_html.py"
         result = subprocess.run(
             ["python3", str(sync_script)],
@@ -651,7 +672,7 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
                 "error": f"sync_presentaciones_html falló: {result.stderr}",
             }
 
-        # Build de Astro (puede tardar)
+        # 4. Build de Astro (puede tardar)
         result_build = subprocess.run(
             ["npm", "run", "build"],
             cwd=PROJECT_DIR / "web",
@@ -667,12 +688,6 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
 
     except Exception as exc:
         return {"success": False, "error": f"Error en publicación: {exc}"}
-
-    # Guardar en tabla presentaciones
-    try:
-        _save_presentacion_to_db(workflow, steps_data)
-    except Exception as exc:
-        return {"success": False, "error": f"Error guardando presentación en BD: {exc}"}
 
     steps_data["publicado"] = True
     return {

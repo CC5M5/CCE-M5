@@ -34,6 +34,19 @@ jobs:
           cp -r ../presentaciones_html ./public/presentaciones_html
         working-directory: ./web
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install -r requirements.txt
+
+      - name: Export data from SQLite to JSON for Astro
+        run: python scripts/export_data_for_web.py
+        working-directory: .
+
       - name: Build site
         run: |
           # Excluir el panel de administración del build estático de GitHub Pages.
