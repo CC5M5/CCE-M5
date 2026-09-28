@@ -29,6 +29,43 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 }
 
+# Mapeo de nombres comunes de libros bíblicos a abreviaturas litúrgicas.
+ABREVIATURAS_LIBROS = {
+    # Antiguo Testamento
+    'génesis': 'Gn', 'genesis': 'Gn', 'éxodo': 'Ex', 'exodo': 'Ex',
+    'levítico': 'Lv', 'levitico': 'Lv', 'números': 'Nm', 'numeros': 'Nm',
+    'deuteronomio': 'Dt', 'jos': 'Jos', 'jueces': 'Jue', 'rut': 'Rt',
+    '1 samuel': '1 S', '2 samuel': '2 S', '1 reyes': '1 R', '2 reyes': '2 R',
+    '1 crónicas': '1 Cr', '1 cronicas': '1 Cr', '2 crónicas': '2 Cr', '2 cronicas': '2 Cr',
+    'esdras': 'Esd', 'nehemías': 'Ne', 'nehemias': 'Ne', 'tobit': 'Tb', 'tobias': 'Tb',
+    'judit': 'Jdt', 'ester': 'Est', 'job': 'Job', 'salmos': 'Sal', 'salmo': 'Sal',
+    'proverbios': 'Pr', 'eclesiastés': 'Ecl', 'eclesiastes': 'Ecl',
+    'cantar de los cantares': 'Cant', 'cantar': 'Cant',
+    'sabiduría': 'Sab', 'sabiduria': 'Sab', 'sirácida': 'Sir', 'siracida': 'Sir',
+    'isaías': 'Is', 'isaias': 'Is', 'jeremías': 'Jer', 'jeremias': 'Jer',
+    'lamentaciones': 'Lam', 'baruc': 'Bar', 'ezequiel': 'Ez', 'daniel': 'Dn',
+    'oseas': 'Os', 'joel': 'Jl', 'amos': 'Am', 'abdías': 'Abd', 'abdias': 'Abd',
+    'jonás': 'Jon', 'jonas': 'Jon', 'miqueas': 'Mi', 'nahúm': 'Na', 'nahum': 'Na',
+    'habacuc': 'Hab', 'sofonías': 'Sof', 'sofonias': 'Sof', 'ageo': 'Ag',
+    'zacarías': 'Zac', 'zacarias': 'Zac', 'malaquías': 'Mal', 'malaquias': 'Mal',
+    '1 macabeos': '1 Mc', '2 macabeos': '2 Mc',
+    # Nuevo Testamento
+    'mateo': 'Mt', 'marcos': 'Mc', 'lucas': 'Lc', 'juan': 'Jn', 'hechos': 'Hch',
+    'romanos': 'Rom', '1 corintios': '1 Cor', '2 corintios': '2 Cor',
+    'gálatas': 'Gal', 'galatas': 'Gal', 'efesios': 'Ef', 'filipenses': 'Flp',
+    'colosenses': 'Col', '1 tesalonicenses': '1 Tes', '2 tesalonicenses': '2 Tes',
+    '1 timoteo': '1 Tm', '2 timoteo': '2 Tm', 'tito': 'Tit', 'filemón': 'Flm',
+    'filemon': 'Flm', 'hebreos': 'Heb', 'santiago': 'Santiago', '1 pedro': '1 Pe',
+    '2 pedro': '2 Pe', '1 juan': '1 Jn', '2 juan': '2 Jn', '3 juan': '3 Jn',
+    'judas': 'Jud', 'apocalipsis': 'Ap',
+}
+
+# Palabras/frases previas que indican dónde está el nombre del libro en la cita.
+PALABRAS_PREVIAS_LIBRO = (
+    'libro de', 'cartas de', 'carta de', 'cartas del', 'carta del',
+    'evangelio según san', 'evangelio según santa', 'evangelio de',
+)
+
 
 class CiudadRedondaClient:
     """Cliente HTTP simple para ciudadredonda.org."""
@@ -237,16 +274,44 @@ class CiudadRedondaParser:
         }
 
     def _limpiar_cita(self, texto: str) -> str:
-        """Limpia y extrae la cita bíblica del texto."""
-        # Quitar "Lectura de..." y dejar solo la referencia
-        match = re.search(r'\(([\w\s,\.\-:]+)\)', texto)
-        if match:
-            return match.group(1).strip()
-        # Si no hay paréntesis, buscar patrón de referencia
-        match = re.search(r'[A-Za-z]+\s*\d+[,:;\-\s\.]*\d*', texto)
+        """
+        Limpia y extrae la cita bíblica del texto, incluyendo libro/abreviatura.
+        Ejemplos:
+          'Lectura del libro de Isaías (5,1-7):' -> 'Is 5,1-7'
+          'Lectura del santo evangelio según san Mateo (21,33-43):' -> 'Mt 21,33-43'
+          'Lectura de la carta del apóstol san Pablo a los Filipenses (4,6-9):' -> 'Flp 4,6-9'
+          'Sal 79,9.12.13-14' -> 'Sal 79,9.12.13-14'
+        """
+        import re as _re
+        texto_limpio = texto.strip()
+
+        # Extraer referencia entre paréntesis, ej. (5,1-7)
+        match_ref = _re.search(r'\(([\w\s,.\-:]+)\)', texto_limpio)
+        referencia = match_ref.group(1).strip() if match_ref else None
+
+        # Buscar nombre del libro directamente en el texto.
+        # Se prueba primero con nombres compuestos (más largos) para evitar falsos positivos.
+        texto_lower = texto_limpio.lower()
+        abrev_libro = None
+        for nombre, abrev in sorted(ABREVIATURAS_LIBROS.items(), key=lambda x: -len(x[0])):
+            patron = rf'\b{_re.escape(nombre)}\b'
+            if _re.search(patron, texto_lower):
+                abrev_libro = abrev
+                break
+
+        # Construir cita final
+        if abrev_libro and referencia:
+            return f"{abrev_libro} {referencia}"
+        if abrev_libro:
+            return abrev_libro
+        if referencia:
+            return referencia
+
+        # Fallback: buscar patrón de referencia suelto
+        match = _re.search(r'[A-Za-z]+\s*\d+[,:\;\-\s\.]*\d*', texto_limpio)
         if match:
             return match.group(0).strip()
-        return texto.strip()
+        return texto_limpio.strip()
 
     def _detectar_temporada(self, soup: BeautifulSoup, celebracion: str) -> dict:
         """Detecta la temporada litúrgica."""
