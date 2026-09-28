@@ -125,7 +125,7 @@ def _git_commit(titulo: str) -> str:
 
 
 def _rebuild_web() -> str:
-    """Reconstruye la web Astro y reinicia el servidor web principal."""
+    """Exporta SQLite a JSON, reconstruye la web Astro y reinicia el servidor web principal."""
     try:
         env = os.environ.copy()
         env["BASE_PATH"] = "/"
@@ -134,7 +134,18 @@ def _rebuild_web() -> str:
         node_bin = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
         env["PATH"] = f"{node_bin}:{env.get('PATH', '')}"
 
-        # Build Astro
+        # 1. Exportar datos de SQLite a JSON para Astro
+        export_script = PROJECT_DIR / "scripts" / "export_data_for_web.py"
+        export_result = subprocess.run(
+            ["python3", str(export_script)],
+            cwd=PROJECT_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+
+        # 2. Build Astro
         build_result = subprocess.run(
             [f"{node_bin}/npm", "run", "build"],
             cwd=PROJECT_DIR / "web",
@@ -144,7 +155,7 @@ def _rebuild_web() -> str:
             env=env,
         )
 
-        # Reiniciar servidor web principal (mata proceso http.server en 4321)
+        # 3. Reiniciar servidor web principal (mata proceso http.server en 4321)
         subprocess.run(
             "ps aux | grep 'http.server 4321' | grep -v grep | awk '{print $2}' | xargs -r kill 2>/dev/null",
             shell=True,
@@ -153,7 +164,7 @@ def _rebuild_web() -> str:
         )
         time.sleep(1)
 
-        # Iniciar nuevo servidor
+        # 4. Iniciar nuevo servidor
         subprocess.Popen(
             ["/usr/bin/python3", "-m", "http.server", "4321",
              "--directory", str(PROJECT_DIR / "web" / "dist"),
