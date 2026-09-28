@@ -1,0 +1,192 @@
+{
+  "meta": {
+    "fecha": "2026-10-04",
+    "celebracion": "l XXVII Domingo del Tiempo Ordinario",
+    "color_liturgico": "verde",
+    "lema": "Somos uno",
+    "lema_imagen": "assets/lema_somos_uno.jpg",
+    "generado": "2026-09-28T08:05:00.794307"
+  },
+  "slides": [
+    {
+      "numero": 1,
+      "tipo": "portada",
+      "titulo": "L XXVII DOMINGO DEL TIEMPO ORDINARIO",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "4 de octubre de 2026",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 2,
+      "tipo": "entrada",
+      "titulo": "ALMA MISIONERA",
+      "contenido": "Señor, toma mi vida nueva antes de que la espera desgaste años en mí.\nEstoy dispuesto a lo que quieras, no importa lo que sea,\nTú llámame a servir.\n**LLÉVAME DONDE LOS**\n**HOMBRES NECESITEN TUS PALABRAS,**\n**NECESITEN MIS GANAS DE VIVIR;**\n**DONDE FALTE LA ESPERANZA,**\n**DONDE FALTE LA**\n**ALEGRÍA SIMPLEMENTE POR NO**\n**SABER DE TI.**\nTe doy mi corazón sincero para gritar sin miedo tu grandeza, Señor.\nTendré mis manos sin cansancio, tu historia entre mis manos y fuerza en la oración\nY así, en marcha iré cantando por calles predicando lo bello que es tu amor.\nSeñor, tengo alma misionera condúceme a la tierra que tenga sed de Dios.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Canción de Entrada",
+      "imagen": "assets/fano_20140362_venid_vosotros_benditos_de_mi_padre.jpg"
+    },
+    {
+      "numero": 3,
+      "tipo": "perdon",
+      "titulo": "ACTO PENITENCIAL",
+      "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140936_es_el_cordero_de_dios_que_limpia_el_pecado_del_mundo.jpg"
+    },
+    {
+      "numero": 4,
+      "tipo": "gloria",
+      "titulo": "ALABO TU BONDAD",
+      "contenido": "Todo mi ser canta hoy por las cosas que hay en mí.\nGracias te doy mi Señor,\nTú me haces tan feliz.\nTú me has regalado tu amistad, confío en ti, me llenas de tu paz.\nTú me haces sentir tu gran bondad, yo cantaré por siempre tu fidelidad.\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\n**GLORIA, GLORIA, SIEMPRE CANTARÉ TU FIDELIDAD.**\n**GLORIA A TI, SEÑOR POR TU BONDAD.**\n**GLORIA, GLORIA, (TÚ ME HACES SENTIR TU GRAN BONDAD. YO CANTARÉ)**\n**SIEMPRE CANTARÉ TU FIDELIDAD.**\n(POR SIEMPRE TU FIDELIDAD)\nSiempre a tu lado estaré alabando tu bondad\nA mis hermanos diré el gran gozo que hallo en ti.\nEn ti podrán siempre encontrar fidelidad, confianza y amistad.\nNunca fallará tu gran amor, ni tu perdón. Me quieres tal como soy",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Gloria",
+      "imagen": "assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg"
+    },
+    {
+      "numero": 5,
+      "tipo": "primera_lectura",
+      "titulo": "PRIMERA LECTURA",
+      "contenido": "Voy a cantar en nombre de mi amigo un canto de amor a su viña. Mi amigo tenía una viña en fértil collado. La entrecavó, la descantó, y plantó buenas cepas; construyó en medio una atalaya y cavó un lagar. Y esperó que diese uvas, pero dio agrazones. Pues ahora, habitantes de Jerusalén, hombres de Judá, por favor, sed jueces entre mí y mi viña. ¿Qué más cabía hacer por mi viña que yo no lo haya hecho? ¿Por qué, esperando que diera uvas, dio agrazones? Pues ahora os diré a vosotros lo que voy a hacer con mi viña: quitar su valla para que sirva de pasto, derruir su tapia para que la pisoteen. La dejaré arrasada: no la podarán ni la escardarán, crecerán zarzas y cardos; prohibiré a las nubes que lluevan sobre ella. La viña del Señor de los ejércitos es la casa de Israel; son los hombres de Judá su plantel preferido. Esperó de ellos derecho, y ahí tenéis: asesinatos; esperó justicia, y ahí tenéis: lamentos.",
+      "cita": "5,1-7",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140405_limpia_mis_oídos_para_poder_escuchar_tu_palabra_domingo_6_se.jpg"
+    },
+    {
+      "numero": 6,
+      "tipo": "salmo",
+      "titulo": "SALMO RESPONSORIAL",
+      "contenido": "Antífona: La viña del Señor es la casa de Israel\n\nSacaste una vid de Egipto, expulsaste a los gentiles, y la trasplantaste.\n\nExtendió sus sarmientos hasta el mar, y sus brotes hasta el Gran Río.; ¿Por qué has derribado su cerca; para que la saqueen los viandantes, la pisoteen los jabalíes; y se la coman las alimañas?\n\nDios de los ejércitos, vuélvete: mira desde el cielo, fíjate, ven a visitar tu viña, la cepa que tu diestra plantó; y que tú hiciste vigorosa.\n\nNo nos alejaremos de ti: danos vida, para que invoquemos tu nombre.\n\nSeñor, Dios de los ejércitos, restáuranos, que brille tu rostro y nos salve.",
+      "cita": "Sal 79,9",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140360_recibimos_para_hacer_crecer.jpg"
+    },
+    {
+      "numero": 7,
+      "tipo": "segunda_lectura",
+      "titulo": "SEGUNDA LECTURA",
+      "contenido": "Nada os preocupe; sino que, en toda ocasión, en la oración y súplica con acción de gracias, vuestras peticiones sean presentadas a Dios. Y la paz de Dios, que sobrepasa todo juicio, custodiará vuestros corazones y vuestros pensamientos en Cristo Jesús. Finalmente, hermanos, todo lo que es verdadero, noble, justo, puro, amable, laudable, todo lo que es virtud o mérito, tenedlo en cuenta. Y lo que aprendisteis, recibisteis, oísteis, visteis en mí, ponedlo por obra. Y el Dios de la paz estará con vosotros.",
+      "cita": "4,6-9",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140941_aprende_a_elegir_el_pan_de_la_palabra.jpg"
+    },
+    {
+      "numero": 8,
+      "tipo": "aleluya",
+      "titulo": "ALELUYA DE LA TIERRA",
+      "contenido": "¿Quién quiere resucitar a este mundo que se muere?\n¿Quién cantará el aleluya de esa nueva luz que viene?\n¿Quién cuando mire la tierra y las tragedias observe, sentirá en su corazón el dolor de quien se muere?\n¿Quién es capaz de salvar a este mundo decadente, y mantiene la esperanza de los muchos que la pierden?\n**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**\n**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**\n¿Quién bajará de la cruz a tanto cristo sufriente, mientras los hombres miramos, impasivos e indolentes?\n¿Quién grita desde el silencio de un ser que a su Dios retiene, porque se hace palabra que sin hablar se la entiende?\n¿Quién se torna en aleluya porque traduce la muerte, como el trigo que se pudre y de uno cientos vienen?\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**\n**Y LA TIERRA SONREIRÁ. ¡ALELUYA!**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Aleluya",
+      "imagen": "assets/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg"
+    },
+    {
+      "numero": 9,
+      "tipo": "evangelio",
+      "titulo": "EVANGELIO",
+      "contenido": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «Escuchad otra parábola: Había un propietario que plantó una viña, la rodeó con una cerca, cavó en ella un lagar, construyó la casa del guarda, la arrendó a unos labradores y se marchó de viaje. Llegado el tiempo de la vendimia, envió sus criados a los labradores, para percibir los frutos que le correspondían. Pero los labradores, agarrando a los criados, apalearon a uno, mataron a otro, y a otro lo apedrearon. Envió de nuevo otros criados, más que la primera vez, e hicieron con ellos lo mismo. Por último les mandó a su hijo, diciéndose: «Tendrán respeto a mi hijo.» Pero los labradores, al ver al hijo, se dijeron: «Éste es el heredero, venid, lo matamos y nos quedamos con su herencia.» Y, agarrándolo, lo empujaron fuera de la viña y lo mataron. Y ahora, cuando vuelva el dueño de la viña, ¿qué hará con aquellos labradores?»Le contestaron: «Hará morir de mala muerte a esos malvados y arrendará la viña a otros labradores, que le entreguen los frutos a sus tiempos.»Y Jesús les dice: «¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?» Por eso os digo que se os quitará a vosotros el reino de Dios y se dará a un pueblo que produzca sus frutos.»; Palabra del Señor",
+      "cita": "21,33-43",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140639_sin_titulo.jpg"
+    },
+    {
+      "numero": 10,
+      "tipo": "credo",
+      "titulo": "CREDO",
+      "contenido": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra.\nCreo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\nDesde allí ha de venir a juzgar a vivos y muertos.\nCreo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140794_una_semillita_de_fe_es_un_sueño_de_amor_para_mí_siémbrala.jpg"
+    },
+    {
+      "numero": 11,
+      "tipo": "ofertorio",
+      "titulo": "QUE TE PUEDO DAR",
+      "contenido": "¿Qué te puedo dar que no me hayas dado Tú?\n¿Qué te puedo decir que no me hayas dicho Tú?\n¿Qué puedo hacer por ti, si yo no puedo hacer nada?\nSi yo no puedo hacer nada si no es por ti, mi Dios.\n**TODO LO QUE SE, TODO LO QUE SOY,**\nTODO LO QUE TENGO ES TUYO (bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Ofertorio",
+      "imagen": "assets/fano_20140880_dadles_vosotros_de_comer.jpg"
+    },
+    {
+      "numero": 12,
+      "tipo": "santo",
+      "titulo": "SANTO JESUITA",
+      "contenido": "**SANTO, SANTO, SANTO-O-O,** **SANTO ES EL SEÑOR,** **DIOS DEL UNIVERSO-O,** **DIOS DEL UNIVERSO-O (bis) **\nLlenos están el cielo y la tierra de tu gloria.\nHosanna en el cielo-o, hosanna en el cielo-o.\nBendito el que viene en nombre del Señor.\nHosanna en el cielo-o, hosanna en el cielo-o.\n**SANTO, SANTO,SANTO-O-O..**\n**SANTO, SANTO, SANTO-O-O,**\n**SANTO ES EL SEÑOR.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Santo",
+      "imagen": "assets/fano_20140896_ii_domingo_de_adviento_dile_sí.jpg"
+    },
+    {
+      "numero": 13,
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO",
+      "contenido": "Rellenar a mano",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Padre Nuestro",
+      "imagen": "assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg"
+    },
+    {
+      "numero": 14,
+      "tipo": "paz",
+      "titulo": "PAZ, SEÑOR (PALOMAS)",
+      "contenido": "Paz Señor en el cielo y la tierra, paz Señor en las olas del mar, paz Señor en las hojas que mueve sin saberlo, la brisa al pasar.\nTú que haces las cosas tan bellas, y les das una vida fugaz, pon, Señor, tu mirada sobre ellas y devuelve a los hombre la paz.\nHoy he visto Señor en el cielo suspendidas un rayo de luz dos palomas que alzaban el vuelo con sus alas en forma de cruz.\nHaz que vuelvan de nuevo a la tierra las palomas que huyeron Señor, y la llama que enciende la guerra se consuma en paz y amor.\n**PAZ, PAZ, PAZ SEÑOR.**\n**PAZ, PAZ, PAZ Y AMOR.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Rito de la Paz",
+      "imagen": "assets/fano_20140408_arranca_lo_que_te_impida_dar_frutos_de_amor_domingo_27_de_se.jpg"
+    },
+    {
+      "numero": 15,
+      "tipo": "comunion",
+      "titulo": "LUCHARÉ POR TI",
+      "contenido": "Cuando ves que todo va mal, cuando crees que no saldrás, siempre está ahí junto a ti,\nRe Do Re Lam… llámale, te contestará.\nEs Jesús, es la Verdad.\nEs amor, es libertad. (bis)\n**LUCHARÉ POR TI,**\n**NO DESCANSARÉ.**\n**TE ANUNCIARÉ ALLÍ**\n**DONDE ES MÁS DIFÍCIL VER.**\n**NO CALLARÉ, SEÑOR,**\n**TÚ LO SABES BIEN,**\nRe Sol …\n**TÚ LO SABES BIEN.**\nSed de Dios, pura necesidad\nDe saber quién eres Tú.\nEnvía tu luz que nos haga ver\nA Cristo Dios, nuestro Salvador\nEs Jesús, es la Verdad.\nEs amor, es libertad. (bis)\n**LUCHARÉ POR TI…**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Comunión",
+      "imagen": "assets/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg"
+    },
+    {
+      "numero": 16,
+      "tipo": "maria",
+      "titulo": "MARÍA, MÚSICA DE DIOS",
+      "contenido": "**MARÍA, MÚSICA DE DIOS**\nMe quedé sin voz con qué cantar y mi alma vacía dormía en sequedad\nY pensé para mí: me pondré en sus manos manos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén Y tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén María, acompaña tú mi caminar yo sola no puedo, ayúdame a andar\nY pensé para mí: me pondré en sus manos manos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén Y tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Canto a María",
+      "imagen": "assets/fano_20140474_solemnidad_de_santa_maria_madre_de_dios_1_de_enero_de_2017_j.jpg"
+    },
+    {
+      "numero": 17,
+      "tipo": "despedida",
+      "titulo": "COMO CORRE UN RÍO",
+      "contenido": "Como corre un río dentro de mi ser (x2)\nasí yo confío en Cristo, mi Rey (x2)\n**COMO UN RÍO DE AGUA VIVA,**\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\nJesús está pasando por ahí\nJesús está pasando por ahí\nY cuando pasa todo lo transforma\nSe va la tristeza, viene la alegría\nY cuando pasa todo lo transforma\nViene la alegría para ti y para mí\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "Despedida",
+      "imagen": "assets/fano_20140414_la_ternura_de_los_humildes_salva_al_mundo_domingo_8_de_novie.jpg"
+    },
+    {
+      "numero": 18,
+      "tipo": "portada",
+      "titulo": "¡ID EN PAZ!",
+      "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?»",
+      "cita": "",
+      "subtitulo": "Somos uno · 4 de octubre de 2026",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    }
+  ]
+}
