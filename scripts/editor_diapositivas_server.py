@@ -894,7 +894,7 @@ def _proponer_composicion(fecha: str) -> List[Dict[str, Any]]:
         GROUP BY c.id
     """)
     canciones_info = {
-        r["id"]: {"titulo": r["titulo"], "momento": r["momentos"].split(",")[0] if r["momentos"] else r["momento_liturgico"]}
+        r["id"]: {"titulo": r["titulo"], "momento": r["momentos"].split(",")[0] if r["momentos"] else ""}
         for r in cursor.fetchall()
     }
     conn.close()
