@@ -258,7 +258,7 @@ def handle_fetch_lectures(
     errores = []
     for scraper_name, scraper_call in [
         ("koinonia", lambda f: KoinoniaScraper().obtener_lecturas(datetime.strptime(f, "%Y-%m-%d"))),
-        ("ciudad_redonda", lambda f: obtener_lecturas_ciudadredonda(datetime.strptime(f, "%Y-%m-%d"))),
+        ("ciudad_redonda", lambda f: obtener_lecturas_ciudadredonda(f)),
     ]:
         try:
             lecturas = scraper_call(fecha)
