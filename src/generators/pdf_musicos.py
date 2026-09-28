@@ -60,7 +60,7 @@ FONT_ACORDES = "CourierNew"
 # proporcional no desplace acordes complejos.  Para una hoja de músicos la
 # prioridad es la precisión de la posición, por eso se opta por Courier New.
 FONT_LETRA = "CourierNew"
-SIZE_ACORDES_PT = 11
+SIZE_ACORDES_PT = 12
 SIZE_LETRA_PT = 12
 SIZE_HEADER_PT = 10
 SIZE_FOOTER_PT = 10
@@ -84,6 +84,25 @@ MOMENTOS_ORDEN: List[str] = [
     "Canto a María",
     "Despedida",
 ]
+
+KEY_A_MOMENTO: Dict[str, str] = {
+    "entrada": "Entrada",
+    "perdon": "Perdón",
+    "gloria": "Gloria",
+    "salmo": "Salmo",
+    "aleluya": "Aleluya",
+    "ofertorio": "Ofertorio",
+    "santo": "Santo",
+    "padre_nuestro": "Padre Nuestro",
+    "paz": "Paz",
+    "comunion": "Comunión",
+    "maria": "Canto a María",
+    "despedida": "Despedida",
+}
+
+
+def _normalizar_momento(key: str) -> str:
+    return KEY_A_MOMENTO.get(key.lower().replace("ó", "o").replace("í", "i").replace("á", "a").replace("é", "e").replace("ú", "u").replace("ñ", "n").replace(" ", "_").strip(), key)
 
 # ---------------------------------------------------------------------------
 # Excepciones
@@ -296,9 +315,10 @@ class RenderizadorCancion:
         self.usable_width = USABLE_WIDTH_MM
 
     def _chord_char_width(self) -> float:
-        # Medimos con el tamaño de letra, no con el de acordes, porque los
-        # acordes se posicionan según la columna de letra subyacente.
-        self.pdf.set_font(FONT_LETRA, "", SIZE_LETRA_PT)
+        # Medimos con la fuente y tamaño en que se pintarán los acordes.
+        # La fuente es monoespaciada, así que cada carácter (letra o acorde)
+        # ocupa exactamente la misma columna.
+        self.pdf.set_font(FONT_ACORDES, "B", SIZE_ACORDES_PT)
         return self.pdf.get_string_width("M")
 
     def _check_page_break(self, needed_height: float) -> None:
@@ -359,8 +379,8 @@ class RenderizadorCancion:
         linea: LineaCancion,
     ) -> None:
         """Renderiza un bloque acordes + letra, con salto de página si es necesario."""
-        # La letra se imprime literal tal cual la devuelve el parser (Courier
-        # New monoespaciado), por lo que no debe envolverse como texto libre.
+        # La letra se imprime literal tal cual la devuelve el parser (fuente
+        # monoespaciada), por lo que no debe envolverse como texto libre.
         # Si una línea de letra es demasiado larga, cortamos por el ancho
         # disponible sin alterar la alineación de los acordes de esa línea.
         self.pdf.set_font(FONT_LETRA, "", SIZE_LETRA_PT)
@@ -371,8 +391,17 @@ class RenderizadorCancion:
 
         y = self.pdf.get_y()
         self._render_acordes_linea(linea.acordes, y)
-        final_y = self._render_texto_letra(letra_cortada, y + 4)
-        self.pdf.set_y(final_y + 1)
+        # Para líneas cortas usamos cell (mantiene espaciado literal);
+        # multi_cell solo si excede el ancho.
+        ancho_letra_mm = len(letra_cortada) * self.chord_char_width_mm
+        if ancho_letra_mm <= self.usable_width + 0.01:
+            self.pdf.set_xy(MARGIN_LEFT_MM, y + 4)
+            self.pdf.set_font(FONT_LETRA, "", SIZE_LETRA_PT)
+            self.pdf.cell(0, 4, letra_cortada, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            self.pdf.set_y(self.pdf.get_y() + 1)
+        else:
+            final_y = self._render_texto_letra(letra_cortada, y + 4)
+            self.pdf.set_y(final_y + 1)
 
     def render_linea_suelta(
         self,
@@ -751,6 +780,12 @@ def generar_hoja_musicos(
         )
 
     celebracion_final = celebracion or f"Celebración del Domingo"
+
+    # Normalizar claves de momento (aceptan minúsculas del workflow o título).
+    canciones_por_momento = {
+        _normalizar_momento(k): v for k, v in canciones_por_momento.items()
+    }
+
     output_path_final = (
         Path(output_path)
         if output_path
