@@ -689,7 +689,20 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
                 "error": f"sync_presentaciones_html falló: {result.stderr}",
             }
 
-        # 4. Build de Astro (puede tardar)
+        # 4. Aplicar parche de Astro para Node 24 antes del build
+        patch_script = PROJECT_DIR / "web" / "scripts" / "apply-astro-patch.sh"
+        if patch_script.exists():
+            result_patch = subprocess.run(
+                ["bash", str(patch_script)],
+                cwd=PROJECT_DIR / "web",
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result_patch.returncode != 0:
+                logger.warning("Parche de Astro no se pudo aplicar: %s", result_patch.stderr)
+
+        # 5. Build de Astro (puede tardar)
         result_build = subprocess.run(
             ["npm", "run", "build"],
             cwd=PROJECT_DIR / "web",
