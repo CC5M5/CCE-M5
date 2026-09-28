@@ -28,3 +28,6 @@ web/package-lock.json
 # La copia en web/public/presentaciones/ se genera durante el build y no se sube.
 web/public/presentaciones/
 docs/INFORME_ESTRATEGICO_*.pdf
+web/src/pages/admin
+web/src/pages/admin.astro
+data/.admin_jwt_secret

@@ -394,51 +394,82 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
     """Genera propuestas de canciones para cada momento litúrgico del día.
 
     Usa el motor de matching contra las lecturas del día y asigna la mejor
-    canción disponible a cada momento, evitando duplicados si es posible.
+    canción disponible a cada momento. Si el matching temático es débil,
+    cae a canciones del mismo momento litúrgico y, en último caso, a
+    cualquier canción no usada, para evitar propuestas vacías.
     """
     with get_connection() as conn:
-        row = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
-        if not row:
+        lectura_row = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
+        if not lectura_row:
             raise ValueError(f"No hay lecturas guardadas para {fecha}")
-        lectura_id = row["id"]
+        lectura_id = lectura_row["id"]
 
+        # Precargar todas las canciones con id, título y momento litúrgico
+        canciones_rows = conn.execute(
+            "SELECT id, titulo, momento_liturgico FROM canciones"
+        ).fetchall()
+
+    todas_canciones: Dict[int, Dict[str, Any]] = {
+        r["id"]: {"cancion_id": r["id"], "titulo": r["titulo"], "momento_liturgico": (r["momento_liturgico"] or "").lower(), "score": 0.0}
+        for r in canciones_rows
+    }
+
+    # Matches temáticos
     engine = MatchingEngine()
-    matches = engine.encontrar_canciones_para_lectura(lectura_id, limite=30, score_minimo=0.0)
+    try:
+        matches = engine.encontrar_canciones_para_lectura(lectura_id, limite=100, score_minimo=0.0)
+    except Exception as exc:
+        logger.warning("Matching engine falló para %s: %s", fecha, exc)
+        matches = []
 
-    # Agrupar por momento litúrgico
-    por_momento: Dict[str, List[Dict[str, Any]]] = {}
+    # Agrupar matches temáticos por momento (según canción)
+    matches_por_momento: Dict[str, List[Dict[str, Any]]] = {}
     for m in matches:
-        momento = m.get("momento_liturgico", "general")
-        por_momento.setdefault(momento, []).append(m)
+        mk = m.get("momento_liturgico", "general").lower().strip()
+        matches_por_momento.setdefault(mk, []).append(m)
 
-    # Orden de preferencia por momento
-    propuestas = {}
-    usadas = set()
+    propuestas: Dict[str, Any] = {}
+    usadas: set = set()
 
-    # Para cada momento del día, buscar la mejor canción del mismo momento,
-    # fallback a general, y finalmente la primera disponible.
-    for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY):
-        candidatas = []
-        # 1. canciones cuyo momento coincide exactamente
-        if momento_key in por_momento:
-            candidatas.extend(por_momento[momento_key])
-        # 2. canciones de momento 'general'
-        if "general" in por_momento:
-            candidatas.extend(por_momento["general"])
-        # 3. cualquier otra candidata
-        for lista in por_momento.values():
-            candidatas.extend(lista)
-
-        seleccionada = None
+    def asignar(momento_es: str, candidatas: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         for c in candidatas:
             cid = c["cancion_id"]
-            if cid not in usadas:
-                seleccionada = c
+            if cid is not None and cid not in usadas:
                 usadas.add(cid)
-                break
-        if not seleccionada and candidatas:
-            seleccionada = candidatas[0]
-            usadas.add(seleccionada["cancion_id"])
+                return c
+        return None
+
+    for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY):
+        seleccionada: Optional[Dict[str, Any]] = None
+
+        # 1. Mejor match temático del mismo momento con score >= 0.10
+        same_matches = matches_por_momento.get(momento_key, [])
+        tematicas = [m for m in same_matches if m.get("score", 0) >= 0.10]
+        seleccionada = asignar(momento_es, tematicas)
+
+        # 2. Cualquier match temático del mismo momento
+        if not seleccionada:
+            seleccionada = asignar(momento_es, same_matches)
+
+        # 3. Canciones cuyo momento litúrgico coincida exactamente
+        if not seleccionada:
+            mismo_momento = [
+                c for c in todas_canciones.values()
+                if c["momento_liturgico"] == momento_key
+            ]
+            mismo_momento.sort(key=lambda c: str(c["titulo"]))
+            seleccionada = asignar(momento_es, mismo_momento)
+
+        # 4. Match temático de momento 'general' o similares
+        if not seleccionada:
+            general_matches = matches_por_momento.get("general", []) + matches_por_momento.get("", [])
+            seleccionada = asignar(momento_es, general_matches)
+
+        # 5. Cualquier canción no usada (último recurso)
+        if not seleccionada:
+            restantes = [c for c in todas_canciones.values() if c["cancion_id"] not in usadas]
+            restantes.sort(key=lambda c: str(c["titulo"]))
+            seleccionada = asignar(momento_es, restantes)
 
         propuestas[momento_es] = seleccionada or {
             "cancion_id": None,
