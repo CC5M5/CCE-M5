@@ -690,8 +690,10 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
             }
 
         # 4. Build de Astro con Node 22 (evita bug de Node 24 + Astro 4.16)
+        import os
         node_bin = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
-        env["PATH"] = f"{node_bin}:{env.get('PATH', '')}"
+        build_env = os.environ.copy()
+        build_env["PATH"] = f"{node_bin}:{build_env.get('PATH', '')}"
 
         result_build = subprocess.run(
             [f"{node_bin}/npm", "run", "build"],
@@ -699,6 +701,7 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
             capture_output=True,
             text=True,
             check=False,
+            env=build_env,
         )
         if result_build.returncode != 0:
             return {
