@@ -445,7 +445,11 @@ def _cargar_canciones(
     cursor = conn.cursor()
     ids: List[int] = []
     titulos: List[str] = []
-    for valor in canciones_por_momento.values():
+    momentos_con_valor: Dict[str, Union[int, str]] = {}
+    for momento, valor in canciones_por_momento.items():
+        if valor is None or (isinstance(valor, str) and not valor.strip()):
+            continue
+        momentos_con_valor[momento] = valor
         if isinstance(valor, int):
             ids.append(valor)
         else:
@@ -477,7 +481,7 @@ def _cargar_canciones(
     parser = AcordesParser()
     resultado: Dict[str, CancionCargada] = {}
 
-    for momento, valor in canciones_por_momento.items():
+    for momento, valor in momentos_con_valor.items():
         row: Optional[sqlite3.Row] = None
         if isinstance(valor, int):
             row = canciones_por_id.get(valor)
