@@ -21,8 +21,10 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from src.db_manager import get_connection
+from src.generators.composicion_catalogo import asegurar_composicion
 from src.generators.pdf_musicos import generar_hoja_musicos
 from src.generators.presentacion_html import GeneradorPresentacionHTML
+from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
 from src.matching_engine import MatchingEngine
 from src.scrapers.koinonia_scraper import KoinoniaScraper
 from src.scrapers.ciudadredonda_scraper import obtener_lecturas_ciudadredonda
@@ -545,7 +547,7 @@ def handle_verify_songs(
 def handle_generate_assets(
     workflow: Dict[str, Any], data: Dict[str, Any]
 ) -> Dict[str, Any]:
-    """Genera PPTX, PDF músicos y HTML estático."""
+    """Genera PPTX, PDF músicos y HTML estático desde el catálogo de slides."""
     fecha = workflow["fecha_domingo"]
     steps_data = dict(workflow["steps_data"])
 
@@ -568,13 +570,28 @@ def handle_generate_assets(
     if not lectura_id:
         return {"success": False, "error": f"No se encontró lectura guardada para {fecha}"}
 
+    # Asegurar que existe una fila presentaciones para la fecha (puede no existir hasta publish)
+    with get_connection() as conn:
+        existing = conn.execute("SELECT id FROM presentaciones WHERE fecha_domingo = ?", (fecha,)).fetchone()
+        if not existing:
+            conn.execute(
+                "INSERT INTO presentaciones (fecha_domingo, lectura_id, canciones_json, estado) VALUES (?, ?, ?, ?)",
+                (fecha, lectura_id, json.dumps(canciones_json, ensure_ascii=False), "borrador"),
+            )
+            conn.commit()
+
+    # Asegurar composición en presentacion_slides; si no existe, crear desde catálogo
     try:
-        gen = GeneradorPresentacionHTML()
-        bundle_dir = gen.generar(
-            fecha=fecha,
-            lectura_id=lectura_id,
-            canciones_ids=canciones_json,
-        )
+        canciones_json_str = json.dumps(canciones_json, ensure_ascii=False)
+        creada = asegurar_composicion(fecha, canciones_json_str)
+        if creada:
+            logger.info("Composición por defecto creada para %s", fecha)
+    except Exception as exc:
+        return {"success": False, "error": f"Error preparando composición: {exc}"}
+
+    try:
+        gen = GeneradorDesdeComposicion()
+        bundle_dir = gen.generar_desde_presentacion(fecha)
     except Exception as exc:
         return {"success": False, "error": f"Error generando presentación: {exc}"}
 
