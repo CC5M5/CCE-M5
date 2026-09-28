@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import asyncio
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
@@ -16,8 +17,11 @@ from fastapi.staticfiles import StaticFiles
 
 from src.web_admin.auth import (
     authenticate_user,
+    change_user_password,
     create_access_token,
+    create_new_user,
     get_current_user,
+    hash_password,
     require_admin,
     security,
     seed_default_admin,
@@ -25,15 +29,20 @@ from src.web_admin.auth import (
 from src.web_admin import models as m
 from src.web_admin.database import (
     add_workflow_log,
+    count_admins,
     create_workflow_run,
+    delete_user,
     get_backups_for_date,
     get_latest_workflow_run,
+    get_user_by_id,
     get_workflow_logs,
     get_workflow_run,
     init_admin_schema,
     list_users,
     list_workflow_runs,
+    set_user_password,
     supersede_workflow_run,
+    update_user,
 )
 from src.web_admin.workflow_engine import run_step
 
@@ -131,6 +140,101 @@ async def get_users(current_user: Dict[str, Any] = Depends(require_admin)):
     return [m.UserProfile(**r) for r in rows]
 
 
+@app.post("/users", response_model=m.UserProfile)
+async def create_user_endpoint(
+    payload: m.UserCreate,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    if payload.role not in ("admin", "viewer"):
+        raise HTTPException(status_code=400, detail="Rol debe ser admin o viewer")
+    try:
+        user_id = create_new_user(
+            username=payload.username,
+            password=payload.password,
+            full_name=payload.full_name,
+            role=payload.role,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    user = get_user_by_id(user_id)
+    assert user is not None
+    return m.UserProfile(**{
+        "id": user.id,
+        "username": user.username,
+        "full_name": user.full_name,
+        "role": user.role,
+        "is_active": 1 if user.is_active else 0,
+    })
+
+
+@app.patch("/users/{user_id}", response_model=m.UserProfile)
+async def update_user_endpoint(
+    user_id: int,
+    payload: m.UserUpdate,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    target = get_user_by_id(user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if payload.role is not None and payload.role not in ("admin", "viewer"):
+        raise HTTPException(status_code=400, detail="Rol debe ser admin o viewer")
+    if target.role == "admin" and (payload.role == "viewer" or payload.is_active is False):
+        if count_admins() <= 1:
+            raise HTTPException(status_code=409, detail="No se puede eliminar el último administrador activo")
+    update_user(
+        user_id,
+        full_name=payload.full_name,
+        role=payload.role,
+        is_active=payload.is_active,
+    )
+    updated = get_user_by_id(user_id)
+    assert updated is not None
+    return m.UserProfile(**{
+        "id": updated.id,
+        "username": updated.username,
+        "full_name": updated.full_name,
+        "role": updated.role,
+        "is_active": 1 if updated.is_active else 0,
+    })
+
+
+@app.delete("/users/{user_id}")
+async def delete_user_endpoint(
+    user_id: int,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    target = get_user_by_id(user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if target.id == current_user["id"]:
+        raise HTTPException(status_code=409, detail="No puedes eliminar tu propio usuario")
+    if target.role == "admin" and count_admins() <= 1:
+        raise HTTPException(status_code=409, detail="No se puede eliminar el último administrador activo")
+    delete_user(user_id)
+    return {"detail": "Usuario eliminado"}
+
+
+# ---------------------------------------------------------------------------
+# Cambio de contraseña propio
+# ---------------------------------------------------------------------------
+
+
+@app.post("/auth/change-password")
+async def change_password(
+    payload: m.PasswordChange,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    user = get_user_by_id(current_user["id"])
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if not authenticate_user(user.username, payload.current_password):
+        raise HTTPException(status_code=401, detail="Contraseña actual incorrecta")
+    if len(payload.new_password) < 4:
+        raise HTTPException(status_code=400, detail="La nueva contraseña debe tener al menos 4 caracteres")
+    change_user_password(user.id, payload.new_password)
+    return {"detail": "Contraseña actualizada"}
+
+
 # ---------------------------------------------------------------------------
 # Workflows
 # ---------------------------------------------------------------------------
@@ -218,7 +322,7 @@ async def workflow_advance(
     if payload.workflow_id != workflow_id:
         raise HTTPException(status_code=400, detail="workflow_id inconsistente")
 
-    result = run_step(workflow_id, payload.action, payload.data or {})
+    result = await asyncio.to_thread(run_step, workflow_id, payload.action, payload.data or {})
     if not result.get("success"):
         raise HTTPException(status_code=422, detail=result.get("error", "Error desconocido"))
 

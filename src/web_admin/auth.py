@@ -26,8 +26,12 @@ logger = logging.getLogger(__name__)
 security = HTTPBearer(auto_error=False)
 
 
-def _hash_password(password: str) -> str:
+def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def _hash_password(password: str) -> str:
+    return hash_password(password)
 
 
 def _verify_password(password: str, password_hash: str) -> bool:
@@ -110,3 +114,33 @@ def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
     if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Se requiere rol de administrador")
     return current_user
+
+
+# ---------------------------------------------------------------------------
+# Helpers de gestión de usuarios
+# ---------------------------------------------------------------------------
+
+
+def create_new_user(
+    username: str,
+    password: str,
+    full_name: Optional[str] = None,
+    role: str = "viewer",
+) -> int:
+    init_admin_schema()
+    if role not in ("admin", "viewer"):
+        raise ValueError("Rol no válido")
+    existing = get_user_by_username(username)
+    if existing:
+        raise ValueError("El usuario ya existe")
+    hashed = hash_password(password)
+    return create_user(username=username, password_hash=hashed, full_name=full_name, role=role)
+
+
+def change_user_password(user_id: int, new_password: str) -> None:
+    from src.web_admin.database import get_user_by_id, set_user_password
+
+    user = get_user_by_id(user_id)
+    if not user:
+        raise ValueError("Usuario no encontrado")
+    set_user_password(user_id, hash_password(new_password))
