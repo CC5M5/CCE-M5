@@ -21,7 +21,7 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 from src.db_manager import get_connection
-from src.generators.composicion_catalogo import asegurar_composicion
+from src.generators.composicion_catalogo import asegurar_composicion, sincronizar_presentacion_slides
 from src.generators.pdf_musicos import generar_hoja_musicos
 from src.generators.presentacion_html import GeneradorPresentacionHTML
 from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
@@ -660,6 +660,12 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
         _save_presentacion_to_db(workflow, steps_data)
     except Exception as exc:
         return {"success": False, "error": f"Error guardando presentación en BD: {exc}"}
+
+    # 1b. Sincronizar contenido de presentacion_slides con slides editadas
+    try:
+        sincronizar_presentacion_slides(fecha)
+    except Exception as exc:
+        logger.warning("No se pudo sincronizar presentacion_slides: %s", exc)
 
     try:
         import subprocess
