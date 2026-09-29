@@ -233,6 +233,33 @@ def guardar_composicion(fecha: str, items: List[Dict[str, Any]]) -> None:
     conn.close()
 
 
+def sincronizar_presentacion_slides(fecha: str) -> int:
+    """Actualiza el contenido de presentacion_slides desde las slides actuales.
+
+    Util cuando el usuario edita una slide del catalogo y quiere que la
+    presentacion publicada refleje los cambios sin regenerar toda la composicion.
+    Devuelve el numero de filas actualizadas.
+    """
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        return 0
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE presentacion_slides
+        SET titulo = (SELECT s.titulo FROM slides s WHERE s.id = presentacion_slides.slide_id),
+            contenido = (SELECT s.contenido FROM slides s WHERE s.id = presentacion_slides.slide_id),
+            cita = (SELECT s.cita FROM slides s WHERE s.id = presentacion_slides.slide_id),
+            subtitulo = (SELECT s.subtitulo FROM slides s WHERE s.id = presentacion_slides.slide_id),
+            imagen = (SELECT s.imagen FROM slides s WHERE s.id = presentacion_slides.slide_id)
+        WHERE presentacion_id = ? AND slide_id IS NOT NULL
+    """, (pres["id"],))
+    updated = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return updated
+
+
 def asegurar_composicion(fecha: str, canciones_json: Optional[str] = None) -> bool:
     """Crea o regenera la composición por defecto para una fecha.
 
