@@ -71,7 +71,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 # CORS permitido para el origen local del panel admin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4321", "http://192.168.68.244:4321"],
+    allow_origins=["http://localhost:4321", "http://192.168.68.244:4321", "http://192.168.68.244:4324", "http://localhost:4324"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -385,8 +385,9 @@ async def create_cancion_endpoint(
 ):
     """Crea una nueva canción en el cancionero."""
     from src.canciones_manager import CancionCreateUpdate, crear_cancion
+    from src.rebuild_web import rebuild_web
     try:
-        return crear_cancion(
+        cancion = crear_cancion(
             CancionCreateUpdate(
                 titulo=payload.titulo,
                 letra_con_acordes=payload.letra_con_acordes,
@@ -395,6 +396,8 @@ async def create_cancion_endpoint(
                 fuente=payload.fuente,
             )
         )
+        await asyncio.to_thread(rebuild_web)
+        return cancion
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -420,9 +423,10 @@ async def update_cancion_endpoint(
 ):
     """Actualiza una canción existente."""
     from src.canciones_manager import CancionCreateUpdate, actualizar_cancion, obtener_cancion
+    from src.rebuild_web import rebuild_web
     try:
         existing = obtener_cancion(cancion_id)
-        return actualizar_cancion(
+        cancion = actualizar_cancion(
             cancion_id,
             CancionCreateUpdate(
                 titulo=payload.titulo if payload.titulo is not None else existing["titulo"],
@@ -432,6 +436,8 @@ async def update_cancion_endpoint(
                 fuente=payload.fuente if payload.fuente is not None else existing["fuente"],
             ),
         )
+        await asyncio.to_thread(rebuild_web)
+        return cancion
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
