@@ -112,3 +112,38 @@ class WorkflowResponse(BaseModel):
     can_advance: bool
     next_step_name: Optional[str]
     warning: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Canciones
+# ---------------------------------------------------------------------------
+
+
+class CancionCreate(BaseModel):
+    titulo: str
+    letra_con_acordes: str
+    momentos: List[str] = []
+    tono: Optional[str] = None
+    fuente: Optional[str] = "manual"
+
+
+class CancionUpdate(BaseModel):
+    titulo: Optional[str] = None
+    letra_con_acordes: Optional[str] = None
+    momentos: Optional[List[str]] = None
+    tono: Optional[str] = None
+    fuente: Optional[str] = None
+
+
+class CancionResponse(BaseModel):
+    id: int
+    titulo: str
+    titulo_url: str
+    slug: str
+    letra_con_acordes: Optional[str] = None
+    letra_sin_acordes: Optional[str] = None
+    html_visual: Optional[str] = None
+    tono: Optional[str] = None
+    fuente: Optional[str] = None
+    momentos: List[str] = []
+    fecha_creacion: Optional[str] = None

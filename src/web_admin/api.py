@@ -369,17 +369,86 @@ async def workflow_advance(
 
 
 
-@app.get("/canciones")
-async def list_canciones(
+@app.get("/canciones", response_model=List[m.CancionResponse])
+async def list_canciones_endpoint(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ):
-    """Devuelve todas las canciones con id, título y momento litúrgico."""
-    from src.db_manager import get_connection
-    with get_connection() as conn:
-        rows = conn.execute(
-            "SELECT id, titulo, momento_liturgico FROM canciones ORDER BY titulo COLLATE NOCASE"
-        ).fetchall()
-    return {"canciones": [dict(r) for r in rows]}
+    """Lista todas las canciones del cancionero."""
+    from src.canciones_manager import listar_canciones
+    return listar_canciones()
+
+
+@app.post("/canciones", response_model=m.CancionResponse, status_code=201)
+async def create_cancion_endpoint(
+    payload: m.CancionCreate,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    """Crea una nueva canción en el cancionero."""
+    from src.canciones_manager import CancionCreateUpdate, crear_cancion
+    try:
+        return crear_cancion(
+            CancionCreateUpdate(
+                titulo=payload.titulo,
+                letra_con_acordes=payload.letra_con_acordes,
+                momentos=payload.momentos,
+                tono=payload.tono,
+                fuente=payload.fuente,
+            )
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/canciones/{cancion_id}", response_model=m.CancionResponse)
+async def get_cancion_endpoint(
+    cancion_id: int,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+):
+    """Devuelve una canción por ID."""
+    from src.canciones_manager import obtener_cancion
+    try:
+        return obtener_cancion(cancion_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.patch("/canciones/{cancion_id}", response_model=m.CancionResponse)
+async def update_cancion_endpoint(
+    cancion_id: int,
+    payload: m.CancionUpdate,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    """Actualiza una canción existente."""
+    from src.canciones_manager import CancionCreateUpdate, actualizar_cancion, obtener_cancion
+    try:
+        existing = obtener_cancion(cancion_id)
+        return actualizar_cancion(
+            cancion_id,
+            CancionCreateUpdate(
+                titulo=payload.titulo if payload.titulo is not None else existing["titulo"],
+                letra_con_acordes=payload.letra_con_acordes if payload.letra_con_acordes is not None else existing["letra_con_acordes"] or "",
+                momentos=payload.momentos if payload.momentos is not None else existing["momentos"],
+                tono=payload.tono if payload.tono is not None else existing["tono"],
+                fuente=payload.fuente if payload.fuente is not None else existing["fuente"],
+            ),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.delete("/canciones/{cancion_id}")
+async def delete_cancion_endpoint(
+    cancion_id: int,
+    current_user: Dict[str, Any] = Depends(require_admin),
+):
+    """Elimina una canción del cancionero."""
+    from src.canciones_manager import eliminar_cancion
+    try:
+        eliminar_cancion(cancion_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {"detail": "Canción eliminada"}
+
 
 @app.get("/workflows/{workflow_id}/backups")
 async def workflow_backups(
