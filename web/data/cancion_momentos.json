@@ -341,7 +341,19 @@
   },
   {
     "cancion_id": 91,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 91,
     "momento_liturgico": "general"
+  },
+  {
+    "cancion_id": 91,
+    "momento_liturgico": "ofertorio"
+  },
+  {
+    "cancion_id": 91,
+    "momento_liturgico": "salmo"
   },
   {
     "cancion_id": 92,
@@ -406,5 +418,17 @@
   {
     "cancion_id": 107,
     "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 109,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 109,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 109,
+    "momento_liturgico": "salmo"
   }
 ]
