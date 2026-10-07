@@ -205,6 +205,23 @@ def _get_slide(id: int) -> Optional[Dict[str, Any]]:
     return dict(row)
 
 
+def _get_presentaciones() -> List[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT p.fecha_domingo, l.celebracion, l.color_liturgico, p.estado,
+               COUNT(ps.id) as num_slides
+        FROM presentaciones p
+        LEFT JOIN lecturas l ON l.id = p.lectura_id
+        LEFT JOIN presentacion_slides ps ON ps.presentacion_id = p.id AND ps.activo = 1
+        GROUP BY p.id
+        ORDER BY p.fecha_domingo DESC
+    """)
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
 def _apply_bold_html(text: str) -> str:
     """Convierte **texto** en <strong>texto</strong>, permitiendo espacios opcionales."""
     return re.sub(r"\*\*\s*(.+?)\s*\*\*", r"<strong>\1</strong>", text)
@@ -349,6 +366,7 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
     <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
       <a href="/slides/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
       <a href="/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
+      <a href="/canciones/nueva" style="text-decoration:none;background:#10b981;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">🎵 Añadir canción al cancionero</a>
     </nav>
   </header>
   <div class="container">
@@ -846,17 +864,18 @@ def listar_presentaciones():
         label = {"borrador": "🟡 Borrador", "generado": "🟢 Generado", "publicado": "🟣 Publicado"}.get(estado, estado)
         return f'<span style="display:inline-block;padding:3px 8px;border-radius:6px;background:{color};color:#fff;font-size:12px;font-weight:600;">{label}</span>'
     filas = "\n".join(
-        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td></tr>'
+        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td><td><a href="/presentacion/{p["fecha_domingo"]}/asignar">🎵 Asignar canciones</a></td></tr>'
         for p in pres
     )
     content = f"""<h2>Presentaciones semanales</h2>
     <p>Selecciona una fecha para armar la composición de diapositivas desde el catálogo.</p>
-    <div style="margin-bottom:15px;">
-      <a href="/canciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
+    <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="/presentaciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Nueva presentación</a>
+      <a href="/canciones/nueva" style="text-decoration:none;background:#475569;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
     </div>
     <table style="width:100%;border-collapse:collapse">
       <thead>
-        <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Fecha</th><th>Celebración</th><th>Color</th><th>Slides</th><th>Estado</th></tr>
+        <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Fecha</th><th>Celebración</th><th>Color</th><th>Slides</th><th>Estado</th><th>Acciones</th></tr>
       </thead>
       <tbody>{filas}</tbody>
     </table>"""
@@ -926,6 +945,7 @@ def armar_presentacion(fecha: str):
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")} | <span style="font-weight:600;">{estado_label}</span></p>
     <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
     <a href="/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
+    <a href="/presentacion/{fecha}/asignar">🎵 Asignar canciones</a> |
     <a href="/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a> |
     <a href="/presentacion/{fecha}/reconstruir" style="color:#b91c1c;font-weight:600;">🔄 Reconstruir desde canciones asignadas</a></p>
     <form method="post" action="/presentacion/{fecha}/guardar">
@@ -1196,6 +1216,232 @@ def guardar_momentos_cancion(cancion_id: int):
         body, status = response, 200
     body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
     return body, status
+
+
+# ------------------------------------------------------------------
+# CREACIÓN DE NUEVA PRESENTACIÓN
+# ------------------------------------------------------------------
+
+
+def _listar_lecturas() -> List[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT fecha, domingo, celebracion, color_liturgico FROM lecturas
+        WHERE fecha NOT IN (SELECT fecha_domingo FROM presentaciones)
+        ORDER BY fecha
+    """)
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def _listar_canciones_para_selector() -> List[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
+        FROM canciones c
+        LEFT JOIN cancion_momentos cm ON cm.cancion_id = c.id
+        GROUP BY c.id
+        ORDER BY c.titulo
+    """)
+    rows = [{"id": r["id"], "titulo": r["titulo"], "momentos": r["momentos"]} for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+@app.route("/presentaciones/nueva")
+def nueva_presentacion():
+    lecturas = _listar_lecturas()
+    canciones = _listar_canciones_para_selector()
+
+    if not lecturas:
+        content = "<h2>➕ Nueva presentación</h2><p>No hay lecturas disponibles sin presentación. Scrapea primero las lecturas del domingo.</p>"
+        return _render_base("Nueva presentación", "", content)
+
+    lectura_options = "\n".join(
+        f'<option value="{html_module.escape(r["fecha"])}">{html_module.escape(r["fecha"])} - {html_module.escape(r["celebracion"] or "-")} ({html_module.escape(r["color_liturgico"] or "-")})</option>'
+        for r in lecturas
+    )
+
+    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    momentos_html = ""
+    for m in momentos_musicales:
+        opts = f'<option value="">-- Sin canción --</option>\n'
+        opts += "\n".join(
+            f'<option value="{c["id"]}">{html_module.escape(c["titulo"])}</option>'
+            for c in canciones
+        )
+        momentos_html += f"""
+        <div style="margin-bottom:12px;">
+            <label><strong>{html_module.escape(m.replace("_", " ").title())}</strong></label>
+            <select name="{m}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">{opts}</select>
+        </div>
+        """
+
+    content = f"""
+    <h2>➕ Nueva presentación</h2>
+    <p>Selecciona la fecha y las canciones para cada momento musical. Se creará la presentación y se propondrá la composición desde el catálogo.</p>
+    <form method="post" action="/presentaciones/nueva/guardar">
+        <div style="margin-bottom:12px;">
+            <label><strong>Fecha (lectura)</strong></label>
+            <select name="fecha" required style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">{lectura_options}</select>
+        </div>
+        {momentos_html}
+        <button type="submit">💾 Crear presentación y composición</button>
+    </form>
+    """
+    return _render_base("Nueva presentación", "", content)
+
+
+@app.route("/presentaciones/nueva/guardar", methods=["POST"])
+def guardar_nueva_presentacion():
+    fecha = request.form.get("fecha", "").strip()
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        return _render_base("Error", "", "<h2>Error</h2><p>Fecha inválida.</p>", "Fecha inválida.", "err")
+
+    # Verificar que existe la lectura
+    lecturas = _listar_lecturas()
+    lectura = next((r for r in lecturas if r["fecha"] == fecha), None)
+    if not lectura:
+        return _render_base("Error", "", "<h2>Error</h2><p>No existe lectura para esa fecha o ya tiene presentación.</p>", "No existe lectura o ya tiene presentación.", "err")
+
+    # Construir canciones_json
+    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    canciones_asignadas = {}
+    for m in momentos_musicales:
+        val = request.form.get(m, "").strip()
+        if val:
+            try:
+                canciones_asignadas[m] = int(val)
+            except ValueError:
+                pass
+
+    canciones_json = json.dumps(canciones_asignadas)
+
+    # Crear presentación
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO presentaciones (fecha_domingo, lectura_id, canciones_json, estado, fecha_creacion)
+        VALUES (?, (SELECT id FROM lecturas WHERE fecha = ?), ?, 'borrador', CURRENT_TIMESTAMP)
+    """, (fecha, fecha, canciones_json))
+    pres_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+
+    # Proponer y guardar composición
+    composicion = proponer_composicion(fecha)
+    guardar_composicion(fecha, composicion)
+
+    # Generar bundle PPTX/HTML/PDF
+    gen_msg = _generar_presentacion(fecha)
+
+    commit_result = _git_commit(f"nueva presentación {fecha}")
+    mensaje = f"✅ Presentación {fecha} creada y commiteada ({commit_result}). {gen_msg}"
+    clase = "ok" if not commit_result.startswith("ERROR") else "err"
+
+    # Redirigir a la pantalla de armado
+    response = armar_presentacion(fecha)
+    if isinstance(response, tuple):
+        body, status = response
+    else:
+        body, status = response, 200
+    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    return body, status
+
+
+# ------------------------------------------------------------------
+# EDICIÓN DE ASIGNACIÓN DE CANCIONES EN PRESENTACIÓN EXISTENTE
+# ------------------------------------------------------------------
+
+
+@app.route("/presentacion/<fecha>/asignar")
+def asignar_canciones(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        abort(404)
+
+    canciones = _listar_canciones_para_selector()
+    canciones_asignadas = _canciones_asignadas(pres.get("canciones_json"))
+
+    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    momentos_html = ""
+    for m in momentos_musicales:
+        opts = '<option value="">-- Sin canción --</option>\n'
+        current_id = canciones_asignadas.get(m)
+        for c in canciones:
+            selected = ' selected' if current_id == c["id"] else ''
+            opts += f'<option value="{c["id"]}"{selected}>{html_module.escape(c["titulo"])}</option>\n'
+        momentos_html += f"""
+        <div style="margin-bottom:12px;">
+            <label><strong>{html_module.escape(m.replace("_", " ").title())}</strong></label>
+            <select name="{m}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">{opts}</select>
+        </div>
+        """
+
+    content = f"""
+    <h2>🎵 Asignar canciones para {fecha}</h2>
+    <p><strong>{html_module.escape(pres.get("celebracion") or "-")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
+    <p>Cambia las canciones asignadas y guarda para reconstruir la composición.</p>
+    <form method="post" action="/presentacion/{fecha}/asignar/guardar">
+        {momentos_html}
+        <button type="submit">💾 Guardar asignación y reconstruir</button>
+    </form>
+    <p><a href="/presentacion/{fecha}/armar">← Volver a armar presentación</a></p>
+    """
+    return _render_base(f"Asignar canciones {fecha}", "", content)
+
+
+@app.route("/presentacion/<fecha>/asignar/guardar", methods=["POST"])
+def guardar_asignacion_canciones(fecha: str):
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
+        abort(400)
+    pres = _get_presentacion_por_fecha(fecha)
+    if not pres:
+        abort(404)
+
+    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    canciones_asignadas = {}
+    for m in momentos_musicales:
+        val = request.form.get(m, "").strip()
+        if val:
+            try:
+                canciones_asignadas[m] = int(val)
+            except ValueError:
+                pass
+
+    canciones_json = json.dumps(canciones_asignadas)
+
+    # Actualizar presentación
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"]))
+    conn.commit()
+    conn.close()
+
+    # Reconstruir composición
+    _reconstruir_composicion_desde_canciones(fecha)
+
+    # Generar bundle
+    gen_msg = _generar_presentacion(fecha)
+
+    commit_result = _git_commit(f"asignación canciones {fecha}")
+    mensaje = f"✅ Asignación guardada y commiteada ({commit_result}). {gen_msg}"
+    clase = "ok" if not commit_result.startswith("ERROR") else "err"
+
+    response = armar_presentacion(fecha)
+    if isinstance(response, tuple):
+        body, status = response
+    else:
+        body, status = response, 200
+    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    return body, status
+
 
 def main():
     host = os.environ.get("EDITOR_HOST", "0.0.0.0")
