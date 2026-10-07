@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>l XXVIII Domingo del Tiempo Ordinario - 2026-10-11</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;600;700&display=swap');
+
+    :root {
+      --liturgia-from: #e8f5e9;
+      --liturgia-to: #c8e6c9;
+      --liturgia-acento: #2e7d32;
+      --oro: #A16207;
+      --morado: #7C3AED;
+      --blanco-tarjeta: rgba(255,255,255,0.94);
+    }
+
+    .reveal {
+      font-family: 'Nunito', 'Open Sans', sans-serif;
+      font-size: 40px;
+      color: #2c3e50;
+    }
+
+    .reveal {
+      aspect-ratio: 4 / 3;
+      max-width: 100vw;
+      max-height: 100vh;
+      margin: auto;
+    }
+
+    .reveal .slides {
+      text-align: left;
+      aspect-ratio: 4 / 3;
+    }
+
+    .reveal .slides section {
+      aspect-ratio: 4 / 3;
+      width: 100%;
+      height: 100%;
+    }
+
+    .reveal .slides section {
+      padding: 0;
+      background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
+    }
+
+    .slide-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .reveal .slides section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro), var(--liturgia-acento));
+      z-index: 20;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Fredoka', 'Montserrat', sans-serif;
+      color: var(--liturgia-acento);
+      text-transform: uppercase;
+      margin-bottom: 0.3em;
+      line-height: 1.15;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .reveal h1 { font-size: 1.35em; }
+    .reveal h2 { font-size: 0.95em; font-weight: 400; text-transform: none; color: #555; }
+    .reveal h3 { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
+    .reveal .lectura .tarjeta,
+    .reveal .primera_lectura .tarjeta,
+    .reveal .segunda_lectura .tarjeta,
+    .reveal .salmo .tarjeta,
+    .reveal .evangelio .tarjeta {
+      max-width: 92%;
+      margin: 30px 40px 110px 40px;
+      max-height: 70%;
+    }
+
+    .reveal .lectura .ilustracion,
+    .reveal .primera_lectura .ilustracion,
+    .reveal .segunda_lectura .ilustracion,
+    .reveal .salmo .ilustracion,
+    .reveal .evangelio .ilustracion {
+      display: none;
+    }
+
+    .reveal p, .reveal li {
+      line-height: 1.5;
+      margin-bottom: 0.5em;
+    }
+
+    .reveal .tarjeta {
+      background: var(--blanco-tarjeta);
+      border-radius: 24px;
+      padding: 24px 32px;
+      margin: 30px 40px 110px 40px;
+      box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(124, 58, 237, 0.12);
+      max-height: 70%;
+      overflow: auto;
+      position: relative;
+      z-index: 5;
+    }
+
+    .reveal .tarjeta::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
+      border-radius: 0 0 24px 24px;
+    }
+
+    .reveal .cita {
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 0.6em;
+      padding: 0.25em 0.7em;
+      display: inline-block;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
+      color: white;
+      border-radius: 8px;
+    }
+
+    .reveal .contenido {
+      white-space: pre-wrap;
+      max-height: none;
+      overflow: visible;
+      font-size: 0.9em;
+      line-height: 1.22;
+    }
+
+    .reveal .primera_lectura .contenido,
+    .reveal .segunda_lectura .contenido,
+    .reveal .evangelio .contenido {
+      font-size: 1em;
+      line-height: 1.18;
+    }
+
+    .reveal .salmo .contenido {
+      font-size: 0.95em;
+      line-height: 1.22;
+    }
+
+    .reveal .primera_lectura .tarjeta,
+    .reveal .segunda_lectura .tarjeta,
+    .reveal .salmo .tarjeta,
+    .reveal .evangelio .tarjeta {
+      padding: 18px 24px;
+      max-width: 95%;
+      margin: 20px 30px 110px 30px;
+    }
+
+    .reveal .logo-lema {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      height: 55px;
+      width: auto;
+      max-width: 180px;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .reveal .ilustracion {
+      position: absolute;
+      top: auto;
+      bottom: 90px;
+      right: 70px;
+      max-width: 280px;
+      max-height: 280px;
+      opacity: 0.98;
+      z-index: 6;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      object-fit: contain;
+    }
+
+    section:has(.ilustracion) .tarjeta {
+      margin-right: 320px;
+    }
+
+    .reveal .portada .slide-wrapper {
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 40%, #7C3AED 70%, var(--oro) 100%);
+    }
+
+    .reveal .portada .tarjeta {
+      background: rgba(255,255,255,0.96);
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .reveal .portada h1 {
+      text-align: center;
+      font-size: 1.8em;
+      margin-top: 0;
+    }
+
+    .reveal .portada h2 {
+      text-align: center;
+      font-size: 1.1em;
+      color: #555;
+      text-transform: none;
+      font-weight: 400;
+      margin-top: 0.5em;
+    }
+
+    .reveal .portada .ilustracion {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      max-width: 320px;
+      max-height: 320px;
+      margin: 0 auto 1em;
+    }
+
+    .reveal .transicion .slide-wrapper,
+    .reveal .paso .slide-wrapper {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .reveal .transicion .tarjeta,
+    .reveal .paso .tarjeta {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 55%;
+      max-width: 78%;
+      background: rgba(255,255,255,0.96);
+      border-radius: 32px;
+      padding: 36px 44px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.22);
+    }
+
+    .reveal .transicion h1,
+    .reveal .paso h1 {
+      text-align: center;
+      font-size: 2.4em;
+      letter-spacing: 0.02em;
+      color: var(--liturgia-acento);
+      margin-bottom: 0.2em;
+    }
+
+    .reveal .transicion h2,
+    .reveal .paso h2 {
+      text-align: center;
+      font-size: 1.1em;
+      color: #555;
+      font-weight: 400;
+      margin-bottom: 0.8em;
+    }
+
+    .reveal .transicion .contenido,
+    .reveal .paso .contenido {
+      font-size: 1.0em;
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    .reveal .transicion .ilustracion,
+    .reveal .paso .ilustracion {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      max-width: 220px;
+      max-height: 220px;
+      margin: 0 auto 1em;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    }
+
+    .reveal .cancion .tarjeta {
+      background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,255,0.96) 100%);
+    }
+
+    .reveal .cancion .contenido {
+      font-size: 0.88em;
+      line-height: 1.25;
+    }
+
+    .reveal .cancion .contenido br {
+      display: block;
+      content: "";
+      margin-bottom: 0.05em;
+    }
+
+    .reveal .salmo .contenido {
+      font-size: 0.95em;
+      line-height: 1.18;
+    }
+
+    .reveal .salmo .contenido br {
+      display: block;
+      content: "";
+      margin-bottom: 0.02em;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal .slides section.present {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .reveal .contenido::-webkit-scrollbar {
+      width: 6px;
+    }
+    .reveal .contenido::-webkit-scrollbar-thumb {
+      background: var(--liturgia-acento);
+      border-radius: 3px;
+    }
+
+    @media print {
+      .reveal .slides section {
+        page-break-after: always;
+        height: 100vh;
+      }
+      .reveal .slides section .slide-wrapper {
+        height: 100vh;
+      }
+      .reveal .logo-lema {
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+      }
+      .slide-wrapper:has(.ilustracion) .tarjeta {
+        margin-right: 340px;
+      }
+      .reveal .tarjeta {
+        margin: 30px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="portada" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>l XXVIII Domingo del Tiempo Ordinario</h1>
+  <h2>11 de octubre de 2026</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="entrada cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PREPARAD EL CAMINO</h1>
+  <div class="contenido">PREPARAD EL CAMINO
+PREPARAD EL CAMINO AL SEÑOR
+Y ESCUCHAD LA PALABRA DE DIOS.(Bis)
+Voz que clama en el desierto:
+preparad los caminos de Dios,
+desterrad la mentira por siempre,
+preparad los caminos de Dios(Bis)</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="transicion_palabra" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140961.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>LITURGIA DE LA PALABRA</h1>
+  <div class="contenido">Escuchemos la Palabra de Dios</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="perdon" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140955.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ACTO PENITENCIAL</h1>
+  <div class="contenido">Yo confieso ante Dios todopoderoso
+y ante vosotros, hermanos,
+que he pecado mucho de pensamiento, palabra, obra y omisión:
+por mi culpa, por mi culpa, por mi gran culpa.
+
+Por eso ruego a Santa María, siempre Virgen,
+a los ángeles, a los santos y a vosotros, hermanos,
+que intercedáis por mí ante Dios, nuestro Señor.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="gloria cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>GLORIA A DIOS (1/2)</h1>
+  <div class="contenido">Te damos gracias, Señor,
+por la tierra y el sol
+por la luna y las estrellas;
+bendecimos tu nombre
+alzando las manos,
+cantando para Ti, Señor.
+
+Te damos gracias, Jesús,
+por el fuego y la luz,
+por la noche y por el día;
+bendecimos tu nombre
+alzando las manos,
+cantando para Ti, Señor.
+
+<strong>¡GLORIA A DIOS!</strong>
+(A él sea el poder),
+<strong>¡GLORIA A DIOS!</strong>
+ él sea el honor).
+<strong>¡GLORIA A DIOS POR SIEMPRE,</strong>
+<strong>GLORIA A TODO EL CIELO!,</strong>
+<strong>¡GLORIA PARA NUESTRO DIOS! (Bis)</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="gloria cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>GLORIA A DIOS (2/2)</h1>
+  <div class="contenido">Te damos gracias, Señor,
+por los campos en flor,
+por la nieve de los montes;
+bendecimos tu nombre
+alzando las manos,
+cantando para Ti, Señor.
+
+Te damos gracias, Jesús,
+por las olas del mar,
+por el canto de las aves;
+bendecimos tu nombre
+alzando las manos,
+cantando para Ti, Señor.
+
+<strong>¡GLORIA A DIOS!</strong>
+(A él sea el poder),
+<strong>¡GLORIA A DIOS!</strong>
+ él sea el honor).
+<strong>¡GLORIA A DIOS POR SIEMPRE,</strong>
+<strong>GLORIA A TODO EL CIELO!,</strong>
+<strong>¡GLORIA PARA NUESTRO DIOS! (Bis)</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="primera_lectura" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PRIMERA LECTURA</h1>
+  <div class="cita">Is 25,6-10a</div>
+  <div class="contenido">Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="salmo" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140962.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>SALMO RESPONSORIAL</h1>
+  <div class="cita">Sal 22, 1 — Habitaré en la casa del Señor</div>
+  <div class="contenido">El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas; y repara mis fuerzas.
+
+Me guía por el sendero justo, por el honor de su nombre.
+
+Aunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.
+
+Preparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.
+
+Tu bondad y tu misericordia me acompañan; todos los días de mi vida, y habitaré en la casa del Señor; por años sin término.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="segunda_lectura" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140960.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>SEGUNDA LECTURA</h1>
+  <div class="cita">Flp 4,12-14.19-20</div>
+  <div class="contenido">Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="aleluya cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ALE, ALELUYA</h1>
+  <div class="contenido">Ale, aleluya,
+aleluya, aleluya,
+aleluya, aleluya,
+aleluya, aleluya.
+Pasarán los cielos,
+pasará la tierra,
+mas tus palabras no pasarán.
+Aleluya, aleluya.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="evangelio" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>EVANGELIO</h1>
+  <div class="cita">Mt 22,1-14</div>
+  <div class="contenido">En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»; Palabra del Señor</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="transicion_eucaristia" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>LITURGIA EUCARÍSTICA</h1>
+  <div class="contenido">Preparémonos para la mesa del Señor</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="credo" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140954.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>CREDO</h1>
+  <div class="contenido">Creo en Dios, Padre todopoderoso, 
+creador del cielo y de la tierra.
+Creo en Jesucristo, su único Hijo, nuestro Señor, 
+que fue concebido por obra y gracia del Espíritu Santo; 
+nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; 
+fue crucificado, muerto y sepultado; descendió a los infiernos; 
+al tercer día resucitó de entre los muertos; 
+subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.
+Desde allí ha de venir a juzgar a vivos y muertos.
+Creo en el Espíritu Santo, la santa Iglesia católica, 
+la comunión de los santos, el perdón de los pecados, 
+la resurrección de la carne y la vida eterna. Amén.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="ofertorio cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>HOY COMO AYER</h1>
+  <div class="contenido">HOY COMO AYER
+Hoy como ayer calla quien no tiene voz,
+aquél a quien nadie enseñó a decir su palabra.
+Hoy como ayer quien sabe podrá dominar
+y el pobre tendrá que bajar otra vez la mirada.
+CORO
+Calasanz nos enseñó como hacer realidad
+un mañana de esperanza, una nueva humanidad
+despertando la razón, la conciencia y dignidad,
+educando al hombre nuevo en amor y libertad.
+Calasanz nos enseñó como hacer realidad
+un mañana de esperanza, una nueva humanidad
+ayudando a descubrir que Jesús de Nazaret
+sigue vivo y su camino juntos hay que recorrer.
+Mira y verás que hay niños que nunca sabrán
+que tienen derecho a reír y a jugar en la plaza.
+Mira y verás que muchos explotan sin fin
+la fuerza de la juventud para hacer su ganancia</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="santo cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140957.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>GRITO SANTO</h1>
+  <div class="contenido">Hoy quiero proclamarte,
+quiero cantar a tu nombre
+santo,
+quiero bailar ante tu presencia
+hasta morir.
+Y bendecirte, mi Dios; amarte,
+no detenerme hasta encontrarte
+buscar las sendas que me
+conducen
+hacia la luz.
+Y GRITO SANTO, SANTO, SANTO.
+TÚ ERES SANTO, SANTO, SANTO.
+TÚ SIEMPRE SANTO, SANTO, SANTO;
+SANTO ERES TÚ. (Bis)
+Siento en mí tu mirada
+que me traspasa hasta lo más
+hondo
+como una fuerza que me arrastra
+hacia tu cruz.
+Y allí me limpias, me
+purificas,
+sacas de mí el corazón de
+piedra
+y me transformas en criatura
+viva por ti.
+Y GRITO SANTO…</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="padre_nuestro cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140955.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PADRE NUESTRO (Gallego)</h1>
+  <div class="contenido">En el mar he oído hoy
+Señor tu voz que me llamó
+y me pidió que me entregara
+a mis hermanos.
+Esa voz me transformó,
+mi vida entera ya cambió,
+y sólo pienso ahora Señor
+en repetirte:
+PADRE NUESTRO
+EN TI CREEMOS,
+PADRE NUESTRO
+TE OFRECEMOS,
+PADRE NUESTRO
+NUESTRAS MANOS
+DE HERMANOS.
+Cuando vaya a otro lugar
+tendré Señor que abandonar
+a mi familia a mis amigos
+por seguirte.
+Pero sé que así algún día
+podré enseñar tu verdad,
+ir a mi hermano y junto a él
+yo repetirte.
+PADRE NUESTRO…</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paz cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140958.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>RITO DE LA PAZ</h1>
+  <div class="contenido">Señor Jesucristo, que dijiste a tus apóstoles:
+«La paz os dejo, mi paz os doy»,
+no tengas en cuenta nuestros pecados,
+sino la fe de tu Iglesia,
+y conforme a tu palabra concédele la paz y la unidad.
+
+Tú que vives y reinas por los siglos de los siglos. Amén.
+
+La paz del Señor esté siempre con vosotros.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="comunion cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>MARÍA, MÚSICA DE DIOS</h1>
+  <div class="contenido">MARÍA, MÚSICA DE DIOS
+Me quedé sin voz con qué cantar
+y mi alma vacía dormía en sequedad
+Y pensé para mí: me pondré en sus manos
+manos de Madre, me dejaré en su amor
+Y tú, María, házme música de Dios
+Y tú, María, anima tú las cuerdas de mi alma
+Aleluya, Amén
+Y tú, María, házme música de Dios
+Y tú, María, anima tú las cuerdas de mi alma
+Aleluya, Amén
+María, acompaña tú mi caminar
+yo sola no puedo, ayúdame a andar
+Y pensé para mí: me pondré en sus manos
+manos de Madre, me dejaré en su amor
+Y tú, María, házme música de Dios
+Y tú, María, anima tú las cuerdas de mi alma
+Aleluya, Amén
+Y tú, María, házme música de Dios
+Y tú, María, anima tú las cuerdas de mi alma
+Aleluya, Amén</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="maria cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/virgen_fatima.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>CANTO A MARÍA</h1>
+  <div class="contenido">Dios te salve, María;
+llena eres de gracia;
+el Señor es contigo.
+Bendita tú eres entre todas las mujeres,
+y bendito es el fruto de tu vientre, Jesús.
+
+Santa María, Madre de Dios,
+ruega por nosotros, pecadores,
+ahora y en la hora de nuestra muerte. Amén.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="despedida cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PREPARAD EL CAMINO</h1>
+  <div class="contenido">PREPARAD EL CAMINO
+PREPARAD EL CAMINO AL SEÑOR
+Y ESCUCHAD LA PALABRA DE DIOS.(Bis)
+Voz que clama en el desierto:
+preparad los caminos de Dios,
+desterrad la mentira por siempre,
+preparad los caminos de Dios(Bis)</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="portada" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>¡ID EN PAZ!</h1>
+  <h2>Somos uno · 11 de octubre de 2026</h2>
+  <div class="contenido">La paz del Señor esté siempre con vosotros.
+
+«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+    </div>
+  </div>
+  <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno" style="display:none;">
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      width: 1280,
+      height: 960,
+      center: true,
+      margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
+    });
+
+    // Ajustar tamaño de fuente de la tarjeta para llenar la diapositiva sin cortar
+    function ajustarTexto(slide) {
+      const tarjeta = slide.querySelector('.tarjeta');
+      if (!tarjeta) return;
+      const wrapper = slide.querySelector('.slide-wrapper');
+      const logo = slide.querySelector('.logo-lema');
+      const ilustracion = slide.querySelector('.ilustracion');
+
+      const esLectura = slide.classList.contains('primera_lectura')
+                     || slide.classList.contains('segunda_lectura')
+                     || slide.classList.contains('salmo')
+                     || slide.classList.contains('evangelio')
+                     || slide.classList.contains('lectura');
+
+      // Lecturas: un poco mas grande para mejor legibilidad
+      let fontSize = esLectura ? 48 : 48;
+      tarjeta.style.fontSize = fontSize + 'px';
+
+      const logoHeight = logo ? logo.offsetHeight + 36 : 90;
+      const topMargin = 30;
+      const bottomSafety = 20;
+      const maxHeight = wrapper.clientHeight - topMargin - logoHeight - bottomSafety;
+
+      const ilustracionWidth = ilustracion ? ilustracion.offsetWidth + 60 : 0;
+      const maxWidth = wrapper.clientWidth - 80 - ilustracionWidth;
+
+      tarjeta.style.maxHeight = maxHeight + 'px';
+
+      // Reducir hasta que el texto quepa; para lecturas permitimos bajar hasta 28px
+      const minSize = esLectura ? 28 : 16;
+      while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > minSize) {
+        fontSize -= 0.5;
+        tarjeta.style.fontSize = fontSize + 'px';
+      }
+    }
+    Reveal.on('ready', event => ajustarTexto(event.currentSlide));
+    Reveal.on('slidechanged', event => {
+      ajustarTexto(event.currentSlide);
+      if (event.previousSlide) {
+        const prevTarjeta = event.previousSlide.querySelector('.tarjeta');
+        if (prevTarjeta) prevTarjeta.style.fontSize = '';
+      }
+    });
+  </script>
+</body>
+</html>

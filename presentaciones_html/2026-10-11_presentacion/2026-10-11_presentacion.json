@@ -1,0 +1,302 @@
+{
+  "meta": {
+    "fecha": "2026-10-11",
+    "celebracion": "l XXVIII Domingo del Tiempo Ordinario",
+    "color_liturgico": "verde",
+    "lema": "Somos uno",
+    "lema_imagen": "assets/lema_somos_uno.jpg",
+    "generado": "2026-10-07T15:24:13.138097"
+  },
+  "slides": [
+    {
+      "numero": 1,
+      "tipo": "portada",
+      "titulo": "l XXVIII Domingo del Tiempo Ordinario",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "11 de octubre de 2026",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 2,
+      "tipo": "entrada",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 3,
+      "tipo": "transicion_palabra",
+      "titulo": "LITURGIA DE LA PALABRA",
+      "contenido": "Escuchemos la Palabra de Dios",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140961.jpg"
+    },
+    {
+      "numero": 4,
+      "tipo": "perdon",
+      "titulo": "ACTO PENITENCIAL",
+      "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 5,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 6,
+      "tipo": "gloria",
+      "titulo": "GLORIA A DIOS (1/2)",
+      "contenido": "Te damos gracias, Señor,\r\npor la tierra y el sol\r\npor la luna y las estrellas;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús,\r\npor el fuego y la luz,\r\npor la noche y por el día;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS!**\r\n(A él sea el poder),\r\n**¡GLORIA A DIOS!**\r\n él sea el honor).\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg"
+    },
+    {
+      "numero": 7,
+      "tipo": "gloria",
+      "titulo": "GLORIA A DIOS (2/2)",
+      "contenido": "Te damos gracias, Señor,\r\npor los campos en flor,\r\npor la nieve de los montes;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús,\r\npor las olas del mar,\r\npor el canto de las aves;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS!**\r\n(A él sea el poder),\r\n**¡GLORIA A DIOS!**\r\n él sea el honor).\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg"
+    },
+    {
+      "numero": 8,
+      "tipo": "primera_lectura",
+      "titulo": "PRIMERA LECTURA",
+      "contenido": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»",
+      "cita": "Is 25,6-10a",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 9,
+      "tipo": "salmo",
+      "titulo": "SALMO RESPONSORIAL",
+      "contenido": "El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas; y repara mis fuerzas.\n\nMe guía por el sendero justo, por el honor de su nombre.\n\nAunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.\n\nPreparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.\n\nTu bondad y tu misericordia me acompañan; todos los días de mi vida, y habitaré en la casa del Señor; por años sin término.",
+      "cita": "Sal 22, 1 — Habitaré en la casa del Señor",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140962.jpg"
+    },
+    {
+      "numero": 10,
+      "tipo": "segunda_lectura",
+      "titulo": "SEGUNDA LECTURA",
+      "contenido": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.",
+      "cita": "Flp 4,12-14.19-20",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140960.jpg"
+    },
+    {
+      "numero": 11,
+      "tipo": "aleluya",
+      "titulo": "ALE, ALELUYA",
+      "contenido": "Ale, aleluya,\naleluya, aleluya,\naleluya, aleluya,\naleluya, aleluya.\nPasarán los cielos,\npasará la tierra,\nmas tus palabras no pasarán.\nAleluya, aleluya.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 12,
+      "tipo": "evangelio",
+      "titulo": "EVANGELIO",
+      "contenido": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»; Palabra del Señor",
+      "cita": "Mt 22,1-14",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    },
+    {
+      "numero": 13,
+      "tipo": "transicion_eucaristia",
+      "titulo": "LITURGIA EUCARÍSTICA",
+      "contenido": "Preparémonos para la mesa del Señor",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 14,
+      "tipo": "credo",
+      "titulo": "CREDO",
+      "contenido": "Creo en Dios, Padre todopoderoso, \r\ncreador del cielo y de la tierra.\r\nCreo en Jesucristo, su único Hijo, nuestro Señor, \r\nque fue concebido por obra y gracia del Espíritu Santo; \r\nnació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; \r\nfue crucificado, muerto y sepultado; descendió a los infiernos; \r\nal tercer día resucitó de entre los muertos; \r\nsubió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\r\nDesde allí ha de venir a juzgar a vivos y muertos.\r\nCreo en el Espíritu Santo, la santa Iglesia católica, \r\nla comunión de los santos, el perdón de los pecados, \r\nla resurrección de la carne y la vida eterna. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140954.jpg"
+    },
+    {
+      "numero": 15,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 16,
+      "tipo": "ofertorio",
+      "titulo": "HOY COMO AYER",
+      "contenido": "HOY COMO AYER\nHoy como ayer calla quien no tiene voz,\naquél a quien nadie enseñó a decir su palabra.\nHoy como ayer quien sabe podrá dominar\ny el pobre tendrá que bajar otra vez la mirada.\nCORO\nCalasanz nos enseñó como hacer realidad\nun mañana de esperanza, una nueva humanidad\ndespertando la razón, la conciencia y dignidad,\neducando al hombre nuevo en amor y libertad.\nCalasanz nos enseñó como hacer realidad\nun mañana de esperanza, una nueva humanidad\nayudando a descubrir que Jesús de Nazaret\nsigue vivo y su camino juntos hay que recorrer.\nMira y verás que hay niños que nunca sabrán\nque tienen derecho a reír y a jugar en la plaza.\nMira y verás que muchos explotan sin fin\nla fuerza de la juventud para hacer su ganancia",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 17,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 18,
+      "tipo": "santo",
+      "titulo": "GRITO SANTO",
+      "contenido": "Hoy quiero proclamarte,\nquiero cantar a tu nombre\nsanto,\nquiero bailar ante tu presencia\nhasta morir.\nY bendecirte, mi Dios; amarte,\nno detenerme hasta encontrarte\nbuscar las sendas que me\nconducen\nhacia la luz.\nY GRITO SANTO, SANTO, SANTO.\nTÚ ERES SANTO, SANTO, SANTO.\nTÚ SIEMPRE SANTO, SANTO, SANTO;\nSANTO ERES TÚ. (Bis)\nSiento en mí tu mirada\nque me traspasa hasta lo más\nhondo\ncomo una fuerza que me arrastra\nhacia tu cruz.\nY allí me limpias, me\npurificas,\nsacas de mí el corazón de\npiedra\ny me transformas en criatura\nviva por ti.\nY GRITO SANTO…",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140957.jpg"
+    },
+    {
+      "numero": 19,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 20,
+      "tipo": "padre_nuestro",
+      "titulo": "PADRE NUESTRO (Gallego)",
+      "contenido": "En el mar he oído hoy\nSeñor tu voz que me llamó\ny me pidió que me entregara\na mis hermanos.\nEsa voz me transformó,\nmi vida entera ya cambió,\ny sólo pienso ahora Señor\nen repetirte:\nPADRE NUESTRO\nEN TI CREEMOS,\nPADRE NUESTRO\nTE OFRECEMOS,\nPADRE NUESTRO\nNUESTRAS MANOS\nDE HERMANOS.\nCuando vaya a otro lugar\ntendré Señor que abandonar\na mi familia a mis amigos\npor seguirte.\nPero sé que así algún día\npodré enseñar tu verdad,\nir a mi hermano y junto a él\nyo repetirte.\nPADRE NUESTRO…",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140955.jpg"
+    },
+    {
+      "numero": 21,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 22,
+      "tipo": "paz",
+      "titulo": "RITO DE LA PAZ",
+      "contenido": "Señor Jesucristo, que dijiste a tus apóstoles:\n«La paz os dejo, mi paz os doy»,\nno tengas en cuenta nuestros pecados,\nsino la fe de tu Iglesia,\ny conforme a tu palabra concédele la paz y la unidad.\n\nTú que vives y reinas por los siglos de los siglos. Amén.\n\nLa paz del Señor esté siempre con vosotros.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140958.jpg"
+    },
+    {
+      "numero": 23,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 24,
+      "tipo": "comunion",
+      "titulo": "MARÍA, MÚSICA DE DIOS",
+      "contenido": "MARÍA, MÚSICA DE DIOS\nMe quedé sin voz con qué cantar\ny mi alma vacía dormía en sequedad\nY pensé para mí: me pondré en sus manos\nmanos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén\nMaría, acompaña tú mi caminar\nyo sola no puedo, ayúdame a andar\nY pensé para mí: me pondré en sus manos\nmanos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140959.jpg"
+    },
+    {
+      "numero": 25,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 26,
+      "tipo": "maria",
+      "titulo": "CANTO A MARÍA",
+      "contenido": "Dios te salve, María;\nllena eres de gracia;\nel Señor es contigo.\nBendita tú eres entre todas las mujeres,\ny bendito es el fruto de tu vientre, Jesús.\n\nSanta María, Madre de Dios,\nruega por nosotros, pecadores,\nahora y en la hora de nuestra muerte. Amén.",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/virgen_fatima.jpg"
+    },
+    {
+      "numero": 27,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+    },
+    {
+      "numero": 28,
+      "tipo": "despedida",
+      "titulo": "PREPARAD EL CAMINO",
+      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 29,
+      "tipo": "portada",
+      "titulo": "¡ID EN PAZ!",
+      "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
+      "cita": "",
+      "subtitulo": "Somos uno · 11 de octubre de 2026",
+      "momento": "",
+      "imagen": "assets/fano_25_domingo_vina.jpg"
+    }
+  ]
+}
