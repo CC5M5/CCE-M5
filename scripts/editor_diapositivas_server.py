@@ -38,6 +38,13 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
+from src.canciones_manager import (
+    CancionCreateUpdate,
+    MOMENTOS_LITURGICOS,
+    crear_cancion,
+)
+from src.rebuild_web import rebuild_web
+
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -728,6 +735,73 @@ def _generar_presentacion(fecha: str) -> str:
         return f"⚠️ Error al generar: {e}"
 
 
+@app.route("/canciones/nueva")
+def nueva_cancion_diapositivas():
+    momentos_checks = "\n".join(
+        f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}"> {html_module.escape(m.replace("_", " ").title())}</label>'
+        for m in MOMENTOS_LITURGICOS
+    )
+    content = f"""<h2>➕ Añadir canción al cancionero</h2>
+    <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
+      <strong>ℹ️ Importante:</strong> Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
+      El cancionero web usa fuente monoespaciada (Courier New).
+      <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
+    </div>
+    <form method="post" action="/canciones/nueva/guardar">
+      <div style="margin-bottom:12px;">
+        <label><strong>Título</strong></label>
+        <input type="text" name="titulo" placeholder="Título de la canción" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label><strong>Tono (opcional)</strong></label>
+        <input type="text" name="tono" placeholder="Ej: Do" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label><strong>Momentos litúrgicos</strong></label><br>
+        {momentos_checks}
+      </div>
+      <div>
+        <label><strong>Texto con acordes</strong></label>
+        <textarea name="texto" placeholder="Escribe la letra con los acordes encima..." required style="min-height:350px;"></textarea>
+      </div>
+      <button type="submit">💾 Crear canción y reconstruir web</button>
+    </form>"""
+    return _render_base("Nueva canción", "", content)
+
+
+@app.route("/canciones/nueva/guardar", methods=["POST"])
+def guardar_nueva_cancion_diapositivas():
+    titulo = request.form.get("titulo", "").strip()
+    texto = request.form.get("texto", "")
+    tono = request.form.get("tono", "").strip() or None
+    momentos = request.form.getlist("momentos")
+
+    if not titulo:
+        return _render_base("Error", "", "<h2>Error</h2><p>El título es obligatorio.</p>", "El título es obligatorio.", "err")
+
+    try:
+        cancion = crear_cancion(CancionCreateUpdate(
+            titulo=titulo,
+            letra_con_acordes=texto,
+            momentos=momentos,
+            tono=tono,
+            fuente="manual",
+        ))
+    except Exception as exc:
+        return _render_base("Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+
+    rebuild_result = rebuild_web()
+    mensaje = f"✅ Canción '{cancion['titulo']}' creada. "
+    if rebuild_result.startswith("ERROR"):
+        mensaje += f"⚠️ Rebuild web falló: {rebuild_result}"
+        clase = "err"
+    else:
+        mensaje += "Web reconstruida correctamente."
+        clase = "ok"
+
+    return _render_base("Canción creada", "", f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente.</p>", mensaje, clase)
+
+
 # ------------------------------------------------------------------
 # FASE C: Armado de presentación semanal desde el catálogo
 # ------------------------------------------------------------------
@@ -777,6 +851,9 @@ def listar_presentaciones():
     )
     content = f"""<h2>Presentaciones semanales</h2>
     <p>Selecciona una fecha para armar la composición de diapositivas desde el catálogo.</p>
+    <div style="margin-bottom:15px;">
+      <a href="/canciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
+    </div>
     <table style="width:100%;border-collapse:collapse">
       <thead>
         <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Fecha</th><th>Celebración</th><th>Color</th><th>Slides</th><th>Estado</th></tr>

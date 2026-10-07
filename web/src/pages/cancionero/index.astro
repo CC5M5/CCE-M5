@@ -36,6 +36,51 @@ const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 
       Explora las canciones de la Comunidad Cristiana Escolapia M5. Usa el buscador o filtra por momento litúrgico.
     </p>
 
+    <div id="admin-cancionero-actions" class="hidden mb-6">
+      <button id="btn-nueva-cancion" class="btn-primary">
+        ➕ Añadir canción
+      </button>
+    </div>
+
+    <div id="modal-nueva-cancion" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div class="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-2xl font-heading font-bold text-slate-800">➕ Añadir canción</h2>
+          <button id="btn-cerrar-modal" class="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+        </div>
+        <form id="form-nueva-cancion" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Título *</label>
+            <input type="text" name="titulo" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-liturgia-verde">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Tono (opcional)</label>
+            <input type="text" name="tono" placeholder="Ej: Do" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-liturgia-verde">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Momentos litúrgicos</label>
+            <div class="flex flex-wrap gap-2">
+              {momentos.map(m => (
+                <label class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 text-sm cursor-pointer hover:bg-slate-200">
+                  <input type="checkbox" name="momentos" value={m} class="mr-2">
+                  {m}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Letra con acordes *</label>
+            <textarea name="texto" required rows="12" class="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-liturgia-verde" placeholder="Escribe la letra con los acordes encima usando espacios..."></textarea>
+          </div>
+          <div id="modal-mensaje" class="hidden p-3 rounded-lg text-sm"></div>
+          <div class="flex gap-3 pt-2">
+            <button type="submit" class="btn-primary">💾 Guardar canción</button>
+            <button type="button" id="btn-cancelar-modal" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="grid md:grid-cols-[1fr_auto] gap-4 mb-8 items-start">
       <BuscadorCanciones client:load basePath={base} />
       <FiltroMomentos client:load momentos={momentos} basePath={base} />
@@ -91,6 +136,101 @@ const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 
       document.querySelectorAll('#listado-canciones > div').forEach(div => {
         const visible = div.querySelectorAll('li:not([style*="none"])').length > 0;
         div.style.display = visible ? '' : 'none';
+      });
+    }
+  </script>
+
+  <script>
+    const ADMIN_API_URL = 'http://192.168.68.244:4324';
+    let adminToken = localStorage.getItem('cce_admin_token');
+
+    function checkAdmin() {
+      const actions = document.getElementById('admin-cancionero-actions');
+      if (!adminToken) {
+        if (actions) actions.classList.add('hidden');
+        return;
+      }
+      fetch(`${ADMIN_API_URL}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      })
+      .then(r => {
+        if (!r.ok) throw new Error('Token inválido');
+        return r.json();
+      })
+      .then(user => {
+        if (user.role === 'admin' && actions) {
+          actions.classList.remove('hidden');
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('cce_admin_token');
+        if (actions) actions.classList.add('hidden');
+      });
+    }
+
+    checkAdmin();
+
+    const btnNueva = document.getElementById('btn-nueva-cancion');
+    const modal = document.getElementById('modal-nueva-cancion');
+    const btnCerrar = document.getElementById('btn-cerrar-modal');
+    const btnCancelar = document.getElementById('btn-cancelar-modal');
+    const form = document.getElementById('form-nueva-cancion');
+    const mensaje = document.getElementById('modal-mensaje');
+
+    function mostrarModal() { modal.classList.remove('hidden'); }
+    function ocultarModal() { modal.classList.add('hidden'); form.reset(); mensaje.classList.add('hidden'); }
+
+    if (btnNueva) btnNueva.addEventListener('click', mostrarModal);
+    if (btnCerrar) btnCerrar.addEventListener('click', ocultarModal);
+    if (btnCancelar) btnCancelar.addEventListener('click', ocultarModal);
+    if (modal) modal.addEventListener('click', e => { if (e.target === modal) ocultarModal(); });
+
+    if (form) {
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const token = localStorage.getItem('cce_admin_token');
+        if (!token) {
+          mensaje.textContent = 'No hay sesión de administrador activa.';
+          mensaje.className = 'p-3 rounded-lg text-sm bg-red-100 text-red-800';
+          mensaje.classList.remove('hidden');
+          return;
+        }
+
+        const formData = new FormData(form);
+        const momentos = Array.from(form.querySelectorAll('input[name="momentos"]:checked')).map(cb => cb.value);
+        const payload = {
+          titulo: formData.get('titulo'),
+          letra_con_acordes: formData.get('texto'),
+          tono: formData.get('tono') || null,
+          momentos: momentos,
+          fuente: 'manual'
+        };
+
+        mensaje.textContent = 'Guardando...';
+        mensaje.className = 'p-3 rounded-lg text-sm bg-blue-100 text-blue-800';
+        mensaje.classList.remove('hidden');
+
+        try {
+          const res = await fetch(`${ADMIN_API_URL}/canciones`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `Error ${res.status}`);
+          }
+          const data = await res.json();
+          mensaje.textContent = `✅ Canción "${data.titulo}" añadida. Recarga la web para ver los cambios.`;
+          mensaje.className = 'p-3 rounded-lg text-sm bg-green-100 text-green-800';
+          setTimeout(() => ocultarModal(), 2000);
+        } catch (err) {
+          mensaje.textContent = `Error: ${err.message}`;
+          mensaje.className = 'p-3 rounded-lg text-sm bg-red-100 text-red-800';
+        }
       });
     }
   </script>

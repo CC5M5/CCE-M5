@@ -11,8 +11,9 @@ Funcionalidades:
 - Listado de canciones del cancionero.
 - Editor de texto con acordes posicionados.
 - Preview visual de la canción con acordes.
+- Crear nuevas canciones manualmente.
 - Al guardar: actualiza SQLite, regenera html_visual/estructura_json,
-  y hace git commit automático.
+  hace git commit automático y reconstruye la web.
 """
 
 from __future__ import annotations
@@ -27,9 +28,23 @@ import sys
 import time
 from pathlib import Path
 
+# Asegurar que el directorio del proyecto está en sys.path para importar src.*
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
+
 from flask import Flask, abort, request
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
+from src.canciones_manager import (
+    CancionCreateUpdate,
+    MOMENTOS_LITURGICOS,
+    actualizar_cancion,
+    crear_cancion,
+    listar_canciones,
+    slugify,
+)
+from src.rebuild_web import rebuild_web
+
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 
 app = Flask(__name__)
@@ -89,7 +104,6 @@ def _git_commit(titulo: str) -> str:
             capture_output=True,
             text=True,
         )
-        # Si no hay nada staged, no hay nada que commitear
         diff_check = subprocess.run(
             ["git", "diff", "--cached", "--quiet"],
             cwd=PROJECT_DIR,
@@ -125,73 +139,8 @@ def _git_commit(titulo: str) -> str:
 
 
 def _rebuild_web() -> str:
-    """Exporta SQLite a JSON, reconstruye la web Astro y reinicia el servidor web principal."""
-    try:
-        env = os.environ.copy()
-        env["BASE_PATH"] = "/"
-        env["SITE_URL"] = "http://192.168.68.244:4321"
-        # Node 22 evita bug de import ESM de Astro 4.16/4.19 con Node 24
-        node_bin = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
-        env["PATH"] = f"{node_bin}:{env.get('PATH', '')}"
-
-        # 1. Exportar datos de SQLite a JSON para Astro
-        export_script = PROJECT_DIR / "scripts" / "export_data_for_web.py"
-        export_result = subprocess.run(
-            ["python3", str(export_script)],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-            env=env,
-        )
-
-        # 2. Build Astro
-        build_result = subprocess.run(
-            [f"{node_bin}/npm", "run", "build"],
-            cwd=PROJECT_DIR / "web",
-            check=True,
-            capture_output=True,
-            text=True,
-            env=env,
-        )
-
-        # 3. Reiniciar servidor web principal (mata proceso http.server en 4321)
-        subprocess.run(
-            "ps aux | grep 'http.server 4321' | grep -v grep | awk '{print $2}' | xargs -r kill 2>/dev/null",
-            shell=True,
-            check=False,
-            capture_output=True,
-        )
-        time.sleep(1)
-
-        # 4. Iniciar nuevo servidor
-        subprocess.Popen(
-            ["/usr/bin/python3", "-m", "http.server", "4321",
-             "--directory", str(PROJECT_DIR / "web" / "dist"),
-             "--bind", "0.0.0.0"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
-
-        return "rebuild OK"
-    except subprocess.CalledProcessError as exc:
-        err = exc.stderr or exc.stdout or ""
-        # Incluir solo la última línea relevante del error
-        err_short = err.strip().splitlines()[-1] if err else "error desconocido"
-        return f"ERROR rebuild: {err_short}"
-    except Exception as exc:
-        return f"ERROR rebuild: {exc}"
-
-
-
-
-# --- Momentos litúrgicos ---
-MOMENTOS_LITURGICOS = [
-    "entrada", "acto penitencial", "gloria", "primera_lectura", "salmo",
-    "segunda_lectura", "aleluya", "evangelio", "credo", "ofertorio", "santo",
-    "padre_nuestro", "paz", "comunion", "maria", "despedida", "general"
-]
+    """Delega en el módulo compartido de reconstrucción web."""
+    return rebuild_web()
 
 
 def _get_momentos_cancion(cancion_id: int) -> list[str]:
@@ -220,48 +169,38 @@ def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
     conn.commit()
     conn.close()
 
-def _slugify(titulo: str) -> str:
-    import unicodedata
-    t = unicodedata.normalize("NFD", titulo.lower())
-    t = "".join(c for c in t if unicodedata.category(c) != "Mn")
-    t = re.sub(r"[^a-z0-9]+", "-", t).strip("-")
-    return t
-
 
 def _get_canciones():
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, titulo FROM canciones ORDER BY titulo")
-    canciones = [{"id": r["id"], "titulo": r["titulo"], "slug": _slugify(r["titulo"])} for r in cursor.fetchall()]
-    conn.close()
-    return canciones
+    canciones = listar_canciones()
+    return [{"id": c["id"], "titulo": c["titulo"], "slug": c["slug"]} for c in canciones]
 
 
 def _get_cancion_by_slug(slug: str):
-    canciones = _get_canciones()
+    canciones = listar_canciones()
     for c in canciones:
         if c["slug"] == slug:
-            conn = _get_connection()
-            cursor = conn.cursor()
-            cursor.execute(
-                "SELECT id, titulo, titulo_url, letra_con_acordes, html_visual, tono FROM canciones WHERE id = ?",
-                (c["id"],),
-            )
-            row = cursor.fetchone()
-            conn.close()
-            if row:
-                momentos = _get_momentos_cancion(row["id"])
             return {
-                    "id": row["id"],
-                    "titulo": row["titulo"],
-                    "titulo_url": row["titulo_url"],
-                    "slug": slug,
-                    "texto": row["letra_con_acordes"] or "",
-                    "preview": row["html_visual"] or "",
-                    "tono": row["tono"],
-                    "momentos": momentos,
-                }
+                "id": c["id"],
+                "titulo": c["titulo"],
+                "titulo_url": c["titulo_url"],
+                "slug": slug,
+                "texto": c["letra_con_acordes"] or "",
+                "preview": c["html_visual"] or "",
+                "tono": c["tono"],
+                "momentos": c.get("momentos", []),
+            }
     return None
+
+
+def _render_sidebar(active_slug: str | None = None, extra_link: str = "") -> str:
+    canciones = _get_canciones()
+    links = []
+    for c in canciones:
+        active = ' class="active"' if active_slug and c["slug"] == active_slug else ""
+        links.append(f'<a href="/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>')
+    if extra_link:
+        links.append(extra_link)
+    return "\n".join(links)
 
 
 def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = "") -> str:
@@ -325,15 +264,14 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
 </html>"""
 
 
+NUEVA_LINK = '<hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">\n<a href="/cancionero/nueva" style="background:#7C3AED;color:#fff;border-radius:6px;padding:8px;text-align:center;display:block;text-decoration:none;">➕ Nueva canción</a>'
+
+
 @app.route("/")
 def index():
-    canciones = _get_canciones()
-    sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
-        for c in canciones
-    )
-    content = "<h2>Selecciona una canción</h2><p>Elige una canción del menú lateral para editar sus acordes.</p>"
-    return _render_base("Canciones", sidebar_links, content)
+    sidebar = _render_sidebar(extra_link=NUEVA_LINK)
+    content = "<h2>Selecciona una canción</h2><p>Elige una canción del menú lateral para editar sus acordes, o añade una nueva.</p>"
+    return _render_base("Canciones", sidebar, content)
 
 
 @app.route("/cancionero/<slug>")
@@ -342,15 +280,7 @@ def editar(slug: str):
     if cancion is None:
         abort(404)
 
-    canciones = _get_canciones()
-    sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"' if c["slug"] == slug else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
-        for c in canciones
-    )
-    sidebar_links = "\n".join(
-        f'{link}>{html_module.escape(c["titulo"])}</a>'
-        for c, link in zip(canciones, sidebar_links.split("\n"))
-    )
+    sidebar = _render_sidebar(active_slug=slug, extra_link=NUEVA_LINK)
 
     momentos_checks = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in cancion.get("momentos", []) else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
@@ -387,7 +317,92 @@ def editar(slug: str):
       </div>
       <button type="submit">💾 Guardar y commitear</button>
     </form>"""
-    return _render_base(cancion["titulo"], sidebar_links, content)
+    return _render_base(cancion["titulo"], sidebar, content)
+
+
+@app.route("/cancionero/nueva")
+def nueva_cancion():
+    sidebar = _render_sidebar(extra_link=NUEVA_LINK.replace('href="/cancionero/nueva"', 'href="/cancionero/nueva" class="active"'))
+
+    momentos_checks = "\n".join(
+        f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}"> {html_module.escape(m.replace("_", " ").title())}</label>'
+        for m in MOMENTOS_LITURGICOS
+    )
+    content = f"""<h2>➕ Nueva canción</h2>
+    <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
+      <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
+      Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
+      <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
+    </div>
+    <form method="post" action="/cancionero/nueva/guardar">
+      <div style="margin-bottom:12px;">
+        <label><strong>Título</strong></label>
+        <input type="text" name="titulo" placeholder="Título de la canción" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label><strong>Tono (opcional)</strong></label>
+        <input type="text" name="tono" placeholder="Ej: Do" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label><strong>Momentos litúrgicos</strong></label><br>
+        {momentos_checks}
+      </div>
+      <div class="two-col">
+        <div>
+          <label><strong>Texto con acordes</strong></label>
+          <textarea name="texto" placeholder="Escribe la letra con los acordes encima..." required></textarea>
+        </div>
+        <div class="preview">
+          <strong>Preview</strong>
+          <p style="color:#666;">Se generará al guardar.</p>
+        </div>
+      </div>
+      <button type="submit">💾 Crear canción y commitear</button>
+    </form>"""
+    return _render_base("Nueva canción", sidebar, content)
+
+
+@app.route("/cancionero/nueva/guardar", methods=["POST"])
+def guardar_nueva_cancion():
+    titulo = request.form.get("titulo", "").strip()
+    texto = request.form.get("texto", "")
+    tono = request.form.get("tono", "").strip() or None
+    momentos = request.form.getlist("momentos")
+
+    if not titulo:
+        return _render_base("Error", NUEVA_LINK, "<h2>Error</h2><p>El título es obligatorio.</p>", "El título es obligatorio.", "err")
+
+    try:
+        cancion = crear_cancion(CancionCreateUpdate(
+            titulo=titulo,
+            letra_con_acordes=texto,
+            momentos=momentos,
+            tono=tono,
+            fuente="manual",
+        ))
+    except Exception as exc:
+        return _render_base("Error", NUEVA_LINK, f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+
+    commit_result = _git_commit(cancion["titulo"])
+    rebuild_result = _rebuild_web()
+
+    if commit_result.startswith("ERROR"):
+        mensaje = f"Canción creada, pero falló git: {commit_result}"
+        clase = "err"
+    elif rebuild_result.startswith("ERROR"):
+        mensaje = f"✅ Canción creada y commiteada: {commit_result}. ⚠️ Pero falló rebuild web: {rebuild_result}"
+        clase = "err"
+    else:
+        mensaje = f"✅ Canción creada, commiteada ({commit_result}) y web reconstruida."
+        clase = "ok"
+
+    return _render_base(
+        "Canción creada",
+        NUEVA_LINK,
+        f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente. <a href='/cancionero/{html_module.escape(cancion['slug'])}'>Editar canción</a></p>",
+        mensaje,
+        clase,
+    )
 
 
 @app.route("/cancionero/<slug>/guardar", methods=["POST"])
@@ -398,41 +413,22 @@ def guardar(slug: str):
 
     nuevo_texto = request.form.get("texto", "")
     nuevos_momentos = request.form.getlist("momentos")
-    derivados = _regenerar_derivados(nuevo_texto)
 
-    # Actualizar momentos litúrgicos
-    _set_momentos_cancion(cancion["id"], nuevos_momentos)
-
-    # Actualizar el campo legacy con el primer momento (o vacío) para compatibilidad
-    momento_legacy = nuevos_momentos[0] if nuevos_momentos else ""
-
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        UPDATE canciones
-        SET letra_con_acordes = ?,
-            letra_sin_acordes = ?,
-            acordes_json = ?,
-            estructura_json = ?,
-            html_visual = ?,
-            tono = ?,
-            momento_liturgico = ?
-        WHERE id = ?
-        """,
-        (
-            nuevo_texto,
-            derivados["letra_sin_acordes"],
-            derivados["acordes_json"],
-            derivados["estructura_json"],
-            derivados["html_visual"],
-            derivados["tono"],
-            momento_legacy,
+    try:
+        actualizar_cancion(
             cancion["id"],
-        ),
-    )
-    conn.commit()
-    conn.close()
+            CancionCreateUpdate(
+                titulo=cancion["titulo"],
+                letra_con_acordes=nuevo_texto,
+                momentos=nuevos_momentos,
+                tono=cancion["tono"],
+                fuente="manual",
+            ),
+        )
+    except Exception as exc:
+        return _render_base("Error", NUEVA_LINK, f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+
+    derivados = _regenerar_derivados(nuevo_texto)
 
     commit_result = _git_commit(cancion["titulo"])
     rebuild_result = _rebuild_web()
@@ -447,15 +443,7 @@ def guardar(slug: str):
         mensaje = f"✅ Guardado, commiteado ({commit_result}) y web reconstruida."
         clase = "ok"
 
-    canciones = _get_canciones()
-    sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"' if c["slug"] == slug else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
-        for c in canciones
-    )
-    sidebar_links = "\n".join(
-        f'{link}>{html_module.escape(c["titulo"])}</a>'
-        for c, link in zip(canciones, sidebar_links.split("\n"))
-    )
+    sidebar = _render_sidebar(active_slug=slug, extra_link=NUEVA_LINK)
 
     content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
     <div class="meta">
@@ -483,7 +471,7 @@ def guardar(slug: str):
       </div>
       <button type="submit">💾 Guardar y commitear</button>
     </form>"""
-    return _render_base(cancion["titulo"], sidebar_links, content, mensaje, clase)
+    return _render_base(cancion["titulo"], sidebar, content, mensaje, clase)
 
 
 def main():
