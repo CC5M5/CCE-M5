@@ -40,7 +40,7 @@ ORDEN_MOMENTOS_C: List[tuple[str, str]] = [
     ("portada", "despedida"),
 ]
 
-MOMENTOS_MUSICALES = ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida")
+MOMENTOS_MUSICALES = ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida", "salmo")
 
 
 def _get_connection() -> sqlite3.Connection:
@@ -61,10 +61,20 @@ def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
         return {}
     resultado = {}
     for momento, info in data.items():
+        if info is None:
+            continue
         if isinstance(info, dict) and "id" in info:
-            resultado[momento] = int(info["id"])
+            try:
+                resultado[momento] = int(info["id"])
+            except (ValueError, TypeError):
+                pass
         elif isinstance(info, int):
             resultado[momento] = info
+        elif isinstance(info, str):
+            try:
+                resultado[momento] = int(info)
+            except (ValueError, TypeError):
+                pass
     return resultado
 
 
