@@ -249,6 +249,9 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
   <header>
     <h1>🎵 Editor de Acordes CCE-M5</h1>
     <p>Edición local con commit automático. URL de origen se mantiene como referencia.</p>
+    <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="/cancionero/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">➕ Nueva canción</a>
+    </nav>
   </header>
   <div class="container">
     <aside>
@@ -264,14 +267,18 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
 </html>"""
 
 
-NUEVA_LINK = '<hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb;">\n<a href="/cancionero/nueva" style="background:#7C3AED;color:#fff;border-radius:6px;padding:8px;text-align:center;display:block;text-decoration:none;">➕ Nueva canción</a>'
+NUEVA_LINK = ''
 
 
 @app.route("/")
 def index():
-    sidebar = _render_sidebar(extra_link=NUEVA_LINK)
+    canciones = _get_canciones()
+    sidebar_links = "\n".join(
+        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
+        for c in canciones
+    )
     content = "<h2>Selecciona una canción</h2><p>Elige una canción del menú lateral para editar sus acordes, o añade una nueva.</p>"
-    return _render_base("Canciones", sidebar, content)
+    return _render_base("Canciones", sidebar_links, content)
 
 
 @app.route("/cancionero/<slug>")
@@ -280,7 +287,15 @@ def editar(slug: str):
     if cancion is None:
         abort(404)
 
-    sidebar = _render_sidebar(active_slug=slug, extra_link=NUEVA_LINK)
+    canciones = _get_canciones()
+    sidebar_links = "\n".join(
+        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"' if c["slug"] == slug else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
+        for c in canciones
+    )
+    sidebar_links = "\n".join(
+        f'{link}>{html_module.escape(c["titulo"])}</a>'
+        for c, link in zip(canciones, sidebar_links.split("\n"))
+    )
 
     momentos_checks = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in cancion.get("momentos", []) else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
@@ -322,7 +337,11 @@ def editar(slug: str):
 
 @app.route("/cancionero/nueva")
 def nueva_cancion():
-    sidebar = _render_sidebar(extra_link=NUEVA_LINK.replace('href="/cancionero/nueva"', 'href="/cancionero/nueva" class="active"'))
+    canciones = _get_canciones()
+    sidebar_links = "\n".join(
+        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
+        for c in canciones
+    )
 
     momentos_checks = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}"> {html_module.escape(m.replace("_", " ").title())}</label>'
@@ -370,7 +389,7 @@ def guardar_nueva_cancion():
     momentos = request.form.getlist("momentos")
 
     if not titulo:
-        return _render_base("Error", NUEVA_LINK, "<h2>Error</h2><p>El título es obligatorio.</p>", "El título es obligatorio.", "err")
+        return _render_base("Error", "", "<h2>Error</h2><p>El título es obligatorio.</p>", "El título es obligatorio.", "err")
 
     try:
         cancion = crear_cancion(CancionCreateUpdate(
@@ -381,7 +400,7 @@ def guardar_nueva_cancion():
             fuente="manual",
         ))
     except Exception as exc:
-        return _render_base("Error", NUEVA_LINK, f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+        return _render_base("Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
 
     commit_result = _git_commit(cancion["titulo"])
     rebuild_result = _rebuild_web()
@@ -398,7 +417,7 @@ def guardar_nueva_cancion():
 
     return _render_base(
         "Canción creada",
-        NUEVA_LINK,
+        "",
         f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente. <a href='/cancionero/{html_module.escape(cancion['slug'])}'>Editar canción</a></p>",
         mensaje,
         clase,
@@ -426,7 +445,7 @@ def guardar(slug: str):
             ),
         )
     except Exception as exc:
-        return _render_base("Error", NUEVA_LINK, f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+        return _render_base("Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
 
     derivados = _regenerar_derivados(nuevo_texto)
 
@@ -443,7 +462,7 @@ def guardar(slug: str):
         mensaje = f"✅ Guardado, commiteado ({commit_result}) y web reconstruida."
         clase = "ok"
 
-    sidebar = _render_sidebar(active_slug=slug, extra_link=NUEVA_LINK)
+    sidebar = _render_sidebar(active_slug=slug, extra_link="")
 
     content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
     <div class="meta">
