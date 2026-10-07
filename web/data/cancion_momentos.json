@@ -37,7 +37,15 @@
   },
   {
     "cancion_id": 11,
-    "momento_liturgico": "paz"
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 11,
+    "momento_liturgico": "despedida"
+  },
+  {
+    "cancion_id": 11,
+    "momento_liturgico": "entrada"
   },
   {
     "cancion_id": 12,

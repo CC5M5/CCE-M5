@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-10-07T15:24:13.138097"
+    "generado": "2026-10-08T00:27:36.069826"
   },
   "slides": [
     {
@@ -21,12 +21,12 @@
     {
       "numero": 2,
       "tipo": "entrada",
-      "titulo": "PREPARAD EL CAMINO",
-      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+      "titulo": "AL CALOR DE LA PALABRA",
+      "contenido": "Cerca del hogar que calienta mi alma\nquiero yo saber lo que en comunidad\nTú quieres de mi.\nSintiendo el calor que me da tu Palabra\nquiero responder a lo que me pides\nsin que a nada yo pueda temer.\nA NADA, A NADA NUNCA HE DE TEMER,\nYENDO JUNTO A TI CON TUS OJOS DE FE\nNUNCA HE DE TEMER (BIS)\nSólo he de beber de tu fuente de agua,\nsé que sólo ella será la que sacie\nmi hambre y mi sed.\nTú eres el Señor que alimenta mi alma\ny si hago mi opción por seguirte a Ti\nnunca jamás yo temeré.\n**ESTRIBILLO**\nLlegan hasta mí momentos de calma\nque me hacen dudar de si mi camino\nse orienta hacia Ti.\nComienza a faltar la paz en mi alma\ny sin esperarlo apareces Tú\nhaciéndome ver que ha nada he de temer.\n**ESTRIBILLO**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140953.jpg"
+      "imagen": "assets/fano_20140362_venid_vosotros_benditos_de_mi_padre.jpg"
     },
     {
       "numero": 3,
@@ -61,8 +61,8 @@
     {
       "numero": 6,
       "tipo": "gloria",
-      "titulo": "GLORIA A DIOS (1/2)",
-      "contenido": "Te damos gracias, Señor,\r\npor la tierra y el sol\r\npor la luna y las estrellas;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús,\r\npor el fuego y la luz,\r\npor la noche y por el día;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS!**\r\n(A él sea el poder),\r\n**¡GLORIA A DIOS!**\r\n él sea el honor).\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "titulo": "GLORIA TE DAMOS GRACIAS, SEÑOR (R. CARISMÁTICA)",
+      "contenido": "GLORIA TE DAMOS GRACIAS SEÑOR (R. CARISMÁTICA)\n\n  Do\n  Te damos gracias, Señor,\n\n\n\n  Lam\n  por la tierra y el sol\n\n\n\n  Fa                Sol\n  por la luna y las estrellas;\n\n\n\n  Do\n  bendecimos tu nombre\n\n\n\n    Lam\n  alzando las manos,\n\n\n\n    Fa                Sol\n  cantando para Ti, Señor.\n\nTe damos gracias, Jesús,\npor el fuego y la luz,\npor la noche y por el día;\nbendecimos tu nombre\nalzando las manos,\ncantando para Ti, Señor.\n\n\n    Do\n  ¡GLORIA A DIOS!\n\n(A él sea el poder),\n\n\n           Lam\n  ¡GLORIA A DIOS!\n\n(A él sea el honor).\n\n\n   Fa\n  ¡GLORIA A DIOS POR SIEMPRE,\n\n\n  Rem\n  GLORIA A TODO EL CIELO!,\n\n\n   Sol\n  ¡GLORIA PARA NUESTRO DIOS! (Bis)\n\nTe damos gracias, Señor,\npor los campos en flor,\npor la nieve de los montes;\nbendecimos tu nombre\nalzando las manos,\ncantando para Ti, Señor.\nTe damos gracias, Jesús,\npor las olas del mar,\npor el canto de las aves;\nbendecimos tu nombre\nalzando las manos,\ncantando para Ti, Señor.",
       "cita": "",
       "subtitulo": "",
       "momento": "",
@@ -70,16 +70,6 @@
     },
     {
       "numero": 7,
-      "tipo": "gloria",
-      "titulo": "GLORIA A DIOS (2/2)",
-      "contenido": "Te damos gracias, Señor,\r\npor los campos en flor,\r\npor la nieve de los montes;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús,\r\npor las olas del mar,\r\npor el canto de las aves;\r\nbendecimos tu nombre\r\nalzando las manos,\r\ncantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS!**\r\n(A él sea el poder),\r\n**¡GLORIA A DIOS!**\r\n él sea el honor).\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg"
-    },
-    {
-      "numero": 8,
       "tipo": "primera_lectura",
       "titulo": "PRIMERA LECTURA",
       "contenido": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»",
@@ -89,17 +79,17 @@
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 9,
+      "numero": 8,
       "tipo": "salmo",
       "titulo": "SALMO RESPONSORIAL",
       "contenido": "El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas; y repara mis fuerzas.\n\nMe guía por el sendero justo, por el honor de su nombre.\n\nAunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.\n\nPreparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.\n\nTu bondad y tu misericordia me acompañan; todos los días de mi vida, y habitaré en la casa del Señor; por años sin término.",
       "cita": "Sal 22, 1 — Habitaré en la casa del Señor",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140962.jpg"
+      "imagen": "assets/fano_20140360_recibimos_para_hacer_crecer.jpg"
     },
     {
-      "numero": 10,
+      "numero": 9,
       "tipo": "segunda_lectura",
       "titulo": "SEGUNDA LECTURA",
       "contenido": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.",
@@ -109,14 +99,24 @@
       "imagen": "assets/20140960.jpg"
     },
     {
-      "numero": 11,
+      "numero": 10,
       "tipo": "aleluya",
-      "titulo": "ALE, ALELUYA",
-      "contenido": "Ale, aleluya,\naleluya, aleluya,\naleluya, aleluya,\naleluya, aleluya.\nPasarán los cielos,\npasará la tierra,\nmas tus palabras no pasarán.\nAleluya, aleluya.",
+      "titulo": "ALELUYA DE LA TIERRA (1/2)",
+      "contenido": "¿Quién quiere resucitar a este mundo que se muere?\r\n¿Quién cantará el aleluya de esa nueva luz que viene?\r\n¿Quién cuando mire la tierra y las tragedias observe,\r\nsentirá en su corazón el dolor de quien se muere?\r\n¿Quién es capaz de salvar a este mundo decadente,\r\ny mantiene la esperanza de los muchos que la pierden?\r\n\r\n**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**\r\n**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140957.jpg"
+      "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
+    },
+    {
+      "numero": 11,
+      "tipo": "aleluya",
+      "titulo": "ALELUYA DE LA TIERRA (2/2)",
+      "contenido": "¿Quién bajará de la cruz a tanto cristo sufriente,\r\nmientras los hombres miramos, impasivos e indolentes?\r\n¿Quién grita desde el silencio de un ser que a su Dios retiene,\r\nporque se hace palabra que sin hablar se la entiende?\r\n¿Quién se torna en aleluya porque traduce la muerte,\r\ncomo el trigo que se pudre y de uno cientos vienen?\r\n\r\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,\r\nY LA TIERRA SONREIRÁ. ¡ALELUYA!**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
     },
     {
       "numero": 12,
@@ -161,12 +161,12 @@
     {
       "numero": 16,
       "tipo": "ofertorio",
-      "titulo": "HOY COMO AYER",
-      "contenido": "HOY COMO AYER\nHoy como ayer calla quien no tiene voz,\naquél a quien nadie enseñó a decir su palabra.\nHoy como ayer quien sabe podrá dominar\ny el pobre tendrá que bajar otra vez la mirada.\nCORO\nCalasanz nos enseñó como hacer realidad\nun mañana de esperanza, una nueva humanidad\ndespertando la razón, la conciencia y dignidad,\neducando al hombre nuevo en amor y libertad.\nCalasanz nos enseñó como hacer realidad\nun mañana de esperanza, una nueva humanidad\nayudando a descubrir que Jesús de Nazaret\nsigue vivo y su camino juntos hay que recorrer.\nMira y verás que hay niños que nunca sabrán\nque tienen derecho a reír y a jugar en la plaza.\nMira y verás que muchos explotan sin fin\nla fuerza de la juventud para hacer su ganancia",
+      "titulo": "TOMA MI VIDA",
+      "contenido": "Do Fa Do Fa\n\nEsto que te doy es vino y pan\nseñor.\n\nDo Sol Fa\n\nEsto que te doy\nes mi trabajo.\n\nSol Do\n\nEs mi corazón, es\nmi alma,\n\nMim Lam Rem\n\nes mi cuerpo\ny mi razón,\n\nSol Do Sol7\n\nel esfuerzo\nde mi caminar...\n\nEsto que te doy mi vida es\nseñor.\n\nes mi amor también es mi dolor.\n\nEs la ilusión de mis sueños,\n\nes mi gozo y mi llorar,\n\nes mi canto\ny mi oración.\n\nDo\nMim Lam Fa Sol\n\nTOMA MI VIDA, PONLA EN TU CORAZÓN.\n\nDo Mim\nLam Fa Sol\n\nDAME TU MANO Y LLÉVAME.\n\nFa Sol Do\n\nCAMBIA MI PAN EN TU CARNE\n\nMim Lam\n\nY MI VINO EN TU SANGRE\n\nRem Sol Do Do7\n\nY A MI SEÑOR RENUÉVAME,\n\nFa Sol Do\n\nLÍMPIAME\nY SÁLVAME\n\nEsto te lo doy, no solo, mi\nSeñor,\n\nesta voz también es mi hermano.\n\nEs la unión, la paz y el orden,\n\nla armonía y felicidad,\n\nes un canto en comunidad.",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140959.jpg"
+      "imagen": "assets/fano_20140880_dadles_vosotros_de_comer.jpg"
     },
     {
       "numero": 17,
@@ -181,12 +181,12 @@
     {
       "numero": 18,
       "tipo": "santo",
-      "titulo": "GRITO SANTO",
-      "contenido": "Hoy quiero proclamarte,\nquiero cantar a tu nombre\nsanto,\nquiero bailar ante tu presencia\nhasta morir.\nY bendecirte, mi Dios; amarte,\nno detenerme hasta encontrarte\nbuscar las sendas que me\nconducen\nhacia la luz.\nY GRITO SANTO, SANTO, SANTO.\nTÚ ERES SANTO, SANTO, SANTO.\nTÚ SIEMPRE SANTO, SANTO, SANTO;\nSANTO ERES TÚ. (Bis)\nSiento en mí tu mirada\nque me traspasa hasta lo más\nhondo\ncomo una fuerza que me arrastra\nhacia tu cruz.\nY allí me limpias, me\npurificas,\nsacas de mí el corazón de\npiedra\ny me transformas en criatura\nviva por ti.\nY GRITO SANTO…",
+      "titulo": "SEÑOR SANTO",
+      "contenido": "Re\n\nSol\n\nRe\n\nSol\n\nSeñor santo, Dios del universo,\nTú.\n\nRe\n\nSol\n\nLa\n\nLlenos están cielo y tierra de\ntu gloria.\n\nSol\n\nLa\n\nBendito aquél que viene\n\nRe\n\nSim\n\nen nombre del señor.\n\nSol\n\nLa\n\nSol\n\nSolm\n\nRe-Sol-Re….\n\nHosanna en el cielo. (bis)",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140957.jpg"
+      "imagen": "assets/fano_20140896_ii_domingo_de_adviento_dile_sí.jpg"
     },
     {
       "numero": 19,
@@ -221,12 +221,12 @@
     {
       "numero": 22,
       "tipo": "paz",
-      "titulo": "RITO DE LA PAZ",
-      "contenido": "Señor Jesucristo, que dijiste a tus apóstoles:\n«La paz os dejo, mi paz os doy»,\nno tengas en cuenta nuestros pecados,\nsino la fe de tu Iglesia,\ny conforme a tu palabra concédele la paz y la unidad.\n\nTú que vives y reinas por los siglos de los siglos. Amén.\n\nLa paz del Señor esté siempre con vosotros.",
+      "titulo": "LA PAZ TE DOY",
+      "contenido": "La paz te doy a ti, mi hermano,\r\nla paz que Dios me regaló,\r\ny en un abrazo a ti te entrego\r\nla paz que llevo en mi corazón. (BIS)\r\n\r\n**Recíbela, recíbela,**\r\n**esta es la paz**\r\n**que el mundo no te puede dar.**\r\n**(BIS)**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140958.jpg"
+      "imagen": "assets/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
     },
     {
       "numero": 23,
@@ -241,12 +241,12 @@
     {
       "numero": 24,
       "tipo": "comunion",
-      "titulo": "MARÍA, MÚSICA DE DIOS",
-      "contenido": "MARÍA, MÚSICA DE DIOS\nMe quedé sin voz con qué cantar\ny mi alma vacía dormía en sequedad\nY pensé para mí: me pondré en sus manos\nmanos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén\nMaría, acompaña tú mi caminar\nyo sola no puedo, ayúdame a andar\nY pensé para mí: me pondré en sus manos\nmanos de Madre, me dejaré en su amor\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén\nY tú, María, házme música de Dios\nY tú, María, anima tú las cuerdas de mi alma\nAleluya, Amén",
+      "titulo": "EL SEÑOR ES MI PASTOR",
+      "contenido": "EL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEn praderas reposa mi alma,\nen su agua descansa mi sed.\nEl me guía por senderos justos\npor amor, por amor de su nombre.\nAunque pase por valles oscuros\nningún mal, ningún mal temeré\nporque se que el Señor va conmigo\nsu cayado sostiene mi fe.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nTu preparas por mi una mesa\nfrente a aquellos que buscan mi mal.\nCon aceite me ungiste ,Señor\ny mi copa rebosa de ti.\nGloria a Dios, padre omnipotente\ny a su hijo Jesús, el Señor\ny al Espíritu que habita en el mundo\npor los siglos eternos Amen.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140959.jpg"
+      "imagen": "assets/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg"
     },
     {
       "numero": 25,
@@ -261,12 +261,12 @@
     {
       "numero": 26,
       "tipo": "maria",
-      "titulo": "CANTO A MARÍA",
-      "contenido": "Dios te salve, María;\nllena eres de gracia;\nel Señor es contigo.\nBendita tú eres entre todas las mujeres,\ny bendito es el fruto de tu vientre, Jesús.\n\nSanta María, Madre de Dios,\nruega por nosotros, pecadores,\nahora y en la hora de nuestra muerte. Amén.",
+      "titulo": "A TU AMPARO Y PROTECCIÓN",
+      "contenido": "A TU AMPARO Y PROTECCIÓN,\r\nMADRE DE DIOS, ACUDIMOS.\r\nNO DESOIGAS NUESTROS RUEGOS\r\nY DE TODOS LOS PELIGROS,\r\nVIRGEN GLORIOSA Y BENDITA,\r\nDEFIENDE SIEMPRE A TUS HIJOS",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/virgen_fatima.jpg"
+      "imagen": "assets/patite_ilustracion_52a3d8fa.jpeg"
     },
     {
       "numero": 27,
@@ -281,12 +281,12 @@
     {
       "numero": 28,
       "tipo": "despedida",
-      "titulo": "PREPARAD EL CAMINO",
-      "contenido": "PREPARAD EL CAMINO\nPREPARAD EL CAMINO AL SEÑOR\nY ESCUCHAD LA PALABRA DE DIOS.(Bis)\nVoz que clama en el desierto:\npreparad los caminos de Dios,\ndesterrad la mentira por siempre,\npreparad los caminos de Dios(Bis)",
+      "titulo": "COMO CORRE UN RÍO",
+      "contenido": "Como corre un río dentro de mi ser (x2)\r\nasí yo confío en Cristo, mi Rey (x2)\r\n\r\n**COMO UN RÍO DE AGUA VIVA,**\r\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\r\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\r\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\r\n\r\n Jesús está pasando por ahí\r\nJesús está pasando por ahí\r\nY cuando pasa todo lo transforma\r\nSe va la tristeza, viene la alegría\r\nY cuando pasa todo lo transforma\r\nViene la alegría para ti y para mí\r\n\r\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140953.jpg"
+      "imagen": "assets/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
     },
     {
       "numero": 29,
