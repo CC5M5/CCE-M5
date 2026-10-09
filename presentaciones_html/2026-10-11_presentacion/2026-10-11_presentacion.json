@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-10-08T00:27:36.069826"
+    "generado": "2026-10-09T17:37:52.642177"
   },
   "slides": [
     {
@@ -21,15 +21,25 @@
     {
       "numero": 2,
       "tipo": "entrada",
-      "titulo": "AL CALOR DE LA PALABRA",
-      "contenido": "Cerca del hogar que calienta mi alma\nquiero yo saber lo que en comunidad\nTú quieres de mi.\nSintiendo el calor que me da tu Palabra\nquiero responder a lo que me pides\nsin que a nada yo pueda temer.\nA NADA, A NADA NUNCA HE DE TEMER,\nYENDO JUNTO A TI CON TUS OJOS DE FE\nNUNCA HE DE TEMER (BIS)\nSólo he de beber de tu fuente de agua,\nsé que sólo ella será la que sacie\nmi hambre y mi sed.\nTú eres el Señor que alimenta mi alma\ny si hago mi opción por seguirte a Ti\nnunca jamás yo temeré.\n**ESTRIBILLO**\nLlegan hasta mí momentos de calma\nque me hacen dudar de si mi camino\nse orienta hacia Ti.\nComienza a faltar la paz en mi alma\ny sin esperarlo apareces Tú\nhaciéndome ver que ha nada he de temer.\n**ESTRIBILLO**",
+      "titulo": "AL CALOR DE LA PALABRA (1/2)",
+      "contenido": "Cerca del hogar que calienta mi alma\r\nquiero yo saber lo que en comunidad\r\nTú quieres de mi.\r\nSintiendo el calor que me da tu Palabra\r\nquiero responder a lo que me pides\r\nsin que a nada yo pueda temer.\r\n\r\n**A NADA, A NADA NUNCA HE DE TEMER,**\r\n**YENDO JUNTO A TI CON TUS OJOS DE FE**\r\n**NUNCA HE DE TEMER (BIS)**\r\n\r\nSólo he de beber de tu fuente de agua,\r\nsé que sólo ella será la que sacie\r\nmi hambre y mi sed.\r\nTú eres el Señor que alimenta mi alma\r\ny si hago mi opción por seguirte a Ti\r\nnunca jamás yo temeré.\r\n\r\n**ESTRIBILLO**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140362_venid_vosotros_benditos_de_mi_padre.jpg"
+      "imagen": "assets/fano_20140757_tu_palabra_no_pasará.jpg"
     },
     {
       "numero": 3,
+      "tipo": "entrada",
+      "titulo": "AL CALOR DE LA PALABRA (2/2)",
+      "contenido": "Llegan hasta mí momentos de calma\r\nque me hacen dudar de si mi camino\r\nse orienta hacia Ti.\r\nComienza a faltar la paz en mi alma\r\ny sin esperarlo apareces Tú\r\nhaciéndome ver que ha nada he de temer.\r\n\r\n**A NADA, A NADA NUNCA HE DE TEMER,**\r\n**YENDO JUNTO A TI CON TUS OJOS DE FE**\r\n**NUNCA HE DE TEMER (BIS)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140757_tu_palabra_no_pasará.jpg"
+    },
+    {
+      "numero": 4,
       "tipo": "transicion_palabra",
       "titulo": "LITURGIA DE LA PALABRA",
       "contenido": "Escuchemos la Palabra de Dios",
@@ -39,7 +49,7 @@
       "imagen": "assets/20140961.jpg"
     },
     {
-      "numero": 4,
+      "numero": 5,
       "tipo": "perdon",
       "titulo": "ACTO PENITENCIAL",
       "contenido": "Yo confieso ante Dios todopoderoso\ny ante vosotros, hermanos,\nque he pecado mucho de pensamiento, palabra, obra y omisión:\npor mi culpa, por mi culpa, por mi gran culpa.\n\nPor eso ruego a Santa María, siempre Virgen,\na los ángeles, a los santos y a vosotros, hermanos,\nque intercedáis por mí ante Dios, nuestro Señor.",
@@ -49,27 +59,37 @@
       "imagen": "assets/20140955.jpg"
     },
     {
-      "numero": 5,
+      "numero": 6,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
-    },
-    {
-      "numero": 6,
-      "tipo": "gloria",
-      "titulo": "GLORIA TE DAMOS GRACIAS, SEÑOR (R. CARISMÁTICA)",
-      "contenido": "GLORIA TE DAMOS GRACIAS SEÑOR (R. CARISMÁTICA)\n\n  Do\n  Te damos gracias, Señor,\n\n\n\n  Lam\n  por la tierra y el sol\n\n\n\n  Fa                Sol\n  por la luna y las estrellas;\n\n\n\n  Do\n  bendecimos tu nombre\n\n\n\n    Lam\n  alzando las manos,\n\n\n\n    Fa                Sol\n  cantando para Ti, Señor.\n\nTe damos gracias, Jesús,\npor el fuego y la luz,\npor la noche y por el día;\nbendecimos tu nombre\nalzando las manos,\ncantando para Ti, Señor.\n\n\n    Do\n  ¡GLORIA A DIOS!\n\n(A él sea el poder),\n\n\n           Lam\n  ¡GLORIA A DIOS!\n\n(A él sea el honor).\n\n\n   Fa\n  ¡GLORIA A DIOS POR SIEMPRE,\n\n\n  Rem\n  GLORIA A TODO EL CIELO!,\n\n\n   Sol\n  ¡GLORIA PARA NUESTRO DIOS! (Bis)\n\nTe damos gracias, Señor,\npor los campos en flor,\npor la nieve de los montes;\nbendecimos tu nombre\nalzando las manos,\ncantando para Ti, Señor.\nTe damos gracias, Jesús,\npor las olas del mar,\npor el canto de las aves;\nbendecimos tu nombre\nalzando las manos,\ncantando para Ti, Señor.",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 7,
+      "tipo": "gloria",
+      "titulo": "¡GLORIA A DIOS! (1/2)",
+      "contenido": "Te damos gracias, Señor, por la tierra y el sol\r\npor la luna y las estrellas; bendecimos tu nombre\r\nalzando las manos, cantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús, por el fuego y la luz,\r\npor la noche y por el día; bendecimos tu nombre\r\nalzando las manos, cantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS! (A él sea el poder),**\r\n**¡GLORIA A DIOS! (A él sea el honor).**\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+    },
+    {
+      "numero": 8,
+      "tipo": "gloria",
+      "titulo": "¡GLORIA A DIOS! (2/2)",
+      "contenido": "Te damos gracias, Señor, por los campos en flor,\r\npor la nieve de los montes; bendecimos tu nombre\r\nalzando las manos, cantando para Ti, Señor.\r\n\r\nTe damos gracias, Jesús, por las olas del mar,\r\npor el canto de las aves; bendecimos tu nombre\r\nalzando las manos, cantando para Ti, Señor.\r\n\r\n**¡GLORIA A DIOS! (A él sea el poder),**\r\n**¡GLORIA A DIOS! (A él sea el honor).**\r\n**¡GLORIA A DIOS POR SIEMPRE,**\r\n**GLORIA A TODO EL CIELO!,**\r\n**¡GLORIA PARA NUESTRO DIOS! (Bis)**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg"
+    },
+    {
+      "numero": 9,
       "tipo": "primera_lectura",
       "titulo": "PRIMERA LECTURA",
       "contenido": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»",
@@ -79,17 +99,17 @@
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 8,
+      "numero": 10,
       "tipo": "salmo",
       "titulo": "SALMO RESPONSORIAL",
       "contenido": "El Señor es mi pastor, nada me falta: en verdes praderas me hace recostar; me conduce hacia fuentes tranquilas; y repara mis fuerzas.\n\nMe guía por el sendero justo, por el honor de su nombre.\n\nAunque camine por cañadas oscuras, nada temo, porque tú vas conmigo: tu vara y tu cayado me sosiegan.\n\nPreparas una mesa ante mí, enfrente de mis enemigos; me unges la cabeza con perfume, y mi copa rebosa.\n\nTu bondad y tu misericordia me acompañan; todos los días de mi vida, y habitaré en la casa del Señor; por años sin término.",
       "cita": "Sal 22, 1 — Habitaré en la casa del Señor",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140360_recibimos_para_hacer_crecer.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 9,
+      "numero": 11,
       "tipo": "segunda_lectura",
       "titulo": "SEGUNDA LECTURA",
       "contenido": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.",
@@ -99,7 +119,7 @@
       "imagen": "assets/20140960.jpg"
     },
     {
-      "numero": 10,
+      "numero": 12,
       "tipo": "aleluya",
       "titulo": "ALELUYA DE LA TIERRA (1/2)",
       "contenido": "¿Quién quiere resucitar a este mundo que se muere?\r\n¿Quién cantará el aleluya de esa nueva luz que viene?\r\n¿Quién cuando mire la tierra y las tragedias observe,\r\nsentirá en su corazón el dolor de quien se muere?\r\n¿Quién es capaz de salvar a este mundo decadente,\r\ny mantiene la esperanza de los muchos que la pierden?\r\n\r\n**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**\r\n**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**",
@@ -109,7 +129,7 @@
       "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
     },
     {
-      "numero": 11,
+      "numero": 13,
       "tipo": "aleluya",
       "titulo": "ALELUYA DE LA TIERRA (2/2)",
       "contenido": "¿Quién bajará de la cruz a tanto cristo sufriente,\r\nmientras los hombres miramos, impasivos e indolentes?\r\n¿Quién grita desde el silencio de un ser que a su Dios retiene,\r\nporque se hace palabra que sin hablar se la entiende?\r\n¿Quién se torna en aleluya porque traduce la muerte,\r\ncomo el trigo que se pudre y de uno cientos vienen?\r\n\r\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,\r\nY LA TIERRA SONREIRÁ. ¡ALELUYA!**",
@@ -119,7 +139,7 @@
       "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
     },
     {
-      "numero": 12,
+      "numero": 14,
       "tipo": "evangelio",
       "titulo": "EVANGELIO",
       "contenido": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»; Palabra del Señor",
@@ -129,7 +149,7 @@
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 13,
+      "numero": 15,
       "tipo": "transicion_eucaristia",
       "titulo": "LITURGIA EUCARÍSTICA",
       "contenido": "Preparémonos para la mesa del Señor",
@@ -139,7 +159,7 @@
       "imagen": "assets/20140959.jpg"
     },
     {
-      "numero": 14,
+      "numero": 16,
       "tipo": "credo",
       "titulo": "CREDO",
       "contenido": "Creo en Dios, Padre todopoderoso, \r\ncreador del cielo y de la tierra.\r\nCreo en Jesucristo, su único Hijo, nuestro Señor, \r\nque fue concebido por obra y gracia del Espíritu Santo; \r\nnació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; \r\nfue crucificado, muerto y sepultado; descendió a los infiernos; \r\nal tercer día resucitó de entre los muertos; \r\nsubió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\r\nDesde allí ha de venir a juzgar a vivos y muertos.\r\nCreo en el Espíritu Santo, la santa Iglesia católica, \r\nla comunión de los santos, el perdón de los pecados, \r\nla resurrección de la carne y la vida eterna. Amén.",
@@ -149,26 +169,6 @@
       "imagen": "assets/20140954.jpg"
     },
     {
-      "numero": 15,
-      "tipo": "paso",
-      "titulo": "",
-      "contenido": "",
-      "cita": "",
-      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
-      "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
-    },
-    {
-      "numero": 16,
-      "tipo": "ofertorio",
-      "titulo": "TOMA MI VIDA",
-      "contenido": "Do Fa Do Fa\n\nEsto que te doy es vino y pan\nseñor.\n\nDo Sol Fa\n\nEsto que te doy\nes mi trabajo.\n\nSol Do\n\nEs mi corazón, es\nmi alma,\n\nMim Lam Rem\n\nes mi cuerpo\ny mi razón,\n\nSol Do Sol7\n\nel esfuerzo\nde mi caminar...\n\nEsto que te doy mi vida es\nseñor.\n\nes mi amor también es mi dolor.\n\nEs la ilusión de mis sueños,\n\nes mi gozo y mi llorar,\n\nes mi canto\ny mi oración.\n\nDo\nMim Lam Fa Sol\n\nTOMA MI VIDA, PONLA EN TU CORAZÓN.\n\nDo Mim\nLam Fa Sol\n\nDAME TU MANO Y LLÉVAME.\n\nFa Sol Do\n\nCAMBIA MI PAN EN TU CARNE\n\nMim Lam\n\nY MI VINO EN TU SANGRE\n\nRem Sol Do Do7\n\nY A MI SEÑOR RENUÉVAME,\n\nFa Sol Do\n\nLÍMPIAME\nY SÁLVAME\n\nEsto te lo doy, no solo, mi\nSeñor,\n\nesta voz también es mi hermano.\n\nEs la unión, la paz y el orden,\n\nla armonía y felicidad,\n\nes un canto en comunidad.",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/fano_20140880_dadles_vosotros_de_comer.jpg"
-    },
-    {
       "numero": 17,
       "tipo": "paso",
       "titulo": "",
@@ -176,50 +176,60 @@
       "cita": "",
       "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 18,
-      "tipo": "santo",
-      "titulo": "SEÑOR SANTO",
-      "contenido": "Re\n\nSol\n\nRe\n\nSol\n\nSeñor santo, Dios del universo,\nTú.\n\nRe\n\nSol\n\nLa\n\nLlenos están cielo y tierra de\ntu gloria.\n\nSol\n\nLa\n\nBendito aquél que viene\n\nRe\n\nSim\n\nen nombre del señor.\n\nSol\n\nLa\n\nSol\n\nSolm\n\nRe-Sol-Re….\n\nHosanna en el cielo. (bis)",
+      "tipo": "ofertorio",
+      "titulo": "TOMA MI VIDA (1/2)",
+      "contenido": "Esto que te doy es vino y pan señor.\r\nEsto que te doy es mi trabajo.\r\nEs mi corazón, es mi alma,\r\nes mi cuerpo y mi razón,\r\nel esfuerzo de mi caminar...\r\n\r\nEsto que te doy mi vida es señor.\r\nes mi amor también es mi dolor.\r\nEs la ilusión de mis sueños,\r\nes mi gozo y mi llorar,\r\nes mi canto y mi oración.\r\n\r\n**TOMA MI VIDA, PONLA EN TU CORAZÓN.**\r\n**DAME TU MANO Y LLÉVAME.**\r\n**CAMBIA MI PAN EN TU CARNE**\r\n**Y MI VINO EN TU SANGRE**\r\n**Y A MI SEÑOR RENUÉVAME,**\r\n**LÍMPIAME Y SÁLVAME**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140896_ii_domingo_de_adviento_dile_sí.jpg"
+      "imagen": "assets/fano_20140952_reconócelo_al_partir_el_pan.jpg"
     },
     {
       "numero": 19,
-      "tipo": "paso",
-      "titulo": "",
-      "contenido": "",
-      "cita": "",
-      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
-      "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
-    },
-    {
-      "numero": 20,
-      "tipo": "padre_nuestro",
-      "titulo": "PADRE NUESTRO (Gallego)",
-      "contenido": "En el mar he oído hoy\nSeñor tu voz que me llamó\ny me pidió que me entregara\na mis hermanos.\nEsa voz me transformó,\nmi vida entera ya cambió,\ny sólo pienso ahora Señor\nen repetirte:\nPADRE NUESTRO\nEN TI CREEMOS,\nPADRE NUESTRO\nTE OFRECEMOS,\nPADRE NUESTRO\nNUESTRAS MANOS\nDE HERMANOS.\nCuando vaya a otro lugar\ntendré Señor que abandonar\na mi familia a mis amigos\npor seguirte.\nPero sé que así algún día\npodré enseñar tu verdad,\nir a mi hermano y junto a él\nyo repetirte.\nPADRE NUESTRO…",
+      "tipo": "ofertorio",
+      "titulo": "TOMA MI VIDA (2/2)",
+      "contenido": "Esto te lo doy, no solo, mi Señor,\r\nesta voz también es mi hermano.\r\nEs la unión, la paz y el orden,\r\nla armonía y felicidad,\r\nes un canto en comunidad.\r\n\r\n**TOMA MI VIDA, PONLA EN TU CORAZÓN.**\r\n**DAME TU MANO Y LLÉVAME.**\r\n**CAMBIA MI PAN EN TU CARNE**\r\n**Y MI VINO EN TU SANGRE**\r\n**Y A MI SEÑOR RENUÉVAME,**\r\n**LÍMPIAME Y SÁLVAME**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140955.jpg"
+      "imagen": "assets/fano_20140952_reconócelo_al_partir_el_pan.jpg"
     },
     {
-      "numero": 21,
+      "numero": 20,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 21,
+      "tipo": "santo",
+      "titulo": "SEÑOR SANTO",
+      "contenido": "Señor santo, Dios del universo, Tú.\r\nLlenos están cielo y tierra de  tu gloria.\r\nBendito aquél que viene\r\nen nombre del señor.\r\nHosanna en el cielo. (bis)",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/fano_20140758_mi_reino_no_es_de_este_mundo.jpg"
     },
     {
       "numero": 22,
+      "tipo": "paso",
+      "titulo": "",
+      "contenido": "",
+      "cita": "",
+      "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 23,
       "tipo": "paz",
       "titulo": "LA PAZ TE DOY",
       "contenido": "La paz te doy a ti, mi hermano,\r\nla paz que Dios me regaló,\r\ny en un abrazo a ti te entrego\r\nla paz que llevo en mi corazón. (BIS)\r\n\r\n**Recíbela, recíbela,**\r\n**esta es la paz**\r\n**que el mundo no te puede dar.**\r\n**(BIS)**",
@@ -229,17 +239,17 @@
       "imagen": "assets/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
     },
     {
-      "numero": 23,
+      "numero": 24,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 24,
+      "numero": 25,
       "tipo": "comunion",
       "titulo": "EL SEÑOR ES MI PASTOR",
       "contenido": "EL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEn praderas reposa mi alma,\nen su agua descansa mi sed.\nEl me guía por senderos justos\npor amor, por amor de su nombre.\nAunque pase por valles oscuros\nningún mal, ningún mal temeré\nporque se que el Señor va conmigo\nsu cayado sostiene mi fe.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nTu preparas por mi una mesa\nfrente a aquellos que buscan mi mal.\nCon aceite me ungiste ,Señor\ny mi copa rebosa de ti.\nGloria a Dios, padre omnipotente\ny a su hijo Jesús, el Señor\ny al Espíritu que habita en el mundo\npor los siglos eternos Amen.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.",
@@ -249,17 +259,17 @@
       "imagen": "assets/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg"
     },
     {
-      "numero": 25,
+      "numero": 26,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 26,
+      "numero": 27,
       "tipo": "maria",
       "titulo": "A TU AMPARO Y PROTECCIÓN",
       "contenido": "A TU AMPARO Y PROTECCIÓN,\r\nMADRE DE DIOS, ACUDIMOS.\r\nNO DESOIGAS NUESTROS RUEGOS\r\nY DE TODOS LOS PELIGROS,\r\nVIRGEN GLORIOSA Y BENDITA,\r\nDEFIENDE SIEMPRE A TUS HIJOS",
@@ -269,17 +279,17 @@
       "imagen": "assets/patite_ilustracion_52a3d8fa.jpeg"
     },
     {
-      "numero": 27,
+      "numero": 28,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
       "cita": "",
       "subtitulo": "l XXVIII Domingo del Tiempo Ordinario · Mt 22,1-14",
       "momento": "",
-      "imagen": "assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 28,
+      "numero": 29,
       "tipo": "despedida",
       "titulo": "COMO CORRE UN RÍO",
       "contenido": "Como corre un río dentro de mi ser (x2)\r\nasí yo confío en Cristo, mi Rey (x2)\r\n\r\n**COMO UN RÍO DE AGUA VIVA,**\r\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\r\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\r\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\r\n\r\n Jesús está pasando por ahí\r\nJesús está pasando por ahí\r\nY cuando pasa todo lo transforma\r\nSe va la tristeza, viene la alegría\r\nY cuando pasa todo lo transforma\r\nViene la alegría para ti y para mí\r\n\r\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
@@ -289,7 +299,7 @@
       "imagen": "assets/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
     },
     {
-      "numero": 29,
+      "numero": 30,
       "tipo": "portada",
       "titulo": "¡ID EN PAZ!",
       "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
