@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-10-10T12:31:45.550185"
+    "generado": "2026-10-10T12:33:25.728312"
   },
   "slides": [
     {
@@ -121,8 +121,8 @@
     {
       "numero": 12,
       "tipo": "aleluya",
-      "titulo": "ALELUYA DE LA TIERRA (1/2)",
-      "contenido": "¿Quién quiere resucitar a este mundo que se muere?\r\n¿Quién cantará el aleluya de esa nueva luz que viene?\r\n¿Quién cuando mire la tierra y las tragedias observe,\r\nsentirá en su corazón el dolor de quien se muere?\r\n¿Quién es capaz de salvar a este mundo decadente,\r\ny mantiene la esperanza de los muchos que la pierden?\r\n\r\n**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**\r\n**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**",
+      "titulo": "ALELUYA DE LA TIERRA",
+      "contenido": "EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,\r\nY OTROS SON ESPECTADORES, NO LO SIENTEN.\r\n\r\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**\r\n**Y LA TIERRA SONREIRÁ. ¡ALELUYA! (BIS)**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
@@ -130,16 +130,6 @@
     },
     {
       "numero": 13,
-      "tipo": "aleluya",
-      "titulo": "ALELUYA DE LA TIERRA (2/2)",
-      "contenido": "¿Quién bajará de la cruz a tanto cristo sufriente,\r\nmientras los hombres miramos, impasivos e indolentes?\r\n¿Quién grita desde el silencio de un ser que a su Dios retiene,\r\nporque se hace palabra que sin hablar se la entiende?\r\n¿Quién se torna en aleluya porque traduce la muerte,\r\ncomo el trigo que se pudre y de uno cientos vienen?\r\n\r\n**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,\r\nY LA TIERRA SONREIRÁ. ¡ALELUYA!**",
-      "cita": "",
-      "subtitulo": "",
-      "momento": "",
-      "imagen": "assets/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg"
-    },
-    {
-      "numero": 14,
       "tipo": "evangelio",
       "titulo": "EVANGELIO",
       "contenido": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»; Palabra del Señor",
@@ -149,7 +139,7 @@
       "imagen": "assets/fano_25_domingo_vina.jpg"
     },
     {
-      "numero": 15,
+      "numero": 14,
       "tipo": "transicion_eucaristia",
       "titulo": "LITURGIA EUCARÍSTICA",
       "contenido": "Preparémonos para la mesa del Señor",
@@ -159,7 +149,7 @@
       "imagen": "assets/20140959.jpg"
     },
     {
-      "numero": 16,
+      "numero": 15,
       "tipo": "credo",
       "titulo": "CREDO",
       "contenido": "Creo en Dios, Padre todopoderoso, \r\ncreador del cielo y de la tierra.\r\nCreo en Jesucristo, su único Hijo, nuestro Señor, \r\nque fue concebido por obra y gracia del Espíritu Santo; \r\nnació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; \r\nfue crucificado, muerto y sepultado; descendió a los infiernos; \r\nal tercer día resucitó de entre los muertos; \r\nsubió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.\r\nDesde allí ha de venir a juzgar a vivos y muertos.\r\nCreo en el Espíritu Santo, la santa Iglesia católica, \r\nla comunión de los santos, el perdón de los pecados, \r\nla resurrección de la carne y la vida eterna. Amén.",
@@ -169,7 +159,7 @@
       "imagen": "assets/20140954.jpg"
     },
     {
-      "numero": 17,
+      "numero": 16,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -179,7 +169,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 18,
+      "numero": 17,
       "tipo": "ofertorio",
       "titulo": "TOMA MI VIDA (1/2)",
       "contenido": "Esto que te doy es vino y pan señor.\r\nEsto que te doy es mi trabajo.\r\nEs mi corazón, es mi alma,\r\nes mi cuerpo y mi razón,\r\nel esfuerzo de mi caminar...\r\n\r\nEsto que te doy mi vida es señor.\r\nes mi amor también es mi dolor.\r\nEs la ilusión de mis sueños,\r\nes mi gozo y mi llorar,\r\nes mi canto y mi oración.\r\n\r\n**TOMA MI VIDA, PONLA EN TU CORAZÓN.**\r\n**DAME TU MANO Y LLÉVAME.**\r\n**CAMBIA MI PAN EN TU CARNE**\r\n**Y MI VINO EN TU SANGRE**\r\n**Y A MI SEÑOR RENUÉVAME,**\r\n**LÍMPIAME Y SÁLVAME**",
@@ -189,7 +179,7 @@
       "imagen": "assets/fano_20140952_reconócelo_al_partir_el_pan.jpg"
     },
     {
-      "numero": 19,
+      "numero": 18,
       "tipo": "ofertorio",
       "titulo": "TOMA MI VIDA (2/2)",
       "contenido": "Esto te lo doy, no solo, mi Señor,\r\nesta voz también es mi hermano.\r\nEs la unión, la paz y el orden,\r\nla armonía y felicidad,\r\nes un canto en comunidad.\r\n\r\n**TOMA MI VIDA, PONLA EN TU CORAZÓN.**\r\n**DAME TU MANO Y LLÉVAME.**\r\n**CAMBIA MI PAN EN TU CARNE**\r\n**Y MI VINO EN TU SANGRE**\r\n**Y A MI SEÑOR RENUÉVAME,**\r\n**LÍMPIAME Y SÁLVAME**",
@@ -199,7 +189,7 @@
       "imagen": "assets/fano_20140952_reconócelo_al_partir_el_pan.jpg"
     },
     {
-      "numero": 20,
+      "numero": 19,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -209,7 +199,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 21,
+      "numero": 20,
       "tipo": "santo",
       "titulo": "SEÑOR SANTO",
       "contenido": "Señor santo, Dios del universo, Tú.\r\nLlenos están cielo y tierra de  tu gloria.\r\nBendito aquél que viene\r\nen nombre del señor.\r\nHosanna en el cielo. (bis)",
@@ -219,7 +209,7 @@
       "imagen": "assets/fano_20140758_mi_reino_no_es_de_este_mundo.jpg"
     },
     {
-      "numero": 22,
+      "numero": 21,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -229,7 +219,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 23,
+      "numero": 22,
       "tipo": "paz",
       "titulo": "LA PAZ TE DOY",
       "contenido": "La paz te doy a ti, mi hermano,\r\nla paz que Dios me regaló,\r\ny en un abrazo a ti te entrego\r\nla paz que llevo en mi corazón. (BIS)\r\n\r\n**Recíbela, recíbela,**\r\n**esta es la paz**\r\n**que el mundo no te puede dar.**\r\n**(BIS)**",
@@ -239,7 +229,7 @@
       "imagen": "assets/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg"
     },
     {
-      "numero": 24,
+      "numero": 23,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -249,7 +239,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 25,
+      "numero": 24,
       "tipo": "comunion",
       "titulo": "SALMO: EL SEÑOR ES MI PASTOR (1/2)",
       "contenido": "**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**\r\n**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**\r\n\r\nEn praderas reposa mi alma,\r\nen su agua descansa mi sed.\r\nEl me guía por senderos justos\r\npor amor, por amor de su nombre.\r\nAunque pase por valles oscuros\r\nningún mal, ningún mal temeré\r\nporque se que el Señor va conmigo\r\nsu cayado sostiene mi fe.\r\n\r\n**ESTRIBILLO**",
@@ -259,7 +249,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 26,
+      "numero": 25,
       "tipo": "comunion",
       "titulo": "SALMO: EL SEÑOR ES MI PASTOR (2/2)",
       "contenido": "Tu preparas por mi una mesa\r\nfrente a aquellos que buscan mi mal.\r\nCon aceite me ungiste ,Señor\r\ny mi copa rebosa de ti.\r\nGloria a Dios, padre omnipotente\r\ny a su hijo Jesús, el Señor\r\ny al Espíritu que habita en el mundo\r\npor los siglos eternos Amen.\r\n\r\n**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**\r\n**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**",
@@ -269,7 +259,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 27,
+      "numero": 26,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -279,7 +269,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 28,
+      "numero": 27,
       "tipo": "maria",
       "titulo": "A TU AMPARO Y PROTECCIÓN",
       "contenido": "A TU AMPARO Y PROTECCIÓN,\r\nMADRE DE DIOS, ACUDIMOS.\r\nNO DESOIGAS NUESTROS RUEGOS\r\nY DE TODOS LOS PELIGROS,\r\nVIRGEN GLORIOSA Y BENDITA,\r\nDEFIENDE SIEMPRE A TUS HIJOS",
@@ -289,7 +279,7 @@
       "imagen": "assets/patite_ilustracion_52a3d8fa.jpeg"
     },
     {
-      "numero": 29,
+      "numero": 28,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -299,7 +289,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 30,
+      "numero": 29,
       "tipo": "despedida",
       "titulo": "COMO CORRE UN RÍO",
       "contenido": "Como corre un río dentro de mi ser (x2)\r\nasí yo confío en Cristo, mi Rey (x2)\r\n\r\n**COMO UN RÍO DE AGUA VIVA,**\r\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\r\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\r\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\r\n\r\n Jesús está pasando por ahí\r\nJesús está pasando por ahí\r\nY cuando pasa todo lo transforma\r\nSe va la tristeza, viene la alegría\r\nY cuando pasa todo lo transforma\r\nViene la alegría para ti y para mí\r\n\r\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
@@ -309,7 +299,7 @@
       "imagen": "assets/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
     },
     {
-      "numero": 31,
+      "numero": 30,
       "tipo": "portada",
       "titulo": "¡ID EN PAZ!",
       "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
