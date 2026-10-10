@@ -5,7 +5,7 @@
     "color_liturgico": "verde",
     "lema": "Somos uno",
     "lema_imagen": "assets/lema_somos_uno.jpg",
-    "generado": "2026-10-10T12:27:02.182577"
+    "generado": "2026-10-10T12:31:45.550185"
   },
   "slides": [
     {
@@ -106,7 +106,7 @@
       "cita": "Sal 22, 1 — Habitaré en la casa del Señor",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/20140953.jpg"
+      "imagen": "assets/20140962.jpg"
     },
     {
       "numero": 11,
@@ -251,15 +251,25 @@
     {
       "numero": 25,
       "tipo": "comunion",
-      "titulo": "EL SEÑOR ES MI PASTOR",
-      "contenido": "EL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEn praderas reposa mi alma,\nen su agua descansa mi sed.\nEl me guía por senderos justos\npor amor, por amor de su nombre.\nAunque pase por valles oscuros\nningún mal, ningún mal temeré\nporque se que el Señor va conmigo\nsu cayado sostiene mi fe.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nTu preparas por mi una mesa\nfrente a aquellos que buscan mi mal.\nCon aceite me ungiste ,Señor\ny mi copa rebosa de ti.\nGloria a Dios, padre omnipotente\ny a su hijo Jesús, el Señor\ny al Espíritu que habita en el mundo\npor los siglos eternos Amen.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.\nEL SEÑOR ES MI PASTOR NADA ME FALTA\nEL SEÑOR ES MI PASTOR.",
+      "titulo": "SALMO: EL SEÑOR ES MI PASTOR (1/2)",
+      "contenido": "**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**\r\n**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**\r\n\r\nEn praderas reposa mi alma,\r\nen su agua descansa mi sed.\r\nEl me guía por senderos justos\r\npor amor, por amor de su nombre.\r\nAunque pase por valles oscuros\r\nningún mal, ningún mal temeré\r\nporque se que el Señor va conmigo\r\nsu cayado sostiene mi fe.\r\n\r\n**ESTRIBILLO**",
       "cita": "",
       "subtitulo": "",
       "momento": "",
-      "imagen": "assets/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg"
+      "imagen": "assets/20140953.jpg"
     },
     {
       "numero": 26,
+      "tipo": "comunion",
+      "titulo": "SALMO: EL SEÑOR ES MI PASTOR (2/2)",
+      "contenido": "Tu preparas por mi una mesa\r\nfrente a aquellos que buscan mi mal.\r\nCon aceite me ungiste ,Señor\r\ny mi copa rebosa de ti.\r\nGloria a Dios, padre omnipotente\r\ny a su hijo Jesús, el Señor\r\ny al Espíritu que habita en el mundo\r\npor los siglos eternos Amen.\r\n\r\n**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**\r\n**EL SEÑOR ES MI PASTOR NADA ME FALTA**\r\n**EL SEÑOR ES MI PASTOR.**",
+      "cita": "",
+      "subtitulo": "",
+      "momento": "",
+      "imagen": "assets/20140953.jpg"
+    },
+    {
+      "numero": 27,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -269,7 +279,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 27,
+      "numero": 28,
       "tipo": "maria",
       "titulo": "A TU AMPARO Y PROTECCIÓN",
       "contenido": "A TU AMPARO Y PROTECCIÓN,\r\nMADRE DE DIOS, ACUDIMOS.\r\nNO DESOIGAS NUESTROS RUEGOS\r\nY DE TODOS LOS PELIGROS,\r\nVIRGEN GLORIOSA Y BENDITA,\r\nDEFIENDE SIEMPRE A TUS HIJOS",
@@ -279,7 +289,7 @@
       "imagen": "assets/patite_ilustracion_52a3d8fa.jpeg"
     },
     {
-      "numero": 28,
+      "numero": 29,
       "tipo": "paso",
       "titulo": "",
       "contenido": "",
@@ -289,7 +299,7 @@
       "imagen": "assets/20140953.jpg"
     },
     {
-      "numero": 29,
+      "numero": 30,
       "tipo": "despedida",
       "titulo": "COMO CORRE UN RÍO",
       "contenido": "Como corre un río dentro de mi ser (x2)\r\nasí yo confío en Cristo, mi Rey (x2)\r\n\r\n**COMO UN RÍO DE AGUA VIVA,**\r\n**QUE SALTA P’ARRIBA, QUE LLEVO DENTRO**\r\n**QUE AFIRMA Y CONFIRMA EN ESTE MOMENTO**\r\n**EL ESPÍRITU SANTO ESTÁ VINIENDO (X2)**\r\n\r\n Jesús está pasando por ahí\r\nJesús está pasando por ahí\r\nY cuando pasa todo lo transforma\r\nSe va la tristeza, viene la alegría\r\nY cuando pasa todo lo transforma\r\nViene la alegría para ti y para mí\r\n\r\n**COMO UN RÍO DE AGUA VIVA… (X2)**",
@@ -299,7 +309,7 @@
       "imagen": "assets/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
     },
     {
-      "numero": 30,
+      "numero": 31,
       "tipo": "portada",
       "titulo": "¡ID EN PAZ!",
       "contenido": "La paz del Señor esté siempre con vosotros.\n\n«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»",
