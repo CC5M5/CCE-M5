@@ -332,7 +332,7 @@ def editar(slug: str):
       </div>
       <button type="submit">💾 Guardar y commitear</button>
     </form>"""
-    return _render_base(cancion["titulo"], sidebar, content)
+    return _render_base(cancion["titulo"], sidebar_links, content)
 
 
 @app.route("/cancionero/nueva")

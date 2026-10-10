@@ -3,6 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Administrador · CCE M5</title>
     <style>
       * { box-sizing: border-box; }
@@ -287,7 +290,7 @@
     </dialog>
 
     <script>
-      const API_BASE = window.location.origin.replace(':4321', ':4324');
+      const API_BASE = window.location.origin;
       const STEPS = [
         { key: 'init', label: 'Inicio' },
         { key: 'fetch_lectures', label: 'Lecturas' },
@@ -303,7 +306,7 @@
       let allCanciones = [];
 
       const MOMENTO_A_KEY = {
-        'Entrada': 'entrada', 'Perdón': 'perdon', 'Gloria': 'gloria', 'Salmo': 'salmo',
+        'Entrada': 'entrada', 'Perdón': 'acto_penitencial', 'Gloria': 'gloria', 'Salmo': 'salmo',
         'Aleluya': 'aleluya', 'Ofertorio': 'ofertorio', 'Santo': 'santo',
         'Padre Nuestro': 'padre_nuestro', 'Paz': 'paz', 'Comunión': 'comunion',
         'Canto a María': 'maria', 'Despedida': 'despedida'
@@ -312,8 +315,11 @@
       async function loadCanciones() {
         if (allCanciones.length) return;
         const res = await api('/canciones', { method: 'GET' });
-        allCanciones = (res.canciones || []).map(c => ({ ...c, titulo: (c.titulo || '').trim() }));
+        const rawCanciones = Array.isArray(res.canciones) ? res.canciones : Array.isArray(res) ? res : [];
+        console.log('CCE-M5 DEBUG: raw res', res, 'rawCanciones.length', rawCanciones.length);
+        allCanciones = rawCanciones.map(c => ({ ...c, titulo: (c.titulo || '').trim() }));
         allCanciones.sort((a, b) => a.titulo.localeCompare(b.titulo, 'es', { sensitivity: 'base' }));
+        console.log('CCE-M5 DEBUG: canciones cargadas', allCanciones.length, allCanciones.slice(0, 3));
       }
 
       function escapeHtml(str) {
@@ -331,10 +337,20 @@
       function hide(id) { document.getElementById(id).style.display = 'none'; }
 
       async function api(path, opts) {
-        const res = await fetch(`${API_BASE}${path}`, {
-          ...opts,
-          headers: { ...headers(), ...(opts.headers || {}) },
-        });
+        const sep = path.includes('?') ? '&' : '?';
+        const cacheBuster = (!opts || opts.method === 'GET' || !opts.method) ? `${sep}_=${Date.now()}` : '';
+        const url = `${API_BASE}${path}${cacheBuster}`;
+        console.log('CCE-M5 DEBUG: api fetch', opts?.method || 'GET', url);
+        let res;
+        try {
+          res = await fetch(url, {
+            ...opts,
+            headers: { ...headers(), ...(opts.headers || {}) },
+          });
+        } catch (err) {
+          console.error('CCE-M5 DEBUG: fetch error', url, err.name, err.message);
+          throw err;
+        }
         if (res.status === 401) {
           localStorage.removeItem('cce_admin_token');
           window.location.href = '/admin/login.html';
@@ -399,12 +415,32 @@
           for (const [momento, info] of Object.entries(prop)) {
             const cid = info?.cancion_id || '';
             const key = MOMENTO_A_KEY[momento] || momento.toLowerCase().replace(/ /g, '_').replace(/ó/g,'o').replace(/í/g,'i').replace(/á/g,'a').replace(/é/g,'e').replace(/ú/g,'u').replace(/ñ/g,'n');
-            const filtered = allCanciones.filter(c => {
-              const m = (c.momento_liturgico || '').toLowerCase().trim();
-              return m === key || m === 'general' || m === '';
+            const normalized = Array.from(new Set([
+              key,
+              key.replace(/_/g, ' '),
+              key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              key === 'acto_penitencial' ? 'perdon' : '',
+              key === 'perdon' ? 'acto_penitencial' : '',
+              'general'
+            ])).filter(Boolean);
+            console.log('CCE-M5 DEBUG: momento', momento, 'key', key, 'cid', cid, 'allCanciones.length', allCanciones.length);
+            let filtered = allCanciones.filter(c => {
+              const momentos = Array.isArray(c.momentos) ? c.momentos : [];
+              if (!momentos.length) return true;
+              return momentos.some(m => normalized.includes(m));
             });
+            console.log('CCE-M5 DEBUG: filtered.length', filtered.length);
+            // Fallback: si el filtro es demasiado restrictivo (cache, datos incompletos),
+            // mostrar todas las canciones para que el usuario siempre pueda elegir.
+            if (filtered.length < 3) {
+              filtered = [...allCanciones];
+            }
+            const currentInFiltered = filtered.some(c => String(c.id) === String(cid));
             html += `<div class="song-row"><span class="momento">${momento}</span><select data-song="${momento}" style="flex:1;min-width:12rem;padding:0.5rem;border:1px solid #cbd5e1;border-radius:0.45rem;">`;
             html += `<option value="">(sin canción)</option>`;
+            if (cid && !currentInFiltered && info) {
+              html += `<option value="${cid}" selected>${escapeHtml(cid + ' - ' + (info.titulo || 'Canción propuesta'))}</option>`;
+            }
             for (const c of filtered) {
               const selected = String(c.id) === String(cid) ? ' selected' : '';
               html += `<option value="${c.id}"${selected}>${escapeHtml(c.id + ' - ' + c.titulo)}</option>`;
