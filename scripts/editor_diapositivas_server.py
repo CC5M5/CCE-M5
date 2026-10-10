@@ -32,7 +32,7 @@ import sys
 from typing import Any, Dict, List, Optional
 
 
-from flask import Flask, abort, request
+from flask import Flask, abort, redirect, request
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
@@ -364,7 +364,7 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
     <h1>🖼️ Editor de Diapositivas CCE-M5</h1>
     <p>Edición local del catálogo de diapositivas y presentaciones semanales.</p>
     <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="/slides/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
+      <a href="/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
       <a href="/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
       <a href="/canciones/nueva" style="text-decoration:none;background:#10b981;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">🎵 Añadir canción al cancionero</a>
     </nav>
@@ -399,6 +399,11 @@ def index():
     sidebar = "\n".join(sidebar_parts)
     content = "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
     return _render_base("Diapositivas", sidebar, content)
+
+
+@app.route("/slides/")
+def index_slash_redirect():
+    return redirect("/", code=302)
 
 
 @app.route("/slides/<int:id>")
@@ -651,6 +656,36 @@ def presentaciones_html_file(filename: str):
     abort(404)
 
 
+
+
+# ------------------------------------------------------------------
+# Helpers para crear presentación automáticamente desde lectura
+# ------------------------------------------------------------------
+
+def _get_lectura_por_fecha(fecha: str) -> Optional[Dict[str, Any]]:
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, fecha, celebracion, color_liturgico FROM lecturas WHERE fecha = ?", (fecha,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return None
+    return dict(row)
+
+
+def _crear_presentacion_desde_lectura(fecha: str) -> Optional[Dict[str, Any]]:
+    lectura = _get_lectura_por_fecha(fecha)
+    if not lectura:
+        return None
+    conn = _get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO presentaciones (fecha_domingo, lectura_id, canciones_json, estado, fecha_creacion)
+        VALUES (?, ?, '{}', 'borrador', CURRENT_TIMESTAMP)
+    """, (fecha, lectura["id"]))
+    conn.commit()
+    conn.close()
+    return _get_presentacion_por_fecha(fecha)
 
 
 # ------------------------------------------------------------------
@@ -1364,7 +1399,12 @@ def asignar_canciones(fecha: str):
 
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
-        abort(404)
+        lectura = _get_lectura_por_fecha(fecha)
+        if not lectura:
+            return _render_base("Error", "", f"<h2>Error</h2><p>No existe presentación ni lectura para {fecha}.</p>", "No existe presentación ni lectura para esa fecha.", "err")
+        pres = _crear_presentacion_desde_lectura(fecha)
+        if not pres:
+            return _render_base("Error", "", "<h2>Error</h2><p>No se pudo crear la presentación automáticamente.</p>", "No se pudo crear la presentación automáticamente.", "err")
 
     canciones = _listar_canciones_para_selector()
     canciones_asignadas = _canciones_asignadas(pres.get("canciones_json"))
@@ -1403,7 +1443,12 @@ def guardar_asignacion_canciones(fecha: str):
         abort(400)
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
-        abort(404)
+        lectura = _get_lectura_por_fecha(fecha)
+        if not lectura:
+            return _render_base("Error", "", f"<h2>Error</h2><p>No existe presentación ni lectura para {fecha}.</p>", "No existe presentación ni lectura para esa fecha.", "err")
+        pres = _crear_presentacion_desde_lectura(fecha)
+        if not pres:
+            return _render_base("Error", "", "<h2>Error</h2><p>No se pudo crear la presentación automáticamente.</p>", "No se pudo crear la presentación automáticamente.", "err")
 
     momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
     canciones_asignadas = {}
