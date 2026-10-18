@@ -7,9 +7,12 @@ Uso:
     CCE_PROJECT_DIR=/ruta/al/proyecto python scripts/init_db.py
 """
 
-import logging
 import sys
 from pathlib import Path
+
+from src.log_config import get_logger
+
+logger = get_logger(__name__)
 
 # Añadir src al path para importar db_manager
 SRC_DIR = Path(__file__).resolve().parent.parent / "src"
@@ -19,7 +22,6 @@ from db_manager import init_database
 
 
 def main() -> int:
-    logging.basicConfig(level=logging.INFO)
     init_database()
     return 0
 

@@ -15,7 +15,6 @@ Arquitectura separada por responsabilidades:
 from __future__ import annotations
 
 import json
-import logging
 import os
 import re
 import sqlite3
@@ -23,11 +22,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+from src.log_config import get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
 PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))

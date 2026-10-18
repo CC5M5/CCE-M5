@@ -4,7 +4,6 @@ Scraper para las lecturas dominicales de servicioskoinonia.org
 Extrae: Primera lectura, Salmo, Segunda lectura (si aplica), Evangelio
 """
 
-import logging
 import os
 import re
 import sqlite3
@@ -18,9 +17,9 @@ from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# Configurar logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+from src.log_config import get_logger
+
+logger = get_logger(__name__)
 
 # Configuracion
 PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path(__file__).parent.parent.parent))

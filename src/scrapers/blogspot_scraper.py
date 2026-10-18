@@ -5,7 +5,6 @@ Extrae TODAS las canciones con acordes posicionados y guarda en la base de datos
 """
 
 import json
-import logging
 import os
 import random
 import re
@@ -21,6 +20,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from parsers.acordes_parser_v3 import AcordesParser
+from src.log_config import get_logger
+
+logger = get_logger(__name__)
 
 # Detecci\u00f3n de momento lit\u00fargico basada en texto del cancionero
 PALABRAS_MOMENTO = {
@@ -48,9 +50,6 @@ def detectar_momento_liturgico(texto: str) -> str:
     return max_momento if conteos.get(max_momento, 0) > 0 else "general"
 
 
-# Configurar logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
 
 # Configuracion con variable de entorno
 PROJECT_DIR = Path(
