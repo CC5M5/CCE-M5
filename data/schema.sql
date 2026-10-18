@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS canciones (
     letra_con_acordes TEXT,
     letra_sin_acordes TEXT,
     acordes_json TEXT,
+    estructura_json TEXT,
+    html_visual TEXT,
+    html_original TEXT,
     tono TEXT,
     momento_liturgico TEXT,
     temas TEXT,
@@ -41,6 +44,15 @@ CREATE TABLE IF NOT EXISTS canciones (
     fuente TEXT DEFAULT 'blogspot',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Momentos litúrgicos asignados a canciones
+CREATE TABLE IF NOT EXISTS cancion_momentos (
+    cancion_id INTEGER NOT NULL,
+    momento_liturgico TEXT NOT NULL,
+    PRIMARY KEY (cancion_id, momento_liturgico),
+    FOREIGN KEY (cancion_id) REFERENCES canciones(id) ON DELETE CASCADE
+);
+
 
 -- Tabla de presentaciones generadas semanalmente
 CREATE TABLE IF NOT EXISTS presentaciones (
