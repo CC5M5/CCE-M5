@@ -15,8 +15,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-PROJECT_DIR = Path(__file__).parent.parent.parent.resolve()
-
 from src.constants import MOMENTO_A_KEY, MOMENTOS_ES, MOMENTOS_KEY
 from src.db_manager import get_connection
 from src.generators.composicion_catalogo import (

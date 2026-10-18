@@ -273,8 +273,7 @@ def create_workflow_run(
     steps_data: dict[str, Any] | None = None,
     db_path: Path | None = None,
 ) -> int:
-    with _connection(db_path) as conn:
-        with conn:
+    with _connection(db_path) as conn, conn:
             cur = conn.execute(
                 """
                 INSERT INTO workflow_runs (fecha_domingo, status, current_step, steps_data, created_by, updated_at)
@@ -360,8 +359,7 @@ def update_workflow_step(
     completed_at: str | None = None,
     db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn:
-        with conn:
+    with _connection(db_path) as conn, conn:
             if steps_data is not None:
                 conn.execute(
                     """
@@ -444,8 +442,7 @@ def create_backup_record(
     original_paths: list[str],
     db_path: Path | None = None,
 ) -> int:
-    with _connection(db_path) as conn:
-        with conn:
+    with _connection(db_path) as conn, conn:
             cur = conn.execute(
                 """
                 INSERT INTO workflow_backups (workflow_id, fecha_domingo, backup_path, original_paths, created_at)

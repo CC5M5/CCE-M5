@@ -78,3 +78,11 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "scripts"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/web_admin/api.py" = ["B008"]
+"src/web_admin/auth.py" = ["B008"]
+"scripts/editor_acordes_server.py" = ["E402"]
+"scripts/editor_diapositivas_server.py" = ["E402"]
+"scripts/init_db.py" = ["E402"]
+"scripts/run_admin_api.py" = ["E402"]

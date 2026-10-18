@@ -614,7 +614,7 @@ Voz que clama en el desierto:"""
             assert acorde.acorde.upper() != "LA", f"Falso positivo: {acorde.acorde} en letra"
 
     # 2. La letra debe conservarse exacta.
-    letras = [l.letra for l in estructura if l.tipo == "acordes_letra"]
+    letras = [linea.letra for linea in estructura if linea.tipo == "acordes_letra"]
     assert "Y ESCUCHAD LA PALABRA DE DIOS.(Bis)" in letras, f"Letra corrompida: {letras}"
 
     # 3. Posiciones sobre letra (no negativas).
@@ -668,7 +668,7 @@ def test_posicion_html_exacto():
     spans = list(
         _re.finditer(r'<span class="acorde" style="left:(\d+)ch">([^<]+)</span>', html_out)
     )
-    acordes = [a for l in estructura for a in l.acordes]
+    acordes = [a for linea in estructura for a in linea.acordes]
     assert len(spans) == len(acordes)
     for span, acorde in zip(spans, acordes, strict=False):
         assert (
@@ -696,12 +696,12 @@ Voz que clama en el desierto:"""
         json.dumps(
             [
                 {
-                    "tipo": l.tipo,
-                    "acordes": [{"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes],
-                    "letra": l.letra,
-                    "texto": l.texto,
+                    "tipo": linea.tipo,
+                    "acordes": [{"acorde": a.acorde, "posicion": a.posicion} for a in linea.acordes],
+                    "letra": linea.letra,
+                    "texto": linea.texto,
                 }
-                for l in estructura
+                for linea in estructura
             ],
             indent=2,
             ensure_ascii=False,

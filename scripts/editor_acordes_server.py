@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+# ruff: noqa: E402
+
 Editor local de acordes con commit automático.
 
 Uso:
@@ -355,7 +357,7 @@ def editar(slug: str):
 @app.route("/cancionero/nueva")
 def nueva_cancion():
     canciones = _get_canciones()
-    "\n".join(
+    sidebar_links = "\n".join(
         f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
         for c in canciones
     )
@@ -395,7 +397,7 @@ def nueva_cancion():
       </div>
       <button type="submit">💾 Crear canción y commitear</button>
     </form>"""
-    return _render_base("Nueva canción", sidebar, content)
+    return _render_base("Nueva canción", sidebar_links, content)
 
 
 @app.route("/cancionero/nueva/guardar", methods=["POST"])

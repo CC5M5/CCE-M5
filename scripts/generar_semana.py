@@ -36,6 +36,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+import requests
+
 from src.constants import MOMENTO_A_KEY, MOMENTOS_ES, MOMENTOS_KEY
 from src.db_manager import DB_PATH, get_connection
 from src.generators.pdf_musicos import CancionNoEncontradaError, generar_hoja_musicos
@@ -825,8 +827,12 @@ def main(argv: list[str] | None = None) -> int:
     dry_run = args.dry_run
 
     # Seguridad: por defecto, publicar solo si no existe ya una publicada o con --forzar.
-    if modo == MODO_PUBLICAR and not dry_run and not args.forzar:
-        if presentacion_existe_en_bd(fecha_domingo):
+    if (
+        modo == MODO_PUBLICAR
+        and not dry_run
+        and not args.forzar
+        and presentacion_existe_en_bd(fecha_domingo)
+    ):
             logger.error(
                 "Ya existe una presentación publicada para %s. "
                 "Usa --forzar para sobrescribir o --modo borrador para generar borrador.",

@@ -314,9 +314,11 @@ class CiudadRedondaParser:
                     continue
 
                 # Buscar antifona: párrafo que empieza con "R/." seguido de texto en cursiva
-                if contenido.lower().startswith("r/.") or contenido.lower().startswith("r/"):
-                    # Es antifona si no tiene <b> y es corto
-                    if not elem.find("b") and len(contenido) < 100:
+                if (
+                    (contenido.lower().startswith("r/.") or contenido.lower().startswith("r/"))
+                    and not elem.find("b")
+                    and len(contenido) < 100
+                ):
                         match = re.search(r"R[/\.]\.?\s*(.+)", contenido, re.IGNORECASE)
                         if match:
                             antifona = match.group(1).strip('"').strip()

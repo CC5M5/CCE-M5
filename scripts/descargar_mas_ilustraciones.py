@@ -317,7 +317,7 @@ def fetch_sarabg_more(session: requests.Session) -> list[dict]:
             products.append((url, d["title"], d["img_url"]))
 
     print(f"  {len(products)} productos de ilustración encontrados")
-    for url, title, img_url in products:
+    for _url, title, img_url in products:
         ext = Path(urlparse(img_url).path).suffix or ".jpg"
         filename = f"sarabg_{safe_name(title)}_{hashlib.md5(img_url.encode()).hexdigest()[:8]}{ext}"
         dest = OUT_DIR / "sarabg" / filename
