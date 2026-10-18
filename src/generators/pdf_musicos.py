@@ -18,7 +18,6 @@ Requisitos técnicos:
 
 from __future__ import annotations
 
-import logging
 import os
 import re
 import sqlite3
@@ -33,8 +32,9 @@ from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
 from src.parsers.acordes_parser_v3 import AcordesParser, LineaCancion, limpiar_texto_cancion
+from src.log_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # Reducir el ruido del subconjunto de fuentes que genera fpdf2/fonttools.
 logging.getLogger("fontTools").setLevel(logging.WARNING)
@@ -855,8 +855,4 @@ def generar_hoja_musicos(
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-    )
     raise SystemExit("Usa el script demo para probar el generador.")

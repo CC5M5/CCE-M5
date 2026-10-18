@@ -39,8 +39,9 @@ from typing import Any
 from src.constants import MOMENTOS_ES, MOMENTOS_KEY, MOMENTO_A_KEY
 from src.db_manager import DB_PATH, get_connection
 from src.generators.pdf_musicos import CancionNoEncontradaError, generar_hoja_musicos
+from src.log_config import get_logger
 
-logger = logging.getLogger("generar_semana")
+logger = get_logger("generar_semana")
 
 PROJECT_DIR = Path(__file__).parent.parent.resolve()
 OUTPUT_DIR = PROJECT_DIR / "presentaciones"
@@ -75,12 +76,8 @@ def _estado_presentacion(modo: str) -> str:
 
 
 def configurar_logging(nivel: int = logging.INFO) -> None:
-    """Configura logging uniforme para consola."""
-    logging.basicConfig(
-        level=nivel,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        stream=sys.stdout,
-    )
+    """Ajusta el nivel del root logger usando la configuración centralizada."""
+    logging.getLogger().setLevel(nivel)
 
 
 # ---------------------------------------------------------------------------
