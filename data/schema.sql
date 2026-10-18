@@ -1,12 +1,12 @@
 -- Esquema de base de datos SQLite para CCE-M5-Web-Presentaciones
--- Creado: 2026-09-11
--- Fase: Fundacion
+-- Actualizado para reflejar el schema real de producción
 
 -- Tabla de lecturas dominicales extraidas de Koinonia
 CREATE TABLE IF NOT EXISTS lecturas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fecha DATE NOT NULL,
     domingo TEXT NOT NULL,
+    celebracion TEXT,
     temporada TEXT NOT NULL,
     ciclo TEXT,
     color_liturgico TEXT NOT NULL,
@@ -53,6 +53,23 @@ CREATE TABLE IF NOT EXISTS cancion_momentos (
     FOREIGN KEY (cancion_id) REFERENCES canciones(id) ON DELETE CASCADE
 );
 
+-- Slides del catálogo
+CREATE TABLE IF NOT EXISTS slides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tipo TEXT NOT NULL,
+    subtipo TEXT NOT NULL DEFAULT 'general',
+    titulo TEXT NOT NULL,
+    contenido TEXT NOT NULL DEFAULT '',
+    cita TEXT DEFAULT '',
+    subtitulo TEXT DEFAULT '',
+    imagen TEXT DEFAULT '',
+    color_liturgico TEXT DEFAULT '',
+    es_default INTEGER DEFAULT 0,
+    activo INTEGER DEFAULT 1,
+    notas TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Tabla de presentaciones generadas semanalmente
 CREATE TABLE IF NOT EXISTS presentaciones (
@@ -70,7 +87,27 @@ CREATE TABLE IF NOT EXISTS presentaciones (
     FOREIGN KEY (lectura_id) REFERENCES lecturas(id)
 );
 
--- Tabla de comentarios/aprobaciones
+-- Presentación compuesta por slides
+CREATE TABLE IF NOT EXISTS presentacion_slides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    presentacion_id INTEGER NOT NULL,
+    slide_id INTEGER,
+    numero INTEGER NOT NULL,
+    tipo TEXT NOT NULL,
+    subtipo TEXT DEFAULT 'general',
+    titulo TEXT NOT NULL,
+    contenido TEXT NOT NULL DEFAULT '',
+    cita TEXT DEFAULT '',
+    subtitulo TEXT DEFAULT '',
+    imagen TEXT DEFAULT '',
+    momento TEXT DEFAULT '',
+    activo INTEGER DEFAULT 1,
+    personalizado INTEGER DEFAULT 0,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (presentacion_id) REFERENCES presentaciones(id) ON DELETE CASCADE
+);
+
+-- Comentarios/aprobaciones
 CREATE TABLE IF NOT EXISTS comentarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     presentacion_id INTEGER,
@@ -81,7 +118,7 @@ CREATE TABLE IF NOT EXISTS comentarios (
     FOREIGN KEY (presentacion_id) REFERENCES presentaciones(id)
 );
 
--- Tabla de log de automatizaciones
+-- Log de automatizaciones
 CREATE TABLE IF NOT EXISTS automation_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     agente TEXT NOT NULL,
@@ -90,8 +127,3 @@ CREATE TABLE IF NOT EXISTS automation_log (
     mensaje TEXT,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Indices para optimizacion
-CREATE INDEX IF NOT EXISTS idx_lecturas_fecha ON lecturas(fecha);
-CREATE INDEX IF NOT EXISTS idx_canciones_momento ON canciones(momento_liturgico);
-CREATE INDEX IF NOT EXISTS idx_presentaciones_fecha ON presentaciones(fecha_domingo);
