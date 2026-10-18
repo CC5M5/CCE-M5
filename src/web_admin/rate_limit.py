@@ -54,7 +54,7 @@ class _MemoryStorage:
         self.max_attempts = max_attempts
         self.window_seconds = window_seconds
         self.block_seconds = block_seconds
-        self._buckets: dict[str, _Bucket] = field(default_factory=dict)
+        self._buckets: dict[str, _Bucket] = {}
 
     def _now(self) -> float:
         return time.monotonic()
