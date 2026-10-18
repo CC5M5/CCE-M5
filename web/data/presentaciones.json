@@ -1,5 +1,21 @@
 [
   {
+    "id": 49,
+    "fecha_domingo": "2026-10-18",
+    "lectura_id": 75,
+    "canciones_json": "{\"entrada\": 44, \"perdon\": null, \"gloria\": 13, \"salmo\": null, \"aleluya\": 15, \"ofertorio\": 96, \"santo\": 90, \"padre_nuestro\": null, \"paz\": 76, \"comunion\": 95, \"maria\": 2, \"despedida\": 85}",
+    "evento_especial": null,
+    "ruta_pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_celebracion.pptx",
+    "ruta_pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_fieles.pdf",
+    "ruta_pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_hoja_musicos.pdf",
+    "ruta_web": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-18_presentacion",
+    "estado": "publicada",
+    "fecha_creacion": "2026-10-18 00:38:35",
+    "lectura_json": null,
+    "notas": null,
+    "creado_en": "2026-10-14 22:40:46"
+  },
+  {
     "id": 48,
     "fecha_domingo": "2026-10-11",
     "lectura_id": 68,
