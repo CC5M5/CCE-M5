@@ -25,6 +25,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
+        timeout-minutes: 10
         run: npm install
         working-directory: ./web
 
