@@ -28,14 +28,11 @@ DEFAULT_BLOCK_SECONDS = float(os.environ.get("CCE_ADMIN_RATE_LIMIT_BLOCK_SECONDS
 class _Storage(Protocol):
     """Protocolo mínimo para backend de rate limiting."""
 
-    def is_blocked(self, key: str) -> bool:
-        ...
+    def is_blocked(self, key: str) -> bool: ...
 
-    def record_failure(self, key: str) -> None:
-        ...
+    def record_failure(self, key: str) -> None: ...
 
-    def record_success(self, key: str) -> None:
-        ...
+    def record_success(self, key: str) -> None: ...
 
 
 @dataclass
@@ -113,9 +110,7 @@ class _RedisStorage:
 
     def is_blocked(self, key: str) -> bool:
         block_until = self._client.get(self._key(key, "block_until"))
-        if block_until and float(block_until) > time.time():
-            return True
-        return False
+        return bool(block_until and float(block_until) > time.time())
 
     def record_failure(self, key: str) -> None:
         pipe = self._client.pipeline()
@@ -169,9 +164,7 @@ class LoginRateLimiter:
         if storage is None:
             redis_url = os.environ.get("CCE_ADMIN_REDIS_URL")
             if redis_url:
-                storage = _RedisStorage(
-                    redis_url, max_attempts, window_seconds, block_seconds
-                )
+                storage = _RedisStorage(redis_url, max_attempts, window_seconds, block_seconds)
             else:
                 storage = _MemoryStorage(max_attempts, window_seconds, block_seconds)
         self._storage = storage

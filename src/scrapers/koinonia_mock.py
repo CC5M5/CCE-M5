@@ -4,8 +4,6 @@ Mock de lecturas para desarrollo y testing.
 Usar cuando Koinonia no este disponible.
 """
 
-from datetime import datetime, timedelta
-
 LECTURAS_MOCK = {
     "20260914": {
         "fecha": "20260914",
@@ -22,7 +20,7 @@ LECTURAS_MOCK = {
         "segunda_lectura_cita": "1 Tm 2, 1-8",
         "segunda_lectura_texto": "En primer lugar, os exhorto a que pidáis, oréis, intercedáis y déis gracias por todos...",
         "evangelio_cita": "Lc 16, 1-13",
-        "evangelio_texto": "En aquel tiempo, Jesús dijo a sus discípulos: 'Había un hombre rico que tenía un administrador...'"
+        "evangelio_texto": "En aquel tiempo, Jesús dijo a sus discípulos: 'Había un hombre rico que tenía un administrador...'",
     },
     "20260921": {
         "fecha": "20260921",
@@ -39,19 +37,21 @@ LECTURAS_MOCK = {
         "segunda_lectura_cita": "Ef 4, 1-7. 11-13",
         "segunda_lectura_texto": "Yo, preso por el Señor, os exhorto a que andéis como corresponde a la vocación...",
         "evangelio_cita": "Mc 9, 30-37",
-        "evangelio_texto": "De camino, Jesús les decía: 'El Hijo del hombre va a ser entregado...'"
-    }
+        "evangelio_texto": "De camino, Jesús les decía: 'El Hijo del hombre va a ser entregado...'",
+    },
 }
+
 
 def obtener_mock(fecha_codigo):
     """Obtiene lecturas mock para una fecha"""
     return LECTURAS_MOCK.get(fecha_codigo)
 
+
 def generar_mock_aleatorio(fecha_codigo):
     """Genera un mock aleatorio si no existe"""
     return {
         "fecha": fecha_codigo,
-        "celebracion": f"Domingo del Tiempo Ordinario",
+        "celebracion": "Domingo del Tiempo Ordinario",
         "domingo": "Domingo Ordinario",
         "temporada": "ordinario",
         "ciclo": "C",
@@ -64,8 +64,9 @@ def generar_mock_aleatorio(fecha_codigo):
         "segunda_lectura_cita": "Fil 4, 4-9",
         "segunda_lectura_texto": "Estad siempre alegres en el Señor...",
         "evangelio_cita": "Mt 5, 1-12",
-        "evangelio_texto": "Viendo Jesús a la multitud, subió al monte..."
+        "evangelio_texto": "Viendo Jesús a la multitud, subió al monte...",
     }
+
 
 if __name__ == "__main__":
     # Test

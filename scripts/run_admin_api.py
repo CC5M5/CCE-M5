@@ -17,7 +17,8 @@ if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
 import uvicorn
-from src.web_admin.config import DEFAULT_ADMIN_PASSWORD, DEFAULT_ADMIN_USERNAME
+
+from src.web_admin.config import DEFAULT_ADMIN_USERNAME
 from src.web_admin.database import init_admin_schema
 
 

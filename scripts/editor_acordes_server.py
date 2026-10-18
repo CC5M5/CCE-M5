@@ -25,7 +25,6 @@ import re
 import sqlite3
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 # Asegurar que el directorio del proyecto está en sys.path para importar src.*
@@ -36,12 +35,11 @@ if str(PROJECT_DIR) not in sys.path:
 from flask import Flask, abort, request
 
 from src.canciones_manager import (
-    CancionCreateUpdate,
     MOMENTOS_LITURGICOS,
+    CancionCreateUpdate,
     actualizar_cancion,
     crear_cancion,
     listar_canciones,
-    slugify,
 )
 from src.rebuild_web import rebuild_web
 
@@ -115,8 +113,14 @@ def _git_commit(titulo: str) -> str:
             return "sin cambios"
 
         result = subprocess.run(
-            ["git", "commit", "-m", f"chore(acordes): editar {titulo}",
-             "-m", "Actualización manual desde editor local de acordes."],
+            [
+                "git",
+                "commit",
+                "-m",
+                f"chore(acordes): editar {titulo}",
+                "-m",
+                "Actualización manual desde editor local de acordes.",
+            ],
             cwd=PROJECT_DIR,
             check=True,
             capture_output=True,
@@ -133,7 +137,12 @@ def _git_commit(titulo: str) -> str:
         return m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
         err = exc.stderr or exc.stdout or ""
-        if "nothing to commit" in err or "working tree clean" in err or "No changes" in err or "sin cambios agregados" in err:
+        if (
+            "nothing to commit" in err
+            or "working tree clean" in err
+            or "No changes" in err
+            or "sin cambios agregados" in err
+        ):
             return "sin cambios"
         return f"ERROR: {err}"
 
@@ -197,14 +206,20 @@ def _render_sidebar(active_slug: str | None = None, extra_link: str = "") -> str
     links = []
     for c in canciones:
         active = ' class="active"' if active_slug and c["slug"] == active_slug else ""
-        links.append(f'<a href="/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>')
+        links.append(
+            f'<a href="/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>'
+        )
     if extra_link:
         links.append(extra_link)
     return "\n".join(links)
 
 
-def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = "") -> str:
-    msg_html = f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
+def _render_base(
+    title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = ""
+) -> str:
+    msg_html = (
+        f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
+    )
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -267,7 +282,7 @@ def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mens
 </html>"""
 
 
-NUEVA_LINK = ''
+NUEVA_LINK = ""
 
 
 @app.route("/")
@@ -289,12 +304,14 @@ def editar(slug: str):
 
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"' if c["slug"] == slug else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
+        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"'
+        if c["slug"] == slug
+        else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
         for c in canciones
     )
     sidebar_links = "\n".join(
         f'{link}>{html_module.escape(c["titulo"])}</a>'
-        for c, link in zip(canciones, sidebar_links.split("\n"))
+        for c, link in zip(canciones, sidebar_links.split("\n"), strict=False)
     )
 
     momentos_checks = "\n".join(
@@ -338,7 +355,7 @@ def editar(slug: str):
 @app.route("/cancionero/nueva")
 def nueva_cancion():
     canciones = _get_canciones()
-    sidebar_links = "\n".join(
+    "\n".join(
         f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
         for c in canciones
     )
@@ -389,18 +406,28 @@ def guardar_nueva_cancion():
     momentos = request.form.getlist("momentos")
 
     if not titulo:
-        return _render_base("Error", "", "<h2>Error</h2><p>El título es obligatorio.</p>", "El título es obligatorio.", "err")
+        return _render_base(
+            "Error",
+            "",
+            "<h2>Error</h2><p>El título es obligatorio.</p>",
+            "El título es obligatorio.",
+            "err",
+        )
 
     try:
-        cancion = crear_cancion(CancionCreateUpdate(
-            titulo=titulo,
-            letra_con_acordes=texto,
-            momentos=momentos,
-            tono=tono,
-            fuente="manual",
-        ))
+        cancion = crear_cancion(
+            CancionCreateUpdate(
+                titulo=titulo,
+                letra_con_acordes=texto,
+                momentos=momentos,
+                tono=tono,
+                fuente="manual",
+            )
+        )
     except Exception as exc:
-        return _render_base("Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+        return _render_base(
+            "Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err"
+        )
 
     commit_result = _git_commit(cancion["titulo"])
     rebuild_result = _rebuild_web()
@@ -445,7 +472,9 @@ def guardar(slug: str):
             ),
         )
     except Exception as exc:
-        return _render_base("Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+        return _render_base(
+            "Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err"
+        )
 
     derivados = _regenerar_derivados(nuevo_texto)
 
@@ -456,7 +485,9 @@ def guardar(slug: str):
         mensaje = f"Guardado en BD, pero falló git: {commit_result}"
         clase = "err"
     elif rebuild_result.startswith("ERROR"):
-        mensaje = f"✅ Guardado y commiteado: {commit_result}. ⚠️ Pero falló rebuild web: {rebuild_result}"
+        mensaje = (
+            f"✅ Guardado y commiteado: {commit_result}. ⚠️ Pero falló rebuild web: {rebuild_result}"
+        )
         clase = "err"
     else:
         mensaje = f"✅ Guardado, commiteado ({commit_result}) y web reconstruida."

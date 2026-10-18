@@ -4,20 +4,19 @@ from __future__ import annotations
 
 import datetime
 import logging
-from typing import Optional
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.web_admin.config import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     DEFAULT_ADMIN_NAME,
     DEFAULT_ADMIN_PASSWORD,
     DEFAULT_ADMIN_USERNAME,
     JWT_ALGORITHM,
     JWT_SECRET,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
 )
 from src.web_admin.database import create_user, get_user_by_username, init_admin_schema
 
@@ -39,14 +38,14 @@ def _verify_password(password: str, password_hash: str) -> bool:
 
 
 def create_access_token(username: str, role: str) -> str:
-    expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+    expires = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
     payload = {
         "sub": username,
         "role": role,
         "exp": expires,
-        "iat": datetime.datetime.now(datetime.timezone.utc),
+        "iat": datetime.datetime.now(datetime.UTC),
         "type": "access",
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -79,7 +78,7 @@ def seed_default_admin() -> None:
     logger.info("Usuario admin inicial creado: %s (id=%d)", DEFAULT_ADMIN_USERNAME, user_id)
 
 
-def authenticate_user(username: str, password: str) -> Optional[dict]:
+def authenticate_user(username: str, password: str) -> dict | None:
     user = get_user_by_username(username)
     if not user or not user.is_active:
         return None
@@ -94,7 +93,7 @@ def authenticate_user(username: str, password: str) -> Optional[dict]:
 
 
 def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> dict:
     if not credentials:
         raise HTTPException(status_code=401, detail="No se proporcionó token")
@@ -124,7 +123,7 @@ def require_admin(current_user: dict = Depends(get_current_user)) -> dict:
 def create_new_user(
     username: str,
     password: str,
-    full_name: Optional[str] = None,
+    full_name: str | None = None,
     role: str = "viewer",
 ) -> int:
     init_admin_schema()

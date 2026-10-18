@@ -7,6 +7,7 @@ imágenes descargadas de Fano, Pati.te y Sara BG.
 - Asigna imágenes a momentos litúrgicos según palabras clave en títulos.
 - Genera un catálogo extendido con metadatos.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -16,7 +17,6 @@ from pathlib import Path
 from typing import Any
 
 from PIL import Image
-
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
@@ -48,17 +48,128 @@ MOMENTOS = [
 
 
 KEYWORDS: dict[str, list[str]] = {
-    "maria": ["virgen", "maria", "madre", "fatima", "fatima", "nazaret", "inmaculada", "abrazada", "mirame", "mariana", "mariplano", "magnificat"],
-    "paz": ["paz", "comunidad", "abrazo", "hermanos", "unidos", "unidad", "reconciliacion", "familia", "amor"],
-    "comunion": ["pan", "vino", "eucaristia", "comunion", "comer", "mesa", "cordero", "cena", "altar", "ofrecer", "ofrenda"],
-    "salmo": ["salmo", "palabra", "agua", "luz", "semilla", "seminador", "camino", "sembrar", "crecer", "vid", "pastor", "oveja"],
-    "perdon": ["perdon", "confesar", "pecado", "conversion", "arrepentir", "misericordia", "corazon", "penitencia", "luchar"],
-    "gloria_aleluya": ["gloria", "aleluya", "espiritu", "rey", "resucitado", "pascua", "fiesta", "cielo", "triunfo", "hosanna"],
-    "entrada": ["entrar", "camino", "llamar", "llamada", "venid", "venga", "recibir", "abrir", "puerta", "caminar", "invitar", "bienvenido"],
+    "maria": [
+        "virgen",
+        "maria",
+        "madre",
+        "fatima",
+        "fatima",
+        "nazaret",
+        "inmaculada",
+        "abrazada",
+        "mirame",
+        "mariana",
+        "mariplano",
+        "magnificat",
+    ],
+    "paz": [
+        "paz",
+        "comunidad",
+        "abrazo",
+        "hermanos",
+        "unidos",
+        "unidad",
+        "reconciliacion",
+        "familia",
+        "amor",
+    ],
+    "comunion": [
+        "pan",
+        "vino",
+        "eucaristia",
+        "comunion",
+        "comer",
+        "mesa",
+        "cordero",
+        "cena",
+        "altar",
+        "ofrecer",
+        "ofrenda",
+    ],
+    "salmo": [
+        "salmo",
+        "palabra",
+        "agua",
+        "luz",
+        "semilla",
+        "seminador",
+        "camino",
+        "sembrar",
+        "crecer",
+        "vid",
+        "pastor",
+        "oveja",
+    ],
+    "perdon": [
+        "perdon",
+        "confesar",
+        "pecado",
+        "conversion",
+        "arrepentir",
+        "misericordia",
+        "corazon",
+        "penitencia",
+        "luchar",
+    ],
+    "gloria_aleluya": [
+        "gloria",
+        "aleluya",
+        "espiritu",
+        "rey",
+        "resucitado",
+        "pascua",
+        "fiesta",
+        "cielo",
+        "triunfo",
+        "hosanna",
+    ],
+    "entrada": [
+        "entrar",
+        "camino",
+        "llamar",
+        "llamada",
+        "venid",
+        "venga",
+        "recibir",
+        "abrir",
+        "puerta",
+        "caminar",
+        "invitar",
+        "bienvenido",
+    ],
     "ofertorio": ["ofrenda", "ofrecer", "don", "dar", "entregar", "manos", "servir", "compartir"],
-    "santo_padre_credo": ["santo", "padre", "credo", "fe", "oracion", "rezar", "trinidad", "paternoster", "amarse"],
-    "despedida": ["despedida", "enviar", "mision", "mundo", "ir", "paz", "bendicion", "camino", "gracias"],
-    "lecturas": ["lectura", "evangelio", "biblia", "escritura", "palabra", "anunciar", "proclamar", "profeta"],
+    "santo_padre_credo": [
+        "santo",
+        "padre",
+        "credo",
+        "fe",
+        "oracion",
+        "rezar",
+        "trinidad",
+        "paternoster",
+        "amarse",
+    ],
+    "despedida": [
+        "despedida",
+        "enviar",
+        "mision",
+        "mundo",
+        "ir",
+        "paz",
+        "bendicion",
+        "camino",
+        "gracias",
+    ],
+    "lecturas": [
+        "lectura",
+        "evangelio",
+        "biblia",
+        "escritura",
+        "palabra",
+        "anunciar",
+        "proclamar",
+        "profeta",
+    ],
 }
 
 
@@ -83,11 +194,15 @@ def score_for_momento(path: Path, title: str, momento: str) -> int:
         score += 10
     if momento == "entrada" and any(k in words for k in KEYWORDS["entrada"]):
         score += 10
-    if momento in ("santo", "padre_nuestro", "credo") and any(k in words for k in KEYWORDS["santo_padre_credo"]):
+    if momento in ("santo", "padre_nuestro", "credo") and any(
+        k in words for k in KEYWORDS["santo_padre_credo"]
+    ):
         score += 10
     if momento == "despedida" and any(k in words for k in KEYWORDS["despedida"]):
         score += 10
-    if momento in ("primera_lectura", "segunda_lectura", "evangelio") and any(k in words for k in KEYWORDS["lecturas"]):
+    if momento in ("primera_lectura", "segunda_lectura", "evangelio") and any(
+        k in words for k in KEYWORDS["lecturas"]
+    ):
         score += 10
     # momentos transición y paso aceptan cualquier imagen religiosa válida
     if momento in ("transicion_palabra", "transicion_eucaristia", "paso", "portada"):
@@ -99,7 +214,11 @@ def load_images() -> list[dict[str, Any]]:
     """Carga metadatos de todas las imágenes válidas del repositorio."""
     images: list[dict[str, Any]] = []
     for p in ILUSTRACIONES_DIR.rglob("*"):
-        if not p.is_file() or p.name in {"catalogo.json", "catalogo_extendido.json", "descargas_metadata.json"}:
+        if not p.is_file() or p.name in {
+            "catalogo.json",
+            "catalogo_extendido.json",
+            "descargas_metadata.json",
+        }:
             continue
         if p.suffix.lower() not in {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}:
             continue
@@ -114,15 +233,17 @@ def load_images() -> list[dict[str, Any]]:
         rel = str(p.relative_to(ILUSTRACIONES_DIR))
         artista = rel.split("/")[0]
         title = derive_title(p, artista)
-        images.append({
-            "archivo": rel,
-            "artista": artista,
-            "titulo": title,
-            "ancho": w,
-            "alto": h,
-            "bytes": p.stat().st_size,
-            "hash": hashlib.md5(p.read_bytes()).hexdigest(),
-        })
+        images.append(
+            {
+                "archivo": rel,
+                "artista": artista,
+                "titulo": title,
+                "ancho": w,
+                "alto": h,
+                "bytes": p.stat().st_size,
+                "hash": hashlib.md5(p.read_bytes()).hexdigest(),
+            }
+        )
     return images
 
 
@@ -184,7 +305,9 @@ def assign_images(images: list[dict[str, Any]]) -> dict[str, list[str]]:
     return assignments
 
 
-def build_extended_catalog(images: list[dict[str, Any]], assignments: dict[str, list[str]]) -> dict[str, Any]:
+def build_extended_catalog(
+    images: list[dict[str, Any]], assignments: dict[str, list[str]]
+) -> dict[str, Any]:
     """Construye el catálogo extendido con metadatos."""
     by_file = {img["archivo"]: img for img in images}
     catalogo: dict[str, Any] = {
@@ -197,7 +320,7 @@ def build_extended_catalog(images: list[dict[str, Any]], assignments: dict[str, 
         "imagenes": assignments,
         "metadatos": {},
     }
-    for momento, refs in assignments.items():
+    for _momento, refs in assignments.items():
         for ref in refs:
             img = by_file.get(ref, {})
             catalogo["metadatos"][ref] = {
@@ -234,7 +357,7 @@ def main() -> None:
 
     # Resumen
     total_refs = sum(len(v) for v in assignments.values())
-    unique_refs = len(set(r for v in assignments.values() for r in v))
+    unique_refs = len({r for v in assignments.values() for r in v})
     print(f"\nTotal referencias en catálogo: {total_refs}")
     print(f"Imágenes únicas referenciadas: {unique_refs}")
     for momento, refs in assignments.items():

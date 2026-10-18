@@ -21,8 +21,6 @@ import html
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Iterator, List, Optional
-
 
 # ---------------------------------------------------------------------------
 # Utilidades de limpieza de texto
@@ -58,7 +56,7 @@ def limpiar_texto_cancion(texto: str) -> str:
     que el ancho de carácter sea predecible al renderizar en fuentes
     monoespaciadas.
     """
-    lineas: List[str] = []
+    lineas: list[str] = []
     for linea in texto.splitlines():
         # Quitar etiquetas HTML (atributos incluidos) dejando su contenido.
         linea = _HTML_TAG_RE.sub("", linea)
@@ -81,7 +79,7 @@ def limpiar_texto_preservando_espacios(texto: str) -> str:
 
     Útil para generar la visualización HTML con fuente monoespaciada.
     """
-    lineas: List[str] = []
+    lineas: list[str] = []
     for linea in texto.splitlines():
         # Quitar etiquetas HTML.
         linea = _HTML_TAG_RE.sub("", linea)
@@ -94,13 +92,16 @@ def limpiar_texto_preservando_espacios(texto: str) -> str:
         lineas.append(linea.rstrip())
     return "\n".join(lineas)
 
+
 # ---------------------------------------------------------------------------
 # Modelo de datos
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AcordePosicionado:
     """Un acorde con su posición de inicio (índice de carácter)."""
+
     acorde: str
     posicion: int
 
@@ -112,8 +113,9 @@ class AcordePosicionado:
 @dataclass
 class LineaCancion:
     """Bloque de canción: opcionalmente una línea de acordes y su letra."""
+
     tipo: str  # 'acordes_letra', 'letra', 'acordes', 'vacía', 'sección'
-    acordes: List[AcordePosicionado] = field(default_factory=list)
+    acordes: list[AcordePosicionado] = field(default_factory=list)
     letra: str = ""
     texto: str = ""  # Para líneas de metadatos/sección
     acordes_raw: str = ""  # Línea de acordes original con espacios de posicionamiento
@@ -122,6 +124,7 @@ class LineaCancion:
 # ---------------------------------------------------------------------------
 # Parser
 # ---------------------------------------------------------------------------
+
 
 class AcordesParser:
     """
@@ -139,7 +142,7 @@ class AcordesParser:
 
     # Patrón de acordes compilado una sola vez por clase.
     # El grupo de captura principal es el acorde completo.
-    _PATRON_ACORDES: Optional[re.Pattern[str]] = None
+    _PATRON_ACORDES: re.Pattern[str] | None = None
 
     # Notas base reconocidas.
     NOTAS_ESPANOLAS = ("Do", "Re", "Mi", "Fa", "Sol", "La", "Si")
@@ -148,13 +151,27 @@ class AcordesParser:
     # Extensiones permitidas, ordenadas de más específicas a menos para evitar
     # que "m7" se consuma como "m" + "7".
     EXTENSIONES = (
-        r"maj7", r"maj9", r"maj11", r"maj13",
-        r"m7", r"m9", r"m11", r"m13",
-        r"add9", r"add11", r"add13",
-        r"sus4", r"sus2",
-        r"dim", r"aug",
-        r"7", r"9", r"11", r"13",
-        r"m", r"M",
+        r"maj7",
+        r"maj9",
+        r"maj11",
+        r"maj13",
+        r"m7",
+        r"m9",
+        r"m11",
+        r"m13",
+        r"add9",
+        r"add11",
+        r"add13",
+        r"sus4",
+        r"sus2",
+        r"dim",
+        r"aug",
+        r"7",
+        r"9",
+        r"11",
+        r"13",
+        r"m",
+        r"M",
     )
 
     @classmethod
@@ -213,7 +230,10 @@ class AcordesParser:
         # Si hay ':' verificar que sea de etiqueta de sección seguida de acordes.
         if ":" in linea:
             parte_etiqueta, _, resto = linea.partition(":")
-            if not re.fullmatch(r"(?i)\s*(intro|estribillo|estrofa|puente|pre-coro|precoro|final|outro|solo|interludio)\s*\d*\s*", parte_etiqueta):
+            if not re.fullmatch(
+                r"(?i)\s*(intro|estribillo|estrofa|puente|pre-coro|precoro|final|outro|solo|interludio)\s*\d*\s*",
+                parte_etiqueta,
+            ):
                 return False
             if not resto.strip():
                 return False
@@ -266,14 +286,16 @@ class AcordesParser:
 
         return hay_acorde
 
-    def extraer_acordes_de_linea(self, linea: str) -> List[AcordePosicionado]:
+    def extraer_acordes_de_linea(self, linea: str) -> list[AcordePosicionado]:
         """Extrae acordes de una línea junto con su posición de inicio."""
-        acordes: List[AcordePosicionado] = []
+        acordes: list[AcordePosicionado] = []
         for match in self._patron.finditer(linea):
-            acordes.append(AcordePosicionado(
-                acorde=match.group(1),
-                posicion=match.start(1),
-            ))
+            acordes.append(
+                AcordePosicionado(
+                    acorde=match.group(1),
+                    posicion=match.start(1),
+                )
+            )
         return acordes
 
     def normalizar_acorde(self, acorde: str) -> str:
@@ -286,7 +308,7 @@ class AcordesParser:
     # Parseo principal
     # ------------------------------------------------------------------
 
-    def parsear_cancion_completa(self, texto: str) -> List[LineaCancion]:
+    def parsear_cancion_completa(self, texto: str) -> list[LineaCancion]:
         """
         Parsea el texto completo de una canción.
 
@@ -305,7 +327,7 @@ class AcordesParser:
         # Emparejar líneas limpias con originales por índice (después de eliminar metadatos).
         # limpiar_texto_cancion y limpiar_texto_preservando_espacios eliminan las mismas líneas,
         # por lo que los índices coinciden.
-        resultado: List[LineaCancion] = []
+        resultado: list[LineaCancion] = []
         i = 0
         n = len(lineas_limpias)
 
@@ -338,7 +360,10 @@ class AcordesParser:
                 etiqueta_seccion = None
                 if ":" in linea:
                     parte_etiqueta, _, _ = linea.partition(":")
-                    if re.fullmatch(r"(?i)\s*(intro|estribillo|estrofa|puente|pre-coro|precoro|final|outro|solo|interludio)\s*\d*\s*", parte_etiqueta):
+                    if re.fullmatch(
+                        r"(?i)\s*(intro|estribillo|estrofa|puente|pre-coro|precoro|final|outro|solo|interludio)\s*\d*\s*",
+                        parte_etiqueta,
+                    ):
                         etiqueta_seccion = parte_etiqueta.strip()
 
                 if etiqueta_seccion:
@@ -346,22 +371,30 @@ class AcordesParser:
 
                 # Mira si la siguiente línea es letra.
                 siguiente = lineas_limpias[i + 1] if i + 1 < n else None
-                if siguiente is not None and not self.es_linea_de_acordes(siguiente) and siguiente.strip():
+                if (
+                    siguiente is not None
+                    and not self.es_linea_de_acordes(siguiente)
+                    and siguiente.strip()
+                ):
                     # Emparejar acordes + letra.
-                    resultado.append(LineaCancion(
-                        tipo="acordes_letra",
-                        acordes=acordes,
-                        letra=siguiente,
-                        acordes_raw=linea_raw,
-                    ))
+                    resultado.append(
+                        LineaCancion(
+                            tipo="acordes_letra",
+                            acordes=acordes,
+                            letra=siguiente,
+                            acordes_raw=linea_raw,
+                        )
+                    )
                     i += 2
                 else:
                     # Línea de acordes sin letra asociada.
-                    resultado.append(LineaCancion(
-                        tipo="acordes",
-                        acordes=acordes,
-                        acordes_raw=linea_raw,
-                    ))
+                    resultado.append(
+                        LineaCancion(
+                            tipo="acordes",
+                            acordes=acordes,
+                            acordes_raw=linea_raw,
+                        )
+                    )
                     i += 1
             else:
                 # Línea de letra suelta (sin acordes encima).
@@ -370,7 +403,7 @@ class AcordesParser:
 
         return resultado
 
-    def detectar_tono(self, estructura: List[LineaCancion]) -> str:
+    def detectar_tono(self, estructura: list[LineaCancion]) -> str:
         """
         Detecta el acorde más frecuente como aproximación de tono.
 
@@ -393,23 +426,23 @@ class AcordesParser:
     # Generación HTML
     # ------------------------------------------------------------------
 
-    def generar_html_visual(self, estructura: List[LineaCancion]) -> str:
+    def generar_html_visual(self, estructura: list[LineaCancion]) -> str:
         """
         Genera HTML donde los acordes aparecen encima de la letra,
         manteniendo la posición exacta mediante fuente monoespaciada y
         posicionamiento relativo en unidades 'ch'.
         """
-        lineas_html: List[str] = []
+        lineas_html: list[str] = []
         lineas_html.append('<div class="cancion-con-acordes">')
 
         # Heurística: detectar estribillo por cambio a MAYÚSCULAS.
         # Si encontramos una línea de letra completamente en mayúsculas (salvo
         # acentos, Ñ, Ç, signos) y la anterior estaba en minúsculas/mezcla,
         # consideramos que empieza el estribillo. Vuelve a normal al bajar.
-        ultima_letra_mayuscula: Optional[bool] = None
+        ultima_letra_mayuscula: bool | None = None
         en_estribillo = False
 
-        for idx, linea in enumerate(estructura):
+        for _idx, linea in enumerate(estructura):
             if linea.tipo == "vacía":
                 lineas_html.append('<div class="linea-vacia"></div>')
                 continue
@@ -450,22 +483,23 @@ class AcordesParser:
 
                     linea_acordes_html = self._patron.sub(_envolver_acorde_en_raw, acordes_raw)
                     lineas_html.append(f'  <div class="linea-acordes">{linea_acordes_html}</div>')
-                    lineas_html.append(f'  <div class="linea-letra">{self._renderizar_texto_con_formato(letra_padded, negrita=en_estribillo)}</div>')
-                    lineas_html.append('</div>')
+                    lineas_html.append(
+                        f'  <div class="linea-letra">{self._renderizar_texto_con_formato(letra_padded, negrita=en_estribillo)}</div>'
+                    )
+                    lineas_html.append("</div>")
                 continue
 
             if linea.tipo == "acordes":
                 acordes_html = " ".join(
-                    html.escape(self.normalizar_acorde(a.acorde))
-                    for a in linea.acordes
+                    html.escape(self.normalizar_acorde(a.acorde)) for a in linea.acordes
                 )
                 lineas_html.append(f'<div class="linea-acordes-suelta">{acordes_html}</div>')
                 continue
 
-        lineas_html.append('</div>')
+        lineas_html.append("</div>")
         return "\n".join(lineas_html)
 
-    def _es_texto_mayuscula(self, texto: str) -> Optional[bool]:
+    def _es_texto_mayuscula(self, texto: str) -> bool | None:
         """
         Devuelve True si el texto es mayormente mayúsculas (letras), False si
         tiene letras minúsculas, None si no tiene letras.
@@ -486,7 +520,7 @@ class AcordesParser:
         """
         if not texto:
             return ""
-        partes: List[str] = []
+        partes: list[str] = []
         i = 0
         n = len(texto)
         while i < n:
@@ -496,7 +530,7 @@ class AcordesParser:
                     partes.append(html.escape(texto[i]))
                     i += 1
                 else:
-                    contenido = texto[i + 2:fin]
+                    contenido = texto[i + 2 : fin]
                     partes.append(f"<strong>{html.escape(contenido)}</strong>")
                     i = fin + 2
             else:
@@ -511,7 +545,7 @@ class AcordesParser:
             resultado = f"<strong>{resultado}</strong>"
         return resultado
 
-    def generar_html_completo(self, estructura: List[LineaCancion]) -> str:
+    def generar_html_completo(self, estructura: list[LineaCancion]) -> str:
         """Genera un documento HTML completo con CSS para visualización exacta."""
         body = self.generar_html_visual(estructura)
         return f"""<!DOCTYPE html>
@@ -559,6 +593,7 @@ class AcordesParser:
 # Tests
 # ---------------------------------------------------------------------------
 
+
 def test_posicionamiento_exacto():
     texto_ejemplo = """PREPARAD EL CAMINO
 escuchar
@@ -576,20 +611,17 @@ Voz que clama en el desierto:"""
     # 1. No debe detectar la palabra "LA" como acorde.
     for linea in estructura:
         for acorde in linea.acordes:
-            assert acorde.acorde.upper() != "LA", \
-                f"Falso positivo: {acorde.acorde} en letra"
+            assert acorde.acorde.upper() != "LA", f"Falso positivo: {acorde.acorde} en letra"
 
     # 2. La letra debe conservarse exacta.
     letras = [l.letra for l in estructura if l.tipo == "acordes_letra"]
-    assert "Y ESCUCHAD LA PALABRA DE DIOS.(Bis)" in letras, \
-        f"Letra corrompida: {letras}"
+    assert "Y ESCUCHAD LA PALABRA DE DIOS.(Bis)" in letras, f"Letra corrompida: {letras}"
 
     # 3. Posiciones sobre letra (no negativas).
     for linea in estructura:
         if linea.tipo == "acordes_letra":
             for acorde in linea.acordes:
-                assert acorde.posicion >= 0, \
-                    f"Posición negativa para {acorde.acorde}"
+                assert acorde.posicion >= 0, f"Posición negativa para {acorde.acorde}"
 
     print("✓ test_posicionamiento_exacto pasado")
 
@@ -609,6 +641,7 @@ def test_extensiones_y_slash():
 
     print("✓ test_extensiones_y_slash pasado")
 
+
 def test_html_sin_xss():
     """El parser limpia etiquetas HTML del texto de entrada.
 
@@ -627,16 +660,20 @@ def test_html_sin_xss():
 def test_posicion_html_exacto():
     """Verifica que cada span de acorde tenga left == posicion del acorde."""
     import re as _re
+
     texto = "SOL   Lam        Sim                 DO          RE7\nPREPARAD EL CAMINO AL SEÑOR"
     estructura = AcordesParser().parsear_cancion_completa(texto)
     html_out = AcordesParser().generar_html_visual(estructura)
 
-    spans = list(_re.finditer(r'<span class="acorde" style="left:(\d+)ch">([^<]+)</span>', html_out))
+    spans = list(
+        _re.finditer(r'<span class="acorde" style="left:(\d+)ch">([^<]+)</span>', html_out)
+    )
     acordes = [a for l in estructura for a in l.acordes]
     assert len(spans) == len(acordes)
-    for span, acorde in zip(spans, acordes):
-        assert int(span.group(1)) == acorde.posicion, \
-            f"{acorde.acorde}: esperado {acorde.posicion}, got {span.group(1)}"
+    for span, acorde in zip(spans, acordes, strict=False):
+        assert (
+            int(span.group(1)) == acorde.posicion
+        ), f"{acorde.acorde}: esperado {acorde.posicion}, got {span.group(1)}"
     print("✓ test_posicion_html_exacto pasado")
 
 
@@ -655,19 +692,21 @@ Voz que clama en el desierto:"""
     estructura = parser.parsear_cancion_completa(texto_ejemplo)
 
     print("=== ESTRUCTURA JSON ===")
-    print(json.dumps(
-        [
-            {
-                "tipo": l.tipo,
-                "acordes": [{"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes],
-                "letra": l.letra,
-                "texto": l.texto,
-            }
-            for l in estructura
-        ],
-        indent=2,
-        ensure_ascii=False,
-    ))
+    print(
+        json.dumps(
+            [
+                {
+                    "tipo": l.tipo,
+                    "acordes": [{"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes],
+                    "letra": l.letra,
+                    "texto": l.texto,
+                }
+                for l in estructura
+            ],
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
     print()
     print("=== TONO DETECTADO ===")
     print(parser.detectar_tono(estructura))

@@ -7,7 +7,6 @@ import logging
 import os
 import sqlite3
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ DB_PATH = DATA_DIR / "db.sqlite3"
 SCHEMA_PATH = DATA_DIR / "schema.sql"
 
 
-def create_connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
+def create_connection(db_path: Path | None = None) -> sqlite3.Connection:
     """Crea y configura una conexión SQLite lista para usar."""
     target = db_path or DB_PATH
     conn = sqlite3.connect(
@@ -71,7 +70,7 @@ def _ensure_schema_version(conn: sqlite3.Connection) -> None:
         )
 
 
-def init_database(db_path: Optional[Path] = None) -> None:
+def init_database(db_path: Path | None = None) -> None:
     """Inicializa la base de datos con el esquema, índices y control de versiones."""
     target = db_path or DB_PATH
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -198,12 +197,22 @@ def _create_default_indexes(conn: sqlite3.Connection) -> None:
     """Crea índices por defecto cuando no existe schema.sql."""
     with conn:
         conn.execute("CREATE INDEX IF NOT EXISTS idx_lecturas_fecha ON lecturas(fecha)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_canciones_momento ON canciones(momento_liturgico)")
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_canciones_momento ON canciones(momento_liturgico)"
+        )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_canciones_titulo ON canciones(titulo)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_presentaciones_fecha ON presentaciones(fecha_domingo)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_presentaciones_lectura ON presentaciones(lectura_id)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_comentarios_presentacion ON comentarios(presentacion_id)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_automation_log_agente_fecha ON automation_log(agente, fecha)")
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_presentaciones_fecha ON presentaciones(fecha_domingo)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_presentaciones_lectura ON presentaciones(lectura_id)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_comentarios_presentacion ON comentarios(presentacion_id)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_automation_log_agente_fecha ON automation_log(agente, fecha)"
+        )
 
 
 def _add_column_if_missing(
@@ -213,10 +222,7 @@ def _add_column_if_missing(
     tipo: str,
 ) -> None:
     """Añade una columna a una tabla si no existe (migración ligera)."""
-    cols = {
-        row["name"]
-        for row in conn.execute(f"PRAGMA table_info({tabla})").fetchall()
-    }
+    cols = {row["name"] for row in conn.execute(f"PRAGMA table_info({tabla})").fetchall()}
     if columna not in cols:
         conn.execute(f"ALTER TABLE {tabla} ADD COLUMN {columna} {tipo}")
         logger.info("Migración: añadida columna %s a %s", columna, tabla)
