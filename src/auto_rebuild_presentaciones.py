@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 MOMENTOS_CON_SLIDE = {
     "entrada",
-    "acto_penitencial",
+    "perdon",
     "gloria",
     "salmo",
     "aleluya",
@@ -41,7 +41,7 @@ MOMENTOS_CON_SLIDE = {
 
 MOMENTO_A_TITULO = {
     "entrada": "{titulo}",
-    "acto_penitencial": "{titulo}",
+    "perdon": "{titulo}",
     "gloria": "{titulo}",
     "salmo": "SALMO: {titulo}",
     "aleluya": "{titulo}",
