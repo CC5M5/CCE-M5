@@ -4,7 +4,6 @@ Scraper para las lecturas dominicales de ciudadredonda.org (backup de Koinonia).
 Extrae: Primera lectura, Salmo, Segunda lectura (si aplica), Evangelio
 """
 
-import logging
 import os
 import re
 import sqlite3
@@ -14,9 +13,9 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-# Configurar logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+from src.log_config import get_logger
+
+logger = get_logger(__name__)
 
 PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path(__file__).parent.parent.parent))
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"

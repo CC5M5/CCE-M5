@@ -3,12 +3,13 @@
 Gestor de base de datos SQLite para CCE-M5-Web-Presentaciones
 """
 
-import logging
 import os
 import sqlite3
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+from src.log_config import get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
 PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))
@@ -234,5 +235,4 @@ def get_connection() -> sqlite3.Connection:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     init_database()

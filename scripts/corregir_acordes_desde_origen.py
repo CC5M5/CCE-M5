@@ -19,7 +19,6 @@ from __future__ import annotations
 import argparse
 import html as html_module
 import json
-import logging
 import re
 import sqlite3
 import time
@@ -29,8 +28,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from src.parsers.acordes_parser_v3 import AcordesParser
+from src.log_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
@@ -279,10 +279,9 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=getattr(logging, args.log_level.upper(), logging.INFO),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
+    nivel = getattr(logging, args.log_level.upper(), logging.INFO)
+    logging.getLogger().setLevel(nivel)
+    logger.setLevel(nivel)
 
     conn = _get_connection()
     cursor = conn.cursor()
