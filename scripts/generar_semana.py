@@ -578,7 +578,7 @@ def generar_pptx(
     bundle_base_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        from src.generators.presentacion_html import GeneradorPresentacionHTML
+        from src.generators.presentacion.generador import GeneradorPresentacionHTML
 
         incluir_bendicion_agua = bool(canciones_ids.get("bendicion_agua"))
         gen = GeneradorPresentacionHTML(
