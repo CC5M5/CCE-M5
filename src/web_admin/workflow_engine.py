@@ -27,6 +27,7 @@ from src.generators.pdf_musicos import generar_hoja_musicos
 from src.matching_engine import MatchingEngine
 from src.scrapers.ciudadredonda_scraper import obtener_lecturas_ciudadredonda
 from src.scrapers.koinonia_scraper import KoinoniaScraper
+from src.constants import MOMENTOS_ES, MOMENTOS_KEY, MOMENTO_A_KEY
 from src.web_admin.config import BACKUPS_DIR, PROJECT_DIR
 from src.web_admin.database import (
     WORKFLOW_STEPS,
@@ -40,38 +41,6 @@ from src.web_admin.database import (
 )
 
 logger = logging.getLogger(__name__)
-
-MOMENTOS_ES = [
-    "Entrada",
-    "Perdón",
-    "Gloria",
-    "Salmo",
-    "Aleluya",
-    "Ofertorio",
-    "Santo",
-    "Padre Nuestro",
-    "Paz",
-    "Comunión",
-    "Canto a María",
-    "Despedida",
-]
-
-MOMENTOS_KEY = [
-    "entrada",
-    "perdon",
-    "gloria",
-    "salmo",
-    "aleluya",
-    "ofertorio",
-    "santo",
-    "padre_nuestro",
-    "paz",
-    "comunion",
-    "maria",
-    "despedida",
-]
-
-MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False))
 
 
 def _now() -> str:

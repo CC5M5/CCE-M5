@@ -36,6 +36,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from src.constants import MOMENTOS_ES, MOMENTOS_KEY, MOMENTO_A_KEY
 from src.db_manager import DB_PATH, get_connection
 from src.generators.pdf_musicos import CancionNoEncontradaError, generar_hoja_musicos
 
@@ -66,39 +67,6 @@ def _directorio_salida(modo: str) -> Path:
 def _estado_presentacion(modo: str) -> str:
     """Devuelve el estado de la presentación según el modo."""
     return "borrador" if modo == MODO_BORRADOR else "publicada"
-
-
-MOMENTOS_ES: list[str] = [
-    "Entrada",
-    "Perdón",
-    "Gloria",
-    "Salmo",
-    "Aleluya",
-    "Ofertorio",
-    "Santo",
-    "Padre Nuestro",
-    "Paz",
-    "Comunión",
-    "Canto a María",
-    "Despedida",
-]
-
-MOMENTOS_KEY: list[str] = [
-    "entrada",
-    "perdon",
-    "gloria",
-    "salmo",
-    "aleluya",
-    "ofertorio",
-    "santo",
-    "padre_nuestro",
-    "paz",
-    "comunion",
-    "maria",
-    "despedida",
-]
-
-MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False))
 
 
 # ---------------------------------------------------------------------------
