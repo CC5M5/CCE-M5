@@ -440,14 +440,14 @@ class CancioneroScraper:
             "estructura_json": json.dumps(
                 [
                     {
-                        "tipo": l.tipo,
+                        "tipo": linea.tipo,
                         "acordes": [
-                            {"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes
+                            {"acorde": a.acorde, "posicion": a.posicion} for a in linea.acordes
                         ],
-                        "letra": l.letra,
-                        "texto": l.texto,
+                        "letra": linea.letra,
+                        "texto": linea.texto,
                     }
-                    for l in estructura
+                    for linea in estructura
                 ],
                 ensure_ascii=False,
             ),

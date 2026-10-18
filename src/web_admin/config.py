@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Configuración del panel de administración."""
+
+from __future__ import annotations
 
 import logging
 import os

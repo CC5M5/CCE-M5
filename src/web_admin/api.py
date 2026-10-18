@@ -249,11 +249,14 @@ async def update_user_endpoint(
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     if payload.role is not None and payload.role not in ("admin", "viewer"):
         raise HTTPException(status_code=400, detail="Rol debe ser admin o viewer")
-    if target.role == "admin" and (payload.role == "viewer" or payload.is_active is False):
-        if count_admins() <= 1:
-            raise HTTPException(
-                status_code=409, detail="No se puede eliminar el último administrador activo"
-            )
+    if (
+        target.role == "admin"
+        and (payload.role == "viewer" or payload.is_active is False)
+        and count_admins() <= 1
+    ):
+        raise HTTPException(
+            status_code=409, detail="No se puede eliminar el último administrador activo"
+        )
     update_user(
         user_id,
         full_name=payload.full_name,

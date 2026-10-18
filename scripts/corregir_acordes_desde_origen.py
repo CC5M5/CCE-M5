@@ -19,8 +19,10 @@ from __future__ import annotations
 import argparse
 import html as html_module
 import json
+import logging
 import re
 import sqlite3
+import sys
 import time
 from pathlib import Path
 

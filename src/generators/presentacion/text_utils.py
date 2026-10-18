@@ -90,7 +90,7 @@ def _compactar_salmo_o_lectura(texto: str) -> str:
     if not texto:
         return ""
 
-    lineas = [l.strip() for l in texto.splitlines() if l.strip()]
+    lineas = [linea.strip() for linea in texto.splitlines() if linea.strip()]
     if not lineas:
         return ""
 
