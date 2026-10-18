@@ -16,6 +16,7 @@ Funcionalidades:
 - Duplicar diapositiva.
 - Al guardar: actualiza SQLite y hace git commit automático.
 """
+# ruff: noqa: E402
 
 from __future__ import annotations
 
@@ -142,28 +143,6 @@ def _listar_ilustraciones() -> list[str]:
         if isinstance(rutas, list):
             resultado.extend(rutas)
     return resultado
-
-
-# --- Momentos litúrgicos ---
-MOMENTOS_LITURGICOS = [
-    "entrada",
-    "acto penitencial",
-    "gloria",
-    "primera_lectura",
-    "salmo",
-    "segunda_lectura",
-    "aleluya",
-    "evangelio",
-    "credo",
-    "ofertorio",
-    "santo",
-    "padre_nuestro",
-    "paz",
-    "comunion",
-    "maria",
-    "despedida",
-    "general",
-]
 
 
 def _get_momentos_cancion(cancion_id: int) -> list[str]:
@@ -1021,6 +1000,22 @@ def _get_composicion_guardada(fecha: str) -> list[dict[str, Any]]:
     rows = [dict(r) for r in cursor.fetchall()]
     conn.close()
     return rows
+
+
+def _proponer_composicion(fecha: str) -> list[dict[str, Any]]:
+    """Propone una composición por defecto para la presentación de una fecha."""
+    return proponer_composicion(fecha) or []
+
+
+def _formatear_fecha_preview(fecha: str) -> str:
+    """Formatea la fecha para mostrar en la preview de portada."""
+    try:
+        from datetime import datetime
+
+        dt = datetime.strptime(fecha, "%Y-%m-%d")
+        return dt.strftime("%A %d de %B de %Y").capitalize()
+    except ValueError:
+        return fecha
 
 
 @app.route("/presentaciones/")
