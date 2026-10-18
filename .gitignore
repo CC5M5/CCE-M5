@@ -1,3 +1,9 @@
+# Metadata de setuptools editable install
+src/*.egg-info/
+
+# Snapshots manuales guardados fuera del repo principal
+archive/data-snapshots/
+
 # Archivos temporales SQLite
 *.sqlite3-shm
 *.sqlite3-wal
