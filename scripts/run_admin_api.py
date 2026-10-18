@@ -29,7 +29,7 @@ def main() -> None:
 
     init_admin_schema()
     print(f"API de administración en http://{args.host}:{args.port}")
-    print(f"Usuario por defecto: {DEFAULT_ADMIN_USERNAME} / {DEFAULT_ADMIN_PASSWORD}")
+    print(f"Usuario por defecto: {DEFAULT_ADMIN_USERNAME}")
     print("⚠️  Cambia la contraseña en producción con CCE_ADMIN_DEFAULT_PASSWORD")
 
     uvicorn.run(
