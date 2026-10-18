@@ -7,13 +7,14 @@ futuras que usen esa canción en su asignación.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import re
 import sqlite3
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from src.generators.composicion_catalogo import guardar_composicion, proponer_composicion
 from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
@@ -24,8 +25,18 @@ DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 logger = logging.getLogger(__name__)
 
 MOMENTOS_CON_SLIDE = {
-    "entrada", "acto_penitencial", "gloria", "salmo", "aleluya",
-    "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida",
+    "entrada",
+    "acto_penitencial",
+    "gloria",
+    "salmo",
+    "aleluya",
+    "ofertorio",
+    "santo",
+    "padre_nuestro",
+    "paz",
+    "comunion",
+    "maria",
+    "despedida",
 }
 
 MOMENTO_A_TITULO = {
@@ -50,7 +61,9 @@ def _get_connection() -> sqlite3.Connection:
     return conn
 
 
-def _limpiar_letra(html_visual: Optional[str], letra_sin_acordes: Optional[str], letra_con_acordes: Optional[str]) -> str:
+def _limpiar_letra(
+    html_visual: str | None, letra_sin_acordes: str | None, letra_con_acordes: str | None
+) -> str:
     """Devuelve la letra limpia para el contenido de una slide."""
     if html_visual:
         return re.sub(r"<[^>]+?>", "", html_visual)
@@ -61,7 +74,7 @@ def _limpiar_letra(html_visual: Optional[str], letra_sin_acordes: Optional[str],
     return ""
 
 
-def crear_slides_para_cancion(cancion_id: int) -> List[Tuple[str, int]]:
+def crear_slides_para_cancion(cancion_id: int) -> list[tuple[str, int]]:
     """Crea slides `cancion_<id>` para los momentos litúrgicos de la canción.
 
     Devuelve la lista de (momento, slide_id) creados o ya existentes.
@@ -89,7 +102,7 @@ def crear_slides_para_cancion(cancion_id: int) -> List[Tuple[str, int]]:
     )
     momentos = [r["momento_liturgico"] for r in cursor.fetchall()]
 
-    creados: List[Tuple[str, int]] = []
+    creados: list[tuple[str, int]] = []
     for momento in momentos:
         # Normalizar variantes de clave
         momento_norm = "perdon" if momento == "acto_penitencial" else momento
@@ -122,7 +135,7 @@ def crear_slides_para_cancion(cancion_id: int) -> List[Tuple[str, int]]:
     return creados
 
 
-def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
+def _canciones_asignadas(canciones_json: str | None) -> dict[str, int]:
     """Devuelve {momento: cancion_id} desde el JSON de la presentación."""
     if not canciones_json:
         return {}
@@ -133,26 +146,24 @@ def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
         return {}
     if not isinstance(data, dict):
         return {}
-    resultado: Dict[str, int] = {}
+    resultado: dict[str, int] = {}
     for momento, info in data.items():
         if info is None:
             continue
         if isinstance(info, dict) and "id" in info:
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 resultado[momento] = int(info["id"])
-            except (ValueError, TypeError):
-                pass
         elif isinstance(info, int):
             resultado[momento] = info
         elif isinstance(info, str):
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 resultado[momento] = int(info)
-            except (ValueError, TypeError):
-                pass
     return resultado
 
 
-def encontrar_presentaciones_afectadas(cancion_id: int, solo_futuras: bool = True) -> List[Dict[str, Any]]:
+def encontrar_presentaciones_afectadas(
+    cancion_id: int, solo_futuras: bool = True
+) -> list[dict[str, Any]]:
     """Busca presentaciones cuya asignación incluya la canción."""
     conn = _get_connection()
     cursor = conn.cursor()
@@ -176,7 +187,7 @@ def encontrar_presentaciones_afectadas(cancion_id: int, solo_futuras: bool = Tru
     return afectadas
 
 
-def regenerar_presentacion(fecha: str) -> Dict[str, str]:
+def regenerar_presentacion(fecha: str) -> dict[str, str]:
     """Regenera composición y bundle para una presentación."""
     items = proponer_composicion(fecha)
     if not items:
@@ -202,7 +213,7 @@ def regenerar_presentacion(fecha: str) -> Dict[str, str]:
     return {"status": "ok", "slides": len(items)}
 
 
-def auto_rebuild_tras_cancion(cancion_id: int, solo_futuras: bool = True) -> Dict[str, Any]:
+def auto_rebuild_tras_cancion(cancion_id: int, solo_futuras: bool = True) -> dict[str, Any]:
     """Punto de entrada principal: crea slides y regenera presentaciones afectadas."""
     slides = crear_slides_para_cancion(cancion_id)
     presentaciones = encontrar_presentaciones_afectadas(cancion_id, solo_futuras=solo_futuras)

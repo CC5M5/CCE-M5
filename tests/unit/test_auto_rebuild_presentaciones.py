@@ -9,8 +9,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 
 
@@ -44,8 +42,12 @@ def _create_db(conn: sqlite3.Connection) -> None:
             FOREIGN KEY (cancion_id) REFERENCES canciones(id) ON DELETE CASCADE
         )
     """)
-    c.execute("CREATE INDEX IF NOT EXISTS idx_cancion_momentos_cancion ON cancion_momentos(cancion_id)")
-    c.execute("CREATE INDEX IF NOT EXISTS idx_cancion_momentos_momento ON cancion_momentos(momento_liturgico)")
+    c.execute(
+        "CREATE INDEX IF NOT EXISTS idx_cancion_momentos_cancion ON cancion_momentos(cancion_id)"
+    )
+    c.execute(
+        "CREATE INDEX IF NOT EXISTS idx_cancion_momentos_momento ON cancion_momentos(momento_liturgico)"
+    )
     c.execute("""
         CREATE TABLE IF NOT EXISTS schema_version (
             version INTEGER PRIMARY KEY,
@@ -75,7 +77,9 @@ def _insert_cancion(conn: sqlite3.Connection, titulo: str, momentos: list[str]) 
     return cid
 
 
-def _insert_presentacion(conn: sqlite3.Connection, fecha: str, canciones: dict, lectura_id: int = 1) -> int:
+def _insert_presentacion(
+    conn: sqlite3.Connection, fecha: str, canciones: dict, lectura_id: int = 1
+) -> int:
     c = conn.cursor()
     c.execute(
         "INSERT INTO presentaciones (fecha_domingo, lectura_id, estado, canciones_json) VALUES (?, ?, ?, ?)",
@@ -129,6 +133,7 @@ def test_crear_slides_para_cancion():
             Path(tmp.name),
         ):
             from src.auto_rebuild_presentaciones import crear_slides_para_cancion
+
             slides = crear_slides_para_cancion(cid)
 
         assert len(slides) == 2
@@ -160,6 +165,7 @@ def test_encontrar_presentaciones_afectadas():
             Path(tmp.name),
         ):
             from src.auto_rebuild_presentaciones import encontrar_presentaciones_afectadas
+
             afectadas = encontrar_presentaciones_afectadas(cid, solo_futuras=True)
 
         assert len(afectadas) == 1
@@ -179,6 +185,7 @@ def test_crear_slides_para_cancion_con_salmo():
             Path(tmp.name),
         ):
             from src.auto_rebuild_presentaciones import crear_slides_para_cancion
+
             slides = crear_slides_para_cancion(cid)
 
         assert len(slides) == 1

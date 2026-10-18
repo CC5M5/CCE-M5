@@ -58,9 +58,9 @@ def test_secciones_intro_estrofa_puente():
     parser = _crear_parser()
     estructura = parser.parsear_cancion_completa(texto)
 
-    tipos = [l.tipo for l in estructura]
+    tipos = [item.tipo for item in estructura]
     assert "sección" in tipos
-    textos_seccion = [l.texto for l in estructura if l.tipo == "sección"]
+    textos_seccion = [item.texto for item in estructura if item.tipo == "sección"]
     assert "[Intro]" in textos_seccion
     assert "[Estrofa]" in textos_seccion
     assert "[Puente]" in textos_seccion
@@ -68,7 +68,11 @@ def test_secciones_intro_estrofa_puente():
 
     # La línea con etiqueta 'Puente:' debe emparejar acordes + letra.
     bloque_puente = next(
-        (l for l in estructura if l.tipo == "acordes_letra" and "Re7" in [a.acorde for a in l.acordes]),
+        (
+            item
+            for item in estructura
+            if item.tipo == "acordes_letra" and "Re7" in [a.acorde for a in item.acordes]
+        ),
         None,
     )
     assert bloque_puente is not None
@@ -81,8 +85,8 @@ def test_repeticiones_x2():
     parser = _crear_parser()
     estructura = parser.parsear_cancion_completa(texto)
 
-    assert any(l.tipo == "acordes_letra" for l in estructura)
-    linea = next(l for l in estructura if l.tipo == "acordes_letra")
+    assert any(item.tipo == "acordes_letra" for item in estructura)
+    linea = next(item for item in estructura if item.tipo == "acordes_letra")
     nombres = [a.acorde for a in linea.acordes]
     assert "Do" in nombres
     assert "Fa" in nombres
@@ -95,8 +99,8 @@ def test_notas_al_pie():
     parser = _crear_parser()
     estructura = parser.parsear_cancion_completa(texto)
 
-    lineas_letra = [l for l in estructura if l.tipo == "letra"]
-    assert any("Nota:" in l.letra for l in lineas_letra)
+    lineas_letra = [item for item in estructura if item.tipo == "letra"]
+    assert any("Nota:" in item.letra for item in lineas_letra)
 
 
 def test_conversion_html_visual():

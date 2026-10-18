@@ -13,14 +13,14 @@ Lógica:
 Uso:
     python3 scripts/importar_slides_catalogo.py
 """
+
 import json
-import sqlite3
 import re
+import sqlite3
 import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
@@ -29,16 +29,40 @@ SCHEMA_PATH = PROJECT_DIR / "data" / "schema_slides.sql"
 
 # Tipos canónicos reconocidos (deben coincidir con schema_slides.sql)
 TIPOS_CANONICOS = {
-    "portada", "entrada", "paso", "perdon", "gloria", "transicion_palabra",
-    "primera_lectura", "salmo", "segunda_lectura", "aleluya", "evangelio",
-    "transicion_eucaristia", "credo", "ofertorio", "santo", "padre_nuestro",
-    "paz", "comunion", "maria", "despedida",
+    "portada",
+    "entrada",
+    "paso",
+    "perdon",
+    "gloria",
+    "transicion_palabra",
+    "primera_lectura",
+    "salmo",
+    "segunda_lectura",
+    "aleluya",
+    "evangelio",
+    "transicion_eucaristia",
+    "credo",
+    "ofertorio",
+    "santo",
+    "padre_nuestro",
+    "paz",
+    "comunion",
+    "maria",
+    "despedida",
 }
 
 # Tipos que son siempre momentos musicales y deben buscar canción
 TIPOS_MUSICALES = {
-    "entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro",
-    "paz", "comunion", "maria", "despedida",
+    "entrada",
+    "gloria",
+    "aleluya",
+    "ofertorio",
+    "santo",
+    "padre_nuestro",
+    "paz",
+    "comunion",
+    "maria",
+    "despedida",
 }
 
 # Orden canónico de momentos en una presentación, con los pasos de transición
@@ -46,16 +70,16 @@ TIPOS_MUSICALES = {
 ORDEN_MOMENTOS = [
     ("portada", None),
     ("entrada", None),
-    ("transicion_palabra", None),             # Liturgia de la Palabra (texto)
+    ("transicion_palabra", None),  # Liturgia de la Palabra (texto)
     ("perdon", None),
-    ("paso", "transicion_gloria"),             # paso neutro antes del gloria
+    ("paso", "transicion_gloria"),  # paso neutro antes del gloria
     ("gloria", None),
     ("primera_lectura", None),
     ("salmo", None),
     ("segunda_lectura", None),
     ("aleluya", None),
     ("evangelio", None),
-    ("transicion_eucaristia", None),            # Liturgia Eucarística (texto)
+    ("transicion_eucaristia", None),  # Liturgia Eucarística (texto)
     ("credo", None),
     ("paso", "transicion_ofertorio"),
     ("ofertorio", None),
@@ -71,7 +95,7 @@ ORDEN_MOMENTOS = [
     ("maria", None),
     ("paso", "transicion_despedida"),
     ("despedida", None),
-    ("portada", "despedida"),                   # slide final ¡Id en paz!
+    ("portada", "despedida"),  # slide final ¡Id en paz!
 ]
 
 # Slides con texto fijo litúrgico que queremos como base única
@@ -120,7 +144,7 @@ def _aplicar_schema():
     if not SCHEMA_PATH.exists():
         raise FileNotFoundError(f"No existe {SCHEMA_PATH}")
     conn = _get_connection()
-    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(SCHEMA_PATH, encoding="utf-8") as f:
         conn.executescript(f.read())
     conn.commit()
     conn.close()
@@ -175,7 +199,7 @@ def _leer_presentaciones():
         json_files = list(bundle_dir.glob("*_presentacion.json"))
         if not json_files:
             continue
-        with open(json_files[0], "r", encoding="utf-8") as f:
+        with open(json_files[0], encoding="utf-8") as f:
             data = json.load(f)
         data["_ruta"] = str(bundle_dir)
         bundles.append(data)
@@ -273,7 +297,19 @@ def _registrar_presentacion_slide(
         (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento),
+        (
+            presentacion_id,
+            slide_id,
+            numero,
+            tipo,
+            subtipo,
+            titulo,
+            contenido,
+            cita,
+            subtitulo,
+            imagen,
+            momento,
+        ),
     )
     conn.commit()
 
@@ -311,13 +347,13 @@ def _slide_por_tipo_y_subtipo(conn: sqlite3.Connection, tipo: str, subtipo: str)
     return row["id"] if row else None
 
 
-def _construir_orden_con_pasos(slides_originales: List[dict]) -> List[dict]:
+def _construir_orden_con_pasos(slides_originales: list[dict]) -> list[dict]:
     """
     Toma las slides de una presentación histórica y devuelve el orden canónico
     con diapositivas de paso insertadas según ORDEN_MOMENTOS.
     """
     # Indexar slides originales por tipo (y subtipo para portada/despedida)
-    by_tipo: Dict[str, List[dict]] = defaultdict(list)
+    by_tipo: dict[str, list[dict]] = defaultdict(list)
     for s in slides_originales:
         tipo = s.get("tipo", "")
         titulo = s.get("titulo", "").strip().upper()
@@ -329,37 +365,51 @@ def _construir_orden_con_pasos(slides_originales: List[dict]) -> List[dict]:
 
     # Asegurar que las transiciones litúrgicas existen como base canónica
     for trans_tipo, trans_titulo, trans_contenido, trans_imagen in [
-        ("transicion_palabra", "LITURGIA DE LA PALABRA", "Escuchemos la Palabra de Dios", "assets/20140961.jpg"),
-        ("transicion_eucaristia", "LITURGIA EUCARÍSTICA", "Preparémonos para la mesa del Señor", "assets/20140959.jpg"),
+        (
+            "transicion_palabra",
+            "LITURGIA DE LA PALABRA",
+            "Escuchemos la Palabra de Dios",
+            "assets/20140961.jpg",
+        ),
+        (
+            "transicion_eucaristia",
+            "LITURGIA EUCARÍSTICA",
+            "Preparémonos para la mesa del Señor",
+            "assets/20140959.jpg",
+        ),
     ]:
         if not by_tipo.get(trans_tipo):
-            by_tipo[trans_tipo].append({
-                "tipo": trans_tipo,
-                "subtipo": "general",
-                "titulo": trans_titulo,
-                "contenido": trans_contenido,
-                "cita": "",
-                "subtitulo": "",
-                "imagen": trans_imagen,
-                "momento": "",
-            })
+            by_tipo[trans_tipo].append(
+                {
+                    "tipo": trans_tipo,
+                    "subtipo": "general",
+                    "titulo": trans_titulo,
+                    "contenido": trans_contenido,
+                    "cita": "",
+                    "subtitulo": "",
+                    "imagen": trans_imagen,
+                    "momento": "",
+                }
+            )
 
-    resultado: List[dict] = []
+    resultado: list[dict] = []
     for tipo_req, subtipo_req in ORDEN_MOMENTOS:
         if tipo_req == "paso":
             # Insertar slide de paso neutra
-            resultado.append({
-                "tipo": "paso",
-                "subtipo": f"paso_{subtipo_req}",
-                "titulo": "",
-                "contenido": "",
-                "cita": "",
-                "subtitulo": "",
-                "imagen": PASO_IMAGEN_DEFAULT,
-                "momento": "",
-                "_es_paso": True,
-                "_paso_etiqueta": subtipo_req,
-            })
+            resultado.append(
+                {
+                    "tipo": "paso",
+                    "subtipo": f"paso_{subtipo_req}",
+                    "titulo": "",
+                    "contenido": "",
+                    "cita": "",
+                    "subtitulo": "",
+                    "imagen": PASO_IMAGEN_DEFAULT,
+                    "momento": "",
+                    "_es_paso": True,
+                    "_paso_etiqueta": subtipo_req,
+                }
+            )
         elif tipo_req == "portada" and subtipo_req == "despedida":
             slide = by_tipo.get("portada_despedida", [None])[0]
             if slide:
@@ -401,7 +451,7 @@ def main():
     for data in presentaciones:
         meta = data.get("meta", {})
         fecha = meta.get("fecha")
-        color = (meta.get("color_liturgico") or "verde").lower()
+        (meta.get("color_liturgico") or "verde").lower()
         if not fecha:
             print("WARNING: presentación sin fecha, se omite.", file=sys.stderr)
             continue
@@ -409,7 +459,9 @@ def main():
         presentacion_id = _presentacion_id_por_fecha(conn, fecha)
         slides_originales = data.get("slides", [])
         slides_ordenadas = _construir_orden_con_pasos(slides_originales)
-        print(f"Procesando {fecha} ({len(slides_originales)} originales -> {len(slides_ordenadas)} con pasos)...")
+        print(
+            f"Procesando {fecha} ({len(slides_originales)} originales -> {len(slides_ordenadas)} con pasos)..."
+        )
 
         for numero, slide in enumerate(slides_ordenadas, start=1):
             tipo = slide.get("tipo", "")
@@ -426,8 +478,18 @@ def main():
                 slide_id = _insertar_paso_base(conn, etiqueta, imagen)
                 pasos_vistos.add(subtipo)
                 _registrar_presentacion_slide(
-                    conn, presentacion_id, slide_id, numero, "paso", subtipo,
-                    titulo, contenido, cita, subtitulo, imagen, momento,
+                    conn,
+                    presentacion_id,
+                    slide_id,
+                    numero,
+                    "paso",
+                    subtipo,
+                    titulo,
+                    contenido,
+                    cita,
+                    subtitulo,
+                    imagen,
+                    momento,
                 )
                 stats["pasos"] += 1
                 continue
@@ -437,17 +499,17 @@ def main():
                 continue
 
             tipo_resuelto, subtipo = _extraer_subtipo_fijo(titulo, tipo)
-            es_cancion = False
             cancion_id = None
 
             # Resolver canciones para tipos musicales
             if tipo_resuelto in TIPOS_MUSICALES and not subtipo:
                 cancion = _buscar_cancion_por_titulo(conn, titulo)
                 if cancion:
-                    es_cancion = True
                     cancion_id = cancion["id"]
                     subtipo = f"cancion_{cancion_id}"
-                    contenido_base = cancion["letra_sin_acordes"] or cancion["letra_con_acordes"] or contenido
+                    contenido_base = (
+                        cancion["letra_sin_acordes"] or cancion["letra_con_acordes"] or contenido
+                    )
                     titulo_base = cancion["titulo"] or titulo
                     stats["canciones"] += 1
                 else:
@@ -461,11 +523,29 @@ def main():
                 stats["fijos"] += 1
 
             slide_id = _insertar_slide_base(
-                conn, tipo_resuelto, subtipo, titulo_base, contenido_base, cita, subtitulo, imagen, ""
+                conn,
+                tipo_resuelto,
+                subtipo,
+                titulo_base,
+                contenido_base,
+                cita,
+                subtitulo,
+                imagen,
+                "",
             )
             _registrar_presentacion_slide(
-                conn, presentacion_id, slide_id, numero, tipo_resuelto, subtipo,
-                titulo, contenido, cita, subtitulo, imagen, momento,
+                conn,
+                presentacion_id,
+                slide_id,
+                numero,
+                tipo_resuelto,
+                subtipo,
+                titulo,
+                contenido,
+                cita,
+                subtitulo,
+                imagen,
+                momento,
             )
 
     # Normalizar es_default: solo una por (tipo, subtipo)

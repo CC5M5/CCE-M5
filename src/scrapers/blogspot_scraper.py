@@ -12,7 +12,7 @@ import re
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import unquote, urljoin, urlparse
 
 import requests
@@ -49,14 +49,13 @@ def detectar_momento_liturgico(texto: str) -> str:
 
 
 # Configurar logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Configuracion con variable de entorno
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"))
+PROJECT_DIR = Path(
+    os.environ.get("CCE_PROJECT_DIR", Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones")
+)
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 DEFAULT_BASE_URL = "https://ccem5music.blogspot.com/p/cancionero-escolapio.html"
 DEFAULT_ALLOWED_HOSTS = {"ccem5music.blogspot.com"}
@@ -65,27 +64,39 @@ MAX_RESPONSE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 # User-Agent rotativo para evitar bloqueos
 USER_AGENTS = [
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 ]
 
 # Atributos/eventos peligrosos a eliminar para sanitizacion visual
-DANGEROUS_ATTRS_RE = re.compile(r'^(on|style|formaction|xlink:href|data|xmlns)', re.IGNORECASE)
-DANGEROUS_TAGS = {'script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea'}
+DANGEROUS_ATTRS_RE = re.compile(r"^(on|style|formaction|xlink:href|data|xmlns)", re.IGNORECASE)
+DANGEROUS_TAGS = {
+    "script",
+    "style",
+    "iframe",
+    "object",
+    "embed",
+    "form",
+    "input",
+    "button",
+    "textarea",
+}
 
 
-def _normalizar_url(url: str, base_url: str = DEFAULT_BASE_URL, allowed_hosts: set = DEFAULT_ALLOWED_HOSTS) -> Optional[str]:
+def _normalizar_url(
+    url: str, base_url: str = DEFAULT_BASE_URL, allowed_hosts: set = DEFAULT_ALLOWED_HOSTS
+) -> str | None:
     url_completa = urljoin(base_url, url)
     parsed = urlparse(url_completa)
-    if parsed.scheme not in ('https', 'http'):
+    if parsed.scheme not in ("https", "http"):
         return None
-    netloc = parsed.netloc.lower().replace('www.', '')
+    netloc = parsed.netloc.lower().replace("www.", "")
     if netloc not in allowed_hosts:
         return None
     path = unquote(parsed.path)
     url_normalizada = f"https://{netloc}{path}"
-    return url_normalizada.split('#')[0].split('?')[0].rstrip('/')
+    return url_normalizada.split("#")[0].split("?")[0].rstrip("/")
 
 
 def _sanitize_html_visual(soup: BeautifulSoup) -> str:
@@ -99,24 +110,30 @@ def _sanitize_html_visual(soup: BeautifulSoup) -> str:
     return str(soup)
 
 
-
-
 def _limpiar_metadata_betania(soup: BeautifulSoup) -> None:
     """Elimina enlaces de metadata (escuchar, volver a lista, etc.)."""
-    for a in soup.find_all('a'):
+    for a in soup.find_all("a"):
         t = a.get_text(strip=True).lower()
-        if t in ('escuchar', '/', 'volver a lista de canciones', 'volver a lista',
-                 'volver lista de canciones', 'volver lista', 'version en castellano',
-                 'version en español', 'version en ingles'):
+        if t in (
+            "escuchar",
+            "/",
+            "volver a lista de canciones",
+            "volver a lista",
+            "volver lista de canciones",
+            "volver lista",
+            "version en castellano",
+            "version en español",
+            "version en ingles",
+        ):
             a.decompose()
 
 
 def _es_span_acorde(tag) -> bool:
     """Detecta spans de acordes por color rojo (#c00000)."""
-    if tag.name != 'span':
+    if tag.name != "span":
         return False
-    style = tag.get('style', '')
-    return '#c00000' in style or '#C00000' in style or 'color: red' in style.lower()
+    style = tag.get("style", "")
+    return "#c00000" in style or "#C00000" in style or "color: red" in style.lower()
 
 
 def _es_linea_de_acordes(texto: str) -> bool:
@@ -124,14 +141,14 @@ def _es_linea_de_acordes(texto: str) -> bool:
     texto = texto.strip()
     if not texto:
         return False
-    acorde_re = re.compile(r'^[A-G](b|#)?(m|M|maj|min|dim|aug|sus|add)?\d*(/[A-G](b|#)?)?$')
+    acorde_re = re.compile(r"^[A-G](b|#)?(m|M|maj|min|dim|aug|sus|add)?\d*(/[A-G](b|#)?)?$")
     tokens = separar_acordes_pegados(texto).split()
     if not tokens:
         return False
     return all(acorde_re.match(t) for t in tokens)
 
 
-ACORDE_TOKEN_RE = re.compile(r'([A-G])(#|b)?(m|M|maj|min|dim|aug|sus|add)?(\d+)?(/[A-G](#|b)?)?')
+ACORDE_TOKEN_RE = re.compile(r"([A-G])(#|b)?(m|M|maj|min|dim|aug|sus|add)?(\d+)?(/[A-G](#|b)?)?")
 
 
 def separar_acordes_pegados(texto: str) -> str:
@@ -141,18 +158,18 @@ def separar_acordes_pegados(texto: str) -> str:
     last_end = 0
     for m in ACORDE_TOKEN_RE.finditer(texto):
         if m.start() > last_end:
-            inter = texto[last_end:m.start()]
+            inter = texto[last_end : m.start()]
             # Si entre dos acordes solo hay espacios, mantener un espacio
-            if inter.strip() == '':
-                partes.append(' ')
+            if inter.strip() == "":
+                partes.append(" ")
             else:
                 partes.append(inter)
         partes.append(m.group(0))
         last_end = m.end()
     if last_end < len(texto):
         partes.append(texto[last_end:])
-    resultado = ''.join(partes).strip()
-    return re.sub(r'\s+', ' ', resultado)
+    resultado = "".join(partes).strip()
+    return re.sub(r"\s+", " ", resultado)
 
 
 def _extraer_texto_betania(post_body) -> str:
@@ -165,15 +182,15 @@ def _extraer_texto_betania(post_body) -> str:
     _limpiar_metadata_betania(post_body)
 
     lineas: list[tuple[str, bool]] = []
-    bloque_tags = ('div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span')
+    bloque_tags = ("div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "span")
 
     for elem in post_body.find_all(bloque_tags):
-        text = elem.get_text('\n').strip()
-        text = re.sub(r'\s+', ' ', text)
+        text = elem.get_text("\n").strip()
+        text = re.sub(r"\s+", " ", text)
         if not text:
             continue
         # Detect chord block: red span inside, or line made of chords
-        has_red_span = any(_es_span_acorde(span) for span in elem.find_all('span'))
+        has_red_span = any(_es_span_acorde(span) for span in elem.find_all("span"))
         is_chord = has_red_span or _es_linea_de_acordes(text)
         # If it's a chord block, normalize spacing
         if is_chord:
@@ -205,40 +222,42 @@ def _extraer_texto_betania(post_body) -> str:
             while j < len(lineas_dedup) and not lineas_dedup[j][1]:
                 letra_lines.append(lineas_dedup[j][0])
                 j += 1
-            bloques.append('\n'.join(acordes_lines))
-            bloques.append('\n'.join(letra_lines))
+            bloques.append("\n".join(acordes_lines))
+            bloques.append("\n".join(letra_lines))
             i = j
         else:
             bloques.append(texto)
             i += 1
 
-    return '\n'.join(bloques)
+    return "\n".join(bloques)
 
 
 class CancioneroScraper:
     """Scraper robusto para el cancionero escolapio con reintentos y validacion."""
 
-    def __init__(self, base_url: str = DEFAULT_BASE_URL, allowed_hosts: set = None, fuente: str = None) -> None:
+    def __init__(
+        self, base_url: str = DEFAULT_BASE_URL, allowed_hosts: set = None, fuente: str = None
+    ) -> None:
         self.base_url = base_url
         parsed = urlparse(base_url)
-        self.allowed_hosts = allowed_hosts or {parsed.netloc.lower().replace('www.', '')}
-        self.fuente = fuente or parsed.netloc.lower().replace('www.', '')
+        self.allowed_hosts = allowed_hosts or {parsed.netloc.lower().replace("www.", "")}
+        self.fuente = fuente or parsed.netloc.lower().replace("www.", "")
         self.session = requests.Session()
         retry = Retry(
             total=5,
             backoff_factor=0.5,
             status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods={"HEAD", "GET"}
+            allowed_methods={"HEAD", "GET"},
         )
         adapter = HTTPAdapter(max_retries=retry)
-        self.session.mount('https://', adapter)
+        self.session.mount("https://", adapter)
 
         self.db_path = DB_PATH
-        self.db: Optional[sqlite3.Connection] = None
+        self.db: sqlite3.Connection | None = None
         self._init_db()
         self._progress: dict[str, Any] = self._load_progress()
 
-    def __enter__(self) -> 'CancioneroScraper':
+    def __enter__(self) -> "CancioneroScraper":
         if self.db is None or self.db.total_changes < 0:
             self.db = self._open_connection()
         return self
@@ -260,7 +279,7 @@ class CancioneroScraper:
         os.makedirs(self.db_path.parent, exist_ok=True)
         self.db = self._open_connection()
         try:
-            self.db.execute('''
+            self.db.execute("""
                 CREATE TABLE IF NOT EXISTS canciones (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     titulo TEXT NOT NULL,
@@ -274,7 +293,7 @@ class CancioneroScraper:
                     momento_liturgico TEXT,
                     fuente TEXT
                 )
-            ''')
+            """)
             self.db.commit()
             logger.info("Base de datos inicializada con WAL mode")
         except sqlite3.Error:
@@ -284,24 +303,24 @@ class CancioneroScraper:
     def _load_progress(self) -> dict[str, Any]:
         if PROGRESS_PATH.exists():
             try:
-                with open(PROGRESS_PATH, 'r', encoding='utf-8') as f:
+                with open(PROGRESS_PATH, encoding="utf-8") as f:
                     return json.load(f)
             except (json.JSONDecodeError, OSError):
                 logger.exception("Error cargando progreso previo")
-        return {'procesadas': [], 'fallidas': []}
+        return {"procesadas": [], "fallidas": []}
 
     def _save_progress(self) -> None:
         os.makedirs(PROGRESS_PATH.parent, exist_ok=True)
-        with open(PROGRESS_PATH, 'w', encoding='utf-8') as f:
+        with open(PROGRESS_PATH, "w", encoding="utf-8") as f:
             json.dump(self._progress, f, ensure_ascii=False, indent=2)
 
-    def _get_page(self, url: str) -> Optional[bytes]:
-        headers = {'User-Agent': random.choice(USER_AGENTS)}
+    def _get_page(self, url: str) -> bytes | None:
+        headers = {"User-Agent": random.choice(USER_AGENTS)}
         try:
             response = self.session.get(url, headers=headers, timeout=15, stream=True)
             response.raise_for_status()
             response.raise_for_status()
-            content = b''
+            content = b""
             for chunk in response.iter_content(chunk_size=8192):
                 content += chunk
                 if len(content) > MAX_RESPONSE_SIZE:
@@ -314,12 +333,12 @@ class CancioneroScraper:
 
     def extraer_enlaces_canciones(self, html_bytes: bytes) -> list[dict[str, str]]:
         base_url = self.base_url
-        soup = BeautifulSoup(html_bytes, 'lxml')
+        soup = BeautifulSoup(html_bytes, "lxml")
         canciones: list[dict[str, str]] = []
         seen_urls: set[str] = set()
 
-        for enlace in soup.find_all('a', href=True):
-            href = enlace['href']
+        for enlace in soup.find_all("a", href=True):
+            href = enlace["href"]
             texto = enlace.get_text(strip=True)
 
             if not texto or len(texto) <= 2:
@@ -331,59 +350,58 @@ class CancioneroScraper:
 
             parsed = urlparse(url_normalizada)
             # Blogspot posts: /p/ slug (static page) or /YYYY/MM/slug.html (post)
-            if not ('/p/' in parsed.path or re.search(r'/20\d{2}/\d{2}/', parsed.path)):
+            if not ("/p/" in parsed.path or re.search(r"/20\d{2}/\d{2}/", parsed.path)):
                 continue
 
-            if url_normalizada == self.base_url or '/cancionero-escolapio' in parsed.path:
+            if url_normalizada == self.base_url or "/cancionero-escolapio" in parsed.path:
                 continue
 
             if url_normalizada in seen_urls:
                 continue
 
             seen_urls.add(url_normalizada)
-            canciones.append({
-                'titulo': texto,
-                'url': url_normalizada
-            })
+            canciones.append({"titulo": texto, "url": url_normalizada})
 
         logger.info(f"Encontradas {len(canciones)} canciones validas")
         return canciones
 
-    def obtener_cancion(self, url: str) -> Optional[dict[str, Any]]:
+    def obtener_cancion(self, url: str) -> dict[str, Any] | None:
         html_bytes = self._get_page(url)
         if not html_bytes:
             return None
 
         try:
-            soup = BeautifulSoup(html_bytes, 'lxml')
+            soup = BeautifulSoup(html_bytes, "lxml")
         except (ValueError, TypeError) as exc:
             logger.exception("Error parseando HTML de %s: %s", url, exc)
             return None
 
-        post_body = soup.find('div', class_='post-body') or soup.find('div', class_='entry-content')
+        post_body = soup.find("div", class_="post-body") or soup.find("div", class_="entry-content")
         if not post_body:
             logger.warning(f"No se encontro contenido en {url}")
             return None
 
-        titulo_h1 = soup.find('h1', class_='post-title')
+        titulo_h1 = soup.find("h1", class_="post-title")
         titulo_pagina = titulo_h1.get_text(strip=True) if titulo_h1 else None
 
         # Copia para sanitizar HTML visual
-        visual_soup = BeautifulSoup(str(post_body), 'lxml')
+        visual_soup = BeautifulSoup(str(post_body), "lxml")
         html_visual = _sanitize_html_visual(visual_soup)
         html_original = str(post_body)
 
-        for tag in post_body.find_all(['script', 'style', 'nav', 'footer', 'aside', 'iframe']):
+        for tag in post_body.find_all(["script", "style", "nav", "footer", "aside", "iframe"]):
             tag.decompose()
 
-        texto_completo = post_body.get_text('\n').strip()
+        texto_completo = post_body.get_text("\n").strip()
 
         if not texto_completo or len(texto_completo) < 20:
             logger.warning(f"Cancion sin contenido suficiente en {url}")
             return None
 
         # Detect Betania-style posts (red chord spans)
-        tiene_acordes_rojos = bool(post_body.find('span', style=re.compile(r'color:\s*#c00000', re.IGNORECASE)))
+        tiene_acordes_rojos = bool(
+            post_body.find("span", style=re.compile(r"color:\s*#c00000", re.IGNORECASE))
+        )
         if tiene_acordes_rojos:
             texto_completo = _extraer_texto_betania(post_body)
 
@@ -404,28 +422,29 @@ class CancioneroScraper:
             momento_liturgico = detectar_momento_liturgico(texto_completo)
         except (ValueError, TypeError, KeyError, AttributeError) as exc:
             logger.exception("Error generando representacion visual de %s: %s", url, exc)
-            tono = ''
-            html_visual = ''
-            momento_liturgico = ''
+            tono = ""
+            html_visual = ""
+            momento_liturgico = ""
 
         lineas_letra = []
         for linea in estructura:
             if linea.tipo in ("letra", "acordes_letra"):
                 lineas_letra.append(linea.letra)
-            elif linea.tipo in ("sección",):
-                if linea.texto:
-                    lineas_letra.append(linea.texto)
+            elif linea.tipo in ("sección",) and linea.texto:
+                lineas_letra.append(linea.texto)
 
         return {
-            'titulo': titulo_pagina,
-            'url': url,
-            'letra_con_acordes': texto_completo,
-            'letra_sin_acordes': '\n'.join(lineas_letra),
-            'estructura_json': json.dumps(
+            "titulo": titulo_pagina,
+            "url": url,
+            "letra_con_acordes": texto_completo,
+            "letra_sin_acordes": "\n".join(lineas_letra),
+            "estructura_json": json.dumps(
                 [
                     {
                         "tipo": l.tipo,
-                        "acordes": [{"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes],
+                        "acordes": [
+                            {"acorde": a.acorde, "posicion": a.posicion} for a in l.acordes
+                        ],
                         "letra": l.letra,
                         "texto": l.texto,
                     }
@@ -433,11 +452,11 @@ class CancioneroScraper:
                 ],
                 ensure_ascii=False,
             ),
-            'html_visual': html_visual,
-            'html_original': html_original,
-            'tono': tono,
-            'momento_liturgico': momento_liturgico,
-            'fuente': self.fuente
+            "html_visual": html_visual,
+            "html_original": html_original,
+            "tono": tono,
+            "momento_liturgico": momento_liturgico,
+            "fuente": self.fuente,
         }
 
     def guardar_lote(self, canciones: list[dict[str, Any]]) -> None:
@@ -448,51 +467,59 @@ class CancioneroScraper:
         registros_update: list[tuple[Any, ...]] = []
 
         for cancion in canciones:
-            titulo = (cancion.get('titulo') or cancion.get('url') or "Sin titulo").strip()
-            url = cancion.get('url', '')
+            titulo = (cancion.get("titulo") or cancion.get("url") or "Sin titulo").strip()
+            url = cancion.get("url", "")
 
             cursor = self.db.cursor()
-            cursor.execute('SELECT id FROM canciones WHERE titulo_url = ?', (url,))
+            cursor.execute("SELECT id FROM canciones WHERE titulo_url = ?", (url,))
             existente = cursor.fetchone()
 
             if existente:
-                registros_update.append((
-                    titulo,
-                    cancion.get('letra_con_acordes', ''),
-                    cancion.get('letra_sin_acordes', ''),
-                    cancion.get('estructura_json', '[]'),
-                    cancion.get('html_visual', ''),
-                    cancion.get('html_original', ''),
-                    cancion.get('tono', ''),
-                    cancion.get('momento_liturgico', ''),
-                    self.fuente,
-                    url
-                ))
+                registros_update.append(
+                    (
+                        titulo,
+                        cancion.get("letra_con_acordes", ""),
+                        cancion.get("letra_sin_acordes", ""),
+                        cancion.get("estructura_json", "[]"),
+                        cancion.get("html_visual", ""),
+                        cancion.get("html_original", ""),
+                        cancion.get("tono", ""),
+                        cancion.get("momento_liturgico", ""),
+                        self.fuente,
+                        url,
+                    )
+                )
             else:
-                registros_insert.append((
-                    titulo,
-                    url,
-                    cancion.get('letra_con_acordes', ''),
-                    cancion.get('letra_sin_acordes', ''),
-                    cancion.get('estructura_json', '[]'),
-                    cancion.get('html_visual', ''),
-                    cancion.get('html_original', ''),
-                    cancion.get('tono', ''),
-                    cancion.get('momento_liturgico', ''),
-                    'blogspot'
-                ))
+                registros_insert.append(
+                    (
+                        titulo,
+                        url,
+                        cancion.get("letra_con_acordes", ""),
+                        cancion.get("letra_sin_acordes", ""),
+                        cancion.get("estructura_json", "[]"),
+                        cancion.get("html_visual", ""),
+                        cancion.get("html_original", ""),
+                        cancion.get("tono", ""),
+                        cancion.get("momento_liturgico", ""),
+                        "blogspot",
+                    )
+                )
 
         try:
             with self.db:
                 if registros_insert:
-                    self.db.executemany('''
+                    self.db.executemany(
+                        """
                         INSERT INTO canciones
                         (titulo, titulo_url, letra_con_acordes, letra_sin_acordes,
                          estructura_json, html_visual, html_original, tono, momento_liturgico, fuente)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ''', registros_insert)
+                    """,
+                        registros_insert,
+                    )
                 if registros_update:
-                    self.db.executemany('''
+                    self.db.executemany(
+                        """
                         UPDATE canciones SET
                             titulo = ?,
                             letra_con_acordes = ?,
@@ -504,7 +531,9 @@ class CancioneroScraper:
                             momento_liturgico = ?,
                             fuente = ?
                         WHERE titulo_url = ?
-                    ''', registros_update)
+                    """,
+                        registros_update,
+                    )
             logger.info(f"Guardado lote de {len(canciones)} canciones")
         except sqlite3.Error:
             logger.exception("Error de SQLite al guardar lote")
@@ -522,16 +551,18 @@ class CancioneroScraper:
         canciones = self.extraer_enlaces_canciones(html)
         logger.info(f"Total: {len(canciones)} canciones")
 
-        ya_procesadas = set(self._progress.get('procesadas', []))
+        ya_procesadas = set(self._progress.get("procesadas", []))
         lote: list[dict[str, Any]] = []
         lote_size = 10
         exitosas = 0
         fallidas = 0
 
         for i, cancion_info in enumerate(canciones, 1):
-            url = cancion_info['url']
+            url = cancion_info["url"]
             if url in ya_procesadas:
-                logger.info(f"[{i:2d}/{len(canciones):2d}] Saltando ya procesada: {cancion_info['titulo']}")
+                logger.info(
+                    f"[{i:2d}/{len(canciones):2d}] Saltando ya procesada: {cancion_info['titulo']}"
+                )
                 continue
 
             logger.info(f"[{i:2d}/{len(canciones):2d}] {cancion_info['titulo']}")
@@ -543,13 +574,13 @@ class CancioneroScraper:
                 datos = None
 
             if datos:
-                if not datos['titulo']:
-                    datos['titulo'] = cancion_info['titulo']
+                if not datos["titulo"]:
+                    datos["titulo"] = cancion_info["titulo"]
                 lote.append(datos)
-                self._progress['procesadas'].append(url)
+                self._progress["procesadas"].append(url)
                 exitosas += 1
             else:
-                self._progress['fallidas'].append(url)
+                self._progress["fallidas"].append(url)
                 fallidas += 1
                 logger.warning(f"  No se pudo procesar: {cancion_info['titulo']}")
 
@@ -565,12 +596,15 @@ class CancioneroScraper:
             self._save_progress()
 
         logger.info("=" * 70)
-        logger.info(f"Resumen: {exitosas}/{len(canciones)} canciones procesadas correctamente, {fallidas} fallidas")
+        logger.info(
+            f"Resumen: {exitosas}/{len(canciones)} canciones procesadas correctamente, {fallidas} fallidas"
+        )
         logger.info("=" * 70)
 
 
 def main() -> None:
     import sys
+
     if len(sys.argv) > 1:
         url = sys.argv[1]
         scraper = CancioneroScraper(base_url=url)

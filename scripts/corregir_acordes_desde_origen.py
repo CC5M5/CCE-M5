@@ -24,7 +24,6 @@ import re
 import sqlite3
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -56,7 +55,7 @@ def _get_connection() -> sqlite3.Connection:
     return conn
 
 
-def fetch_original_html(url: str, timeout: int = 15) -> Optional[str]:
+def fetch_original_html(url: str, timeout: int = 15) -> str | None:
     """Descarga el HTML original de una canción."""
     try:
         resp = requests.get(url, timeout=timeout)
@@ -93,7 +92,7 @@ def extract_text_from_post_body(soup: BeautifulSoup) -> str:
     text = body.get_text("\n", strip=False)
 
     # Eliminar líneas vacías repetidas y líneas de metadatos.
-    cleaned_lines: List[str] = []
+    cleaned_lines: list[str] = []
     prev_empty = False
     for raw_line in text.splitlines():
         line = raw_line.rstrip()
@@ -120,13 +119,13 @@ def extract_text_from_post_body(soup: BeautifulSoup) -> str:
     return "\n".join(cleaned_lines)
 
 
-def compare_texts(actual: str, original: str) -> Dict:
+def compare_texts(actual: str, original: str) -> dict:
     """Calcula métricas simples de diferencia entre dos textos."""
     actual_lines = actual.splitlines()
     original_lines = original.splitlines()
 
     common = 0
-    diff_indices: List[int] = []
+    diff_indices: list[int] = []
     max_len = max(len(actual_lines), len(original_lines))
     for i in range(max_len):
         a = actual_lines[i] if i < len(actual_lines) else None
@@ -145,11 +144,11 @@ def compare_texts(actual: str, original: str) -> Dict:
     }
 
 
-def generate_report(results: List[Dict], songs: Dict[int, Dict]) -> str:
+def generate_report(results: list[dict], songs: dict[int, dict]) -> str:
     """Genera informe HTML de comparación."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    rows: List[str] = []
+    rows: list[str] = []
     for r in results:
         song = songs[r["id"]]
         title = html_module.escape(song["titulo"])
@@ -224,11 +223,9 @@ def apply_correction(cancion_id: int, nuevo_texto: str, conn: sqlite3.Connection
     tono = parser.detectar_tono(estructura)
 
     # Letra sin acordes: concatenar solo las líneas de letra.
-    letra_limpia_lines: List[str] = []
+    letra_limpia_lines: list[str] = []
     for linea in estructura:
-        if linea.tipo == "letra":
-            letra_limpia_lines.append(linea.letra)
-        elif linea.tipo == "acordes_letra":
+        if linea.tipo == "letra" or linea.tipo == "acordes_letra":
             letra_limpia_lines.append(linea.letra)
     letra_sin_acordes = "\n".join(letra_limpia_lines)
 
@@ -267,11 +264,19 @@ def main() -> int:
     parser.add_argument("--report", action="store_true", help="Generar informe comparativo")
     parser.add_argument("--apply", action="store_true", help="Aplicar correcciones a la BD")
     parser.add_argument("--ids", type=str, help="IDs de canciones separados por comas")
-    parser.add_argument("--output", type=str, default=str(OUTPUT_DIR / "informe_acordes.html"),
-                        help="Ruta del informe HTML")
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=str(OUTPUT_DIR / "informe_acordes.html"),
+        help="Ruta del informe HTML",
+    )
     parser.add_argument("--delay", type=float, default=1.0, help="Segundos entre requests")
-    parser.add_argument("--log-level", type=str, default="INFO",
-                        help="Nivel de logging (DEBUG, INFO, WARNING, ERROR)")
+    parser.add_argument(
+        "--log-level",
+        type=str,
+        default="INFO",
+        help="Nivel de logging (DEBUG, INFO, WARNING, ERROR)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -305,7 +310,7 @@ def main() -> int:
         print("No hay canciones con URL original para procesar.")
         return 0
 
-    results: List[Dict] = []
+    results: list[dict] = []
     apply_count = 0
 
     for cancion_id, song in songs.items():

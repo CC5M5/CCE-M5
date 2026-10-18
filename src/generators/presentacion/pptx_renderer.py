@@ -1,5 +1,6 @@
 """Renderizado de presentaciones a PPTX."""
 
+import contextlib
 import re
 from pathlib import Path
 from typing import Any
@@ -15,7 +16,7 @@ from src.constants import SLIDE_HEIGHT_INCHES, SLIDE_WIDTH_INCHES
 
 def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
     hex_color = hex_color.lstrip("#")
-    return tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
 
 def _add_formatted_run(
@@ -75,24 +76,27 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
     prs.slide_height = Inches(SLIDE_HEIGHT_INCHES)
     blank_layout = prs.slide_layouts[6]
 
-    color = COLORES_LITURGICOS.get(
-        data["meta"]["color_liturgico"].lower(), COLORES_LITURGICOS["verde"]
-    )
+    COLORES_LITURGICOS.get(data["meta"]["color_liturgico"].lower(), COLORES_LITURGICOS["verde"])
     lema_img_path = assets_dir / "lema_somos_uno.jpg"
 
     primary = (124, 58, 237)
-    accent_gold = (161, 98, 7)
     bg_light = (250, 245, 255)
-    text_dark = (44, 62, 80)
-    text_muted = (85, 85, 85)
 
     for slide_data in data["slides"]:
         slide = prs.slides.add_slide(blank_layout)
         is_portada = slide_data["tipo"] == "portada"
         has_image = bool(slide_data.get("imagen"))
         is_cancion = slide_data["tipo"] in (
-            "entrada", "gloria", "aleluya", "ofertorio", "santo",
-            "padre_nuestro", "paz", "comunion", "maria", "despedida",
+            "entrada",
+            "gloria",
+            "aleluya",
+            "ofertorio",
+            "santo",
+            "padre_nuestro",
+            "paz",
+            "comunion",
+            "maria",
+            "despedida",
         )
 
         fill = slide.background.fill
@@ -111,15 +115,13 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
         bar.line.fill.background()
 
         if lema_img_path.exists():
-            try:
+            with contextlib.suppress(ValueError, TypeError, OSError):
                 slide.shapes.add_picture(
                     str(lema_img_path),
                     Inches(0.4),
                     Inches(SLIDE_HEIGHT_INCHES - 0.95),
                     height=Inches(0.75),
                 )
-            except (ValueError, TypeError, OSError):
-                pass
 
         if has_image:
             base_name = Path(slide_data["imagen"]).stem
@@ -127,9 +129,13 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
                 img_path = assets_dir / f"{base_name}{ext}"
                 if img_path.exists():
                     if is_portada:
-                        slide.shapes.add_picture(str(img_path), Inches(3.5), Inches(0.5), height=Inches(2.6))
+                        slide.shapes.add_picture(
+                            str(img_path), Inches(3.5), Inches(0.5), height=Inches(2.6)
+                        )
                     else:
-                        slide.shapes.add_picture(str(img_path), Inches(7.3), Inches(1.1), height=Inches(2.8))
+                        slide.shapes.add_picture(
+                            str(img_path), Inches(7.3), Inches(1.1), height=Inches(2.8)
+                        )
                     break
 
         if is_portada:
@@ -150,17 +156,18 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
 
         card = slide.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
-            card_left, card_top, card_width, card_height,
+            card_left,
+            card_top,
+            card_width,
+            card_height,
         )
         card.fill.solid()
         card.fill.fore_color.rgb = RGBColor(255, 255, 255)
         card.line.color.rgb = RGBColor(221, 214, 254)
         card.line.width = Pt(1)
         if hasattr(card, "adjustments"):
-            try:
+            with contextlib.suppress(ValueError, TypeError, IndexError, AttributeError):
                 card.adjustments[0] = 0.08
-            except (ValueError, TypeError, IndexError, AttributeError):
-                pass
 
         line = slide.shapes.add_shape(
             MSO_SHAPE.RECTANGLE,
@@ -201,10 +208,7 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
 
         paragraphs = full_text.split("\n")
         for i, para_text in enumerate(paragraphs):
-            if i == 0:
-                p = tf.paragraphs[0]
-            else:
-                p = tf.add_paragraph()
+            p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             if not para_text.strip():
                 p.space_after = Pt(0)
                 p.space_before = Pt(0)

@@ -2,31 +2,26 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import asyncio
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.security import HTTPAuthorizationCredentials
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
+from src.web_admin import models as m
 from src.web_admin.auth import (
     authenticate_user,
     change_user_password,
     create_access_token,
     create_new_user,
     get_current_user,
-    hash_password,
     require_admin,
-    security,
     seed_default_admin,
 )
-from src.web_admin import models as m
 from src.web_admin.database import (
     WORKFLOW_STEPS,
     add_workflow_log,
@@ -43,7 +38,6 @@ from src.web_admin.database import (
     list_users,
     list_workflow_runs,
     next_step,
-    set_user_password,
     supersede_workflow_run,
     update_user,
 )
@@ -71,7 +65,12 @@ STATIC_DIR = Path(__file__).parent / "static"
 # CORS permitido para el origen local del panel admin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4321", "http://192.168.68.244:4321", "http://192.168.68.244:4324", "http://localhost:4324"],
+    allow_origins=[
+        "http://localhost:4321",
+        "http://192.168.68.244:4321",
+        "http://192.168.68.244:4324",
+        "http://localhost:4324",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -128,7 +127,7 @@ async def login(payload: m.LoginRequest):
 
 
 @app.get("/auth/me", response_model=m.UserProfile)
-async def me(current_user: Dict[str, Any] = Depends(get_current_user)):
+async def me(current_user: dict[str, Any] = Depends(get_current_user)):
     return m.UserProfile(**current_user)
 
 
@@ -137,8 +136,8 @@ async def me(current_user: Dict[str, Any] = Depends(get_current_user)):
 # ---------------------------------------------------------------------------
 
 
-@app.get("/users", response_model=List[m.UserProfile])
-async def get_users(current_user: Dict[str, Any] = Depends(require_admin)):
+@app.get("/users", response_model=list[m.UserProfile])
+async def get_users(current_user: dict[str, Any] = Depends(require_admin)):
     rows = list_users()
     return [m.UserProfile(**r) for r in rows]
 
@@ -146,7 +145,7 @@ async def get_users(current_user: Dict[str, Any] = Depends(require_admin)):
 @app.post("/users", response_model=m.UserProfile)
 async def create_user_endpoint(
     payload: m.UserCreate,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     if payload.role not in ("admin", "viewer"):
         raise HTTPException(status_code=400, detail="Rol debe ser admin o viewer")
@@ -161,20 +160,22 @@ async def create_user_endpoint(
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     user = get_user_by_id(user_id)
     assert user is not None
-    return m.UserProfile(**{
-        "id": user.id,
-        "username": user.username,
-        "full_name": user.full_name,
-        "role": user.role,
-        "is_active": 1 if user.is_active else 0,
-    })
+    return m.UserProfile(
+        **{
+            "id": user.id,
+            "username": user.username,
+            "full_name": user.full_name,
+            "role": user.role,
+            "is_active": 1 if user.is_active else 0,
+        }
+    )
 
 
 @app.patch("/users/{user_id}", response_model=m.UserProfile)
 async def update_user_endpoint(
     user_id: int,
     payload: m.UserUpdate,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     target = get_user_by_id(user_id)
     if not target:
@@ -183,7 +184,9 @@ async def update_user_endpoint(
         raise HTTPException(status_code=400, detail="Rol debe ser admin o viewer")
     if target.role == "admin" and (payload.role == "viewer" or payload.is_active is False):
         if count_admins() <= 1:
-            raise HTTPException(status_code=409, detail="No se puede eliminar el último administrador activo")
+            raise HTTPException(
+                status_code=409, detail="No se puede eliminar el último administrador activo"
+            )
     update_user(
         user_id,
         full_name=payload.full_name,
@@ -192,19 +195,21 @@ async def update_user_endpoint(
     )
     updated = get_user_by_id(user_id)
     assert updated is not None
-    return m.UserProfile(**{
-        "id": updated.id,
-        "username": updated.username,
-        "full_name": updated.full_name,
-        "role": updated.role,
-        "is_active": 1 if updated.is_active else 0,
-    })
+    return m.UserProfile(
+        **{
+            "id": updated.id,
+            "username": updated.username,
+            "full_name": updated.full_name,
+            "role": updated.role,
+            "is_active": 1 if updated.is_active else 0,
+        }
+    )
 
 
 @app.delete("/users/{user_id}")
 async def delete_user_endpoint(
     user_id: int,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     target = get_user_by_id(user_id)
     if not target:
@@ -212,7 +217,9 @@ async def delete_user_endpoint(
     if target.id == current_user["id"]:
         raise HTTPException(status_code=409, detail="No puedes eliminar tu propio usuario")
     if target.role == "admin" and count_admins() <= 1:
-        raise HTTPException(status_code=409, detail="No se puede eliminar el último administrador activo")
+        raise HTTPException(
+            status_code=409, detail="No se puede eliminar el último administrador activo"
+        )
     delete_user(user_id)
     return {"detail": "Usuario eliminado"}
 
@@ -225,7 +232,7 @@ async def delete_user_endpoint(
 @app.post("/auth/change-password")
 async def change_password(
     payload: m.PasswordChange,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     user = get_user_by_id(current_user["id"])
     if not user:
@@ -233,7 +240,9 @@ async def change_password(
     if not authenticate_user(user.username, payload.current_password):
         raise HTTPException(status_code=401, detail="Contraseña actual incorrecta")
     if len(payload.new_password) < 4:
-        raise HTTPException(status_code=400, detail="La nueva contraseña debe tener al menos 4 caracteres")
+        raise HTTPException(
+            status_code=400, detail="La nueva contraseña debe tener al menos 4 caracteres"
+        )
     change_user_password(user.id, payload.new_password)
     return {"detail": "Contraseña actualizada"}
 
@@ -245,9 +254,9 @@ async def change_password(
 
 @app.get("/workflows")
 async def workflows_index(
-    fecha: Optional[str] = Query(None),
+    fecha: str | None = Query(None),
     limit: int = Query(50, ge=1, le=200),
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     rows = list_workflow_runs(fecha_domingo=fecha, limit=limit)
     return {"workflows": [m.WorkflowRun(**r) for r in rows]}
@@ -256,13 +265,14 @@ async def workflows_index(
 @app.get("/workflows/{workflow_id}")
 async def workflow_detail(
     workflow_id: int,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     wf = get_workflow_run(workflow_id)
     if not wf:
         raise HTTPException(status_code=404, detail="Workflow no encontrado")
     logs = get_workflow_logs(workflow_id)
     from src.web_admin.database import next_step
+
     can_advance = wf["current_step"] != "done" and next_step(wf["current_step"]) is not None
     return m.WorkflowResponse(
         workflow=m.WorkflowRun(**wf),
@@ -275,11 +285,11 @@ async def workflow_detail(
 @app.post("/workflows", response_model=m.WorkflowResponse)
 async def workflow_create(
     payload: m.WorkflowCreate,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     fecha = payload.fecha_domingo
     existing = get_latest_workflow_run(fecha)
-    warning: Optional[str] = None
+    warning: str | None = None
 
     if existing and existing["status"] != "superseded":
         if not payload.force:
@@ -317,7 +327,7 @@ async def workflow_create(
 async def workflow_goto_step(
     workflow_id: int,
     payload: m.WorkflowGotoStep,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     """Mueve el workflow a un paso arbitrario para permitir re-edición o re-publicación."""
     wf = get_workflow_run(workflow_id)
@@ -330,10 +340,16 @@ async def workflow_goto_step(
         raise HTTPException(status_code=400, detail=f"Paso no válido: {payload.step}")
 
     goto_workflow_step(workflow_id, payload.step)
-    add_workflow_log(workflow_id, payload.step, f"Movido manualmente al paso {payload.step} por {current_user['username']}")
+    add_workflow_log(
+        workflow_id,
+        payload.step,
+        f"Movido manualmente al paso {payload.step} por {current_user['username']}",
+    )
     updated = get_workflow_run(workflow_id)
     logs = get_workflow_logs(workflow_id)
-    can_advance = updated["current_step"] != "done" and next_step(updated["current_step"]) is not None
+    can_advance = (
+        updated["current_step"] != "done" and next_step(updated["current_step"]) is not None
+    )
     return m.WorkflowResponse(
         workflow=m.WorkflowRun(**updated),
         logs=[m.WorkflowLogEntry(**r) for r in logs],
@@ -346,7 +362,7 @@ async def workflow_goto_step(
 async def workflow_advance(
     workflow_id: int,
     payload: m.WorkflowAdvance,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     wf = get_workflow_run(workflow_id)
     if not wf:
@@ -367,25 +383,25 @@ async def workflow_advance(
     )
 
 
-
-
-@app.get("/canciones", response_model=List[m.CancionResponse])
+@app.get("/canciones", response_model=list[m.CancionResponse])
 async def list_canciones_endpoint(
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """Lista todas las canciones del cancionero."""
     from src.canciones_manager import listar_canciones
+
     return listar_canciones()
 
 
 @app.post("/canciones", response_model=m.CancionResponse, status_code=201)
 async def create_cancion_endpoint(
     payload: m.CancionCreate,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     """Crea una nueva canción en el cancionero."""
     from src.canciones_manager import CancionCreateUpdate, crear_cancion
     from src.rebuild_web import rebuild_web
+
     try:
         cancion = crear_cancion(
             CancionCreateUpdate(
@@ -405,10 +421,11 @@ async def create_cancion_endpoint(
 @app.get("/canciones/{cancion_id}", response_model=m.CancionResponse)
 async def get_cancion_endpoint(
     cancion_id: int,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """Devuelve una canción por ID."""
     from src.canciones_manager import obtener_cancion
+
     try:
         return obtener_cancion(cancion_id)
     except ValueError as exc:
@@ -419,18 +436,21 @@ async def get_cancion_endpoint(
 async def update_cancion_endpoint(
     cancion_id: int,
     payload: m.CancionUpdate,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     """Actualiza una canción existente."""
     from src.canciones_manager import CancionCreateUpdate, actualizar_cancion, obtener_cancion
     from src.rebuild_web import rebuild_web
+
     try:
         existing = obtener_cancion(cancion_id)
         cancion = actualizar_cancion(
             cancion_id,
             CancionCreateUpdate(
                 titulo=payload.titulo if payload.titulo is not None else existing["titulo"],
-                letra_con_acordes=payload.letra_con_acordes if payload.letra_con_acordes is not None else existing["letra_con_acordes"] or "",
+                letra_con_acordes=payload.letra_con_acordes
+                if payload.letra_con_acordes is not None
+                else existing["letra_con_acordes"] or "",
                 momentos=payload.momentos if payload.momentos is not None else existing["momentos"],
                 tono=payload.tono if payload.tono is not None else existing["tono"],
                 fuente=payload.fuente if payload.fuente is not None else existing["fuente"],
@@ -445,10 +465,11 @@ async def update_cancion_endpoint(
 @app.delete("/canciones/{cancion_id}")
 async def delete_cancion_endpoint(
     cancion_id: int,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     """Elimina una canción del cancionero."""
     from src.canciones_manager import eliminar_cancion
+
     try:
         eliminar_cancion(cancion_id)
     except ValueError as exc:
@@ -459,7 +480,7 @@ async def delete_cancion_endpoint(
 @app.get("/workflows/{workflow_id}/backups")
 async def workflow_backups(
     workflow_id: int,
-    current_user: Dict[str, Any] = Depends(require_admin),
+    current_user: dict[str, Any] = Depends(require_admin),
 ):
     wf = get_workflow_run(workflow_id)
     if not wf:
@@ -475,10 +496,11 @@ async def workflow_backups(
 
 @app.get("/presentacion/fechas")
 async def fechas_presentaciones(
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_user: dict[str, Any] = Depends(get_current_user),
 ):
     """Devuelve las fechas de presentaciones ya publicadas (visible para viewer)."""
     from src.db_manager import get_connection
+
     with get_connection() as conn:
         rows = conn.execute(
             "SELECT fecha_domingo FROM presentaciones ORDER BY fecha_domingo DESC"

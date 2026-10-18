@@ -27,7 +27,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import os
 import shutil
 import sqlite3
 import sys
@@ -35,7 +34,7 @@ import traceback
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.db_manager import DB_PATH, get_connection
 from src.generators.pdf_musicos import CancionNoEncontradaError, generar_hoja_musicos
@@ -68,7 +67,8 @@ def _estado_presentacion(modo: str) -> str:
     """Devuelve el estado de la presentación según el modo."""
     return "borrador" if modo == MODO_BORRADOR else "publicada"
 
-MOMENTOS_ES: List[str] = [
+
+MOMENTOS_ES: list[str] = [
     "Entrada",
     "Perdón",
     "Gloria",
@@ -83,7 +83,7 @@ MOMENTOS_ES: List[str] = [
     "Despedida",
 ]
 
-MOMENTOS_KEY: List[str] = [
+MOMENTOS_KEY: list[str] = [
     "entrada",
     "perdon",
     "gloria",
@@ -98,12 +98,13 @@ MOMENTOS_KEY: List[str] = [
     "despedida",
 ]
 
-MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY))
+MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False))
 
 
 # ---------------------------------------------------------------------------
 # Configuración de logging
 # ---------------------------------------------------------------------------
+
 
 def configurar_logging(nivel: int = logging.INFO) -> None:
     """Configura logging uniforme para consola."""
@@ -117,6 +118,7 @@ def configurar_logging(nivel: int = logging.INFO) -> None:
 # ---------------------------------------------------------------------------
 # Utilidades de fechas
 # ---------------------------------------------------------------------------
+
 
 def normalizar_domingo(fecha_str: str) -> str:
     """Devuelve el domingo de la semana correspondiente a la fecha recibida."""
@@ -133,11 +135,12 @@ def normalizar_domingo(fecha_str: str) -> str:
 # Lecturas: Koinonia con fallback a mock/parcial
 # ---------------------------------------------------------------------------
 
+
 def obtener_lecturas(
     fecha_domingo: str,
     timeout: int = 30,
     usar_cache: bool = True,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Obtiene lecturas de Koinonia. Si falla la red, usa mock del cancionero.
 
@@ -172,14 +175,16 @@ def obtener_lecturas(
     # Fallback a Ciudad Redonda
     try:
         from src.scrapers.ciudadredonda_scraper import obtener_lecturas_ciudadredonda
-        
+
         lecturas_cr = obtener_lecturas_ciudadredonda(fecha_domingo)
         if lecturas_cr:
             logger.info("Lecturas de Ciudad Redonda obtenidas para %s", fecha_domingo)
             return lecturas_cr
         logger.warning("Ciudad Redonda no devolvió datos para %s; se usará mock", fecha_domingo)
     except requests.RequestException as exc_cr:
-        logger.warning("Error de red al consultar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr)
+        logger.warning(
+            "Error de red al consultar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr
+        )
     except (ValueError, TypeError, KeyError, AttributeError) as exc_cr:
         logger.warning("Error al procesar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr)
 
@@ -202,7 +207,7 @@ def obtener_lecturas(
         return _lecturas_vacias(fecha_domingo)
 
 
-def _lecturas_vacias(fecha_domingo: str) -> Dict[str, Any]:
+def _lecturas_vacias(fecha_domingo: str) -> dict[str, Any]:
     """Devuelve un diccionario de lecturas mínimo para no romper el flujo."""
     return {
         "fecha": fecha_domingo,
@@ -224,7 +229,7 @@ def _lecturas_vacias(fecha_domingo: str) -> Dict[str, Any]:
     }
 
 
-def leer_lectura_id(fecha_domingo: str) -> Optional[int]:
+def leer_lectura_id(fecha_domingo: str) -> int | None:
     """Lee el id de la fila lecturas correspondiente a la fecha."""
     try:
         with get_connection() as conn:
@@ -263,7 +268,8 @@ def presentacion_existe_en_bd(fecha_domingo: str) -> bool:
 # Matching / asignación manual de canciones
 # ---------------------------------------------------------------------------
 
-def cargar_config_manual(path: Path) -> Dict[str, Any]:
+
+def cargar_config_manual(path: Path) -> dict[str, Any]:
     """Carga un JSON con asignación manual de canciones por momento."""
     try:
         with path.open("r", encoding="utf-8") as f:
@@ -277,7 +283,7 @@ def cargar_config_manual(path: Path) -> Dict[str, Any]:
 def _resolver_cancion_id(
     conn: sqlite3.Connection,
     valor: Any,
-) -> Optional[int]:
+) -> int | None:
     """Resuelve un identificador de canción (int o título) a id de BD.
 
     Si el valor es None, False, 'null', 'N/A' o cadena vacía, se interpreta
@@ -301,19 +307,19 @@ def _resolver_cancion_id(
     return row["id"] if row else None
 
 
-DEFAULT_ASIGNACION: Dict[str, int] = {
-    "entrada": 8,       # PREPARAD EL CAMINO
-    "perdon": 70,       # OTRA OPORTUNIDAD
-    "gloria": 9,        # GLORIA TE DAMOS GRACIAS, SEÑOR
-    "salmo": 3,         # AQUÍ ESTOY, SEÑOR (SALMO 39)
-    "aleluya": 47,      # JESÚS RESUCITA HOY
-    "ofertorio": 74,    # PADRE NUESTRO DE LA VIDA
-    "santo": 84,        # QUIERO HACER LO MISMO
-    "padre_nuestro": 72,# PADRE NUESTRO (Gallego)
-    "paz": 100,         # UNA NUEVA ESPERANZA
-    "comunion": 95,     # TODO MI SER
-    "maria": 7,         # MARÍA, MÚSICA DE DIOS
-    "despedida": 26,    # DE NOCHE IREMOS DE NOCHE
+DEFAULT_ASIGNACION: dict[str, int] = {
+    "entrada": 8,  # PREPARAD EL CAMINO
+    "perdon": 70,  # OTRA OPORTUNIDAD
+    "gloria": 9,  # GLORIA TE DAMOS GRACIAS, SEÑOR
+    "salmo": 3,  # AQUÍ ESTOY, SEÑOR (SALMO 39)
+    "aleluya": 47,  # JESÚS RESUCITA HOY
+    "ofertorio": 74,  # PADRE NUESTRO DE LA VIDA
+    "santo": 84,  # QUIERO HACER LO MISMO
+    "padre_nuestro": 72,  # PADRE NUESTRO (Gallego)
+    "paz": 100,  # UNA NUEVA ESPERANZA
+    "comunion": 95,  # TODO MI SER
+    "maria": 7,  # MARÍA, MÚSICA DE DIOS
+    "despedida": 26,  # DE NOCHE IREMOS DE NOCHE
 }
 
 
@@ -327,7 +333,7 @@ def _es_id_valido(valor: Any) -> bool:
 def proponer_canciones_matching(
     lectura_id: int,
     limite_por_momento: int = 5,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """
     Usa src.matching_engine para proponer canciones para cada momento.
 
@@ -371,10 +377,10 @@ def proponer_canciones_matching(
         score_minimo=0.0,
     )
 
-    propuestas: Dict[str, int] = {}
+    propuestas: dict[str, int] = {}
     usadas: set[int] = set()
 
-    for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY):
+    for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False):
         seleccionada = None
         try:
             # 1) Preferir canción cuyo momento litúrgico coincida exactamente
@@ -413,13 +419,12 @@ def proponer_canciones_matching(
             #    no usada, pero solo si su momento litúrgico no contradice mucho
             #    el solicitado (es decir, si es 'general' o el score es alto).
             #    Para momentos específicos sin candidato, preferimos el fallback.
-            if seleccionada is None:
-                if momento_key in ("general",):
-                    for match in matches:
-                        cancion_id = _cancion_id_de_match(match)
-                        if cancion_id not in usadas:
-                            seleccionada = match
-                            break
+            if seleccionada is None and momento_key in ("general",):
+                for match in matches:
+                    cancion_id = _cancion_id_de_match(match)
+                    if cancion_id not in usadas:
+                        seleccionada = match
+                        break
 
             cancion_id = _cancion_id_de_match(seleccionada) if seleccionada else None
             if _es_id_valido(cancion_id):
@@ -473,15 +478,15 @@ def proponer_canciones_matching(
     return propuestas
 
 
-def _cancion_id_de_match(match: Dict[str, Any]) -> Any:
+def _cancion_id_de_match(match: dict[str, Any]) -> Any:
     """Devuelve el id de canción de un match del motor."""
     return match.get("cancion_id") or match.get("id")
 
 
 def construir_asignacion_canciones(
-    config_manual: Optional[Dict[str, Any]],
+    config_manual: dict[str, Any] | None,
     fecha_domingo: str,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """
     Construye el diccionario final {momento_key: cancion_id}.
 
@@ -491,7 +496,7 @@ def construir_asignacion_canciones(
     - Los momentos no presentes en config_manual se completan con el motor de matching.
     """
     with get_connection() as conn:
-        asignacion: Dict[str, int] = {}
+        asignacion: dict[str, int] = {}
         explicitamente_vacio: set[str] = set()
 
         if config_manual:
@@ -512,7 +517,9 @@ def construir_asignacion_canciones(
             logger.warning("No hay lectura_id en BD; no se puede ejecutar matching")
             return asignacion
 
-        faltantes = [k for k in MOMENTOS_KEY if k not in asignacion and k not in explicitamente_vacio]
+        faltantes = [
+            k for k in MOMENTOS_KEY if k not in asignacion and k not in explicitamente_vacio
+        ]
         if faltantes:
             propuestas = proponer_canciones_matching(lectura_id)
             for key in faltantes:
@@ -524,11 +531,11 @@ def construir_asignacion_canciones(
 
 def nombre_canciones(
     conn: sqlite3.Connection,
-    asignacion: Dict[str, int],
-) -> Dict[str, str]:
+    asignacion: dict[str, int],
+) -> dict[str, str]:
     """Devuelve {momento_key: titulo} para una asignación de ids."""
     ids = [cid for cid in asignacion.values() if isinstance(cid, int) and cid > 0]
-    nombres: Dict[int, str] = {}
+    nombres: dict[int, str] = {}
     if ids:
         placeholders = ",".join("?" * len(ids))
         cur = conn.cursor()
@@ -545,12 +552,13 @@ def nombre_canciones(
 # Generación PPTX
 # ---------------------------------------------------------------------------
 
+
 def generar_pptx(
     fecha_domingo: str,
     lectura_id: int,
-    canciones_ids: Dict[str, int],
+    canciones_ids: dict[str, int],
     modo: str = MODO_PUBLICAR,
-) -> Optional[Path]:
+) -> Path | None:
     """
     Genera la presentación PPTX para fieles.
 
@@ -581,8 +589,7 @@ def generar_pptx(
             fecha=fecha_domingo,
             lectura_id=lectura_id,
             canciones_ids={
-                k: v for k, v in canciones_ids.items()
-                if k in MOMENTOS_KEY or k == "bendicion_agua"
+                k: v for k, v in canciones_ids.items() if k in MOMENTOS_KEY or k == "bendicion_agua"
             },
             incluir_bendicion_agua=incluir_bendicion_agua,
         )
@@ -604,13 +611,14 @@ def generar_pptx(
 # Generación PDF músicos
 # ---------------------------------------------------------------------------
 
+
 def generar_pdf_musicos(
     fecha_domingo: str,
-    canciones_ids: Dict[str, int],
+    canciones_ids: dict[str, int],
     celebracion: str,
-    notas: Optional[List[str]] = None,
+    notas: list[str] | None = None,
     modo: str = MODO_PUBLICAR,
-) -> Optional[Path]:
+) -> Path | None:
     """Genera la hoja de músicos en PDF usando src.generators.pdf_musicos."""
     output_dir = _directorio_salida(modo)
     output_path = output_dir / f"{fecha_domingo}_hoja_musicos.pdf"
@@ -618,8 +626,8 @@ def generar_pdf_musicos(
         logger.warning("PDF de destino ya existe: %s", output_path)
 
     # El generador espera claves con espacios como en MOMENTOS_ES.
-    canciones_por_momento: Dict[str, int] = {}
-    for es, key in zip(MOMENTOS_ES, MOMENTOS_KEY):
+    canciones_por_momento: dict[str, int] = {}
+    for es, key in zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False):
         if key in canciones_ids:
             canciones_por_momento[es] = canciones_ids[key]
 
@@ -648,16 +656,17 @@ def generar_pdf_musicos(
 # Registro en SQLite
 # ---------------------------------------------------------------------------
 
+
 def registrar_presentacion(
     fecha_domingo: str,
-    lectura_id: Optional[int],
-    canciones_ids: Dict[str, int],
-    pptx_path: Optional[Path],
-    pdf_path: Optional[Path],
+    lectura_id: int | None,
+    canciones_ids: dict[str, int],
+    pptx_path: Path | None,
+    pdf_path: Path | None,
     lecturas_json: str,
-    notas: Optional[List[str]] = None,
+    notas: list[str] | None = None,
     estado: str = "publicada",
-) -> Optional[int]:
+) -> int | None:
     """Inserta o actualiza una fila en la tabla presentaciones."""
     try:
         with get_connection() as conn:
@@ -683,8 +692,7 @@ def registrar_presentacion(
 
             # Schema extendido: añadimos columnas si no existen (compatibilidad).
             columnas_existentes = {
-                row["name"]
-                for row in cur.execute("PRAGMA table_info(presentaciones)").fetchall()
+                row["name"] for row in cur.execute("PRAGMA table_info(presentaciones)").fetchall()
             }
             for col in ["lectura_json", "notas", "creado_en"]:
                 if col not in columnas_existentes:
@@ -727,17 +735,18 @@ def registrar_presentacion(
 # Resumen
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ResultadoGeneracion:
     """Resultado del flujo end-to-end."""
 
     fecha_domingo: str
-    lectura_id: Optional[int]
-    presentacion_id: Optional[int]
-    pptx_path: Optional[Path]
-    pdf_path: Optional[Path]
-    canciones: Dict[str, str] = field(default_factory=dict)
-    notas: List[str] = field(default_factory=list)
+    lectura_id: int | None
+    presentacion_id: int | None
+    pptx_path: Path | None
+    pdf_path: Path | None
+    canciones: dict[str, str] = field(default_factory=dict)
+    notas: list[str] = field(default_factory=list)
     modo: str = MODO_PUBLICAR
     dry_run: bool = False
     estado_presentacion: str = "publicada"
@@ -758,7 +767,7 @@ class ResultadoGeneracion:
             print(f"PPTX fieles:   {self.pptx_path or 'NO GENERADO'}")
             print(f"PDF músicos:   {self.pdf_path or 'NO GENERADO'}")
         print("\nCanciones asignadas:")
-        for es, key in zip(MOMENTOS_ES, MOMENTOS_KEY):
+        for es, key in zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False):
             titulo = self.canciones.get(key, "(sin asignar)")
             print(f"  - {es:<18} {titulo}")
         if self.notas:
@@ -774,7 +783,8 @@ class ResultadoGeneracion:
 # Main
 # ---------------------------------------------------------------------------
 
-def main(argv: Optional[List[str]] = None) -> int:
+
+def main(argv: list[str] | None = None) -> int:
     """Punto de entrada del script."""
     parser = argparse.ArgumentParser(
         description="Genera presentaciones y hoja de músicos para un domingo.",
@@ -865,11 +875,11 @@ def main(argv: Optional[List[str]] = None) -> int:
             )
             return 3
 
-    notas: List[str] = []
+    notas: list[str] = []
     if args.notas:
         notas = [n.strip() for n in args.notas.split("|") if n.strip()]
 
-    config_manual: Optional[Dict[str, Any]] = None
+    config_manual: dict[str, Any] | None = None
     if args.config:
         config_manual = cargar_config_manual(args.config)
 

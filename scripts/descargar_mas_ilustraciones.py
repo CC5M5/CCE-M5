@@ -6,6 +6,7 @@ Fuentes:
 - Más Pati.te: artículos de Omnes Mag, Alfa y Omega, Canta y Camina, PEJ22, web oficial (productos de ilustración).
 - Más Sara BG: tienda oficial, productos tipo lámina/cuadro/ilustración (no merch).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -79,8 +80,11 @@ def fetch_fano_more(session: requests.Session, max_per_year: int = 15) -> list[d
                 continue
             img_id = m.group(1)
             # evitar duplicados de archivo existente
-            dest_check = OUT_DIR / "fano" / f"fano_{img_id}_*.jpg"
-            if list(OUT_DIR.glob(f"fano/fano_{img_id}_*.jpg")) or (OUT_DIR / "fano" / f"{img_id}.jpg").exists():
+            OUT_DIR / "fano" / f"fano_{img_id}_*.jpg"
+            if (
+                list(OUT_DIR.glob(f"fano/fano_{img_id}_*.jpg"))
+                or (OUT_DIR / "fano" / f"{img_id}.jpg").exists()
+            ):
                 continue
             container = link.find_parent("div") or link
             title = ""
@@ -112,7 +116,13 @@ def fetch_fano_more(session: requests.Session, max_per_year: int = 15) -> list[d
             dest = OUT_DIR / "fano" / filename
             if download(it["url"], dest, session):
                 if validate_image(dest):
-                    results.append({"artista": "fano", "archivo": str(dest.relative_to(OUT_DIR)), "titulo": it["title"]})
+                    results.append(
+                        {
+                            "artista": "fano",
+                            "archivo": str(dest.relative_to(OUT_DIR)),
+                            "titulo": it["title"],
+                        }
+                    )
                     print(f"    OK {dest.name}")
                 else:
                     dest.unlink(missing_ok=True)
@@ -152,17 +162,52 @@ def fetch_patite_more(session: requests.Session) -> list[dict]:
             low = src.lower()
             if not re.search(r"\.(jpg|jpeg|png|webp)", low):
                 continue
-            if any(x in low for x in ["logo", "icon", "avatar", "banner", "kallyas", "theme", "favicon", "whatsapp", "facebook", "twitter", "instagram", "pinterest", "reuters", "hhs", "apple", "iphone", "osv", "ecclesia", "noticiafaustino", "catalina", "imagen_principal"]):
+            if any(
+                x in low
+                for x in [
+                    "logo",
+                    "icon",
+                    "avatar",
+                    "banner",
+                    "kallyas",
+                    "theme",
+                    "favicon",
+                    "whatsapp",
+                    "facebook",
+                    "twitter",
+                    "instagram",
+                    "pinterest",
+                    "reuters",
+                    "hhs",
+                    "apple",
+                    "iphone",
+                    "osv",
+                    "ecclesia",
+                    "noticiafaustino",
+                    "catalina",
+                    "imagen_principal",
+                ]
+            ):
                 continue
             alt = img.get("alt", "") or img.get("title", "")
-            if alt and any(x in alt.lower() for x in ["reuters", "hhs", "iphone", "apple", "catalina", "noticia"]):
+            if alt and any(
+                x in alt.lower()
+                for x in ["reuters", "hhs", "iphone", "apple", "catalina", "noticia"]
+            ):
                 continue
             # evitar duplicados por hash al descargar
             filename = f"patite_{safe_name(alt or 'ilustracion')}_{hashlib.md5(src.encode()).hexdigest()[:8]}{Path(urlparse(src).path).suffix or '.jpg'}"
             dest = OUT_DIR / "patite" / filename
             if download(src, dest, session):
                 if validate_image(dest):
-                    results.append({"artista": "patite", "archivo": str(dest.relative_to(OUT_DIR)), "titulo": alt, "url_origen": src})
+                    results.append(
+                        {
+                            "artista": "patite",
+                            "archivo": str(dest.relative_to(OUT_DIR)),
+                            "titulo": alt,
+                            "url_origen": src,
+                        }
+                    )
                     print(f"    OK {dest.name}")
                 else:
                     dest.unlink(missing_ok=True)
@@ -194,9 +239,13 @@ def fetch_sarabg_more(session: requests.Session) -> list[dict]:
         title_text = re.sub(r"\bAgotado\b", "", title_text, flags=re.IGNORECASE)
         title_text = re.sub(r"\bAhorre\s+\d+%?", "", title_text, flags=re.IGNORECASE)
         title_text = title_text.strip()
-        title_el = card.find(["h2", "h3", "h4", "span", "p"], class_=re.compile(r"title|product|name", re.I))
+        title_el = card.find(
+            ["h2", "h3", "h4", "span", "p"], class_=re.compile(r"title|product|name", re.I)
+        )
         if title_el:
-            el_text = re.sub(r"\bAgotado\b", "", title_el.get_text(strip=True), flags=re.IGNORECASE).strip()
+            el_text = re.sub(
+                r"\bAgotado\b", "", title_el.get_text(strip=True), flags=re.IGNORECASE
+            ).strip()
             if el_text and len(el_text) < 120:
                 data["title"] = el_text
         elif title_text and title_text.lower() not in {"", "agotado"}:
@@ -213,12 +262,49 @@ def fetch_sarabg_more(session: requests.Session) -> list[dict]:
                 data["img_url"] = img_url
 
     # Filtrar solo ilustraciones/láminas/cuadros, no merch
-    merch_keywords = ["pegatinas", "calendario", "carta", "cartas", "colgantes", "bloc", "colorear",
-                      "balconera", "adorno", "calvario", "abstracto", "en_calma", "creer_sin_ver",
-                      "cuento", "dibujo_para_colorear", "collage", "edén", "buen_pastor", "durmió",
-                      "pack", "pegatina", "sticker", "recordatorio", "joya", "medalla"]
-    illustration_keywords = ["lamina", "cuadro", "obra", "sagrado", "corazon", "virgen", "maria",
-                             "jesus", "cristo", "divina", "pastora", "nazaret", "inmaculado", "paz"]
+    merch_keywords = [
+        "pegatinas",
+        "calendario",
+        "carta",
+        "cartas",
+        "colgantes",
+        "bloc",
+        "colorear",
+        "balconera",
+        "adorno",
+        "calvario",
+        "abstracto",
+        "en_calma",
+        "creer_sin_ver",
+        "cuento",
+        "dibujo_para_colorear",
+        "collage",
+        "edén",
+        "buen_pastor",
+        "durmió",
+        "pack",
+        "pegatina",
+        "sticker",
+        "recordatorio",
+        "joya",
+        "medalla",
+    ]
+    illustration_keywords = [
+        "lamina",
+        "cuadro",
+        "obra",
+        "sagrado",
+        "corazon",
+        "virgen",
+        "maria",
+        "jesus",
+        "cristo",
+        "divina",
+        "pastora",
+        "nazaret",
+        "inmaculado",
+        "paz",
+    ]
 
     products = []
     for url, d in product_data.items():
@@ -237,7 +323,14 @@ def fetch_sarabg_more(session: requests.Session) -> list[dict]:
         dest = OUT_DIR / "sarabg" / filename
         if download(img_url, dest, session):
             if validate_image(dest):
-                results.append({"artista": "sarabg", "archivo": str(dest.relative_to(OUT_DIR)), "titulo": title, "url_origen": img_url})
+                results.append(
+                    {
+                        "artista": "sarabg",
+                        "archivo": str(dest.relative_to(OUT_DIR)),
+                        "titulo": title,
+                        "url_origen": img_url,
+                    }
+                )
                 print(f"    OK {dest.name}")
             else:
                 dest.unlink(missing_ok=True)
@@ -248,11 +341,13 @@ def fetch_sarabg_more(session: requests.Session) -> list[dict]:
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     session = requests.Session()
-    session.headers.update({
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "es-ES,es;q=0.9",
-    })
+    session.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "es-ES,es;q=0.9",
+        }
+    )
     all_meta: list[dict] = []
     all_meta.extend(fetch_fano_more(session, max_per_year=15))
     all_meta.extend(fetch_patite_more(session))

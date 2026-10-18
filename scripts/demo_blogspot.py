@@ -6,15 +6,10 @@ encontrados, sin guardar en la base de datos.
 
 import json
 import logging
-import os
-from pathlib import Path
 
-from scraper_blogspot import CancioneroScraper, BASE_URL
+from scraper_blogspot import BASE_URL, CancioneroScraper
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 

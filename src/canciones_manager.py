@@ -18,15 +18,29 @@ import sqlite3
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 
 MOMENTOS_LITURGICOS = [
-    "entrada", "acto penitencial", "gloria", "primera_lectura", "salmo",
-    "segunda_lectura", "aleluya", "evangelio", "credo", "ofertorio", "santo",
-    "padre_nuestro", "paz", "comunion", "maria", "despedida", "general",
+    "entrada",
+    "acto penitencial",
+    "gloria",
+    "primera_lectura",
+    "salmo",
+    "segunda_lectura",
+    "aleluya",
+    "evangelio",
+    "credo",
+    "ofertorio",
+    "santo",
+    "padre_nuestro",
+    "paz",
+    "comunion",
+    "maria",
+    "despedida",
+    "general",
 ]
 
 
@@ -86,12 +100,12 @@ def _regenerar_derivados(texto_con_acordes: str) -> dict:
 class CancionCreateUpdate:
     titulo: str
     letra_con_acordes: str
-    momentos: Optional[List[str]] = None
-    tono: Optional[str] = None
-    fuente: Optional[str] = None
+    momentos: list[str] | None = None
+    tono: str | None = None
+    fuente: str | None = None
 
 
-def crear_cancion(data: CancionCreateUpdate) -> Dict[str, Any]:
+def crear_cancion(data: CancionCreateUpdate) -> dict[str, Any]:
     """Inserta una nueva canción en la base de datos."""
     titulo = data.titulo.strip()
     if not titulo:
@@ -131,6 +145,7 @@ def crear_cancion(data: CancionCreateUpdate) -> Dict[str, Any]:
 
     try:
         from src.auto_rebuild_presentaciones import auto_rebuild_tras_cancion
+
         auto_rebuild_tras_cancion(cancion_id, solo_futuras=True)
     except (ImportError, ValueError, TypeError, KeyError, OSError, sqlite3.Error) as exc:
         # No bloquear la creación de la canción si la regeneración de presentaciones falla.
@@ -140,7 +155,7 @@ def crear_cancion(data: CancionCreateUpdate) -> Dict[str, Any]:
     return cancion
 
 
-def actualizar_cancion(cancion_id: int, data: CancionCreateUpdate) -> Dict[str, Any]:
+def actualizar_cancion(cancion_id: int, data: CancionCreateUpdate) -> dict[str, Any]:
     """Actualiza una canción existente."""
     titulo = data.titulo.strip()
     if not titulo:
@@ -190,6 +205,7 @@ def actualizar_cancion(cancion_id: int, data: CancionCreateUpdate) -> Dict[str, 
 
     try:
         from src.auto_rebuild_presentaciones import auto_rebuild_tras_cancion
+
         auto_rebuild_tras_cancion(cancion_id, solo_futuras=True)
     except (ImportError, ValueError, TypeError, KeyError, OSError, sqlite3.Error) as exc:
         # No bloquear la actualización de la canción si la regeneración de presentaciones falla.
@@ -212,7 +228,7 @@ def eliminar_cancion(cancion_id: int) -> None:
     conn.close()
 
 
-def _sync_momentos(cursor, cancion_id: int, momentos: List[str]) -> None:
+def _sync_momentos(cursor, cancion_id: int, momentos: list[str]) -> None:
     cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
     for m in momentos:
         m = m.strip().lower()
@@ -223,7 +239,7 @@ def _sync_momentos(cursor, cancion_id: int, momentos: List[str]) -> None:
             )
 
 
-def _get_momentos(cursor, cancion_id: int) -> List[str]:
+def _get_momentos(cursor, cancion_id: int) -> list[str]:
     cursor.execute(
         "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
         (cancion_id,),
@@ -231,7 +247,7 @@ def _get_momentos(cursor, cancion_id: int) -> List[str]:
     return [r["momento_liturgico"] for r in cursor.fetchall()]
 
 
-def _get_cancion_by_id(cursor, cancion_id: int) -> Dict[str, Any]:
+def _get_cancion_by_id(cursor, cancion_id: int) -> dict[str, Any]:
     cursor.execute("SELECT * FROM canciones WHERE id = ?", (cancion_id,))
     row = cursor.fetchone()
     if not row:
@@ -242,7 +258,7 @@ def _get_cancion_by_id(cursor, cancion_id: int) -> Dict[str, Any]:
     return d
 
 
-def listar_canciones() -> List[Dict[str, Any]]:
+def listar_canciones() -> list[dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, titulo FROM canciones ORDER BY titulo")
@@ -254,7 +270,7 @@ def listar_canciones() -> List[Dict[str, Any]]:
     return result
 
 
-def obtener_cancion(cancion_id: int) -> Dict[str, Any]:
+def obtener_cancion(cancion_id: int) -> dict[str, Any]:
     conn = _get_connection()
     cursor = conn.cursor()
     cancion = _get_cancion_by_id(cursor, cancion_id)

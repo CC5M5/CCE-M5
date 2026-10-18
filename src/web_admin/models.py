@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -17,13 +16,13 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: str
-    full_name: Optional[str] = None
+    full_name: str | None = None
 
 
 class UserProfile(BaseModel):
     id: int
     username: str
-    full_name: Optional[str]
+    full_name: str | None
     role: str
     is_active: int = 1
 
@@ -31,14 +30,14 @@ class UserProfile(BaseModel):
 class UserCreate(BaseModel):
     username: str
     password: str
-    full_name: Optional[str] = None
+    full_name: str | None = None
     role: str = "viewer"
 
 
 class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
-    role: Optional[str] = None
-    is_active: Optional[bool] = None
+    full_name: str | None = None
+    role: str | None = None
+    is_active: bool | None = None
 
 
 class PasswordChange(BaseModel):
@@ -54,12 +53,15 @@ class WorkflowCreate(BaseModel):
 class WorkflowAdvance(BaseModel):
     workflow_id: int
     action: str = Field(..., pattern=r"^(next|retry|rollback)$")
-    data: Optional[Dict[str, Any]] = None
+    data: dict[str, Any] | None = None
 
 
 class WorkflowGotoStep(BaseModel):
     workflow_id: int
-    step: str = Field(..., pattern=r"^(init|fetch_lectures|verify_lectures|propose_songs|verify_songs|generate_assets|publish|done)$")
+    step: str = Field(
+        ...,
+        pattern=r"^(init|fetch_lectures|verify_lectures|propose_songs|verify_songs|generate_assets|publish|done)$",
+    )
 
 
 class WorkflowRun(BaseModel):
@@ -67,12 +69,12 @@ class WorkflowRun(BaseModel):
     fecha_domingo: str
     status: str
     current_step: str
-    steps_data: Dict[str, Any]
-    created_by: Optional[str]
-    created_at: Optional[str]
-    updated_at: Optional[str]
-    completed_at: Optional[str]
-    superseded_by: Optional[int]
+    steps_data: dict[str, Any]
+    created_by: str | None
+    created_at: str | None
+    updated_at: str | None
+    completed_at: str | None
+    superseded_by: int | None
 
 
 class WorkflowLogEntry(BaseModel):
@@ -81,24 +83,24 @@ class WorkflowLogEntry(BaseModel):
     step: str
     level: str
     message: str
-    created_at: Optional[str]
+    created_at: str | None
 
 
 class LectureData(BaseModel):
-    domingo: Optional[str] = None
-    temporada: Optional[str] = None
-    ciclo: Optional[str] = None
-    color_liturgico: Optional[str] = None
-    primera_lectura_cita: Optional[str] = None
-    primera_lectura_texto: Optional[str] = None
-    salmo_cita: Optional[str] = None
-    salmo_antifona: Optional[str] = None
-    salmo_texto: Optional[str] = None
-    segunda_lectura_cita: Optional[str] = None
-    segunda_lectura_texto: Optional[str] = None
-    evangelio_cita: Optional[str] = None
-    evangelio_texto: Optional[str] = None
-    fuente_scraping: Optional[str] = None
+    domingo: str | None = None
+    temporada: str | None = None
+    ciclo: str | None = None
+    color_liturgico: str | None = None
+    primera_lectura_cita: str | None = None
+    primera_lectura_texto: str | None = None
+    salmo_cita: str | None = None
+    salmo_antifona: str | None = None
+    salmo_texto: str | None = None
+    segunda_lectura_cita: str | None = None
+    segunda_lectura_texto: str | None = None
+    evangelio_cita: str | None = None
+    evangelio_texto: str | None = None
+    fuente_scraping: str | None = None
 
 
 class SongProposal(BaseModel):
@@ -108,10 +110,10 @@ class SongProposal(BaseModel):
 
 class WorkflowResponse(BaseModel):
     workflow: WorkflowRun
-    logs: List[WorkflowLogEntry]
+    logs: list[WorkflowLogEntry]
     can_advance: bool
-    next_step_name: Optional[str]
-    warning: Optional[str] = None
+    next_step_name: str | None
+    warning: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -122,17 +124,17 @@ class WorkflowResponse(BaseModel):
 class CancionCreate(BaseModel):
     titulo: str
     letra_con_acordes: str
-    momentos: List[str] = []
-    tono: Optional[str] = None
-    fuente: Optional[str] = "manual"
+    momentos: list[str] = []
+    tono: str | None = None
+    fuente: str | None = "manual"
 
 
 class CancionUpdate(BaseModel):
-    titulo: Optional[str] = None
-    letra_con_acordes: Optional[str] = None
-    momentos: Optional[List[str]] = None
-    tono: Optional[str] = None
-    fuente: Optional[str] = None
+    titulo: str | None = None
+    letra_con_acordes: str | None = None
+    momentos: list[str] | None = None
+    tono: str | None = None
+    fuente: str | None = None
 
 
 class CancionResponse(BaseModel):
@@ -140,10 +142,10 @@ class CancionResponse(BaseModel):
     titulo: str
     titulo_url: str
     slug: str
-    letra_con_acordes: Optional[str] = None
-    letra_sin_acordes: Optional[str] = None
-    html_visual: Optional[str] = None
-    tono: Optional[str] = None
-    fuente: Optional[str] = None
-    momentos: List[str] = []
-    fecha_creacion: Optional[str] = None
+    letra_con_acordes: str | None = None
+    letra_sin_acordes: str | None = None
+    html_visual: str | None = None
+    tono: str | None = None
+    fuente: str | None = None
+    momentos: list[str] = []
+    fecha_creacion: str | None = None

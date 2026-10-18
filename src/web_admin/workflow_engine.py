@@ -9,25 +9,27 @@ from __future__ import annotations
 import json
 import logging
 import shutil
-import subprocess
-import sys
+import sqlite3
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 PROJECT_DIR = Path(__file__).parent.parent.parent.resolve()
 
 from src.db_manager import get_connection
-from src.generators.composicion_catalogo import asegurar_composicion, sincronizar_presentacion_slides
-from src.generators.pdf_musicos import generar_hoja_musicos
-from src.generators.presentacion_html import GeneradorPresentacionHTML
+from src.generators.composicion_catalogo import (
+    asegurar_composicion,
+    sincronizar_presentacion_slides,
+)
 from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
+from src.generators.pdf_musicos import generar_hoja_musicos
 from src.matching_engine import MatchingEngine
-from src.scrapers.koinonia_scraper import KoinoniaScraper
 from src.scrapers.ciudadredonda_scraper import obtener_lecturas_ciudadredonda
+from src.scrapers.koinonia_scraper import KoinoniaScraper
 from src.web_admin.config import BACKUPS_DIR, PROJECT_DIR
 from src.web_admin.database import (
+    WORKFLOW_STEPS,
     add_workflow_log,
     create_backup_record,
     get_workflow_logs,
@@ -35,7 +37,6 @@ from src.web_admin.database import (
     next_step,
     step_index,
     update_workflow_step,
-    WORKFLOW_STEPS,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,18 +71,18 @@ MOMENTOS_KEY = [
     "despedida",
 ]
 
-MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY))
+MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False))
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _backup_existing_assets(
     workflow_id: int,
     fecha_domingo: str,
-    steps_data: Dict[str, Any],
-) -> Tuple[List[str], Optional[str]]:
+    steps_data: dict[str, Any],
+) -> tuple[list[str], str | None]:
     """Guarda una copia de seguridad de los archivos existentes de una fecha."""
     paths_to_backup = []
 
@@ -107,7 +108,7 @@ def _backup_existing_assets(
     if not paths_to_backup:
         return [], None
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     backup_dir = BACKUPS_DIR / f"{fecha_domingo}_{timestamp}"
     backup_dir.mkdir(parents=True, exist_ok=True)
 
@@ -132,8 +133,8 @@ def _backup_existing_assets(
 def run_step(
     workflow_id: int,
     action: str,
-    payload_data: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    payload_data: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Ejecuta una transición de paso del workflow.
 
     Devuelve un dict con:
@@ -197,7 +198,9 @@ def run_step(
 
     updated = get_workflow_run(workflow_id)
     logs = get_workflow_logs(workflow_id)
-    can_advance = updated["current_step"] != "done" and next_step(updated["current_step"]) is not None
+    can_advance = (
+        updated["current_step"] != "done" and next_step(updated["current_step"]) is not None
+    )
 
     return {
         "success": True,
@@ -209,7 +212,7 @@ def run_step(
     }
 
 
-def _do_rollback(workflow: Dict[str, Any]) -> Dict[str, Any]:
+def _do_rollback(workflow: dict[str, Any]) -> dict[str, Any]:
     current = workflow["current_step"]
     idx = step_index(current)
     if idx <= 0:
@@ -237,7 +240,7 @@ def _do_rollback(workflow: Dict[str, Any]) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def handle_init(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, Any]:
+def handle_init(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Paso inicial: simplemente avanza a fetch_lectures."""
     return {
         "success": True,
@@ -247,9 +250,7 @@ def handle_init(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, Any
     }
 
 
-def handle_fetch_lectures(
-    workflow: Dict[str, Any], data: Dict[str, Any]
-) -> Dict[str, Any]:
+def handle_fetch_lectures(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Scrapea lecturas de Koinonia; si falla, usa Ciudad Redonda."""
     fecha = workflow["fecha_domingo"]
     steps_data = dict(workflow["steps_data"])
@@ -257,7 +258,10 @@ def handle_fetch_lectures(
     lecturas, fuente = None, None
     errores = []
     for scraper_name, scraper_call in [
-        ("koinonia", lambda f: KoinoniaScraper().obtener_lecturas(datetime.strptime(f, "%Y-%m-%d"))),
+        (
+            "koinonia",
+            lambda f: KoinoniaScraper().obtener_lecturas(datetime.strptime(f, "%Y-%m-%d")),
+        ),
         ("ciudad_redonda", lambda f: obtener_lecturas_ciudadredonda(f)),
     ]:
         try:
@@ -307,16 +311,16 @@ def handle_fetch_lectures(
         "logs": [
             {
                 "step": "fetch_lectures",
-                "message": f"Lecturas obtenidas desde {fuente} para {fecha}" if fuente != "manual" else "Lecturas no disponibles; se habilita entrada manual",
+                "message": f"Lecturas obtenidas desde {fuente} para {fecha}"
+                if fuente != "manual"
+                else "Lecturas no disponibles; se habilita entrada manual",
             }
         ],
         "warning": warning,
     }
 
 
-def handle_verify_lectures(
-    workflow: Dict[str, Any], data: Dict[str, Any]
-) -> Dict[str, Any]:
+def handle_verify_lectures(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Permite al admin corregir lecturas manualmente."""
     steps_data = dict(workflow["steps_data"])
     lecturas = steps_data.get("lecturas", {})
@@ -350,48 +354,45 @@ def handle_verify_lectures(
     }
 
 
-def _save_lecturas_to_db(fecha: str, lecturas: Dict[str, Any]) -> None:
+def _save_lecturas_to_db(fecha: str, lecturas: dict[str, Any]) -> None:
     """Inserta o actualiza lecturas en la tabla lecturas de db.sqlite3."""
-    with get_connection() as conn:
-        with conn:
-            existing = conn.execute(
-                "SELECT id FROM lecturas WHERE fecha = ?", (fecha,)
-            ).fetchone()
+    with get_connection() as conn, conn:
+        existing = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
 
-            fields = {
-                "domingo": lecturas.get("domingo", ""),
-                "temporada": lecturas.get("temporada", ""),
-                "ciclo": lecturas.get("ciclo", ""),
-                "color_liturgico": lecturas.get("color_liturgico", "verde"),
-                "primera_lectura_cita": lecturas.get("primera_lectura_cita", ""),
-                "primera_lectura_texto": lecturas.get("primera_lectura_texto", ""),
-                "salmo_cita": lecturas.get("salmo_cita", ""),
-                "salmo_antifona": lecturas.get("salmo_antifona", ""),
-                "salmo_texto": lecturas.get("salmo_texto", ""),
-                "segunda_lectura_cita": lecturas.get("segunda_lectura_cita", ""),
-                "segunda_lectura_texto": lecturas.get("segunda_lectura_texto", ""),
-                "evangelio_cita": lecturas.get("evangelio_cita", ""),
-                "evangelio_texto": lecturas.get("evangelio_texto", ""),
-                "fuente_scraping": lecturas.get("fuente_scraping", "koinonia"),
-            }
+        fields = {
+            "domingo": lecturas.get("domingo", ""),
+            "temporada": lecturas.get("temporada", ""),
+            "ciclo": lecturas.get("ciclo", ""),
+            "color_liturgico": lecturas.get("color_liturgico", "verde"),
+            "primera_lectura_cita": lecturas.get("primera_lectura_cita", ""),
+            "primera_lectura_texto": lecturas.get("primera_lectura_texto", ""),
+            "salmo_cita": lecturas.get("salmo_cita", ""),
+            "salmo_antifona": lecturas.get("salmo_antifona", ""),
+            "salmo_texto": lecturas.get("salmo_texto", ""),
+            "segunda_lectura_cita": lecturas.get("segunda_lectura_cita", ""),
+            "segunda_lectura_texto": lecturas.get("segunda_lectura_texto", ""),
+            "evangelio_cita": lecturas.get("evangelio_cita", ""),
+            "evangelio_texto": lecturas.get("evangelio_texto", ""),
+            "fuente_scraping": lecturas.get("fuente_scraping", "koinonia"),
+        }
 
-            if existing:
-                set_clause = ", ".join(f"{k} = ?" for k in fields)
-                values = list(fields.values()) + [fecha]
-                conn.execute(
-                    f"UPDATE lecturas SET {set_clause}, fecha_creacion = CURRENT_TIMESTAMP WHERE fecha = ?",
-                    values,
-                )
-            else:
-                cols = ", ".join(fields.keys())
-                placeholders = ", ".join(["?"] * len(fields))
-                conn.execute(
-                    f"INSERT INTO lecturas (fecha, {cols}) VALUES (?, {placeholders})",
-                    [fecha] + list(fields.values()),
-                )
+        if existing:
+            set_clause = ", ".join(f"{k} = ?" for k in fields)
+            values = list(fields.values()) + [fecha]
+            conn.execute(
+                f"UPDATE lecturas SET {set_clause}, fecha_creacion = CURRENT_TIMESTAMP WHERE fecha = ?",
+                values,
+            )
+        else:
+            cols = ", ".join(fields.keys())
+            placeholders = ", ".join(["?"] * len(fields))
+            conn.execute(
+                f"INSERT INTO lecturas (fecha, {cols}) VALUES (?, {placeholders})",
+                [fecha] + list(fields.values()),
+            )
 
 
-def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
+def proponer_canciones_para_dia(fecha: str) -> dict[str, Any]:
     """Genera propuestas de canciones para cada momento litúrgico del día.
 
     Usa el motor de matching contra las lecturas del día y asigna la mejor
@@ -410,8 +411,13 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
             "SELECT id, titulo, momento_liturgico FROM canciones"
         ).fetchall()
 
-    todas_canciones: Dict[int, Dict[str, Any]] = {
-        r["id"]: {"cancion_id": r["id"], "titulo": r["titulo"], "momento_liturgico": (r["momento_liturgico"] or "").lower(), "score": 0.0}
+    todas_canciones: dict[int, dict[str, Any]] = {
+        r["id"]: {
+            "cancion_id": r["id"],
+            "titulo": r["titulo"],
+            "momento_liturgico": (r["momento_liturgico"] or "").lower(),
+            "score": 0.0,
+        }
         for r in canciones_rows
     }
 
@@ -424,15 +430,15 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
         matches = []
 
     # Agrupar matches temáticos por momento (según canción)
-    matches_por_momento: Dict[str, List[Dict[str, Any]]] = {}
+    matches_por_momento: dict[str, list[dict[str, Any]]] = {}
     for m in matches:
         mk = m.get("momento_liturgico", "general").lower().strip()
         matches_por_momento.setdefault(mk, []).append(m)
 
-    propuestas: Dict[str, Any] = {}
+    propuestas: dict[str, Any] = {}
     usadas: set = set()
 
-    def asignar(momento_es: str, candidatas: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def asignar(momento_es: str, candidatas: list[dict[str, Any]]) -> dict[str, Any] | None:
         for c in candidatas:
             cid = c["cancion_id"]
             if cid is not None and cid not in usadas:
@@ -440,8 +446,8 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
                 return c
         return None
 
-    for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY):
-        seleccionada: Optional[Dict[str, Any]] = None
+    for momento_es, momento_key in zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False):
+        seleccionada: dict[str, Any] | None = None
 
         # 1. Mejor match temático del mismo momento con score >= 0.10
         same_matches = matches_por_momento.get(momento_key, [])
@@ -455,15 +461,16 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
         # 3. Canciones cuyo momento litúrgico coincida exactamente
         if not seleccionada:
             mismo_momento = [
-                c for c in todas_canciones.values()
-                if c["momento_liturgico"] == momento_key
+                c for c in todas_canciones.values() if c["momento_liturgico"] == momento_key
             ]
             mismo_momento.sort(key=lambda c: str(c["titulo"]))
             seleccionada = asignar(momento_es, mismo_momento)
 
         # 4. Match temático de momento 'general' o similares
         if not seleccionada:
-            general_matches = matches_por_momento.get("general", []) + matches_por_momento.get("", [])
+            general_matches = matches_por_momento.get("general", []) + matches_por_momento.get(
+                "", []
+            )
             seleccionada = asignar(momento_es, general_matches)
 
         # 5. Cualquier canción no usada (último recurso)
@@ -481,9 +488,7 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
     return propuestas
 
 
-def handle_propose_songs(
-    workflow: Dict[str, Any], data: Dict[str, Any]
-) -> Dict[str, Any]:
+def handle_propose_songs(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Propone canciones para los 12 momentos litúrgicos."""
     fecha = workflow["fecha_domingo"]
     steps_data = dict(workflow["steps_data"])
@@ -508,9 +513,7 @@ def handle_propose_songs(
     }
 
 
-def handle_verify_songs(
-    workflow: Dict[str, Any], data: Dict[str, Any]
-) -> Dict[str, Any]:
+def handle_verify_songs(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Permite al admin ajustar la asignación de canciones."""
     steps_data = dict(workflow["steps_data"])
     propuestas = steps_data.get("canciones_propuestas", {})
@@ -528,7 +531,17 @@ def handle_verify_songs(
     # Convertir a formato canciones_json para la tabla presentaciones
     canciones_json = {}
     for momento, info in propuestas.items():
-        key = MOMENTO_A_KEY.get(momento, momento.lower().replace(" ", "_").replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").replace("ñ", "n"))
+        key = MOMENTO_A_KEY.get(
+            momento,
+            momento.lower()
+            .replace(" ", "_")
+            .replace("á", "a")
+            .replace("é", "e")
+            .replace("í", "i")
+            .replace("ó", "o")
+            .replace("ú", "u")
+            .replace("ñ", "n"),
+        )
         canciones_json[key] = info.get("cancion_id")
 
     steps_data["canciones_json"] = canciones_json
@@ -537,23 +550,17 @@ def handle_verify_songs(
         "success": True,
         "next_step": "generate_assets",
         "steps_data": steps_data,
-        "logs": [
-            {"step": "verify_songs", "message": "Asignación de canciones confirmada"}
-        ],
+        "logs": [{"step": "verify_songs", "message": "Asignación de canciones confirmada"}],
     }
 
 
-def handle_generate_assets(
-    workflow: Dict[str, Any], data: Dict[str, Any]
-) -> Dict[str, Any]:
+def handle_generate_assets(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Genera PPTX, PDF músicos y HTML estático desde el catálogo de slides."""
     fecha = workflow["fecha_domingo"]
     steps_data = dict(workflow["steps_data"])
 
     # Hacer backup si ya existen archivos previos
-    backed_paths, backup_dir = _backup_existing_assets(
-        workflow["id"], fecha, steps_data
-    )
+    backed_paths, backup_dir = _backup_existing_assets(workflow["id"], fecha, steps_data)
     warning = None
     if backup_dir:
         warning = f"Se ha creado backup en {backup_dir}"
@@ -571,7 +578,9 @@ def handle_generate_assets(
 
     # Asegurar que existe una fila presentaciones para la fecha (puede no existir hasta publish)
     with get_connection() as conn:
-        existing = conn.execute("SELECT id FROM presentaciones WHERE fecha_domingo = ?", (fecha,)).fetchone()
+        existing = conn.execute(
+            "SELECT id FROM presentaciones WHERE fecha_domingo = ?", (fecha,)
+        ).fetchone()
         if not existing:
             conn.execute(
                 "INSERT INTO presentaciones (fecha_domingo, lectura_id, canciones_json, estado) VALUES (?, ?, ?, ?)",
@@ -628,9 +637,7 @@ def handle_generate_assets(
         "pdf_musicos": pdf_musicos_path,
     }
 
-    logs = [
-        {"step": "generate_assets", "message": f"Presentación generada: {bundle_dir}"}
-    ]
+    logs = [{"step": "generate_assets", "message": f"Presentación generada: {bundle_dir}"}]
     if backup_dir:
         logs.append(
             {
@@ -649,7 +656,7 @@ def handle_generate_assets(
     }
 
 
-def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, Any]:
+def handle_publish(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     """Publica la presentación: guarda en BD, exporta JSON, sync HTML y build de Astro."""
     fecha = workflow["fecha_domingo"]
     steps_data = dict(workflow["steps_data"])
@@ -701,6 +708,7 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
 
         # 4. Build de Astro con Node 22 (evita bug de Node 24 + Astro 4.16)
         import os
+
         node_bin = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
         build_env = os.environ.copy()
         build_env["PATH"] = f"{node_bin}:{build_env.get('PATH', '')}"
@@ -719,7 +727,7 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
                 "error": f"astro build falló: {result_build.stderr}",
             }
 
-    except (OSError) as exc:
+    except OSError as exc:
         return {"success": False, "error": f"Error en publicación: {exc}"}
 
     steps_data["publicado"] = True
@@ -727,68 +735,60 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
         "success": True,
         "next_step": "done",
         "steps_data": steps_data,
-        "logs": [
-            {"step": "publish", "message": "Web reconstruida y presentación publicada"}
-        ],
+        "logs": [{"step": "publish", "message": "Web reconstruida y presentación publicada"}],
     }
 
 
-def _save_presentacion_to_db(
-    workflow: Dict[str, Any], steps_data: Dict[str, Any]
-) -> None:
+def _save_presentacion_to_db(workflow: dict[str, Any], steps_data: dict[str, Any]) -> None:
     fecha = workflow["fecha_domingo"]
-    lecturas = steps_data.get("lecturas", {})
     canciones_json = steps_data.get("canciones_json", {})
     assets = steps_data.get("assets", {})
 
-    with get_connection() as conn:
-        with conn:
-            lectura_row = conn.execute(
-                "SELECT id FROM lecturas WHERE fecha = ?", (fecha,)
-            ).fetchone()
-            lectura_id = lectura_row["id"] if lectura_row else None
+    with get_connection() as conn, conn:
+        lectura_row = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
+        lectura_id = lectura_row["id"] if lectura_row else None
 
-            ruta_pptx = assets.get("pptx")
-            ruta_pdf_fieles = assets.get("pdf_fieles")
-            ruta_pdf_musicos = assets.get("pdf_musicos")
-            ruta_web = assets.get("bundle_dir")
+        ruta_pptx = assets.get("pptx")
+        ruta_pdf_fieles = assets.get("pdf_fieles")
+        ruta_pdf_musicos = assets.get("pdf_musicos")
+        ruta_web = assets.get("bundle_dir")
 
-            existing = conn.execute(
-                "SELECT id FROM presentaciones WHERE fecha_domingo = ?", (fecha,)
-            ).fetchone()
+        existing = conn.execute(
+            "SELECT id FROM presentaciones WHERE fecha_domingo = ?", (fecha,)
+        ).fetchone()
 
-            if existing:
-                conn.execute(
-                    """
+        if existing:
+            conn.execute(
+                """
                     UPDATE presentaciones
                     SET lectura_id = ?, canciones_json = ?, ruta_pptx = ?, ruta_pdf_fieles = ?,
                         ruta_pdf_musicos = ?, ruta_web = ?, estado = 'publicada', fecha_creacion = CURRENT_TIMESTAMP
                     WHERE fecha_domingo = ?
                     """,
-                    (
-                        lectura_id,
-                        json.dumps(canciones_json, ensure_ascii=False),
-                        ruta_pptx,
-                        ruta_pdf_fieles,
-                        ruta_pdf_musicos,
-                        ruta_web,
-                        fecha,
-                    ),
-                )
-            else:
-                conn.execute(
-                    """
+                (
+                    lectura_id,
+                    json.dumps(canciones_json, ensure_ascii=False),
+                    ruta_pptx,
+                    ruta_pdf_fieles,
+                    ruta_pdf_musicos,
+                    ruta_web,
+                    fecha,
+                ),
+            )
+        else:
+            conn.execute(
+                """
                     INSERT INTO presentaciones
                     (fecha_domingo, lectura_id, canciones_json, ruta_pptx, ruta_pdf_fieles, ruta_pdf_musicos, ruta_web, estado)
                     VALUES (?, ?, ?, ?, ?, ?, ?, 'publicada')
                     """,
-                    (
-                        fecha,
-                        lectura_id,
-                        json.dumps(canciones_json, ensure_ascii=False),
-                        ruta_pptx,
-                        ruta_pdf_fieles,
-                        ruta_pdf_musicos,
-                        ruta_web,
-                    ),
-                )
+                (
+                    fecha,
+                    lectura_id,
+                    json.dumps(canciones_json, ensure_ascii=False),
+                    ruta_pptx,
+                    ruta_pdf_fieles,
+                    ruta_pdf_musicos,
+                    ruta_web,
+                ),
+            )

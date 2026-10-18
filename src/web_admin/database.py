@@ -9,17 +9,17 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.web_admin.config import DB_PATH
 
 logger = logging.getLogger(__name__)
 
 
-def _connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
+def _connection(db_path: Path | None = None) -> sqlite3.Connection:
     target = db_path or DB_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(target), timeout=30.0, isolation_level="DEFERRED")
@@ -31,15 +31,14 @@ def _connection(db_path: Optional[Path] = None) -> sqlite3.Connection:
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
-def init_admin_schema(db_path: Optional[Path] = None) -> None:
+def init_admin_schema(db_path: Path | None = None) -> None:
     """Crea las tablas de administración si no existen."""
-    with _connection(db_path) as conn:
-        with conn:
-            conn.executescript(
-                """
+    with _connection(db_path) as conn, conn:
+        conn.executescript(
+            """
                 CREATE TABLE IF NOT EXISTS admin_users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT NOT NULL UNIQUE,
@@ -89,7 +88,7 @@ def init_admin_schema(db_path: Optional[Path] = None) -> None:
                 CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON workflow_runs(status);
                 CREATE INDEX IF NOT EXISTS idx_workflow_logs_workflow ON workflow_logs(workflow_id);
                 """
-            )
+        )
     logger.info("Esquema de administración inicializado en %s", db_path or DB_PATH)
 
 
@@ -97,21 +96,20 @@ def init_admin_schema(db_path: Optional[Path] = None) -> None:
 # Usuarios
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class User:
     id: int
     username: str
     password_hash: str
-    full_name: Optional[str]
+    full_name: str | None
     role: str
     is_active: bool
 
 
-def get_user_by_username(username: str, db_path: Optional[Path] = None) -> Optional[User]:
+def get_user_by_username(username: str, db_path: Path | None = None) -> User | None:
     with _connection(db_path) as conn:
-        row = conn.execute(
-            "SELECT * FROM admin_users WHERE username = ?", (username,)
-        ).fetchone()
+        row = conn.execute("SELECT * FROM admin_users WHERE username = ?", (username,)).fetchone()
         if not row:
             return None
         return User(
@@ -127,27 +125,24 @@ def get_user_by_username(username: str, db_path: Optional[Path] = None) -> Optio
 def create_user(
     username: str,
     password_hash: str,
-    full_name: Optional[str] = None,
+    full_name: str | None = None,
     role: str = "viewer",
-    db_path: Optional[Path] = None,
+    db_path: Path | None = None,
 ) -> int:
-    with _connection(db_path) as conn:
-        with conn:
-            cur = conn.execute(
-                """
+    with _connection(db_path) as conn, conn:
+        cur = conn.execute(
+            """
                 INSERT INTO admin_users (username, password_hash, full_name, role, updated_at)
                 VALUES (?, ?, ?, ?, ?)
                 """,
-                (username, password_hash, full_name, role, _now()),
-            )
-            return int(cur.lastrowid)
+            (username, password_hash, full_name, role, _now()),
+        )
+        return int(cur.lastrowid)
 
 
-def get_user_by_id(user_id: int, db_path: Optional[Path] = None) -> Optional[User]:
+def get_user_by_id(user_id: int, db_path: Path | None = None) -> User | None:
     with _connection(db_path) as conn:
-        row = conn.execute(
-            "SELECT * FROM admin_users WHERE id = ?", (user_id,)
-        ).fetchone()
+        row = conn.execute("SELECT * FROM admin_users WHERE id = ?", (user_id,)).fetchone()
         if not row:
             return None
         return User(
@@ -162,55 +157,52 @@ def get_user_by_id(user_id: int, db_path: Optional[Path] = None) -> Optional[Use
 
 def update_user(
     user_id: int,
-    full_name: Optional[str] = None,
-    role: Optional[str] = None,
-    is_active: Optional[bool] = None,
-    db_path: Optional[Path] = None,
+    full_name: str | None = None,
+    role: str | None = None,
+    is_active: bool | None = None,
+    db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn:
-        with conn:
-            fields = []
-            values = []
-            if full_name is not None:
-                fields.append("full_name = ?")
-                values.append(full_name)
-            if role is not None:
-                fields.append("role = ?")
-                values.append(role)
-            if is_active is not None:
-                fields.append("is_active = ?")
-                values.append(1 if is_active else 0)
-            if not fields:
-                return
-            fields.append("updated_at = ?")
-            values.append(_now())
-            values.append(user_id)
-            conn.execute(
-                f"UPDATE admin_users SET {', '.join(fields)} WHERE id = ?",
-                values,
-            )
+    with _connection(db_path) as conn, conn:
+        fields = []
+        values = []
+        if full_name is not None:
+            fields.append("full_name = ?")
+            values.append(full_name)
+        if role is not None:
+            fields.append("role = ?")
+            values.append(role)
+        if is_active is not None:
+            fields.append("is_active = ?")
+            values.append(1 if is_active else 0)
+        if not fields:
+            return
+        fields.append("updated_at = ?")
+        values.append(_now())
+        values.append(user_id)
+        conn.execute(
+            f"UPDATE admin_users SET {', '.join(fields)} WHERE id = ?",
+            values,
+        )
 
 
 def set_user_password(
     user_id: int,
     password_hash: str,
-    db_path: Optional[Path] = None,
+    db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn:
-        with conn:
-            conn.execute(
-                "UPDATE admin_users SET password_hash = ?, updated_at = ? WHERE id = ?",
-                (password_hash, _now(), user_id),
-            )
+    with _connection(db_path) as conn, conn:
+        conn.execute(
+            "UPDATE admin_users SET password_hash = ?, updated_at = ? WHERE id = ?",
+            (password_hash, _now(), user_id),
+        )
 
 
-def delete_user(user_id: int, db_path: Optional[Path] = None) -> None:
-    with _connection(db_path) as conn:
-        with conn:
-            conn.execute("DELETE FROM admin_users WHERE id = ?", (user_id,))
+def delete_user(user_id: int, db_path: Path | None = None) -> None:
+    with _connection(db_path) as conn, conn:
+        conn.execute("DELETE FROM admin_users WHERE id = ?", (user_id,))
 
 
-def count_admins(db_path: Optional[Path] = None) -> int:
+def count_admins(db_path: Path | None = None) -> int:
     with _connection(db_path) as conn:
         row = conn.execute(
             "SELECT COUNT(*) AS c FROM admin_users WHERE role = 'admin' AND is_active = 1"
@@ -218,7 +210,7 @@ def count_admins(db_path: Optional[Path] = None) -> int:
         return row["c"] if row else 0
 
 
-def list_users(db_path: Optional[Path] = None) -> List[Dict[str, Any]]:
+def list_users(db_path: Path | None = None) -> list[dict[str, Any]]:
     with _connection(db_path) as conn:
         rows = conn.execute(
             "SELECT id, username, full_name, role, is_active, created_at FROM admin_users"
@@ -249,7 +241,7 @@ def step_index(step: str) -> int:
         return -1
 
 
-def next_step(step: str) -> Optional[str]:
+def next_step(step: str) -> str | None:
     idx = step_index(step)
     if idx < 0 or idx >= len(WORKFLOW_STEPS) - 1:
         return None
@@ -259,28 +251,27 @@ def next_step(step: str) -> Optional[str]:
 def goto_workflow_step(
     workflow_id: int,
     target_step: str,
-    db_path: Optional[Path] = None,
+    db_path: Path | None = None,
 ) -> None:
     """Mueve el workflow a un paso arbitrario conservando steps_data."""
     if target_step not in WORKFLOW_STEPS:
         raise ValueError(f"Paso no válido: {target_step}")
-    with _connection(db_path) as conn:
-        with conn:
-            conn.execute(
-                """
+    with _connection(db_path) as conn, conn:
+        conn.execute(
+            """
                 UPDATE workflow_runs
                 SET status = ?, current_step = ?, updated_at = ?
                 WHERE id = ?
                 """,
-                (target_step, target_step, _now(), workflow_id),
-            )
+            (target_step, target_step, _now(), workflow_id),
+        )
 
 
 def create_workflow_run(
     fecha_domingo: str,
-    created_by: Optional[str] = None,
-    steps_data: Optional[Dict[str, Any]] = None,
-    db_path: Optional[Path] = None,
+    created_by: str | None = None,
+    steps_data: dict[str, Any] | None = None,
+    db_path: Path | None = None,
 ) -> int:
     with _connection(db_path) as conn:
         with conn:
@@ -301,11 +292,9 @@ def create_workflow_run(
             return int(cur.lastrowid)
 
 
-def get_workflow_run(workflow_id: int, db_path: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+def get_workflow_run(workflow_id: int, db_path: Path | None = None) -> dict[str, Any] | None:
     with _connection(db_path) as conn:
-        row = conn.execute(
-            "SELECT * FROM workflow_runs WHERE id = ?", (workflow_id,)
-        ).fetchone()
+        row = conn.execute("SELECT * FROM workflow_runs WHERE id = ?", (workflow_id,)).fetchone()
         if not row:
             return None
         data = dict(row)
@@ -314,8 +303,8 @@ def get_workflow_run(workflow_id: int, db_path: Optional[Path] = None) -> Option
 
 
 def get_latest_workflow_run(
-    fecha_domingo: str, db_path: Optional[Path] = None
-) -> Optional[Dict[str, Any]]:
+    fecha_domingo: str, db_path: Path | None = None
+) -> dict[str, Any] | None:
     with _connection(db_path) as conn:
         row = conn.execute(
             """
@@ -334,10 +323,10 @@ def get_latest_workflow_run(
 
 
 def list_workflow_runs(
-    fecha_domingo: Optional[str] = None,
+    fecha_domingo: str | None = None,
     limit: int = 50,
-    db_path: Optional[Path] = None,
-) -> List[Dict[str, Any]]:
+    db_path: Path | None = None,
+) -> list[dict[str, Any]]:
     with _connection(db_path) as conn:
         if fecha_domingo:
             rows = conn.execute(
@@ -367,9 +356,9 @@ def update_workflow_step(
     workflow_id: int,
     status: str,
     current_step: str,
-    steps_data: Optional[Dict[str, Any]] = None,
-    completed_at: Optional[str] = None,
-    db_path: Optional[Path] = None,
+    steps_data: dict[str, Any] | None = None,
+    completed_at: str | None = None,
+    db_path: Path | None = None,
 ) -> None:
     with _connection(db_path) as conn:
         with conn:
@@ -401,18 +390,17 @@ def update_workflow_step(
 
 
 def supersede_workflow_run(
-    old_workflow_id: int, new_workflow_id: int, db_path: Optional[Path] = None
+    old_workflow_id: int, new_workflow_id: int, db_path: Path | None = None
 ) -> None:
-    with _connection(db_path) as conn:
-        with conn:
-            conn.execute(
-                """
+    with _connection(db_path) as conn, conn:
+        conn.execute(
+            """
                 UPDATE workflow_runs
                 SET superseded_by = ?, status = 'superseded', updated_at = ?
                 WHERE id = ?
                 """,
-                (new_workflow_id, _now(), old_workflow_id),
-            )
+            (new_workflow_id, _now(), old_workflow_id),
+        )
 
 
 def add_workflow_log(
@@ -420,22 +408,19 @@ def add_workflow_log(
     step: str,
     message: str,
     level: str = "info",
-    db_path: Optional[Path] = None,
+    db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn:
-        with conn:
-            conn.execute(
-                """
+    with _connection(db_path) as conn, conn:
+        conn.execute(
+            """
                 INSERT INTO workflow_logs (workflow_id, step, level, message, created_at)
                 VALUES (?, ?, ?, ?, ?)
                 """,
-                (workflow_id, step, level, message, _now()),
-            )
+            (workflow_id, step, level, message, _now()),
+        )
 
 
-def get_workflow_logs(
-    workflow_id: int, db_path: Optional[Path] = None
-) -> List[Dict[str, Any]]:
+def get_workflow_logs(workflow_id: int, db_path: Path | None = None) -> list[dict[str, Any]]:
     with _connection(db_path) as conn:
         rows = conn.execute(
             """
@@ -456,8 +441,8 @@ def create_backup_record(
     workflow_id: int,
     fecha_domingo: str,
     backup_path: str,
-    original_paths: List[str],
-    db_path: Optional[Path] = None,
+    original_paths: list[str],
+    db_path: Path | None = None,
 ) -> int:
     with _connection(db_path) as conn:
         with conn:
@@ -477,9 +462,7 @@ def create_backup_record(
             return int(cur.lastrowid)
 
 
-def get_backups_for_date(
-    fecha_domingo: str, db_path: Optional[Path] = None
-) -> List[Dict[str, Any]]:
+def get_backups_for_date(fecha_domingo: str, db_path: Path | None = None) -> list[dict[str, Any]]:
     with _connection(db_path) as conn:
         rows = conn.execute(
             """

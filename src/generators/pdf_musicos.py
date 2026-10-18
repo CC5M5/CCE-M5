@@ -23,10 +23,11 @@ import os
 import re
 import sqlite3
 import subprocess
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
@@ -70,7 +71,7 @@ SIZE_MOMENTO_PT = 12
 
 COLOR_NEGRO = (0, 0, 0)
 
-MOMENTOS_ORDEN: List[str] = [
+MOMENTOS_ORDEN: list[str] = [
     "Entrada",
     "Perdón",
     "Gloria",
@@ -85,7 +86,7 @@ MOMENTOS_ORDEN: List[str] = [
     "Despedida",
 ]
 
-KEY_A_MOMENTO: Dict[str, str] = {
+KEY_A_MOMENTO: dict[str, str] = {
     "entrada": "Entrada",
     "perdon": "Perdón",
     "gloria": "Gloria",
@@ -102,7 +103,19 @@ KEY_A_MOMENTO: Dict[str, str] = {
 
 
 def _normalizar_momento(key: str) -> str:
-    return KEY_A_MOMENTO.get(key.lower().replace("ó", "o").replace("í", "i").replace("á", "a").replace("é", "e").replace("ú", "u").replace("ñ", "n").replace(" ", "_").strip(), key)
+    return KEY_A_MOMENTO.get(
+        key.lower()
+        .replace("ó", "o")
+        .replace("í", "i")
+        .replace("á", "a")
+        .replace("é", "e")
+        .replace("ú", "u")
+        .replace("ñ", "n")
+        .replace(" ", "_")
+        .strip(),
+        key,
+    )
+
 
 # ---------------------------------------------------------------------------
 # Excepciones
@@ -126,13 +139,13 @@ class FuenteNoDisponibleError(PDFMusicosError):
 # ---------------------------------------------------------------------------
 
 
-def _build_font_index() -> Dict[Tuple[str, str], Path]:
+def _build_font_index() -> dict[tuple[str, str], Path]:
     """
     Construye un índice de rutas de fuentes TTF/OTF usando fc-list.
 
     Sólo se indexan archivos .ttf/.otf porque fpdf2 no soporta Type1/PFB.
     """
-    index: Dict[Tuple[str, str], Path] = {}
+    index: dict[tuple[str, str], Path] = {}
     try:
         result = subprocess.run(
             ["fc-list", ":", "family", "style", "file"],
@@ -168,7 +181,7 @@ def _build_font_index() -> Dict[Tuple[str, str], Path]:
 def _find_font_path(
     family_aliases: Sequence[str],
     style_aliases: Sequence[str],
-    index: Optional[Dict[Tuple[str, str], Path]] = None,
+    index: dict[tuple[str, str], Path] | None = None,
 ) -> Path:
     """Busca la primera ruta de fuente que coincida con los alias dados."""
     idx = index or _build_font_index()
@@ -192,8 +205,18 @@ def _format_fecha_es(fecha_str: str) -> str:
     """Convierte 'YYYY-MM-DD' a '13 de Septiembre de 2026'."""
     fecha = date.fromisoformat(fecha_str)
     meses = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
     ]
     return f"{fecha.day} de {meses[fecha.month - 1]} de {fecha.year}"
 
@@ -207,7 +230,7 @@ def _default_output_path(fecha_domingo: str) -> Path:
     return output_dir / f"{fecha_domingo}_hoja_musicos.pdf"
 
 
-def _sanitizar_texto(texto: Optional[str]) -> str:
+def _sanitizar_texto(texto: str | None) -> str:
     """Limpia caracteres de control no imprimibles."""
     if not texto:
         return ""
@@ -219,7 +242,13 @@ def _sanitizar_texto(texto: Optional[str]) -> str:
     return texto
 
 
-def _wrap_line(pdf: FPDF, text: str, max_width_mm: float, font_family: str = FONT_LETRA, font_size: int = SIZE_LETRA_PT) -> List[str]:
+def _wrap_line(
+    pdf: FPDF,
+    text: str,
+    max_width_mm: float,
+    font_family: str = FONT_LETRA,
+    font_size: int = SIZE_LETRA_PT,
+) -> list[str]:
     """Divide un texto en líneas respetando límites de ancho y palabras.
 
     Permite especificar la fuente/tamaño usados para medir el texto, ya que
@@ -228,7 +257,7 @@ def _wrap_line(pdf: FPDF, text: str, max_width_mm: float, font_family: str = FON
     """
     pdf.set_font(font_family, "", font_size)
     words = text.split()
-    lines: List[str] = []
+    lines: list[str] = []
     line = ""
     for word in words:
         if not word:
@@ -261,7 +290,7 @@ class CancionCargada:
     titulo: str
     tono: str
     texto_original: str
-    estructura: List[LineaCancion]
+    estructura: list[LineaCancion]
 
 
 # ---------------------------------------------------------------------------
@@ -463,8 +492,8 @@ class RenderizadorCancion:
 
 def _cargar_canciones(
     conn: sqlite3.Connection,
-    canciones_por_momento: Dict[str, Union[int, str]],
-) -> Dict[str, CancionCargada]:
+    canciones_por_momento: dict[str, int | str],
+) -> dict[str, CancionCargada]:
     """
     Carga desde SQLite las canciones indicadas por momento.
 
@@ -472,9 +501,9 @@ def _cargar_canciones(
     si alguna no existe.
     """
     cursor = conn.cursor()
-    ids: List[int] = []
-    titulos: List[str] = []
-    momentos_con_valor: Dict[str, Union[int, str]] = {}
+    ids: list[int] = []
+    titulos: list[str] = []
+    momentos_con_valor: dict[str, int | str] = {}
     for momento, valor in canciones_por_momento.items():
         if valor is None or (isinstance(valor, str) and not valor.strip()):
             continue
@@ -484,8 +513,8 @@ def _cargar_canciones(
         else:
             titulos.append(str(valor))
 
-    canciones_por_id: Dict[int, sqlite3.Row] = {}
-    canciones_por_titulo: Dict[str, sqlite3.Row] = {}
+    canciones_por_id: dict[int, sqlite3.Row] = {}
+    canciones_por_titulo: dict[str, sqlite3.Row] = {}
 
     if ids:
         placeholders = ",".join("?" * len(ids))
@@ -508,10 +537,10 @@ def _cargar_canciones(
             canciones_por_titulo[row["titulo"]] = row
 
     parser = AcordesParser()
-    resultado: Dict[str, CancionCargada] = {}
+    resultado: dict[str, CancionCargada] = {}
 
     for momento, valor in momentos_con_valor.items():
-        row: Optional[sqlite3.Row] = None
+        row: sqlite3.Row | None = None
         if isinstance(valor, int):
             row = canciones_por_id.get(valor)
         else:
@@ -519,9 +548,7 @@ def _cargar_canciones(
 
         if row is None:
             logger.error("Canción no encontrada para '%s': %r", momento, valor)
-            raise CancionNoEncontradaError(
-                f"No se encontró la canción para '{momento}': {valor!r}"
-            )
+            raise CancionNoEncontradaError(f"No se encontró la canción para '{momento}': {valor!r}")
 
         texto = limpiar_texto_cancion(_sanitizar_texto(row["letra_con_acordes"]))
         estructura = parser.parsear_cancion_completa(texto)
@@ -591,7 +618,7 @@ def _render_portada(
     pdf: PDFMusicos,
     fecha_domingo: str,
     celebracion: str,
-    notas: Optional[List[str]],
+    notas: list[str] | None,
 ) -> None:
     """Dibuja título, subtítulo, fecha y notas previas."""
     pdf.add_page()
@@ -692,8 +719,7 @@ def _render_cancion(
 
     # Si no hay acordes en ninguna línea, mostrar advertencia sutil y la letra
     tiene_acordes = any(
-        linea.tipo in ("acordes_letra", "acordes") and linea.acordes
-        for linea in cancion.estructura
+        linea.tipo in ("acordes_letra", "acordes") and linea.acordes for linea in cancion.estructura
     )
     if not tiene_acordes:
         pdf.set_font(FONT_LETRA, "I", SIZE_LETRA_PT)
@@ -750,10 +776,10 @@ def _render_cierre(pdf: PDFMusicos) -> None:
 
 def generar_hoja_musicos(
     fecha_domingo: str,
-    canciones_por_momento: Dict[str, Union[int, str]],
-    notas: Optional[List[str]] = None,
-    celebracion: Optional[str] = None,
-    output_path: Optional[Union[str, Path]] = None,
+    canciones_por_momento: dict[str, int | str],
+    notas: list[str] | None = None,
+    celebracion: str | None = None,
+    output_path: str | Path | None = None,
 ) -> Path:
     """
     Genera el PDF de la hoja de músicos para una celebración.
@@ -775,22 +801,14 @@ def generar_hoja_musicos(
         PDFMusicosError: para errores inesperados de generación.
     """
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", fecha_domingo):
-        raise PDFMusicosError(
-            f"fecha_domingo debe tener formato YYYY-MM-DD: {fecha_domingo!r}"
-        )
+        raise PDFMusicosError(f"fecha_domingo debe tener formato YYYY-MM-DD: {fecha_domingo!r}")
 
-    celebracion_final = celebracion or f"Celebración del Domingo"
+    celebracion_final = celebracion or "Celebración del Domingo"
 
     # Normalizar claves de momento (aceptan minúsculas del workflow o título).
-    canciones_por_momento = {
-        _normalizar_momento(k): v for k, v in canciones_por_momento.items()
-    }
+    canciones_por_momento = {_normalizar_momento(k): v for k, v in canciones_por_momento.items()}
 
-    output_path_final = (
-        Path(output_path)
-        if output_path
-        else _default_output_path(fecha_domingo)
-    )
+    output_path_final = Path(output_path) if output_path else _default_output_path(fecha_domingo)
     output_path_final.parent.mkdir(parents=True, exist_ok=True)
 
     logger.info(
