@@ -59,3 +59,8 @@ JWT_SECRET = _load_jwt_secret()
 DEFAULT_ADMIN_USERNAME = os.environ.get("CCE_ADMIN_DEFAULT_USER", "rafael.torres")
 DEFAULT_ADMIN_PASSWORD = os.environ.get("CCE_ADMIN_DEFAULT_PASSWORD", "1234")
 DEFAULT_ADMIN_NAME = os.environ.get("CCE_ADMIN_DEFAULT_NAME", "Rafael Torres")
+
+# GitHub para proxy de comentarios (se mantiene en servidor, nunca expuesto al navegador)
+GITHUB_TOKEN_COMENTARIOS = os.environ.get("GITHUB_TOKEN_CC5M5", "")
+GITHUB_COMENTARIOS_OWNER = os.environ.get("CCE_GITHUB_COMENTARIOS_OWNER", "cce-m5")
+GITHUB_COMENTARIOS_REPO = os.environ.get("CCE_GITHUB_COMENTARIOS_REPO", "cce-m5-music")
