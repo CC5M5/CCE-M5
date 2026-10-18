@@ -113,6 +113,12 @@ async def admin_login_html():
     return FileResponse(STATIC_DIR / "admin" / "login.html")
 
 
+@app.get("/health", response_model=dict)
+async def health():
+    """Healthcheck ligero para monitoreo."""
+    return {"status": "ok", "service": "cce-m5-admin"}
+
+
 @app.exception_handler(Exception)
 async def generic_exception_handler(request, exc):
     logger.exception("Error no controlado en API")
