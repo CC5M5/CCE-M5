@@ -3,8 +3,6 @@
 import sqlite3
 from unittest.mock import patch
 
-import pytest
-
 from src.web_admin.workflow_engine import (
     handle_fetch_lectures,
     handle_init,

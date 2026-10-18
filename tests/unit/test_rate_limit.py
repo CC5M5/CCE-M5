@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 
 from src.web_admin.rate_limit import LoginRateLimiter, _MemoryStorage
 

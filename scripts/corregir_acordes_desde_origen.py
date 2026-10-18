@@ -27,8 +27,8 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-from src.parsers.acordes_parser_v3 import AcordesParser
 from src.log_config import get_logger
+from src.parsers.acordes_parser_v3 import AcordesParser
 
 logger = get_logger(__name__)
 

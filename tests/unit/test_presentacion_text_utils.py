@@ -3,8 +3,8 @@
 from src.generators.presentacion.text_utils import (
     _apply_bold_html,
     _compactar_para_slide,
-    _escape_html,
     _es_linea_solo_acordes,
+    _escape_html,
     _formatear_cita,
     _paginar_texto,
     _texto_cancion,
