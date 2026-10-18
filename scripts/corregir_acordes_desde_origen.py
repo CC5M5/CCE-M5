@@ -18,15 +18,20 @@ from __future__ import annotations
 
 import argparse
 import html as html_module
+import json
+import logging
 import re
 import sqlite3
-import sys
 import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests
 from bs4 import BeautifulSoup
+
+from src.parsers.acordes_parser_v3 import AcordesParser
+
+logger = logging.getLogger(__name__)
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
@@ -57,7 +62,11 @@ def fetch_original_html(url: str, timeout: int = 15) -> Optional[str]:
         resp = requests.get(url, timeout=timeout)
         resp.raise_for_status()
         return resp.text
-    except Exception:
+    except requests.RequestException as exc:
+        logger.warning("No se pudo descargar %s: %s", url, exc)
+        return None
+    except (OSError, ValueError) as exc:
+        logger.warning("Error de sistema descargando %s: %s", url, exc)
         return None
 
 
@@ -209,9 +218,6 @@ def generate_report(results: List[Dict], songs: Dict[int, Dict]) -> str:
 
 def apply_correction(cancion_id: int, nuevo_texto: str, conn: sqlite3.Connection) -> None:
     """Aplica la corrección a la BD regenerando los campos derivados."""
-    sys.path.insert(0, str(PROJECT_DIR / "src"))
-    from parsers.acordes_parser_v3 import AcordesParser
-
     parser = AcordesParser()
     estructura = parser.parsear_cancion_completa(nuevo_texto)
     html_visual = parser.generar_html_visual(estructura)
@@ -226,7 +232,6 @@ def apply_correction(cancion_id: int, nuevo_texto: str, conn: sqlite3.Connection
             letra_limpia_lines.append(linea.letra)
     letra_sin_acordes = "\n".join(letra_limpia_lines)
 
-    import json
     estructura_json = json.dumps(
         [
             {
@@ -265,13 +270,20 @@ def main() -> int:
     parser.add_argument("--output", type=str, default=str(OUTPUT_DIR / "informe_acordes.html"),
                         help="Ruta del informe HTML")
     parser.add_argument("--delay", type=float, default=1.0, help="Segundos entre requests")
+    parser.add_argument("--log-level", type=str, default="INFO",
+                        help="Nivel de logging (DEBUG, INFO, WARNING, ERROR)")
     args = parser.parse_args()
 
-    if not args.report and not args.apply:
-        args.report = True
+    logging.basicConfig(
+        level=getattr(logging, args.log_level.upper(), logging.INFO),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
 
     conn = _get_connection()
     cursor = conn.cursor()
+
+    if not args.report and not args.apply:
+        args.report = True
 
     if args.ids:
         ids = [int(x.strip()) for x in args.ids.split(",") if x.strip()]

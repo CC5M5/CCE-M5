@@ -6,14 +6,17 @@ JSON + HTML + PPTX + PDF idénticos en contenido.
 """
 
 import json
+import logging
 import os
 import shutil
 import sqlite3
-import sys
+import subprocess
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+from .presentacion_html import GeneradorPresentacionHTML, Slide
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_DIR / "data"
@@ -22,8 +25,7 @@ LEMA_DIR = DATA_DIR / "lemas"
 ILUSTRACIONES_DIR = DATA_DIR / "ilustraciones"
 OUTPUT_DIR = PROJECT_DIR / "presentaciones_html"
 
-sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
-from presentacion_html import GeneradorPresentacionHTML, Slide  # noqa: E402
+logger = logging.getLogger(__name__)
 
 
 def _get_connection() -> sqlite3.Connection:
@@ -34,7 +36,6 @@ def _get_connection() -> sqlite3.Connection:
 
 def _convertir_svg_a_png(src: Path, dst_dir: Path) -> Optional[Path]:
     """Convierte un SVG a PNG usando inkscape si está disponible."""
-    import subprocess
     if not shutil.which("inkscape"):
         return None
     dst = dst_dir / f"{src.stem}.png"
@@ -46,7 +47,8 @@ def _convertir_svg_a_png(src: Path, dst_dir: Path) -> Optional[Path]:
             stderr=subprocess.DEVNULL,
         )
         return dst
-    except Exception:
+    except (subprocess.CalledProcessError, OSError) as exc:
+        logger.warning("No se pudo convertir SVG %s a PNG: %s", src, exc)
         return None
 
 

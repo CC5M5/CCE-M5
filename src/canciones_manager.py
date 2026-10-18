@@ -132,8 +132,9 @@ def crear_cancion(data: CancionCreateUpdate) -> Dict[str, Any]:
     try:
         from src.auto_rebuild_presentaciones import auto_rebuild_tras_cancion
         auto_rebuild_tras_cancion(cancion_id, solo_futuras=True)
-    except Exception:
+    except (ImportError, ValueError, TypeError, KeyError, OSError, sqlite3.Error) as exc:
         # No bloquear la creación de la canción si la regeneración de presentaciones falla.
+        logger.warning("Auto-rebuild falló tras crear canción %s: %s", cancion_id, exc)
         pass
 
     return cancion
@@ -190,8 +191,9 @@ def actualizar_cancion(cancion_id: int, data: CancionCreateUpdate) -> Dict[str, 
     try:
         from src.auto_rebuild_presentaciones import auto_rebuild_tras_cancion
         auto_rebuild_tras_cancion(cancion_id, solo_futuras=True)
-    except Exception:
+    except (ImportError, ValueError, TypeError, KeyError, OSError, sqlite3.Error) as exc:
         # No bloquear la actualización de la canción si la regeneración de presentaciones falla.
+        logger.warning("Auto-rebuild falló tras actualizar canción %s: %s", cancion_id, exc)
         pass
 
     return cancion

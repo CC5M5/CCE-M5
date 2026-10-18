@@ -356,8 +356,8 @@ class CancioneroScraper:
 
         try:
             soup = BeautifulSoup(html_bytes, 'lxml')
-        except Exception:
-            logger.exception(f"Error parseando HTML de {url}")
+        except (ValueError, TypeError) as exc:
+            logger.exception("Error parseando HTML de %s: %s", url, exc)
             return None
 
         post_body = soup.find('div', class_='post-body') or soup.find('div', class_='entry-content')
@@ -390,8 +390,8 @@ class CancioneroScraper:
         try:
             parser = AcordesParser()
             estructura = parser.parsear_cancion_completa(texto_completo)
-        except Exception:
-            logger.exception(f"Error parseando cancion {url}")
+        except (ValueError, TypeError, KeyError, AttributeError) as exc:
+            logger.exception("Error parseando cancion %s: %s", url, exc)
             return None
 
         if not estructura:
@@ -402,8 +402,8 @@ class CancioneroScraper:
             tono = parser.detectar_tono(estructura)
             html_visual = parser.generar_html_visual(estructura)
             momento_liturgico = detectar_momento_liturgico(texto_completo)
-        except Exception:
-            logger.exception(f"Error generando representacion visual de {url}")
+        except (ValueError, TypeError, KeyError, AttributeError) as exc:
+            logger.exception("Error generando representacion visual de %s: %s", url, exc)
             tono = ''
             html_visual = ''
             momento_liturgico = ''
@@ -538,8 +538,8 @@ class CancioneroScraper:
 
             try:
                 datos = self.obtener_cancion(url)
-            except Exception:
-                logger.exception(f"Error inesperado procesando {url}")
+            except Exception:  # noqa: BLE001 - Bucle de scraping: no romper por errores inesperados de una URL
+                logger.exception("Error inesperado procesando %s", url)
                 datos = None
 
             if datos:

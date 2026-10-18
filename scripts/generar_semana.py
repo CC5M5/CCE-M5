@@ -37,16 +37,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Asegurar que src/ es importable cuando se ejecuta desde el repo raíz.
-PROJECT_DIR = Path(__file__).parent.parent.resolve()
-if str(PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(PROJECT_DIR))
-
 from src.db_manager import DB_PATH, get_connection
 from src.generators.pdf_musicos import CancionNoEncontradaError, generar_hoja_musicos
 
 logger = logging.getLogger("generar_semana")
 
+PROJECT_DIR = Path(__file__).parent.parent.resolve()
 OUTPUT_DIR = PROJECT_DIR / "presentaciones"
 BORRADOR_DIR = PROJECT_DIR / "borradores"
 TEMPLATE_PATH = PROJECT_DIR / "data" / "templates" / "274_Domingo_21_06_2026.pptx"
@@ -166,8 +162,12 @@ def obtener_lecturas(
             logger.info("Lecturas de Koinonia obtenidas para %s", fecha_domingo)
             return lecturas
         logger.warning("Koinonia no devolvió datos para %s; se usará mock", fecha_domingo)
-    except Exception as exc:
-        logger.warning("Error al consultar Koinonia para %s: %s", fecha_domingo, exc)
+    except requests.RequestException as exc:
+        logger.warning("Error de red al consultar Koinonia para %s: %s", fecha_domingo, exc)
+    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        logger.warning("Error al procesar respuesta de Koinonia para %s: %s", fecha_domingo, exc)
+    except OSError as exc:
+        logger.warning("Error de sistema al consultar Koinonia para %s: %s", fecha_domingo, exc)
 
     # Fallback a Ciudad Redonda
     try:
@@ -178,8 +178,10 @@ def obtener_lecturas(
             logger.info("Lecturas de Ciudad Redonda obtenidas para %s", fecha_domingo)
             return lecturas_cr
         logger.warning("Ciudad Redonda no devolvió datos para %s; se usará mock", fecha_domingo)
-    except Exception as exc_cr:
-        logger.warning("Error al consultar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr)
+    except requests.RequestException as exc_cr:
+        logger.warning("Error de red al consultar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr)
+    except (ValueError, TypeError, KeyError, AttributeError) as exc_cr:
+        logger.warning("Error al procesar Ciudad Redonda para %s: %s", fecha_domingo, exc_cr)
 
     # Fallback a mock (persistimos en BD para permitir matching posterior)
     try:
@@ -191,11 +193,11 @@ def obtener_lecturas(
         mock["fecha"] = fecha_domingo
         try:
             KoinoniaRepository().guardar(mock)
-        except Exception as exc_guardar:
+        except (sqlite3.Error, OSError, ValueError, TypeError) as exc_guardar:
             logger.warning("No se pudo guardar mock en BD: %s", exc_guardar)
         logger.warning("Usando mock de lecturas para %s", fecha_domingo)
         return mock
-    except Exception as exc:
+    except (ValueError, TypeError, KeyError) as exc:
         logger.error("No se pudo generar mock de lecturas: %s", exc)
         return _lecturas_vacias(fecha_domingo)
 
@@ -266,7 +268,9 @@ def cargar_config_manual(path: Path) -> Dict[str, Any]:
     try:
         with path.open("r", encoding="utf-8") as f:
             return json.load(f)
-    except Exception as exc:
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"El config manual {path} no es JSON válido: {exc}") from exc
+    except OSError as exc:
         raise ValueError(f"No se pudo leer config manual {path}: {exc}") from exc
 
 
@@ -421,7 +425,7 @@ def proponer_canciones_matching(
             if _es_id_valido(cancion_id):
                 propuestas[momento_key] = int(cancion_id)
                 usadas.add(int(cancion_id))
-        except Exception as exc:
+        except (ValueError, TypeError, KeyError, AttributeError) as exc:
             logger.warning("Matching falló para '%s': %s", momento_key, exc)
 
     # Fallback: asegurar que todos los momentos tengan al menos una canción,
@@ -463,7 +467,7 @@ def proponer_canciones_matching(
                             propuestas[key] = int(row_fb["id"])
                             usadas.add(int(row_fb["id"]))
                         conn_fb.close()
-                    except Exception as exc:
+                    except (sqlite3.Error, ValueError, TypeError, KeyError) as exc:
                         logger.warning("Fallback alternativo BD falló para '%s': %s", key, exc)
 
     return propuestas
@@ -589,7 +593,7 @@ def generar_pptx(
             return output_path
         else:
             logger.warning("No se encontró PPTX en el bundle: %s", bundle_dir)
-    except Exception as exc:
+    except (ValueError, TypeError, KeyError, AttributeError, OSError, sqlite3.Error) as exc:
         logger.error("Generador presentacion_html falló: %s", exc)
         traceback.print_exc()
 
