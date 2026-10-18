@@ -801,7 +801,8 @@ class GeneradorPresentacionHTML:
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
             ]
             return f"{dt.day} de {meses[dt.month - 1]} de {dt.year}"
-        except Exception:
+        except (ValueError, TypeError) as exc:
+            print(f"Error formateando fecha {fecha}: {exc}")
             return fecha
 
     # ------------------------------------------------------------------
@@ -1339,8 +1340,8 @@ class GeneradorPresentacionHTML:
             if lema_img_path.exists():
                 try:
                     slide.shapes.add_picture(str(lema_img_path), Inches(0.4), Inches(SLIDE_HEIGHT_INCHES - 0.95), height=Inches(0.75))
-                except Exception:
-                    pass
+                except (OSError, ValueError, TypeError) as exc:
+                    logger.warning("No se pudo añadir logo lema a slide: %s", exc)
 
             # Ilustración
             if has_image:
@@ -1379,8 +1380,8 @@ class GeneradorPresentacionHTML:
             if hasattr(card, "adjustments"):
                 try:
                     card.adjustments[0] = 0.08
-                except Exception:
-                    pass
+                except (AttributeError, IndexError, TypeError, ValueError) as exc:
+                    logger.debug("Ajuste de esquinas no soportado: %s", exc)
 
             # Línea inferior acento
             line = slide.shapes.add_shape(
@@ -1497,7 +1498,8 @@ class GeneradorPresentacionHTML:
     # PDF vía playwright (4:3)
     # ------------------------------------------------------------------
 
-    def _render_pdf(self, html_path: Path, pdf_path: Path):
+    def _render_pdf(self, html_path: Path, pdf_path: Path) -> None:
+        """Genera PDF vía playwright lanzando el HTML local."""
         try:
             from playwright.sync_api import sync_playwright
             with sync_playwright() as p:
@@ -1507,7 +1509,7 @@ class GeneradorPresentacionHTML:
                 page.wait_for_timeout(1000)
                 page.pdf(path=str(pdf_path), width="10in", height="7.5in", print_background=True)
                 browser.close()
-        except Exception as exc:
+        except (OSError, ValueError, TypeError, RuntimeError) as exc:
             print(f"PDF no generado automáticamente: {exc}")
 
 

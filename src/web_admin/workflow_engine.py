@@ -9,16 +9,14 @@ from __future__ import annotations
 import json
 import logging
 import shutil
+import subprocess
 import sys
 import traceback
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 PROJECT_DIR = Path(__file__).parent.parent.parent.resolve()
-if str(PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(PROJECT_DIR))
 
 from src.db_manager import get_connection
 from src.generators.composicion_catalogo import asegurar_composicion, sincronizar_presentacion_slides
@@ -267,7 +265,7 @@ def handle_fetch_lectures(
             if lecturas:
                 fuente = scraper_name
                 break
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - Fallback scrapers: cualquier error no debe romper el bucle
             err_msg = f"{scraper_name}: {exc}"
             errores.append(err_msg)
             logger.warning("Scraper %s falló para %s: %s", scraper_name, fecha, exc)
@@ -335,7 +333,8 @@ def handle_verify_lectures(
     # Guardar lecturas en la tabla principal
     try:
         _save_lecturas_to_db(workflow["fecha_domingo"], lecturas)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError) as exc:
+        logger.warning("No se pudieron guardar las lecturas: %s", exc)
         return {"success": False, "error": f"No se pudieron guardar las lecturas: {exc}"}
 
     return {
@@ -420,7 +419,7 @@ def proponer_canciones_para_dia(fecha: str) -> Dict[str, Any]:
     engine = MatchingEngine()
     try:
         matches = engine.encontrar_canciones_para_lectura(lectura_id, limite=100, score_minimo=0.0)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError, KeyError, AttributeError) as exc:
         logger.warning("Matching engine falló para %s: %s", fecha, exc)
         matches = []
 
@@ -491,7 +490,7 @@ def handle_propose_songs(
 
     try:
         propuestas = proponer_canciones_para_dia(fecha)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError) as exc:
         return {"success": False, "error": f"Error al proponer canciones: {exc}"}
 
     steps_data["canciones_propuestas"] = propuestas
@@ -586,13 +585,13 @@ def handle_generate_assets(
         creada = asegurar_composicion(fecha, canciones_json_str)
         if creada:
             logger.info("Composición por defecto creada para %s", fecha)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError, KeyError) as exc:
         return {"success": False, "error": f"Error preparando composición: {exc}"}
 
     try:
         gen = GeneradorDesdeComposicion()
         bundle_dir = gen.generar_desde_presentacion(fecha)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError, KeyError, OSError) as exc:
         return {"success": False, "error": f"Error generando presentación: {exc}"}
 
     try:
@@ -601,7 +600,7 @@ def handle_generate_assets(
             fecha_domingo=fecha,
             canciones_por_momento=canciones_json,
         )
-    except Exception as exc:
+    except (ValueError, TypeError, KeyError, OSError) as exc:
         return {"success": False, "error": f"Error generando hoja de músicos: {exc}"}
 
     # Copiar PPTX/PDF al directorio presentaciones/ para descarga
@@ -658,13 +657,13 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
     # 1. Guardar en tabla presentaciones
     try:
         _save_presentacion_to_db(workflow, steps_data)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError) as exc:
         return {"success": False, "error": f"Error guardando presentación en BD: {exc}"}
 
     # 1b. Sincronizar contenido de presentacion_slides con slides editadas
     try:
         sincronizar_presentacion_slides(fecha)
-    except Exception as exc:
+    except (sqlite3.Error, ValueError, TypeError) as exc:
         logger.warning("No se pudo sincronizar presentacion_slides: %s", exc)
 
     try:
@@ -720,7 +719,7 @@ def handle_publish(workflow: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, 
                 "error": f"astro build falló: {result_build.stderr}",
             }
 
-    except Exception as exc:
+    except (OSError) as exc:
         return {"success": False, "error": f"Error en publicación: {exc}"}
 
     steps_data["publicado"] = True

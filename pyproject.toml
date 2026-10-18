@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cce-m5-web-presentaciones"
+version = "1.0.0"
+description = "Generador de presentaciones litúrgicas para CCE-M5"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "CCE-M5 Team"},
+]
+dependencies = [
+    "playwright>=1.40.0",
+    "matplotlib>=3.8.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pyjwt>=2.9.0",
+    "bcrypt>=4.2.0",
+    "python-multipart>=0.0.12",
+    "python-pptx>=1.0.0",
+    "fpdf2>=2.8.0",
+    "reportlab>=4.0.0",
+    "requests>=2.32.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.7.0",
+    "mypy>=1.13.0",
+]
+
+[project.scripts]
+cce-m5-admin-api = "scripts.run_admin_api:main"
+cce-m5-init-db = "scripts.init_db:main"
+cce-m5-generar-semana = "scripts.generar_semana:main"
+cce-m5-editor-diapositivas = "scripts.editor_diapositivas_server:main"
+cce-m5-editor-acordes = "scripts.editor_acordes_server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cce_m5_web_presentaciones = ["web_admin/static/**/*", "web_admin/templates/**/*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "scripts"]
