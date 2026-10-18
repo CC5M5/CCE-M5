@@ -181,7 +181,7 @@ def _paginar_texto(texto: str, max_chars: int = 1100) -> list[str]:
                     actual2 = f"{actual2} {oracion}".strip()
             if actual2:
                 resultado.append(actual2.strip())
-    return fragmentos
+    return resultado
 
 
 def _formatear_cita(libro: str, cita: str) -> str:
