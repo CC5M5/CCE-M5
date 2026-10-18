@@ -32,8 +32,8 @@ from typing import Any
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
-from src.parsers.acordes_parser_v3 import AcordesParser, LineaCancion, limpiar_texto_cancion
 from src.log_config import get_logger
+from src.parsers.acordes_parser_v3 import AcordesParser, LineaCancion, limpiar_texto_cancion
 
 logger = get_logger(__name__)
 

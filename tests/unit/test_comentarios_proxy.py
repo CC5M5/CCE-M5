@@ -53,9 +53,8 @@ async def test_comentario_github_error(monkeypatch):
     def fake_urlopen(req, timeout=None):
         raise urllib.error.HTTPError(req.full_url, 401, "Unauthorized", {}, None)
 
-    with patch("urllib.request.urlopen", fake_urlopen):
-        with pytest.raises(HTTPException) as exc_info:
-            await crear_comentario(_payload())
+    with patch("urllib.request.urlopen", fake_urlopen), pytest.raises(HTTPException) as exc_info:
+        await crear_comentario(_payload())
 
     assert exc_info.value.status_code == 502
 
