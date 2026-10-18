@@ -8,14 +8,20 @@ futuras que usen esa canción en su asignación.
 from __future__ import annotations
 
 import json
+import logging
 import re
 import sqlite3
 from datetime import date
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
+from src.generators.composicion_catalogo import guardar_composicion, proponer_composicion
+from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+
+logger = logging.getLogger(__name__)
 
 MOMENTOS_CON_SLIDE = {
     "entrada", "acto_penitencial", "gloria", "salmo", "aleluya",
@@ -122,7 +128,8 @@ def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
         return {}
     try:
         data = json.loads(canciones_json)
-    except Exception:
+    except json.JSONDecodeError:
+        logger.warning("JSON de canciones inválido: %r", canciones_json)
         return {}
     if not isinstance(data, dict):
         return {}
@@ -171,12 +178,6 @@ def encontrar_presentaciones_afectadas(cancion_id: int, solo_futuras: bool = Tru
 
 def regenerar_presentacion(fecha: str) -> Dict[str, str]:
     """Regenera composición y bundle para una presentación."""
-    import sys
-
-    sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
-    from composicion_catalogo import proponer_composicion, guardar_composicion
-    from generar_desde_composicion import GeneradorDesdeComposicion
-
     items = proponer_composicion(fecha)
     if not items:
         return {"status": "error", "error": f"No se pudo proponer composición para {fecha}"}
@@ -192,7 +193,11 @@ def regenerar_presentacion(fecha: str) -> Dict[str, str]:
     conn.close()
 
     guardar_composicion(fecha, items)
-    GeneradorDesdeComposicion().generar_desde_presentacion(fecha)
+    try:
+        GeneradorDesdeComposicion().generar_desde_presentacion(fecha)
+    except (sqlite3.Error, ValueError, TypeError, KeyError, AttributeError, OSError) as exc:
+        logger.error("Error regenerando presentación %s: %s", fecha, exc)
+        return {"status": "error", "error": str(exc), "slides": len(items)}
 
     return {"status": "ok", "slides": len(items)}
 

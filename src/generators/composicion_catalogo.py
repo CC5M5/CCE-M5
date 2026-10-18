@@ -55,7 +55,7 @@ def _canciones_asignadas(canciones_json: Optional[str]) -> Dict[str, int]:
         return {}
     try:
         data = json.loads(canciones_json)
-    except Exception:
+    except json.JSONDecodeError:
         return {}
     if not isinstance(data, dict):
         return {}
@@ -286,7 +286,7 @@ def asegurar_composicion(fecha: str, canciones_json: Optional[str] = None) -> bo
             return {}
         try:
             data = json.loads(cj)
-        except Exception:
+        except json.JSONDecodeError:
             return {}
         return {k: v for k, v in data.items() if v is not None}
 
