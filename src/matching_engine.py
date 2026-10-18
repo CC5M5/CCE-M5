@@ -16,10 +16,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import sqlite3
 from dataclasses import dataclass, field
-import os
 from pathlib import Path
 from typing import Any
 
@@ -161,7 +161,7 @@ class MatchingConfig:
     afinidad_momento_tema: dict[str, list[str]]
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "MatchingConfig":
+    def from_dict(cls, data: dict[str, Any]) -> MatchingConfig:
         db_path = Path(data.get("db_path", str(DB_PATH)))
         score_minimo = float(data.get("score_minimo", DEFAULT_CONFIG["score_minimo"]))
         limite_resultados = int(data.get("limite_resultados", DEFAULT_CONFIG["limite_resultados"]))
@@ -190,7 +190,7 @@ class MatchingConfig:
         )
 
     @classmethod
-    def load(cls, config_path: Path | None = None) -> "MatchingConfig":
+    def load(cls, config_path: Path | None = None) -> MatchingConfig:
         path = config_path or CONFIG_PATH
         if not path.exists():
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -222,9 +222,7 @@ class TextPreprocessor:
 
     def __init__(self, quitar_tildes: bool = True) -> None:
         self.quitar_tildes = quitar_tildes
-        self._tildes = str.maketrans(
-            "áéíóúüÁÉÍÓÚÜ", "aeiouuAEIOUU"
-        )
+        self._tildes = str.maketrans("áéíóúüÁÉÍÓÚÜ", "aeiouuAEIOUU")
 
     def tokenize(self, texto: str | None) -> list[str]:
         if not texto:
@@ -257,7 +255,9 @@ class ThemeVector:
 class ThemeExtractor:
     """Extrae vectores temáticos ponderados a partir de textos."""
 
-    def __init__(self, config: MatchingConfig, preprocessor: TextPreprocessor | None = None) -> None:
+    def __init__(
+        self, config: MatchingConfig, preprocessor: TextPreprocessor | None = None
+    ) -> None:
         self.config = config
         self.preprocessor = preprocessor or TextPreprocessor()
         self._tema_palabras: dict[str, list[str]] = {}
@@ -611,13 +611,15 @@ class MatchingService:
                     key=lambda t: vector_lectura.temas[t] * vector_cancion.temas[t],
                     reverse=True,
                 )
-                matches.append({
-                    "cancion_id": cancion_id,
-                    "titulo": titulo,
-                    "score": round(score, 3),
-                    "temas_comunes": temas_comunes,
-                    "momento_liturgico": momento_cancion,
-                })
+                matches.append(
+                    {
+                        "cancion_id": cancion_id,
+                        "titulo": titulo,
+                        "score": round(score, 3),
+                        "temas_comunes": temas_comunes,
+                        "momento_liturgico": momento_cancion,
+                    }
+                )
 
         matches.sort(key=lambda x: x["score"], reverse=True)
         return matches[:limite]

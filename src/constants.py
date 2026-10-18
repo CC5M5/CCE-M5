@@ -48,7 +48,7 @@ MOMENTOS_KEY = [
     "despedida",
 ]
 
-MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY))
+MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False))
 
 # Colores litúrgicos (fondos degradados)
 COLORES_LITURGICOS = {
@@ -146,8 +146,7 @@ TEXTOS_LITURGICOS = {
         "ahora y en la hora de nuestra muerte. Amén."
     ),
     "despedida": (
-        "Que el Señor nos bendiga, nos guarde de todo mal\n"
-        "y nos lleve a la vida eterna. Amén."
+        "Que el Señor nos bendiga, nos guarde de todo mal\n" "y nos lleve a la vida eterna. Amén."
     ),
 }
 

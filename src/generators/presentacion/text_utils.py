@@ -3,9 +3,47 @@
 import re
 
 PALABRAS_CORTAS = {
-    "EL", "ÉL", "LA", "LAS", "LOS", "UN", "UNA", "Y", "O", "U", "NO", "SI", "ME", "SE", "TE",
-    "LO", "LE", "LES", "NOS", "OS", "DEL", "AL", "CON", "POR", "PARA", "QUE", "COMO", "CUANDO",
-    "MI", "SU", "SUS", "TU", "TUS", "ES", "SON", "ESTÁ", "ESTAN", "A", "EN", "DE", "DIOS",
+    "EL",
+    "ÉL",
+    "LA",
+    "LAS",
+    "LOS",
+    "UN",
+    "UNA",
+    "Y",
+    "O",
+    "U",
+    "NO",
+    "SI",
+    "ME",
+    "SE",
+    "TE",
+    "LO",
+    "LE",
+    "LES",
+    "NOS",
+    "OS",
+    "DEL",
+    "AL",
+    "CON",
+    "POR",
+    "PARA",
+    "QUE",
+    "COMO",
+    "CUANDO",
+    "MI",
+    "SU",
+    "SUS",
+    "TU",
+    "TUS",
+    "ES",
+    "SON",
+    "ESTÁ",
+    "ESTAN",
+    "A",
+    "EN",
+    "DE",
+    "DIOS",
 }
 
 
@@ -81,10 +119,7 @@ def _compactar_salmo_o_lectura(texto: str) -> str:
             if unido.endswith("-"):
                 unido = unido[:-1] + frase
                 continue
-            if unido[-1] in ",;:":
-                unido = f"{unido} {frase}"
-            else:
-                unido = f"{unido}; {frase}"
+            unido = f"{unido} {frase}" if unido[-1] in ",;:" else f"{unido}; {frase}"
         resultado.append(unido)
 
     return "\n\n".join(resultado)

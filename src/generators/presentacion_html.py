@@ -14,21 +14,18 @@ Características:
 """
 
 import json
-import sqlite3
-import shutil
-import subprocess
 import re
-import zipfile
-from dataclasses import dataclass, asdict
+import shutil
+import sqlite3
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-from xml.etree import ElementTree as ET
+from typing import Any
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor
-from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
-from pptx.util import Emu, Inches, Pt, Cm
+from pptx.enum.text import MSO_ANCHOR
+from pptx.util import Cm, Inches, Pt
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_DIR / "data"
@@ -71,7 +68,7 @@ MOMENTOS_KEY = [
     "despedida",
 ]
 
-MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY))
+MOMENTO_A_KEY = dict(zip(MOMENTOS_ES, MOMENTOS_KEY, strict=False))
 
 # Colores litúrgicos (fondos degradados)
 COLORES_LITURGICOS = {
@@ -192,7 +189,7 @@ class Slide:
 class GeneradorPresentacionHTML:
     """Genera presentación litúrgica en JSON + HTML + PPTX + PDF."""
 
-    def __init__(self, db_path: Optional[str] = None, output_dir: Optional[str] = None):
+    def __init__(self, db_path: str | None = None, output_dir: str | None = None):
         self.db_path = Path(db_path) if db_path else DB_PATH
         self.output_dir = Path(output_dir) if output_dir else OUTPUT_DIR
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -200,11 +197,11 @@ class GeneradorPresentacionHTML:
         self.lema_web = "/presentaciones_assets/lema_somos_uno.jpg"
         self.catalogo = self._cargar_catalogo()
 
-    def _cargar_catalogo(self) -> Dict[str, List[str]]:
+    def _cargar_catalogo(self) -> dict[str, list[str]]:
         catalogo_path = ILUSTRACIONES_DIR / "catalogo.json"
         if not catalogo_path.exists():
             return {}
-        with open(catalogo_path, "r", encoding="utf-8") as f:
+        with open(catalogo_path, encoding="utf-8") as f:
             data = json.load(f)
         return data.get("imagenes", {})
 
@@ -212,7 +209,7 @@ class GeneradorPresentacionHTML:
         self,
         fecha: str,
         lectura_id: int,
-        canciones_ids: Dict[str, int],
+        canciones_ids: dict[str, int],
         incluir_bendicion_agua: bool = False,
         frase_evangelio: str = "",
     ) -> Path:
@@ -230,7 +227,11 @@ class GeneradorPresentacionHTML:
             frase_evangelio = self._extraer_frase_evangelio(lectura)
 
         slides = self._construir_slides(
-            fecha, lectura, celebracion, canciones, color_info,
+            fecha,
+            lectura,
+            celebracion,
+            canciones,
+            color_info,
             incluir_bendicion_agua=incluir_bendicion_agua,
             frase_evangelio=frase_evangelio,
         )
@@ -286,7 +287,7 @@ class GeneradorPresentacionHTML:
 
         return bundle_dir
 
-    def _get_lectura(self, lectura_id: int) -> Optional[sqlite3.Row]:
+    def _get_lectura(self, lectura_id: int) -> sqlite3.Row | None:
         conn = _get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM lecturas WHERE id=?", (lectura_id,))
@@ -294,7 +295,7 @@ class GeneradorPresentacionHTML:
         conn.close()
         return row
 
-    def _get_canciones(self, canciones_ids: Dict[str, int]) -> Dict[str, Dict[str, Any]]:
+    def _get_canciones(self, canciones_ids: dict[str, int]) -> dict[str, dict[str, Any]]:
         conn = _get_connection()
         cursor = conn.cursor()
         canciones = {}
@@ -328,19 +329,19 @@ class GeneradorPresentacionHTML:
 
     def _extraer_frase_evangelio(self, lectura: sqlite3.Row) -> str:
         """Extrae una frase corta representativa del Evangelio."""
-        texto = lectura["evangelio_texto"] if lectura and "evangelio_texto" in lectura.keys() else ""
+        texto = lectura["evangelio_texto"] if lectura and "evangelio_texto" in lectura else ""
         if not texto:
             return ""
-        comillas = re.findall(r'«([^»]{20,180})»', texto)
+        comillas = re.findall(r"«([^»]{20,180})»", texto)
         if comillas:
             return comillas[-1].strip()
-        for oracion in re.split(r'(?<=[.!?])\s+', texto):
+        for oracion in re.split(r"(?<=[.!?])\s+", texto):
             oracion = oracion.strip()
             if 20 <= len(oracion) <= 180:
                 return oracion + "."
         return texto[:180].strip() + "..."
 
-    def _texto_cancion(self, cancion: Dict[str, Any]) -> str:
+    def _texto_cancion(self, cancion: dict[str, Any]) -> str:
         """
         Devuelve la letra de una canción limpia, compacta y lista para slide.
 
@@ -361,12 +362,50 @@ class GeneradorPresentacionHTML:
         estribillo_marcas = {"estribillo", "estrib", "coro", "todos", "todas"}
         # Palabras cortas en mayúsculas que suelen ser inicio de frase cortada al final de línea
         palabras_cortas = {
-            "EL", "ÉL", "LA", "LAS", "LOS", "UN", "UNA", "Y", "O", "U", "NO", "SI", "ME", "SE", "TE",
-            "LO", "LE", "LES", "NOS", "OS", "DEL", "AL", "CON", "POR", "PARA", "QUE", "COMO", "CUANDO",
-            "MI", "SU", "SUS", "TU", "TUS", "ES", "SON", "ESTÁ", "ESTAN", "A", "EN", "DE", "DIOS",
+            "EL",
+            "ÉL",
+            "LA",
+            "LAS",
+            "LOS",
+            "UN",
+            "UNA",
+            "Y",
+            "O",
+            "U",
+            "NO",
+            "SI",
+            "ME",
+            "SE",
+            "TE",
+            "LO",
+            "LE",
+            "LES",
+            "NOS",
+            "OS",
+            "DEL",
+            "AL",
+            "CON",
+            "POR",
+            "PARA",
+            "QUE",
+            "COMO",
+            "CUANDO",
+            "MI",
+            "SU",
+            "SUS",
+            "TU",
+            "TUS",
+            "ES",
+            "SON",
+            "ESTÁ",
+            "ESTAN",
+            "A",
+            "EN",
+            "DE",
+            "DIOS",
         }
 
-        limpio: List[str] = []
+        limpio: list[str] = []
         for linea in lineas:
             linea = linea.strip()
             if not linea:
@@ -380,7 +419,7 @@ class GeneradorPresentacionHTML:
             limpio.append(linea)
 
         # Unir frases cortadas artificialmente
-        unidas: List[str] = []
+        unidas: list[str] = []
         actual = ""
         terminadores = ".!?;:)"
         for linea in limpio:
@@ -403,7 +442,7 @@ class GeneradorPresentacionHTML:
                 continue
 
             # Unir frases cortadas artificialmente
-        unidas: List[str] = []
+        unidas: list[str] = []
         actual = ""
         terminadores = ".!?;:)"
         for linea in limpio:
@@ -465,7 +504,7 @@ class GeneradorPresentacionHTML:
             unidas.append(actual)
 
         # Detectar y marcar estribillos en negrita
-        resultado: List[str] = []
+        resultado: list[str] = []
         en_estribillo = False
         for linea in unidas:
             linea_l = linea.lower().strip("():[] ")
@@ -520,8 +559,8 @@ class GeneradorPresentacionHTML:
         if not lineas:
             return ""
 
-        estrofas: List[List[str]] = []
-        actual: List[str] = [lineas[0]]
+        estrofas: list[list[str]] = []
+        actual: list[str] = [lineas[0]]
 
         def _empieza_nuevo_bloque(linea: str) -> bool:
             return bool(re.match(r"^[A-ZÁÉÍÓÚÑ]", linea))
@@ -540,7 +579,7 @@ class GeneradorPresentacionHTML:
         if actual:
             estrofas.append(actual)
 
-        resultado: List[str] = []
+        resultado: list[str] = []
         for estrofa in estrofas:
             unido = estrofa[0]
             for frase in estrofa[1:]:
@@ -549,14 +588,10 @@ class GeneradorPresentacionHTML:
                     unido = unido[:-1] + frase
                     continue
                 # Si la frase anterior termina en coma/punto y coma, unir con espacio
-                if unido[-1] in ",;:":
-                    unido = f"{unido} {frase}"
-                else:
-                    unido = f"{unido}; {frase}"
+                unido = f"{unido} {frase}" if unido[-1] in ",;:" else f"{unido}; {frase}"
             resultado.append(unido)
 
         return "\n\n".join(resultado)
-
 
     def _compactar_para_slide(self, texto: str) -> str:
         """
@@ -592,7 +627,7 @@ class GeneradorPresentacionHTML:
             return cita
         return f"{libro} {cita}"
 
-    def _paginar_texto(self, texto: str, max_chars: int = 1100) -> List[str]:
+    def _paginar_texto(self, texto: str, max_chars: int = 1100) -> list[str]:
         """Divide un texto largo en fragmentos que quepan en una slide 4:3 real (33,87 cm × 25,4025 cm)."""
         if len(texto) <= max_chars:
             return [texto]
@@ -629,7 +664,7 @@ class GeneradorPresentacionHTML:
     def _add_cancion_slide(
         self,
         add,
-        canciones: Dict[str, Dict[str, Any]],
+        canciones: dict[str, dict[str, Any]],
         key: str,
         tipo: str,
         momento: str,
@@ -650,15 +685,22 @@ class GeneradorPresentacionHTML:
         fecha: str,
         lectura: sqlite3.Row,
         celebracion: str,
-        canciones: Dict[str, Dict[str, Any]],
-        color_info: Dict[str, str],
+        canciones: dict[str, dict[str, Any]],
+        color_info: dict[str, str],
         incluir_bendicion_agua: bool = False,
         frase_evangelio: str = "",
-    ) -> List[Slide]:
-        slides: List[Slide] = []
+    ) -> list[Slide]:
+        slides: list[Slide] = []
         n = 0
 
-        def add(tipo: str, titulo: str, contenido: str = "", cita: str = "", subtitulo: str = "", momento: str = ""):
+        def add(
+            tipo: str,
+            titulo: str,
+            contenido: str = "",
+            cita: str = "",
+            subtitulo: str = "",
+            momento: str = "",
+        ):
             nonlocal n
             n += 1
             slides.append(
@@ -682,11 +724,15 @@ class GeneradorPresentacionHTML:
         )
 
         # 2. Entrada
-        self._add_cancion_slide(add, canciones, "entrada", "entrada", "Canción de Entrada", "Entrada")
+        self._add_cancion_slide(
+            add, canciones, "entrada", "entrada", "Canción de Entrada", "Entrada"
+        )
 
         # 3. Perdón: canción si se asignó; si no, acto penitencial
         if canciones.get("perdon"):
-            self._add_cancion_slide(add, canciones, "perdon", "perdon", "Acto Penitencial", "Perdón")
+            self._add_cancion_slide(
+                add, canciones, "perdon", "perdon", "Acto Penitencial", "Perdón"
+            )
         else:
             add("perdon", "ACTO PENITENCIAL", TEXTOS_LITURGICOS["acto_penitencial"])
 
@@ -712,7 +758,9 @@ class GeneradorPresentacionHTML:
                     "primera_lectura",
                     f"PRIMERA LECTURA{sufijo}",
                     frag,
-                    cita=self._formatear_cita(lectura["primera_lectura_libro"], lectura["primera_lectura_cita"]),
+                    cita=self._formatear_cita(
+                        lectura["primera_lectura_libro"], lectura["primera_lectura_cita"]
+                    ),
                 )
 
         # 7. Salmo (compacto) + canción del salmo en la misma diapositiva
@@ -724,7 +772,9 @@ class GeneradorPresentacionHTML:
             salmo_cancion = canciones.get("salmo")
             if salmo_cancion and salmo_cancion.get("titulo"):
                 cancion_texto = self._texto_cancion(salmo_cancion)
-                salmo_texto = f"{salmo_texto}\n\n---\n\n{salmo_cancion['titulo'].upper()}\n{cancion_texto}"
+                salmo_texto = (
+                    f"{salmo_texto}\n\n---\n\n{salmo_cancion['titulo'].upper()}\n{cancion_texto}"
+                )
             fragmentos = self._paginar_texto(salmo_texto)
             for i, frag in enumerate(fragmentos):
                 sufijo = f" ({i+1}/{len(fragmentos)})" if len(fragmentos) > 1 else ""
@@ -744,7 +794,9 @@ class GeneradorPresentacionHTML:
                     "segunda_lectura",
                     f"SEGUNDA LECTURA{sufijo}",
                     frag,
-                    cita=self._formatear_cita(lectura["segunda_lectura_libro"], lectura["segunda_lectura_cita"]),
+                    cita=self._formatear_cita(
+                        lectura["segunda_lectura_libro"], lectura["segunda_lectura_cita"]
+                    ),
                 )
 
         # 9. Aleluya: canción
@@ -759,7 +811,9 @@ class GeneradorPresentacionHTML:
                     "evangelio",
                     f"EVANGELIO{sufijo}",
                     frag,
-                    cita=self._formatear_cita(lectura["evangelio_libro"], lectura["evangelio_cita"]),
+                    cita=self._formatear_cita(
+                        lectura["evangelio_libro"], lectura["evangelio_cita"]
+                    ),
                 )
 
         # 11. Credo
@@ -768,7 +822,9 @@ class GeneradorPresentacionHTML:
         # 12-16. Ofertorio, Santo, Padre Nuestro, Paz
         self._add_cancion_slide(add, canciones, "ofertorio", "ofertorio", "Ofertorio", "OFERTORIO")
         self._add_cancion_slide(add, canciones, "santo", "santo", "Santo", "SANTO")
-        self._add_cancion_slide(add, canciones, "padre_nuestro", "padre_nuestro", "Padre Nuestro", "PADRE NUESTRO")
+        self._add_cancion_slide(
+            add, canciones, "padre_nuestro", "padre_nuestro", "Padre Nuestro", "PADRE NUESTRO"
+        )
         self._add_cancion_slide(add, canciones, "paz", "paz", "Rito de la Paz", "PAZ")
 
         # 17. Comunión
@@ -797,8 +853,18 @@ class GeneradorPresentacionHTML:
         try:
             dt = datetime.strptime(fecha, "%Y-%m-%d")
             meses = [
-                "enero", "febrero", "marzo", "abril", "mayo", "junio",
-                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+                "enero",
+                "febrero",
+                "marzo",
+                "abril",
+                "mayo",
+                "junio",
+                "julio",
+                "agosto",
+                "septiembre",
+                "octubre",
+                "noviembre",
+                "diciembre",
             ]
             return f"{dt.day} de {meses[dt.month - 1]} de {dt.year}"
         except (ValueError, TypeError) as exc:
@@ -809,7 +875,7 @@ class GeneradorPresentacionHTML:
     # HTML con Reveal.js (4:3)
     # ------------------------------------------------------------------
 
-    def _render_html(self, data: Dict[str, Any], color_info: Dict[str, str]) -> str:
+    def _render_html(self, data: dict[str, Any], color_info: dict[str, str]) -> str:
         slides_html = "\n".join(self._slide_to_html(s, color_info) for s in data["slides"])
         return f"""<!DOCTYPE html>
 <html lang="es">
@@ -1245,7 +1311,7 @@ class GeneradorPresentacionHTML:
 </body>
 </html>"""
 
-    def _slide_to_html(self, slide: Dict[str, Any], color_info: Dict[str, str]) -> str:
+    def _slide_to_html(self, slide: dict[str, Any], color_info: dict[str, str]) -> str:
         tipo = slide["tipo"]
         titulo = self._escape_html(slide["titulo"])
         contenido = self._escape_html(slide["contenido"])
@@ -1259,27 +1325,43 @@ class GeneradorPresentacionHTML:
         inner = ""
 
         if momento:
-            inner += f'  <h3>{momento}</h3>\n'
-        if titulo or tipo != 'paso':
-            inner += f'  <h1>{titulo}</h1>\n'
+            inner += f"  <h3>{momento}</h3>\n"
+        if titulo or tipo != "paso":
+            inner += f"  <h1>{titulo}</h1>\n"
         if subtitulo:
-            inner += f'  <h2>{subtitulo}</h2>\n'
+            inner += f"  <h2>{subtitulo}</h2>\n"
         if cita:
             inner += f'  <div class="cita">{cita}</div>\n'
         if contenido:
             inner += f'  <div class="contenido">{contenido}</div>\n'
 
-        clase = f"{tipo} cancion" if tipo in ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida") else tipo
+        clase = (
+            f"{tipo} cancion"
+            if tipo
+            in (
+                "entrada",
+                "gloria",
+                "aleluya",
+                "ofertorio",
+                "santo",
+                "padre_nuestro",
+                "paz",
+                "comunion",
+                "maria",
+                "despedida",
+            )
+            else tipo
+        )
         html = f'<section class="{clase}" data-transition="fade">\n'
-        html += f'  <div class="slide-wrapper">\n'
+        html += '  <div class="slide-wrapper">\n'
 
         if imagen:
             html += f'    <img class="ilustracion" src="{imagen}" alt="ilustración">\n'
 
         html += f'    <div class="tarjeta">\n{inner}    </div>\n'
         html += f'    <img class="logo-lema" src="{lema_img}" alt="Somos uno">\n'
-        html += f'  </div>\n'
-        html += '</section>\n'
+        html += "  </div>\n"
+        html += "</section>\n"
         return html
 
     def _escape_html(self, text: str) -> str:
@@ -1290,17 +1372,18 @@ class GeneradorPresentacionHTML:
             .replace(">", "&gt;")
             .replace('"', "&quot;")
         )
+
     def _apply_bold_html(self, text: str) -> str:
         """Convierte **texto** en <strong>texto</strong> para HTML."""
         import re
-        return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
 
+        return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
 
     # ------------------------------------------------------------------
     # PPTX con estilo litúrgico mejorado (4:3, mismo contenido que HTML)
     # ------------------------------------------------------------------
 
-    def _render_pptx(self, data: Dict[str, Any], pptx_path: Path, assets_dir: Path):
+    def _render_pptx(self, data: dict[str, Any], pptx_path: Path, assets_dir: Path):
         """Genera PPTX 4:3 desde el mismo JSON intermediario que el HTML."""
         from pptx.enum.shapes import MSO_SHAPE
 
@@ -1309,21 +1392,27 @@ class GeneradorPresentacionHTML:
         prs.slide_height = Inches(SLIDE_HEIGHT_INCHES)
         blank_layout = prs.slide_layouts[6]
 
-        color = COLORES_LITURGICOS.get(data["meta"]["color_liturgico"].lower(), COLORES_LITURGICOS["verde"])
+        COLORES_LITURGICOS.get(data["meta"]["color_liturgico"].lower(), COLORES_LITURGICOS["verde"])
         lema_img_path = assets_dir / "lema_somos_uno.jpg"
 
         primary = (124, 58, 237)
-        accent_gold = (161, 98, 7)
         bg_light = (250, 245, 255)
-        text_dark = (44, 62, 80)
-        text_muted = (85, 85, 85)
 
         for slide_data in data["slides"]:
             slide = prs.slides.add_slide(blank_layout)
             is_portada = slide_data["tipo"] == "portada"
             has_image = bool(slide_data.get("imagen"))
             is_cancion = slide_data["tipo"] in (
-                "entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"
+                "entrada",
+                "gloria",
+                "aleluya",
+                "ofertorio",
+                "santo",
+                "padre_nuestro",
+                "paz",
+                "comunion",
+                "maria",
+                "despedida",
             )
 
             fill = slide.background.fill
@@ -1331,7 +1420,9 @@ class GeneradorPresentacionHTML:
             fill.fore_color.rgb = RGBColor(*primary) if is_portada else RGBColor(*bg_light)
 
             # Barra superior
-            bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(SLIDE_WIDTH_INCHES), Inches(0.12))
+            bar = slide.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(SLIDE_WIDTH_INCHES), Inches(0.12)
+            )
             bar.fill.solid()
             bar.fill.fore_color.rgb = RGBColor(*primary)
             bar.line.fill.background()
@@ -1339,7 +1430,12 @@ class GeneradorPresentacionHTML:
             # Logo lema
             if lema_img_path.exists():
                 try:
-                    slide.shapes.add_picture(str(lema_img_path), Inches(0.4), Inches(SLIDE_HEIGHT_INCHES - 0.95), height=Inches(0.75))
+                    slide.shapes.add_picture(
+                        str(lema_img_path),
+                        Inches(0.4),
+                        Inches(SLIDE_HEIGHT_INCHES - 0.95),
+                        height=Inches(0.75),
+                    )
                 except (OSError, ValueError, TypeError) as exc:
                     logger.warning("No se pudo añadir logo lema a slide: %s", exc)
 
@@ -1350,9 +1446,13 @@ class GeneradorPresentacionHTML:
                     img_path = assets_dir / f"{base_name}{ext}"
                     if img_path.exists():
                         if is_portada:
-                            slide.shapes.add_picture(str(img_path), Inches(3.5), Inches(0.5), height=Inches(2.6))
+                            slide.shapes.add_picture(
+                                str(img_path), Inches(3.5), Inches(0.5), height=Inches(2.6)
+                            )
                         else:
-                            slide.shapes.add_picture(str(img_path), Inches(7.3), Inches(1.1), height=Inches(2.8))
+                            slide.shapes.add_picture(
+                                str(img_path), Inches(7.3), Inches(1.1), height=Inches(2.8)
+                            )
                         break
 
             # Tarjeta de contenido
@@ -1372,7 +1472,9 @@ class GeneradorPresentacionHTML:
                 card_width = Inches(12.1)
                 card_height = Inches(7.0)
 
-            card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, card_left, card_top, card_width, card_height)
+            card = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE, card_left, card_top, card_width, card_height
+            )
             card.fill.solid()
             card.fill.fore_color.rgb = RGBColor(255, 255, 255)
             card.line.color.rgb = RGBColor(221, 214, 254)
@@ -1424,17 +1526,16 @@ class GeneradorPresentacionHTML:
 
             paragraphs = full_text.split("\n")
             for i, para_text in enumerate(paragraphs):
-                if i == 0:
-                    p = tf.paragraphs[0]
-                else:
-                    p = tf.add_paragraph()
+                p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
                 if not para_text.strip():
                     p.space_after = Pt(0)
                     p.space_before = Pt(0)
                     continue
 
                 # Aplicar negrita a segmentos marcados con **texto**
-                self._add_formatted_run(p, para_text, is_cancion, is_portada, i, slide_data, primary)
+                self._add_formatted_run(
+                    p, para_text, is_cancion, is_portada, i, slide_data, primary
+                )
 
         prs.save(str(pptx_path))
 
@@ -1445,8 +1546,8 @@ class GeneradorPresentacionHTML:
         is_cancion: bool,
         is_portada: bool,
         para_index: int,
-        slide_data: Dict[str, Any],
-        primary_rgb: Tuple[int, int, int],
+        slide_data: dict[str, Any],
+        primary_rgb: tuple[int, int, int],
     ):
         """Añade el texto del párrafo respetando marcadores **negrita**."""
         from pptx.dml.color import RGBColor
@@ -1476,6 +1577,7 @@ class GeneradorPresentacionHTML:
 
         # Segmentar por **bold**
         import re
+
         segments = re.split(r"(\*\*.*?\*\*)", para_text)
         for seg in segments:
             if not seg:
@@ -1490,9 +1592,9 @@ class GeneradorPresentacionHTML:
             run.font.size = base_size
             run.font.color.rgb = base_color
 
-    def _hex_to_rgb(self, hex_color: str) -> Tuple[int, int, int]:
+    def _hex_to_rgb(self, hex_color: str) -> tuple[int, int, int]:
         hex_color = hex_color.lstrip("#")
-        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+        return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
     # ------------------------------------------------------------------
     # PDF vía playwright (4:3)
@@ -1502,6 +1604,7 @@ class GeneradorPresentacionHTML:
         """Genera PDF vía playwright lanzando el HTML local."""
         try:
             from playwright.sync_api import sync_playwright
+
             with sync_playwright() as p:
                 browser = p.chromium.launch()
                 page = browser.new_page(viewport={"width": 1024, "height": 768})

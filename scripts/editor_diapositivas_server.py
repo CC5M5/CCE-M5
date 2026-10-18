@@ -26,11 +26,8 @@ import re
 import sqlite3
 import subprocess
 import sys
-import time
 from pathlib import Path
-import sys
-from typing import Any, Dict, List, Optional
-
+from typing import Any
 
 from flask import Flask, abort, redirect, request
 
@@ -38,13 +35,13 @@ PROJECT_DIR = Path(__file__).resolve().parents[1]
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 
+import contextlib
+
 from src.canciones_manager import (
-    CancionCreateUpdate,
     MOMENTOS_LITURGICOS,
+    CancionCreateUpdate,
     crear_cancion,
 )
-from src.rebuild_web import rebuild_web
-
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -53,6 +50,7 @@ from src.generators.composicion_catalogo import (
     guardar_composicion,
     proponer_composicion,
 )
+from src.rebuild_web import rebuild_web
 
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
@@ -98,8 +96,14 @@ def _git_commit(mensaje: str) -> str:
             return "sin cambios"
 
         result = subprocess.run(
-            ["git", "commit", "-m", f"chore(slides): {mensaje}",
-             "-m", "Actualización manual desde editor local de diapositivas."],
+            [
+                "git",
+                "commit",
+                "-m",
+                f"chore(slides): {mensaje}",
+                "-m",
+                "Actualización manual desde editor local de diapositivas.",
+            ],
             cwd=PROJECT_DIR,
             check=True,
             capture_output=True,
@@ -116,35 +120,53 @@ def _git_commit(mensaje: str) -> str:
         return m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
         err = exc.stderr or exc.stdout or ""
-        if "nothing to commit" in err or "working tree clean" in err or "No changes" in err or "sin cambios agregados" in err:
+        if (
+            "nothing to commit" in err
+            or "working tree clean" in err
+            or "No changes" in err
+            or "sin cambios agregados" in err
+        ):
             return "sin cambios"
         return f"ERROR: {err}"
 
 
-def _listar_ilustraciones() -> List[str]:
+def _listar_ilustraciones() -> list[str]:
     """Devuelve la lista plana de rutas de ilustraciones del catálogo."""
     if not CATALOGO_PATH.exists():
         return []
-    with open(CATALOGO_PATH, "r", encoding="utf-8") as f:
+    with open(CATALOGO_PATH, encoding="utf-8") as f:
         data = json.load(f)
     imagenes = data.get("imagenes", {})
-    resultado: List[str] = []
-    for tipo, rutas in imagenes.items():
+    resultado: list[str] = []
+    for _tipo, rutas in imagenes.items():
         if isinstance(rutas, list):
             resultado.extend(rutas)
     return resultado
 
 
-
 # --- Momentos litúrgicos ---
 MOMENTOS_LITURGICOS = [
-    "entrada", "acto penitencial", "gloria", "primera_lectura", "salmo",
-    "segunda_lectura", "aleluya", "evangelio", "credo", "ofertorio", "santo",
-    "padre_nuestro", "paz", "comunion", "maria", "despedida", "general"
+    "entrada",
+    "acto penitencial",
+    "gloria",
+    "primera_lectura",
+    "salmo",
+    "segunda_lectura",
+    "aleluya",
+    "evangelio",
+    "credo",
+    "ofertorio",
+    "santo",
+    "padre_nuestro",
+    "paz",
+    "comunion",
+    "maria",
+    "despedida",
+    "general",
 ]
 
 
-def _get_momentos_cancion(cancion_id: int) -> List[str]:
+def _get_momentos_cancion(cancion_id: int) -> list[str]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -156,7 +178,7 @@ def _get_momentos_cancion(cancion_id: int) -> List[str]:
     return rows
 
 
-def _set_momentos_cancion(cancion_id: int, momentos: List[str]) -> None:
+def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
@@ -170,16 +192,20 @@ def _set_momentos_cancion(cancion_id: int, momentos: List[str]) -> None:
     conn.commit()
     conn.close()
 
-def _tipos() -> List[Dict[str, Any]]:
+
+def _tipos() -> list[dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, nombre, descripcion, orden FROM slides_tipos ORDER BY orden")
-    tipos = [{"id": r["id"], "nombre": r["nombre"], "descripcion": r["descripcion"], "orden": r["orden"]} for r in cursor.fetchall()]
+    tipos = [
+        {"id": r["id"], "nombre": r["nombre"], "descripcion": r["descripcion"], "orden": r["orden"]}
+        for r in cursor.fetchall()
+    ]
     conn.close()
     return tipos
 
 
-def _get_slides(tipo: Optional[str] = None) -> List[Dict[str, Any]]:
+def _get_slides(tipo: str | None = None) -> list[dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     if tipo:
@@ -188,13 +214,25 @@ def _get_slides(tipo: Optional[str] = None) -> List[Dict[str, Any]]:
             (tipo,),
         )
     else:
-        cursor.execute("SELECT id, tipo, subtipo, titulo, es_default, activo FROM slides ORDER BY tipo, subtipo, titulo")
-    slides = [{"id": r["id"], "tipo": r["tipo"], "subtipo": r["subtipo"], "titulo": r["titulo"], "es_default": r["es_default"], "activo": r["activo"]} for r in cursor.fetchall()]
+        cursor.execute(
+            "SELECT id, tipo, subtipo, titulo, es_default, activo FROM slides ORDER BY tipo, subtipo, titulo"
+        )
+    slides = [
+        {
+            "id": r["id"],
+            "tipo": r["tipo"],
+            "subtipo": r["subtipo"],
+            "titulo": r["titulo"],
+            "es_default": r["es_default"],
+            "activo": r["activo"],
+        }
+        for r in cursor.fetchall()
+    ]
     conn.close()
     return slides
 
 
-def _get_slide(id: int) -> Optional[Dict[str, Any]]:
+def _get_slide(id: int) -> dict[str, Any] | None:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM slides WHERE id = ?", (id,))
@@ -205,7 +243,7 @@ def _get_slide(id: int) -> Optional[Dict[str, Any]]:
     return dict(row)
 
 
-def _get_presentaciones() -> List[Dict[str, Any]]:
+def _get_presentaciones() -> list[dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -227,7 +265,7 @@ def _apply_bold_html(text: str) -> str:
     return re.sub(r"\*\*\s*(.+?)\s*\*\*", r"<strong>\1</strong>", text)
 
 
-def _render_preview(slide: Dict[str, Any]) -> str:
+def _render_preview(slide: dict[str, Any]) -> str:
     """Genera HTML que simula la diapositiva real 4:3, dividiendo si hay --- DIAPOSITIVA ---."""
     color = slide.get("color_liturgico") or "verde"
     color_info = COLORES_LITURGICOS.get(color, COLORES_LITURGICOS["verde"])
@@ -245,7 +283,18 @@ def _render_preview(slide: Dict[str, Any]) -> str:
     lema_url = "/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
 
     clase = tipo
-    if tipo in ("entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"):
+    if tipo in (
+        "entrada",
+        "gloria",
+        "aleluya",
+        "ofertorio",
+        "santo",
+        "padre_nuestro",
+        "paz",
+        "comunion",
+        "maria",
+        "despedida",
+    ):
         clase += " cancion"
 
     # Dividir contenido por marca --- DIAPOSITIVA ---
@@ -266,7 +315,7 @@ def _render_preview(slide: Dict[str, Any]) -> str:
         if titulo:
             inner += f'<h1>{titulo}{f" ({idx}/{total})" if total > 1 else ""}</h1>\n'
         if subtitulo:
-            inner += f'<h2>{subtitulo}</h2>\n'
+            inner += f"<h2>{subtitulo}</h2>\n"
         if cita:
             inner += f'<div class="cita">{cita}</div>\n'
         if contenido:
@@ -284,13 +333,23 @@ def _render_preview(slide: Dict[str, Any]) -> str:
         </div>
         """
 
-    slides_html = "\n".join(_render_slide_mini(parte, i + 1, len(partes)) for i, parte in enumerate(partes))
-    return f'<div style="display:flex;flex-direction:column;gap:12px;align-items:center;">{slides_html}</div>' if len(partes) > 1 else slides_html
+    slides_html = "\n".join(
+        _render_slide_mini(parte, i + 1, len(partes)) for i, parte in enumerate(partes)
+    )
+    return (
+        f'<div style="display:flex;flex-direction:column;gap:12px;align-items:center;">{slides_html}</div>'
+        if len(partes) > 1
+        else slides_html
+    )
 
 
-def _render_base(title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = "") -> str:
-    msg_html = f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
-    ilustraciones = _listar_ilustraciones()
+def _render_base(
+    title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = ""
+) -> str:
+    msg_html = (
+        f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
+    )
+    _listar_ilustraciones()
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -395,7 +454,9 @@ def index():
             f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
-        sidebar_parts.append(f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+        sidebar_parts.append(
+            f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+        )
     sidebar = "\n".join(sidebar_parts)
     content = "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
     return _render_base("Diapositivas", sidebar, content)
@@ -418,11 +479,15 @@ def editar(id: int):
         slides = _get_slides(t["id"])
         if not slides:
             continue
+
         def _link_for(s):
             active = ' class="active"' if s["id"] == id else ""
             return f'<a href="/slides/{s["id"]}"{active}>{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+
         links = "\n".join(_link_for(s) for s in slides)
-        sidebar_parts.append(f'<details open><summary>{html_module.escape(t["nombre"])}</summary>{links}</details>')
+        sidebar_parts.append(
+            f'<details open><summary>{html_module.escape(t["nombre"])}</summary>{links}</details>'
+        )
     sidebar = "\n".join(sidebar_parts)
 
     tipo_options = "\n".join(
@@ -431,18 +496,21 @@ def editar(id: int):
     )
     color_options = "\n".join(
         f'<option value="{c}" {"selected" if c == (slide.get("color_liturgico") or "verde") else ""}>{c.capitalize()}</option>'
-        for c in COLORES_LITURGICOS.keys()
+        for c in COLORES_LITURGICOS
     )
 
     ilustraciones = _listar_ilustraciones()
     imagen_actual = slide.get("imagen") or ""
     # Agrupar por artista para los filtros
-    artistas = sorted(set(Path(img).parts[0] for img in ilustraciones))
+    artistas = sorted({Path(img).parts[0] for img in ilustraciones})
     botones_filtro = " ".join(
         f'<button type="button" class="{html_module.escape(a)}" data-filtro="{html_module.escape(a)}" onclick="filtrarImagenes(this.dataset.filtro)">{html_module.escape(a.upper())}</button>'
         for a in artistas
     )
-    botones_filtro = f'<button type="button" class="active" data-filtro="todos" onclick="filtrarImagenes(this.dataset.filtro)">TODOS</button>' + botones_filtro
+    botones_filtro = (
+        '<button type="button" class="active" data-filtro="todos" onclick="filtrarImagenes(this.dataset.filtro)">TODOS</button>'
+        + botones_filtro
+    )
 
     def _miniatura(img: str) -> str:
         artista = html_module.escape(Path(img).parts[0])
@@ -573,15 +641,30 @@ def guardar(id: int):
             fecha_modificacion = CURRENT_TIMESTAMP
         WHERE id = ?
         """,
-        (campos["tipo"], campos["subtipo"], campos["titulo"], campos["subtitulo"],
-         campos["contenido"], campos["cita"], campos["imagen"], campos["color_liturgico"],
-         campos["notas"], campos["es_default"], campos["activo"], id),
+        (
+            campos["tipo"],
+            campos["subtipo"],
+            campos["titulo"],
+            campos["subtitulo"],
+            campos["contenido"],
+            campos["cita"],
+            campos["imagen"],
+            campos["color_liturgico"],
+            campos["notas"],
+            campos["es_default"],
+            campos["activo"],
+            id,
+        ),
     )
     conn.commit()
     conn.close()
 
     commit_result = _git_commit(f"editar diapositiva {id} - {campos['titulo']}")
-    mensaje = f"✅ Guardado y commiteado ({commit_result})." if not commit_result.startswith("ERROR") else f"⚠️ Guardado en BD, falló git: {commit_result}"
+    mensaje = (
+        f"✅ Guardado y commiteado ({commit_result})."
+        if not commit_result.startswith("ERROR")
+        else f"⚠️ Guardado en BD, falló git: {commit_result}"
+    )
     clase = "ok" if not commit_result.startswith("ERROR") else "err"
 
     return editar_con_mensaje(id, mensaje, clase)
@@ -601,17 +684,31 @@ def duplicar(id: int):
                             color_liturgico, notas, es_default, activo)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)
         """,
-        (slide["tipo"], f"{slide['subtipo']}_copia", slide["titulo"], slide["subtitulo"],
-         slide["contenido"], slide["cita"], slide["imagen"], slide.get("color_liturgico", "verde"),
-         slide.get("notas", "")),
+        (
+            slide["tipo"],
+            f"{slide['subtipo']}_copia",
+            slide["titulo"],
+            slide["subtitulo"],
+            slide["contenido"],
+            slide["cita"],
+            slide["imagen"],
+            slide.get("color_liturgico", "verde"),
+            slide.get("notas", ""),
+        ),
     )
     nuevo_id = cursor.lastrowid
     conn.commit()
     conn.close()
 
     commit_result = _git_commit(f"duplicar diapositiva {id} -> {nuevo_id}")
-    mensaje = f"✅ Duplicada como #{nuevo_id} y commiteado ({commit_result})." if not commit_result.startswith("ERROR") else f"⚠️ Duplicada, falló git: {commit_result}"
-    return editar_con_mensaje(nuevo_id, mensaje, "ok" if not commit_result.startswith("ERROR") else "err")
+    mensaje = (
+        f"✅ Duplicada como #{nuevo_id} y commiteado ({commit_result})."
+        if not commit_result.startswith("ERROR")
+        else f"⚠️ Duplicada, falló git: {commit_result}"
+    )
+    return editar_con_mensaje(
+        nuevo_id, mensaje, "ok" if not commit_result.startswith("ERROR") else "err"
+    )
 
 
 def editar_con_mensaje(id: int, mensaje: str, clase: str):
@@ -619,15 +716,20 @@ def editar_con_mensaje(id: int, mensaje: str, clase: str):
     html = editar(id)
     if isinstance(html, tuple):
         body, status = html
-        body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+        body = body.replace(
+            "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+        )
         return body, status
-    html = html.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    html = html.replace(
+        "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+    )
     return html
 
 
 @app.route("/__ilustraciones/<path:filename>")
 def ilustracion(filename: str):
     from flask import send_file
+
     candidate = (ILUSTRACIONES_DIR / filename).resolve()
     # Prevenir path traversal fuera del directorio de ilustraciones
     if not str(candidate).startswith(str(ILUSTRACIONES_DIR.resolve())):
@@ -641,8 +743,10 @@ def ilustracion(filename: str):
 def lema(filename: str):
     if LEMA_PATH.exists():
         from flask import send_file
+
         return send_file(LEMA_PATH)
     abort(404)
+
 
 @app.route("/presentaciones_html/<path:filename>")
 def presentaciones_html_file(filename: str):
@@ -652,20 +756,22 @@ def presentaciones_html_file(filename: str):
         abort(403)
     if target.exists() and target.is_file():
         from flask import send_file
+
         return send_file(target)
     abort(404)
-
-
 
 
 # ------------------------------------------------------------------
 # Helpers para crear presentación automáticamente desde lectura
 # ------------------------------------------------------------------
 
-def _get_lectura_por_fecha(fecha: str) -> Optional[Dict[str, Any]]:
+
+def _get_lectura_por_fecha(fecha: str) -> dict[str, Any] | None:
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, fecha, celebracion, color_liturgico FROM lecturas WHERE fecha = ?", (fecha,))
+    cursor.execute(
+        "SELECT id, fecha, celebracion, color_liturgico FROM lecturas WHERE fecha = ?", (fecha,)
+    )
     row = cursor.fetchone()
     conn.close()
     if not row:
@@ -673,16 +779,19 @@ def _get_lectura_por_fecha(fecha: str) -> Optional[Dict[str, Any]]:
     return dict(row)
 
 
-def _crear_presentacion_desde_lectura(fecha: str) -> Optional[Dict[str, Any]]:
+def _crear_presentacion_desde_lectura(fecha: str) -> dict[str, Any] | None:
     lectura = _get_lectura_por_fecha(fecha)
     if not lectura:
         return None
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         INSERT INTO presentaciones (fecha_domingo, lectura_id, canciones_json, estado, fecha_creacion)
         VALUES (?, ?, '{}', 'borrador', CURRENT_TIMESTAMP)
-    """, (fecha, lectura["id"]))
+    """,
+        (fecha, lectura["id"]),
+    )
     conn.commit()
     conn.close()
     return _get_presentacion_por_fecha(fecha)
@@ -691,6 +800,7 @@ def _crear_presentacion_desde_lectura(fecha: str) -> Optional[Dict[str, Any]]:
 # ------------------------------------------------------------------
 # Helper para reconstruir composicion desde canciones asignadas
 # ------------------------------------------------------------------
+
 
 def _reconstruir_composicion_desde_canciones(fecha: str) -> str:
     """Borra la composicion guardada y la reconstruye desde canciones_json."""
@@ -703,21 +813,29 @@ def _reconstruir_composicion_desde_canciones(fecha: str) -> str:
     guardar_composicion(fecha, items)
     return f"Composicion reconstruida ({len(items)} items)"
 
+
 # ------------------------------------------------------------------
 # Helper para generar presentación desde composición (Fase D)
 # ------------------------------------------------------------------
+
 
 def _generar_presentacion(fecha: str) -> str:
     """Genera PPTX/HTML/PDF desde presentacion_slides y sincroniza con la web."""
     sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
     try:
         from generar_desde_composicion import GeneradorDesdeComposicion
+
         gen = GeneradorDesdeComposicion()
         bundle = gen.generar_desde_presentacion(fecha)
         # Sincronizar a web/public/presentaciones_html/
         try:
             subprocess.run(
-                [sys.executable, str(PROJECT_DIR / "scripts" / "sync_presentaciones_html.py"), "--fecha", fecha],
+                [
+                    sys.executable,
+                    str(PROJECT_DIR / "scripts" / "sync_presentaciones_html.py"),
+                    "--fecha",
+                    fecha,
+                ],
                 cwd=PROJECT_DIR,
                 check=True,
                 capture_output=True,
@@ -728,7 +846,7 @@ def _generar_presentacion(fecha: str) -> str:
             sync_ok = f" | ⚠️ sync falló: {exc.stderr or exc.stdout}"
         # Reconstruir cancionero web para actualizar web/dist/
         try:
-            build_result = subprocess.run(
+            subprocess.run(
                 ["npm", "run", "build"],
                 cwd=str(PROJECT_DIR / "web"),
                 check=True,
@@ -765,14 +883,20 @@ def _generar_presentacion(fecha: str) -> str:
             )
             commit_msg = f"feat(presentacion): genera bundle {fecha}"
             result = subprocess.run(
-                ["git", "commit", "-m", commit_msg,
-                 "-m", f"Generado desde editor local: {bundle.name}"],
+                [
+                    "git",
+                    "commit",
+                    "-m",
+                    commit_msg,
+                    "-m",
+                    f"Generado desde editor local: {bundle.name}",
+                ],
                 cwd=PROJECT_DIR,
                 check=True,
                 capture_output=True,
                 text=True,
             )
-            push_result = subprocess.run(
+            subprocess.run(
                 ["git", "push", "origin", "main"],
                 cwd=PROJECT_DIR,
                 check=True,
@@ -783,7 +907,9 @@ def _generar_presentacion(fecha: str) -> str:
             commit_hash = m.group(1) if m else "commit OK"
         except subprocess.CalledProcessError as exc:
             commit_hash = f"ERROR: {exc.stderr or exc.stdout}"
-        return f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
+        return (
+            f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
+        )
     except Exception as e:
         return f"⚠️ Error al generar: {e}"
 
@@ -830,18 +956,28 @@ def guardar_nueva_cancion_diapositivas():
     momentos = request.form.getlist("momentos")
 
     if not titulo:
-        return _render_base("Error", "", "<h2>Error</h2><p>El título es obligatorio.</p>", "El título es obligatorio.", "err")
+        return _render_base(
+            "Error",
+            "",
+            "<h2>Error</h2><p>El título es obligatorio.</p>",
+            "El título es obligatorio.",
+            "err",
+        )
 
     try:
-        cancion = crear_cancion(CancionCreateUpdate(
-            titulo=titulo,
-            letra_con_acordes=texto,
-            momentos=momentos,
-            tono=tono,
-            fuente="manual",
-        ))
+        cancion = crear_cancion(
+            CancionCreateUpdate(
+                titulo=titulo,
+                letra_con_acordes=texto,
+                momentos=momentos,
+                tono=tono,
+                fuente="manual",
+            )
+        )
     except Exception as exc:
-        return _render_base("Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err")
+        return _render_base(
+            "Error", "", f"<h2>Error</h2><p>{html_module.escape(str(exc))}</p>", str(exc), "err"
+        )
 
     rebuild_result = rebuild_web()
     mensaje = f"✅ Canción '{cancion['titulo']}' creada. "
@@ -852,7 +988,13 @@ def guardar_nueva_cancion_diapositivas():
         mensaje += "Web reconstruida correctamente."
         clase = "ok"
 
-    return _render_base("Canción creada", "", f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente.</p>", mensaje, clase)
+    return _render_base(
+        "Canción creada",
+        "",
+        f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente.</p>",
+        mensaje,
+        clase,
+    )
 
 
 # ------------------------------------------------------------------
@@ -860,19 +1002,22 @@ def guardar_nueva_cancion_diapositivas():
 # ------------------------------------------------------------------
 
 
-def _get_composicion_guardada(fecha: str) -> List[Dict[str, Any]]:
+def _get_composicion_guardada(fecha: str) -> list[dict[str, Any]]:
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
         return []
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT ps.*, s.contenido AS slide_contenido, s.imagen AS slide_imagen, s.color_liturgico AS slide_color
         FROM presentacion_slides ps
         LEFT JOIN slides s ON s.id = ps.slide_id
         WHERE ps.presentacion_id = ? AND ps.activo = 1
         ORDER BY ps.numero
-    """, (pres["id"],))
+    """,
+        (pres["id"],),
+    )
     rows = [dict(r) for r in cursor.fetchall()]
     conn.close()
     return rows
@@ -890,14 +1035,24 @@ def listar_presentaciones():
             f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
-        sidebar_parts.append(f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+        sidebar_parts.append(
+            f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+        )
     sidebar = "\n".join(sidebar_parts)
 
     pres = _get_presentaciones()
+
     def _badge_estado(estado):
-        color = {"borrador": "#f59e0b", "generado": "#10b981", "publicado": "#7c3aed"}.get(estado, "#64748b")
-        label = {"borrador": "🟡 Borrador", "generado": "🟢 Generado", "publicado": "🟣 Publicado"}.get(estado, estado)
+        color = {"borrador": "#f59e0b", "generado": "#10b981", "publicado": "#7c3aed"}.get(
+            estado, "#64748b"
+        )
+        label = {
+            "borrador": "🟡 Borrador",
+            "generado": "🟢 Generado",
+            "publicado": "🟣 Publicado",
+        }.get(estado, estado)
         return f'<span style="display:inline-block;padding:3px 8px;border-radius:6px;background:{color};color:#fff;font-size:12px;font-weight:600;">{label}</span>'
+
     filas = "\n".join(
         f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td><td><a href="/presentacion/{p["fecha_domingo"]}/asignar">🎵 Asignar canciones</a></td></tr>'
         for p in pres
@@ -932,8 +1087,9 @@ def armar_presentacion(fecha: str):
         composicion = _proponer_composicion(fecha)
 
     # Cargar variantes para cada tipo usado
-    variantes_cache: Dict[str, List[Dict[str, Any]]] = {}
-    def variantes_para(tipo: str) -> List[Dict[str, Any]]:
+    variantes_cache: dict[str, list[dict[str, Any]]] = {}
+
+    def variantes_para(tipo: str) -> list[dict[str, Any]]:
         if tipo not in variantes_cache:
             variantes_cache[tipo] = _get_slide_variantes(tipo)
         return variantes_cache[tipo]
@@ -948,7 +1104,9 @@ def armar_presentacion(fecha: str):
             f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
-        sidebar_parts.append(f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+        sidebar_parts.append(
+            f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+        )
     sidebar = "\n".join(sidebar_parts)
 
     filas = []
@@ -974,8 +1132,16 @@ def armar_presentacion(fecha: str):
         """)
 
     estado = pres.get("estado") or "borrador"
-    estado_label = {"borrador": "🟡 Borrador", "generado": "🟢 Generado", "publicado": "🟣 Publicado"}.get(estado, f"⚪ {estado}")
-    gen_label = "🔄 Regenerar y publicar" if estado in ("generado", "publicado") else "⚡ Generar y publicar"
+    estado_label = {
+        "borrador": "🟡 Borrador",
+        "generado": "🟢 Generado",
+        "publicado": "🟣 Publicado",
+    }.get(estado, f"⚪ {estado}")
+    gen_label = (
+        "🔄 Regenerar y publicar"
+        if estado in ("generado", "publicado")
+        else "⚡ Generar y publicar"
+    )
     content = f"""<h2>Armar presentación {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")} | <span style="font-weight:600;">{estado_label}</span></p>
     <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
@@ -1007,28 +1173,34 @@ def guardar_presentacion(fecha: str):
     tipos = request.form.getlist("tipos")
     nums = request.form.getlist("nums")
     subtipos = request.form.getlist("subtipos")
-    activos_raw = set(int(x) for x in request.form.getlist("activos"))
+    activos_raw = {int(x) for x in request.form.getlist("activos")}
 
     # Construir items en orden recibido
-    items: List[Dict[str, Any]] = []
+    items: list[dict[str, Any]] = []
     for i, tipo in enumerate(tipos):
         numero = int(nums[i]) if i < len(nums) else i + 1
         subtipo = subtipos[i] if i < len(subtipos) else "general"
         activo = 1 if numero in activos_raw else 0
         slide = _slide_para_momento(tipo, subtipo)
-        items.append({
-            "numero": i + 1,
-            "tipo": tipo,
-            "subtipo": subtipo,
-            "titulo": slide["titulo"] if slide else f"[FALTA: {tipo}]",
-            "slide_id": slide["id"] if slide else None,
-            "activo": activo,
-        })
+        items.append(
+            {
+                "numero": i + 1,
+                "tipo": tipo,
+                "subtipo": subtipo,
+                "titulo": slide["titulo"] if slide else f"[FALTA: {tipo}]",
+                "slide_id": slide["id"] if slide else None,
+                "activo": activo,
+            }
+        )
 
     guardar_composicion(fecha, items)
 
     commit_result = _git_commit(f"composición presentación {fecha}")
-    mensaje_comp = f"Composición guardada y commiteada ({commit_result})." if not commit_result.startswith("ERROR") else f"Composición guardada, falló git: {commit_result}"
+    mensaje_comp = (
+        f"Composición guardada y commiteada ({commit_result})."
+        if not commit_result.startswith("ERROR")
+        else f"Composición guardada, falló git: {commit_result}"
+    )
 
     # Regenerar automáticamente la presentación para actualizar previsualización
     # _generar_presentacion ya hace commit+push del bundle, no es necesario otro commit
@@ -1042,7 +1214,9 @@ def guardar_presentacion(fecha: str):
         body, status = response
     else:
         body, status = response, 200
-    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    body = body.replace(
+        "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+    )
     return body, status
 
 
@@ -1067,7 +1241,9 @@ def reconstruir_presentacion(fecha: str):
         body, status = response
     else:
         body, status = response, 200
-    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    body = body.replace(
+        "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+    )
     return body, status
 
 
@@ -1088,7 +1264,7 @@ def generar_presentacion(fecha: str):
         body, status = response
     else:
         body, status = response, 200
-    body = body.replace("<main>", f'<main>\n{msg_html}')
+    body = body.replace("<main>", f"<main>\n{msg_html}")
     return body, status
 
 
@@ -1096,6 +1272,7 @@ def generar_presentacion(fecha: str):
 def servir_presentacion_html(subpath: str):
     """Sirve archivos estáticos generados (HTML, PDF, PPTX, imágenes, etc.)."""
     from flask import send_from_directory
+
     base = PROJECT_DIR / "presentaciones_html"
     file_path = base / subpath
     if not file_path.resolve().is_relative_to(base.resolve()):
@@ -1151,7 +1328,9 @@ def preview_presentacion(fecha: str):
             sd["contenido"] = parte
             if len(partes) > 1:
                 sd["titulo"] = f"{sd['titulo']} ({idx + 1}/{len(partes)})"
-            previews.append(f'<div style="color:#aaa;font-size:12px;margin:8px 0 4px">Slide {numero_real}</div>{_render_preview(sd)}')
+            previews.append(
+                f'<div style="color:#aaa;font-size:12px;margin:8px 0 4px">Slide {numero_real}</div>{_render_preview(sd)}'
+            )
             numero_real += 1
 
     html = f"""<!DOCTYPE html>
@@ -1169,13 +1348,10 @@ def preview_presentacion(fecha: str):
     return html
 
 
-
-
-
-
 # ------------------------------------------------------------------
 # Edición de momentos litúrgicos de canciones
 # ------------------------------------------------------------------
+
 
 @app.route("/cancion/<int:cancion_id>/momentos")
 def editar_momentos_cancion(cancion_id: int):
@@ -1203,7 +1379,9 @@ def editar_momentos_cancion(cancion_id: int):
             f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
-        sidebar_parts.append(f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>')
+        sidebar_parts.append(
+            f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+        )
     sidebar = "\n".join(sidebar_parts)
 
     content = f"""<h2>Momentos litúrgicos: {html_module.escape(row["titulo"])}</h2>
@@ -1236,20 +1414,28 @@ def guardar_momentos_cancion(cancion_id: int):
     momento_legacy = nuevos_momentos[0] if nuevos_momentos else ""
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE canciones SET momento_liturgico = ? WHERE id = ?", (momento_legacy, cancion_id))
+    cursor.execute(
+        "UPDATE canciones SET momento_liturgico = ? WHERE id = ?", (momento_legacy, cancion_id)
+    )
     conn.commit()
     conn.close()
 
     commit_result = _git_commit(f"momentos litúrgicos {row['titulo']}")
     clase = "ok" if not commit_result.startswith("ERROR") else "err"
-    mensaje = f"Momentos guardados y commiteados ({commit_result})." if not commit_result.startswith("ERROR") else f"Guardado, falló git: {commit_result}"
+    mensaje = (
+        f"Momentos guardados y commiteados ({commit_result})."
+        if not commit_result.startswith("ERROR")
+        else f"Guardado, falló git: {commit_result}"
+    )
 
     response = editar_momentos_cancion(cancion_id)
     if isinstance(response, tuple):
         body, status = response
     else:
         body, status = response, 200
-    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    body = body.replace(
+        "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+    )
     return body, status
 
 
@@ -1258,7 +1444,7 @@ def guardar_momentos_cancion(cancion_id: int):
 # ------------------------------------------------------------------
 
 
-def _listar_lecturas() -> List[Dict[str, Any]]:
+def _listar_lecturas() -> list[dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -1271,7 +1457,7 @@ def _listar_lecturas() -> List[Dict[str, Any]]:
     return rows
 
 
-def _listar_canciones_para_selector() -> List[Dict[str, Any]]:
+def _listar_canciones_para_selector() -> list[dict[str, Any]]:
     conn = _get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -1281,7 +1467,9 @@ def _listar_canciones_para_selector() -> List[Dict[str, Any]]:
         GROUP BY c.id
         ORDER BY c.titulo
     """)
-    rows = [{"id": r["id"], "titulo": r["titulo"], "momentos": r["momentos"]} for r in cursor.fetchall()]
+    rows = [
+        {"id": r["id"], "titulo": r["titulo"], "momentos": r["momentos"]} for r in cursor.fetchall()
+    ]
     conn.close()
     return rows
 
@@ -1300,10 +1488,21 @@ def nueva_presentacion():
         for r in lecturas
     )
 
-    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    momentos_musicales = [
+        "entrada",
+        "gloria",
+        "aleluya",
+        "ofertorio",
+        "santo",
+        "padre_nuestro",
+        "paz",
+        "comunion",
+        "maria",
+        "despedida",
+    ]
     momentos_html = ""
     for m in momentos_musicales:
-        opts = f'<option value="">-- Sin canción --</option>\n'
+        opts = '<option value="">-- Sin canción --</option>\n'
         opts += "\n".join(
             f'<option value="{c["id"]}">{html_module.escape(c["titulo"])}</option>'
             for c in canciones
@@ -1334,35 +1533,54 @@ def nueva_presentacion():
 def guardar_nueva_presentacion():
     fecha = request.form.get("fecha", "").strip()
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
-        return _render_base("Error", "", "<h2>Error</h2><p>Fecha inválida.</p>", "Fecha inválida.", "err")
+        return _render_base(
+            "Error", "", "<h2>Error</h2><p>Fecha inválida.</p>", "Fecha inválida.", "err"
+        )
 
     # Verificar que existe la lectura
     lecturas = _listar_lecturas()
     lectura = next((r for r in lecturas if r["fecha"] == fecha), None)
     if not lectura:
-        return _render_base("Error", "", "<h2>Error</h2><p>No existe lectura para esa fecha o ya tiene presentación.</p>", "No existe lectura o ya tiene presentación.", "err")
+        return _render_base(
+            "Error",
+            "",
+            "<h2>Error</h2><p>No existe lectura para esa fecha o ya tiene presentación.</p>",
+            "No existe lectura o ya tiene presentación.",
+            "err",
+        )
 
     # Construir canciones_json
-    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    momentos_musicales = [
+        "entrada",
+        "gloria",
+        "aleluya",
+        "ofertorio",
+        "santo",
+        "padre_nuestro",
+        "paz",
+        "comunion",
+        "maria",
+        "despedida",
+    ]
     canciones_asignadas = {}
     for m in momentos_musicales:
         val = request.form.get(m, "").strip()
         if val:
-            try:
+            with contextlib.suppress(ValueError):
                 canciones_asignadas[m] = int(val)
-            except ValueError:
-                pass
 
     canciones_json = json.dumps(canciones_asignadas)
 
     # Crear presentación
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         INSERT INTO presentaciones (fecha_domingo, lectura_id, canciones_json, estado, fecha_creacion)
         VALUES (?, (SELECT id FROM lecturas WHERE fecha = ?), ?, 'borrador', CURRENT_TIMESTAMP)
-    """, (fecha, fecha, canciones_json))
-    pres_id = cursor.lastrowid
+    """,
+        (fecha, fecha, canciones_json),
+    )
     conn.commit()
     conn.close()
 
@@ -1383,7 +1601,9 @@ def guardar_nueva_presentacion():
         body, status = response
     else:
         body, status = response, 200
-    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    body = body.replace(
+        "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+    )
     return body, status
 
 
@@ -1401,22 +1621,47 @@ def asignar_canciones(fecha: str):
     if not pres:
         lectura = _get_lectura_por_fecha(fecha)
         if not lectura:
-            return _render_base("Error", "", f"<h2>Error</h2><p>No existe presentación ni lectura para {fecha}.</p>", "No existe presentación ni lectura para esa fecha.", "err")
+            return _render_base(
+                "Error",
+                "",
+                f"<h2>Error</h2><p>No existe presentación ni lectura para {fecha}.</p>",
+                "No existe presentación ni lectura para esa fecha.",
+                "err",
+            )
         pres = _crear_presentacion_desde_lectura(fecha)
         if not pres:
-            return _render_base("Error", "", "<h2>Error</h2><p>No se pudo crear la presentación automáticamente.</p>", "No se pudo crear la presentación automáticamente.", "err")
+            return _render_base(
+                "Error",
+                "",
+                "<h2>Error</h2><p>No se pudo crear la presentación automáticamente.</p>",
+                "No se pudo crear la presentación automáticamente.",
+                "err",
+            )
 
     canciones = _listar_canciones_para_selector()
     canciones_asignadas = _canciones_asignadas(pres.get("canciones_json"))
 
-    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    momentos_musicales = [
+        "entrada",
+        "gloria",
+        "aleluya",
+        "ofertorio",
+        "santo",
+        "padre_nuestro",
+        "paz",
+        "comunion",
+        "maria",
+        "despedida",
+    ]
     momentos_html = ""
     for m in momentos_musicales:
         opts = '<option value="">-- Sin canción --</option>\n'
         current_id = canciones_asignadas.get(m)
         for c in canciones:
-            selected = ' selected' if current_id == c["id"] else ''
-            opts += f'<option value="{c["id"]}"{selected}>{html_module.escape(c["titulo"])}</option>\n'
+            selected = " selected" if current_id == c["id"] else ""
+            opts += (
+                f'<option value="{c["id"]}"{selected}>{html_module.escape(c["titulo"])}</option>\n'
+            )
         momentos_html += f"""
         <div style="margin-bottom:12px;">
             <label><strong>{html_module.escape(m.replace("_", " ").title())}</strong></label>
@@ -1445,27 +1690,50 @@ def guardar_asignacion_canciones(fecha: str):
     if not pres:
         lectura = _get_lectura_por_fecha(fecha)
         if not lectura:
-            return _render_base("Error", "", f"<h2>Error</h2><p>No existe presentación ni lectura para {fecha}.</p>", "No existe presentación ni lectura para esa fecha.", "err")
+            return _render_base(
+                "Error",
+                "",
+                f"<h2>Error</h2><p>No existe presentación ni lectura para {fecha}.</p>",
+                "No existe presentación ni lectura para esa fecha.",
+                "err",
+            )
         pres = _crear_presentacion_desde_lectura(fecha)
         if not pres:
-            return _render_base("Error", "", "<h2>Error</h2><p>No se pudo crear la presentación automáticamente.</p>", "No se pudo crear la presentación automáticamente.", "err")
+            return _render_base(
+                "Error",
+                "",
+                "<h2>Error</h2><p>No se pudo crear la presentación automáticamente.</p>",
+                "No se pudo crear la presentación automáticamente.",
+                "err",
+            )
 
-    momentos_musicales = ["entrada", "gloria", "aleluya", "ofertorio", "santo", "padre_nuestro", "paz", "comunion", "maria", "despedida"]
+    momentos_musicales = [
+        "entrada",
+        "gloria",
+        "aleluya",
+        "ofertorio",
+        "santo",
+        "padre_nuestro",
+        "paz",
+        "comunion",
+        "maria",
+        "despedida",
+    ]
     canciones_asignadas = {}
     for m in momentos_musicales:
         val = request.form.get(m, "").strip()
         if val:
-            try:
+            with contextlib.suppress(ValueError):
                 canciones_asignadas[m] = int(val)
-            except ValueError:
-                pass
 
     canciones_json = json.dumps(canciones_asignadas)
 
     # Actualizar presentación
     conn = _get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"]))
+    cursor.execute(
+        "UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"])
+    )
     conn.commit()
     conn.close()
 
@@ -1484,7 +1752,9 @@ def guardar_asignacion_canciones(fecha: str):
         body, status = response
     else:
         body, status = response, 200
-    body = body.replace("<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>')
+    body = body.replace(
+        "<main>", f'<main>\n<div class="msg {clase}">{html_module.escape(mensaje)}</div>'
+    )
     return body, status
 
 

@@ -70,8 +70,18 @@ def _formatear_fecha(fecha: str) -> str:
     try:
         dt = datetime.strptime(fecha, "%Y-%m-%d")
         meses = [
-            "enero", "febrero", "marzo", "abril", "mayo", "junio",
-            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+            "enero",
+            "febrero",
+            "marzo",
+            "abril",
+            "mayo",
+            "junio",
+            "julio",
+            "agosto",
+            "septiembre",
+            "octubre",
+            "noviembre",
+            "diciembre",
         ]
         return f"{dt.day} de {meses[dt.month - 1]} de {dt.year}"
     except (ValueError, TypeError, IndexError):
@@ -82,13 +92,13 @@ def _extraer_frase_evangelio(lectura: sqlite3.Row) -> str:
     """Extrae una frase corta representativa del Evangelio."""
     import re
 
-    texto = lectura["evangelio_texto"] if lectura and "evangelio_texto" in lectura.keys() else ""
+    texto = lectura["evangelio_texto"] if lectura and "evangelio_texto" in lectura else ""
     if not texto:
         return ""
-    comillas = re.findall(r'«([^»]{20,180})»', texto)
+    comillas = re.findall(r"«([^»]{20,180})»", texto)
     if comillas:
         return comillas[-1].strip()
-    for oracion in re.split(r'(?<=[.!?])\s+', texto):
+    for oracion in re.split(r"(?<=[.!?])\s+", texto):
         oracion = oracion.strip()
         if 20 <= len(oracion) <= 180:
             return oracion + "."
@@ -208,7 +218,9 @@ def _construir_slides(
                 "primera_lectura",
                 f"PRIMERA LECTURA{sufijo}",
                 frag,
-                cita=_formatear_cita(lectura["primera_lectura_libro"], lectura["primera_lectura_cita"]),
+                cita=_formatear_cita(
+                    lectura["primera_lectura_libro"], lectura["primera_lectura_cita"]
+                ),
             )
 
     if lectura["salmo_texto"]:
@@ -218,7 +230,9 @@ def _construir_slides(
         salmo_cancion = canciones.get("salmo")
         if salmo_cancion and salmo_cancion.get("titulo"):
             cancion_texto = _texto_cancion(salmo_cancion)
-            salmo_texto = f"{salmo_texto}\n\n---\n\n{salmo_cancion['titulo'].upper()}\n{cancion_texto}"
+            salmo_texto = (
+                f"{salmo_texto}\n\n---\n\n{salmo_cancion['titulo'].upper()}\n{cancion_texto}"
+            )
         fragmentos = _paginar_texto(salmo_texto)
         for i, frag in enumerate(fragmentos):
             sufijo = f" ({i + 1}/{len(fragmentos)})" if len(fragmentos) > 1 else ""
@@ -237,7 +251,9 @@ def _construir_slides(
                 "segunda_lectura",
                 f"SEGUNDA LECTURA{sufijo}",
                 frag,
-                cita=_formatear_cita(lectura["segunda_lectura_libro"], lectura["segunda_lectura_cita"]),
+                cita=_formatear_cita(
+                    lectura["segunda_lectura_libro"], lectura["segunda_lectura_cita"]
+                ),
             )
 
     _add_cancion_slide(add, canciones, "aleluya", "aleluya", "Aleluya", "ALELUYA")
@@ -257,7 +273,9 @@ def _construir_slides(
 
     _add_cancion_slide(add, canciones, "ofertorio", "ofertorio", "Ofertorio", "OFERTORIO")
     _add_cancion_slide(add, canciones, "santo", "santo", "Santo", "SANTO")
-    _add_cancion_slide(add, canciones, "padre_nuestro", "padre_nuestro", "Padre Nuestro", "PADRE NUESTRO")
+    _add_cancion_slide(
+        add, canciones, "padre_nuestro", "padre_nuestro", "Padre Nuestro", "PADRE NUESTRO"
+    )
     _add_cancion_slide(add, canciones, "paz", "paz", "Rito de la Paz", "PAZ")
     _add_cancion_slide(add, canciones, "comunion", "comunion", "Comunión", "COMUNIÓN")
     _add_cancion_slide(add, canciones, "maria", "maria", "Canto a María", "CANTO A MARÍA")
@@ -309,7 +327,7 @@ def generar(
         catalogo=catalogo,
     )
 
-    resolved_db_path = Path(db_path) if db_path else DB_PATH
+    Path(db_path) if db_path else DB_PATH
     resolved_output_dir = Path(output_dir) if output_dir else OUTPUT_DIR
     resolved_output_dir.mkdir(parents=True, exist_ok=True)
 

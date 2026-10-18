@@ -7,14 +7,13 @@ JSON + HTML + PPTX + PDF idénticos en contenido.
 
 import json
 import logging
-import os
 import shutil
 import sqlite3
 import subprocess
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .presentacion_html import GeneradorPresentacionHTML, Slide
 
@@ -34,7 +33,7 @@ def _get_connection() -> sqlite3.Connection:
     return conn
 
 
-def _convertir_svg_a_png(src: Path, dst_dir: Path) -> Optional[Path]:
+def _convertir_svg_a_png(src: Path, dst_dir: Path) -> Path | None:
     """Convierte un SVG a PNG usando inkscape si está disponible."""
     if not shutil.which("inkscape"):
         return None
@@ -58,7 +57,8 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
     def generar_desde_presentacion(self, fecha: str) -> Path:
         conn = _get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT p.*, l.celebracion, l.color_liturgico,
                    l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
                    l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
@@ -67,19 +67,24 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
             FROM presentaciones p
             LEFT JOIN lecturas l ON l.id = p.lectura_id
             WHERE p.fecha_domingo = ?
-        """, (fecha,))
+        """,
+            (fecha,),
+        )
         pres = cursor.fetchone()
         if not pres:
             raise ValueError(f"No existe presentación para {fecha}")
         pres = dict(pres)
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT ps.*, s.contenido AS slide_contenido, s.imagen AS slide_imagen
             FROM presentacion_slides ps
             LEFT JOIN slides s ON s.id = ps.slide_id
             WHERE ps.presentacion_id = ? AND ps.activo = 1
             ORDER BY ps.numero
-        """, (pres["id"],))
+        """,
+            (pres["id"],),
+        )
         items = [dict(r) for r in cursor.fetchall()]
         conn.close()
 
@@ -191,7 +196,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                         return cita
             return f"{libro} {cita}"
 
-        def _cita_salmo(libro: str, cita: str, antifona: Optional[str]) -> str:
+        def _cita_salmo(libro: str, cita: str, antifona: str | None) -> str:
             cita = _cita_con_libro(libro, cita)
             if antifona:
                 return f"{cita} — {antifona}"
@@ -200,18 +205,28 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         lecturas_data = {
             "primera_lectura": {
                 "titulo": "PRIMERA LECTURA",
-                "contenido": self._compactar_salmo_o_lectura(pres.get("primera_lectura_texto") or ""),
-                "cita": _cita_con_libro(pres.get("primera_lectura_libro"), pres.get("primera_lectura_cita")),
+                "contenido": self._compactar_salmo_o_lectura(
+                    pres.get("primera_lectura_texto") or ""
+                ),
+                "cita": _cita_con_libro(
+                    pres.get("primera_lectura_libro"), pres.get("primera_lectura_cita")
+                ),
             },
             "salmo": {
                 "titulo": "SALMO RESPONSORIAL",
                 "contenido": self._compactar_salmo_o_lectura(pres.get("salmo_texto") or ""),
-                "cita": _cita_salmo(pres.get("salmo_libro"), pres.get("salmo_cita"), pres.get("salmo_antifona")),
+                "cita": _cita_salmo(
+                    pres.get("salmo_libro"), pres.get("salmo_cita"), pres.get("salmo_antifona")
+                ),
             },
             "segunda_lectura": {
                 "titulo": "SEGUNDA LECTURA",
-                "contenido": self._compactar_salmo_o_lectura(pres.get("segunda_lectura_texto") or ""),
-                "cita": _cita_con_libro(pres.get("segunda_lectura_libro"), pres.get("segunda_lectura_cita")),
+                "contenido": self._compactar_salmo_o_lectura(
+                    pres.get("segunda_lectura_texto") or ""
+                ),
+                "cita": _cita_con_libro(
+                    pres.get("segunda_lectura_libro"), pres.get("segunda_lectura_cita")
+                ),
             },
             "evangelio": {
                 "titulo": "EVANGELIO",
@@ -220,7 +235,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
             },
         }
 
-        slides: List[Slide] = []
+        slides: list[Slide] = []
         primera_portada = True
         for item in items:
             contenido = item.get("contenido") or item.get("slide_contenido") or ""
@@ -238,7 +253,11 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                     subtitulo = fecha_formateada
                     primera_portada = False
                 else:
-                    subtitulo = f"Somos uno · {fecha_formateada}" if subtitulo.lower().startswith("somos uno") else subtitulo
+                    subtitulo = (
+                        f"Somos uno · {fecha_formateada}"
+                        if subtitulo.lower().startswith("somos uno")
+                        else subtitulo
+                    )
 
             # Inyectar texto real de las lecturas del día
             if tipo in lecturas_data and lecturas_data[tipo]["contenido"]:
@@ -299,7 +318,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         if lema_src.exists():
             shutil.copy(lema_src, assets_dir / "lema_somos_uno.jpg")
 
-        rutas_normalizadas: Dict[str, str] = {}
+        rutas_normalizadas: dict[str, str] = {}
         for slide in slides:
             if not slide.imagen:
                 continue
@@ -329,7 +348,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                 # Si no se pudo copiar, al menos normalizar la ruta
                 slide.imagen = f"assets/{Path(slide.imagen).name}"
 
-        data: Dict[str, Any] = {
+        data: dict[str, Any] = {
             "meta": {
                 "fecha": fecha,
                 "celebracion": celebracion,
@@ -353,7 +372,6 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         pptx_path = bundle_dir / f"{base_name}.pptx"
         self._render_pptx(data, pptx_path, assets_dir)
 
-
         pdf_path = bundle_dir / f"{base_name}.pdf"
         self._render_pdf(html_path, pdf_path)
 
@@ -361,30 +379,35 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         conn = _get_connection()
         cursor = conn.cursor()
         ruta_base = str(bundle_dir.relative_to(PROJECT_DIR))
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE presentaciones
             SET estado = 'generado',
                 ruta_web = ?,
                 ruta_pptx = ?,
                 ruta_pdf_fieles = ?
             WHERE id = ?
-        """, (
-            f"{ruta_base}/index.html",
-            f"{ruta_base}/{base_name}.pptx",
-            f"{ruta_base}/{base_name}.pdf",
-            pres["id"],
-        ))
+        """,
+            (
+                f"{ruta_base}/index.html",
+                f"{ruta_base}/{base_name}.pptx",
+                f"{ruta_base}/{base_name}.pdf",
+                pres["id"],
+            ),
+        )
         conn.commit()
         conn.close()
 
         return bundle_dir
 
-    def _color_info(self, color: str) -> Dict[str, str]:
+    def _color_info(self, color: str) -> dict[str, str]:
         from presentacion_html import COLORES_LITURGICOS
+
         return COLORES_LITURGICOS.get(color, COLORES_LITURGICOS["verde"])
 
-    def _split_contenido(self, contenido: str) -> List[str]:
+    def _split_contenido(self, contenido: str) -> list[str]:
         import re
+
         partes = re.split(r"(?m)^\s*---\s*DIAPOSITIVA\s*---\s*$", contenido)
         partes = [p.strip() for p in partes if p.strip()]
         return partes or [""]
@@ -392,6 +415,7 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
 
 def main():
     import argparse
+
     parser = argparse.ArgumentParser(description="Generar presentación desde composición guardada")
     parser.add_argument("--fecha", required=True, help="YYYY-MM-DD del domingo")
     args = parser.parse_args()
