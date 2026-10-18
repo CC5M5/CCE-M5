@@ -59,35 +59,24 @@ export default function FormularioComentarios({ basePath = '/' }) {
       const title = `[Comentario] ${tipoLabel.replace(/[^a-zA-Z0-9áéíóúñüÁÉÍÓÚÑÜ\s]/g, '').trim()}${presentacion ? ` - Domingo ${presentacion}` : ''}`.slice(0, 256);
       const body = `**Autor**: ${nombre || 'Anónimo'}\n**Email**: ${email || 'No proporcionado'}\n**Tipo**: ${tipoLabel}\n**Presentación**: ${presentacion || 'No especificada'}\n**Mensaje**:\n${mensaje}`;
 
-      const owner = import.meta.env.PUBLIC_GITHUB_REPO_OWNER || 'cce-m5';
-      const repo = import.meta.env.PUBLIC_GITHUB_REPO_NAME || 'cce-m5-music';
-      // El token debe viajar desde una variable de entorno PÚBLICA porque este es un sitio
-      // estático que se ejecuta en el navegador. Para evitar exposición permanente, la app
-      // puede apuntar a un proxy/edge function en el futuro. Hasta entonces, usamos la
-      // variable pública documentada en la spec.
-      const token = import.meta.env.PUBLIC_GITHUB_TOKEN;
-
-      if (!token) {
-        throw new Error('No está configurado el token de GitHub para enviar comentarios.');
-      }
-
-      const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
+      // Enviamos al proxy del admin API para no exponer el token de GitHub.
+      const res = await fetch('/comentarios', {
         method: 'POST',
         headers: {
-          'Accept': 'application/vnd.github+json',
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title,
-          body,
-          labels: ['web-comment', 'pendiente'],
+          nombre,
+          email,
+          tipo: form.tipo,
+          presentacion,
+          mensaje,
         }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message || `Error ${res.status} al enviar el comentario.`);
+        throw new Error(data.detail || `Error ${res.status} al enviar el comentario.`);
       }
 
       setSuccess(true);

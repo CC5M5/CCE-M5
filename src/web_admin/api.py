@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import json as _json
+import urllib.request
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from src.web_admin import models as m
 from src.web_admin.rate_limit import LoginRateLimiter
+from src.web_admin.models import ComentarioRequest
 from src.web_admin.auth import (
     authenticate_user,
     change_user_password,
@@ -41,6 +44,13 @@ from src.web_admin.database import (
     next_step,
     supersede_workflow_run,
     update_user,
+)
+from src.web_admin.config import (
+    BACKUPS_DIR,
+    GITHUB_COMENTARIOS_OWNER,
+    GITHUB_COMENTARIOS_REPO,
+    GITHUB_TOKEN_COMENTARIOS,
+    PROJECT_DIR,
 )
 from src.web_admin.workflow_engine import run_step
 
@@ -136,6 +146,52 @@ async def login(request: Request, payload: m.LoginRequest):
 @app.get("/auth/me", response_model=m.UserProfile)
 async def me(current_user: dict[str, Any] = Depends(get_current_user)):
     return m.UserProfile(**current_user)
+
+
+@app.post("/comentarios", response_model=dict)
+async def crear_comentario(payload: ComentarioRequest):
+    """Recibe un comentario de la web y crea un issue en GitHub vía proxy.
+
+    El token de GitHub nunca se expone al navegador; se lee del servidor.
+    """
+    if not GITHUB_TOKEN_COMENTARIOS:
+        logger.warning("Intento de comentario sin GITHUB_TOKEN_COMENTARIOS configurado")
+        raise HTTPException(status_code=503, detail="Servicio de comentarios no configurado")
+
+    tipo_label = {"sugerencia": "🎵 Sug. musical", "correccion": "✏️ Corrección", "otro": "💬 Otro"}.get(payload.tipo, "💬 Otro")
+    title = f"[Comentario] {tipo_label}{f' - Domingo {payload.presentacion}' if payload.presentacion else ''}".strip()
+    body = (
+        f"**Autor**: {payload.nombre or 'Anónimo'}\n"
+        f"**Email**: {payload.email or 'No proporcionado'}\n"
+        f"**Tipo**: {tipo_label}\n"
+        f"**Presentación**: {payload.presentacion or 'No especificada'}\n"
+        f"**Mensaje**:\n{payload.mensaje}"
+    )
+
+    data = _json.dumps({"title": title, "body": body, "labels": ["web-comment", "pendiente"]}).encode("utf-8")
+    url = f"https://api.github.com/repos/{GITHUB_COMENTARIOS_OWNER}/{GITHUB_COMENTARIOS_REPO}/issues"
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {GITHUB_TOKEN_COMENTARIOS}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            resp.read()
+    except urllib.error.HTTPError as exc:
+        logger.error("GitHub rechazó el comentario: %s %s", exc.code, exc.reason)
+        raise HTTPException(status_code=502, detail="No se pudo enviar el comentario a GitHub") from exc
+    except Exception as exc:
+        logger.exception("Error enviando comentario a GitHub")
+        raise HTTPException(status_code=502, detail="Error de conexión con GitHub") from exc
+
+    return {"success": True, "message": "Comentario recibido"}
 
 
 # ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class LoginRequest(BaseModel):
@@ -114,6 +114,19 @@ class WorkflowResponse(BaseModel):
     can_advance: bool
     next_step_name: str | None
     warning: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Comentarios / sugerencias web
+# ---------------------------------------------------------------------------
+
+
+class ComentarioRequest(BaseModel):
+    nombre: str = Field(..., max_length=100)
+    email: EmailStr = Field(..., max_length=254)
+    tipo: str = Field(default="otro", pattern=r"^(sugerencia|correccion|otro)$")
+    presentacion: str = Field(default="", max_length=30)
+    mensaje: str = Field(..., max_length=2000)
 
 
 # ---------------------------------------------------------------------------
