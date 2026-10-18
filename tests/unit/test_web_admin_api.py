@@ -244,3 +244,160 @@ def test_canciones_crud(client) -> None:
 
     r = client.get(f"/canciones/{cancion['id']}", headers={"Authorization": f"Bearer {admin_token}"})
     assert r.status_code == 404
+
+
+def test_static_login_html(client) -> None:
+    r = client.get("/admin/login.html")
+    assert r.status_code in (200, 307, 302)
+
+
+def test_root_redirect(client) -> None:
+    r = client.get("/")
+    assert r.status_code in (200, 307, 302)
+
+
+def test_comentarios_sin_config(client, monkeypatch) -> None:
+    monkeypatch.setattr("src.web_admin.api.GITHUB_TOKEN_COMENTARIOS", "")
+    r = client.post("/comentarios", json={"tipo": "sugerencia", "mensaje": "hola", "presentacion": "2026-01-01", "nombre": "Ana", "email": "a@b.com"})
+    assert r.status_code == 503
+
+
+def test_workflow_advance_mockeado(client, monkeypatch) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/workflows",
+        json={"fecha_domingo": "2026-04-01"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    wf_id = r.json()["workflow"]["id"]
+
+    from src.web_admin import api
+    original = api.run_step
+
+    def fake_run_step(wid, action, data):
+        return {
+            "success": True,
+            "workflow": {
+                "id": wid,
+                "fecha_domingo": "2026-04-01",
+                "current_step": "verify_lectures",
+                "status": "verify_lectures",
+                "steps_data": {},
+                "created_by": "admin",
+                "created_at": "2026-01-01T00:00:00",
+                "updated_at": "2026-01-01T00:00:00",
+                "completed_at": None,
+                "superseded_by": None,
+            },
+            "logs": [],
+            "can_advance": True,
+            "next_step_name": "verify_lectures",
+            "warning": None,
+        }
+
+    monkeypatch.setattr(api, "run_step", fake_run_step)
+    r = client.post(
+        f"/workflows/{wf_id}/advance",
+        json={"workflow_id": wf_id, "action": "next"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 200
+    assert r.json()["workflow"]["current_step"] == "verify_lectures"
+
+
+def test_workflow_advance_failure(client, monkeypatch) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/workflows",
+        json={"fecha_domingo": "2026-05-01"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    wf_id = r.json()["workflow"]["id"]
+
+    from src.web_admin import api
+
+    def fake_run_step(wid, action, data):
+        return {"success": False, "error": "fallo simulado"}
+
+    monkeypatch.setattr(api, "run_step", fake_run_step)
+    r = client.post(
+        f"/workflows/{wf_id}/advance",
+        json={"workflow_id": wf_id, "action": "next"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 422
+
+
+def test_workflow_backups(client) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/workflows",
+        json={"fecha_domingo": "2026-06-01"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    wf_id = r.json()["workflow"]["id"]
+    r = client.get(f"/workflows/{wf_id}/backups", headers={"Authorization": f"Bearer {admin_token}"})
+    assert r.status_code == 200
+    assert "backups" in r.json()
+
+
+def test_fechas_presentaciones(client) -> None:
+    token = _login(client)
+    r = client.get("/presentacion/fechas", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert "fechas" in r.json()
+
+
+def test_create_user_invalid_role(client) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/users",
+        json={"username": "bad", "password": "***", "role": "superadmin"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 400
+
+
+def test_update_user_not_found(client) -> None:
+    admin_token = _login(client)
+    r = client.patch(
+        "/users/9999",
+        json={"full_name": "Nadie"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 404
+
+
+def test_delete_user_not_found(client) -> None:
+    admin_token = _login(client)
+    r = client.delete("/users/9999", headers={"Authorization": f"Bearer {admin_token}"})
+    assert r.status_code == 404
+
+
+def test_viewer_cannot_create_users(client, monkeypatch) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/users",
+        json={"username": "viewer3", "password": "***", "role": "viewer"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    uid = r.json()["id"]
+
+    # cambiar a viewer
+    r = client.patch(
+        f"/users/{uid}",
+        json={"role": "viewer"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 200
+
+    # login como viewer3
+    r = client.post("/auth/login", json={"username": "viewer3", "password": "***"})
+    viewer_token = r.json()["access_token"]
+
+    r = client.post(
+        "/users",
+        json={"username": "nuevo", "password": "***", "role": "viewer"},
+        headers={"Authorization": f"Bearer {viewer_token}"},
+    )
+    assert r.status_code == 403
