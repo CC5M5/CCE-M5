@@ -8,11 +8,12 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from src.web_admin import models as m
+from src.web_admin.rate_limit import LoginRateLimiter
 from src.web_admin.auth import (
     authenticate_user,
     change_user_password,
@@ -113,11 +114,17 @@ async def generic_exception_handler(request, exc):
 # ---------------------------------------------------------------------------
 
 
+_rate_limiter = LoginRateLimiter()
+
+
 @app.post("/auth/login", response_model=m.TokenResponse)
-async def login(payload: m.LoginRequest):
+async def login(request: Request, payload: m.LoginRequest):
+    _rate_limiter.check_or_raise(request, payload.username)
     user = authenticate_user(payload.username, payload.password)
     if not user:
+        _rate_limiter.record_failure(request, payload.username)
         raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+    _rate_limiter.record_success(request, payload.username)
     token = create_access_token(user["username"], user["role"])
     return m.TokenResponse(
         access_token=token,
