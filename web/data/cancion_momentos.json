@@ -292,10 +292,6 @@
     "momento_liturgico": "perdon"
   },
   {
-    "cancion_id": 76,
-    "momento_liturgico": "paz"
-  },
-  {
     "cancion_id": 77,
     "momento_liturgico": "paz"
   },
@@ -328,10 +324,6 @@
     "momento_liturgico": "santo"
   },
   {
-    "cancion_id": 85,
-    "momento_liturgico": "despedida"
-  },
-  {
     "cancion_id": 86,
     "momento_liturgico": "santo"
   },
@@ -341,10 +333,6 @@
   },
   {
     "cancion_id": 89,
-    "momento_liturgico": "santo"
-  },
-  {
-    "cancion_id": 90,
     "momento_liturgico": "santo"
   },
   {

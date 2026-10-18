@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>l XXIX Domingo del Tiempo Ordinario - 2026-10-18</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;600;700&display=swap');
+
+    :root {
+      --liturgia-from: #e8f5e9;
+      --liturgia-to: #c8e6c9;
+      --liturgia-acento: #2e7d32;
+      --oro: #A16207;
+      --morado: #7C3AED;
+      --blanco-tarjeta: rgba(255,255,255,0.94);
+    }
+
+    .reveal {
+      font-family: 'Nunito', 'Open Sans', sans-serif;
+      font-size: 40px;
+      color: #2c3e50;
+    }
+
+    .reveal {
+      aspect-ratio: 4 / 3;
+      max-width: 100vw;
+      max-height: 100vh;
+      margin: auto;
+    }
+
+    .reveal .slides {
+      text-align: left;
+      aspect-ratio: 4 / 3;
+    }
+
+    .reveal .slides section {
+      aspect-ratio: 4 / 3;
+      width: 100%;
+      height: 100%;
+    }
+
+    .reveal .slides section {
+      padding: 0;
+      background: linear-gradient(135deg, #FAF5FF 0%, #F5F3FF 50%, #F0F4F8 100%);
+    }
+
+    .slide-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .reveal .slides section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro), var(--liturgia-acento));
+      z-index: 20;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: 'Fredoka', 'Montserrat', sans-serif;
+      color: var(--liturgia-acento);
+      text-transform: uppercase;
+      margin-bottom: 0.3em;
+      line-height: 1.15;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .reveal h1 { font-size: 1.35em; }
+    .reveal h2 { font-size: 0.95em; font-weight: 400; text-transform: none; color: #555; }
+    .reveal h3 { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
+    .reveal .lectura .tarjeta,
+    .reveal .primera_lectura .tarjeta,
+    .reveal .segunda_lectura .tarjeta,
+    .reveal .salmo .tarjeta,
+    .reveal .evangelio .tarjeta {
+      max-width: 92%;
+      margin: 30px 40px 110px 40px;
+      max-height: 70%;
+    }
+
+    .reveal .lectura .ilustracion,
+    .reveal .primera_lectura .ilustracion,
+    .reveal .segunda_lectura .ilustracion,
+    .reveal .salmo .ilustracion,
+    .reveal .evangelio .ilustracion {
+      display: none;
+    }
+
+    .reveal p, .reveal li {
+      line-height: 1.5;
+      margin-bottom: 0.5em;
+    }
+
+    .reveal .tarjeta {
+      background: var(--blanco-tarjeta);
+      border-radius: 24px;
+      padding: 24px 32px;
+      margin: 30px 40px 110px 40px;
+      box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(124, 58, 237, 0.12);
+      max-height: 70%;
+      overflow: auto;
+      position: relative;
+      z-index: 5;
+    }
+
+    .reveal .tarjeta::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
+      border-radius: 0 0 24px 24px;
+    }
+
+    .reveal .cita {
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 0.6em;
+      padding: 0.25em 0.7em;
+      display: inline-block;
+      background: linear-gradient(90deg, var(--liturgia-acento), var(--oro));
+      color: white;
+      border-radius: 8px;
+    }
+
+    .reveal .contenido {
+      white-space: pre-wrap;
+      max-height: none;
+      overflow: visible;
+      font-size: 0.9em;
+      line-height: 1.22;
+    }
+
+    .reveal .primera_lectura .contenido,
+    .reveal .segunda_lectura .contenido,
+    .reveal .evangelio .contenido {
+      font-size: 1em;
+      line-height: 1.18;
+    }
+
+    .reveal .salmo .contenido {
+      font-size: 0.95em;
+      line-height: 1.22;
+    }
+
+    .reveal .primera_lectura .tarjeta,
+    .reveal .segunda_lectura .tarjeta,
+    .reveal .salmo .tarjeta,
+    .reveal .evangelio .tarjeta {
+      padding: 18px 24px;
+      max-width: 95%;
+      margin: 20px 30px 110px 30px;
+    }
+
+    .reveal .logo-lema {
+      position: absolute;
+      bottom: 22px;
+      right: 30px;
+      height: 55px;
+      width: auto;
+      max-width: 180px;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .reveal .ilustracion {
+      position: absolute;
+      top: auto;
+      bottom: 90px;
+      right: 70px;
+      max-width: 280px;
+      max-height: 280px;
+      opacity: 0.98;
+      z-index: 6;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      object-fit: contain;
+    }
+
+    section:has(.ilustracion) .tarjeta {
+      margin-right: 320px;
+    }
+
+    .reveal .portada .slide-wrapper {
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 40%, #7C3AED 70%, var(--oro) 100%);
+    }
+
+    .reveal .portada .tarjeta {
+      background: rgba(255,255,255,0.96);
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .reveal .portada h1 {
+      text-align: center;
+      font-size: 1.8em;
+      margin-top: 0;
+    }
+
+    .reveal .portada h2 {
+      text-align: center;
+      font-size: 1.1em;
+      color: #555;
+      text-transform: none;
+      font-weight: 400;
+      margin-top: 0.5em;
+    }
+
+    .reveal .portada .ilustracion {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      max-width: 320px;
+      max-height: 320px;
+      margin: 0 auto 1em;
+    }
+
+    .reveal .transicion .slide-wrapper,
+    .reveal .paso .slide-wrapper {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .reveal .transicion .tarjeta,
+    .reveal .paso .tarjeta {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 55%;
+      max-width: 78%;
+      background: rgba(255,255,255,0.96);
+      border-radius: 32px;
+      padding: 36px 44px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.22);
+    }
+
+    .reveal .transicion h1,
+    .reveal .paso h1 {
+      text-align: center;
+      font-size: 2.4em;
+      letter-spacing: 0.02em;
+      color: var(--liturgia-acento);
+      margin-bottom: 0.2em;
+    }
+
+    .reveal .transicion h2,
+    .reveal .paso h2 {
+      text-align: center;
+      font-size: 1.1em;
+      color: #555;
+      font-weight: 400;
+      margin-bottom: 0.8em;
+    }
+
+    .reveal .transicion .contenido,
+    .reveal .paso .contenido {
+      font-size: 1.0em;
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    .reveal .transicion .ilustracion,
+    .reveal .paso .ilustracion {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      max-width: 220px;
+      max-height: 220px;
+      margin: 0 auto 1em;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    }
+
+    .reveal .cancion .tarjeta {
+      background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,255,0.96) 100%);
+    }
+
+    .reveal .cancion .contenido {
+      font-size: 0.88em;
+      line-height: 1.25;
+    }
+
+    .reveal .cancion .contenido br {
+      display: block;
+      content: "";
+      margin-bottom: 0.05em;
+    }
+
+    .reveal .salmo .contenido {
+      font-size: 0.95em;
+      line-height: 1.18;
+    }
+
+    .reveal .salmo .contenido br {
+      display: block;
+      content: "";
+      margin-bottom: 0.02em;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal .slides section.present {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    .reveal .contenido::-webkit-scrollbar {
+      width: 6px;
+    }
+    .reveal .contenido::-webkit-scrollbar-thumb {
+      background: var(--liturgia-acento);
+      border-radius: 3px;
+    }
+
+    @media print {
+      .reveal .slides section {
+        page-break-after: always;
+        height: 100vh;
+      }
+      .reveal .slides section .slide-wrapper {
+        height: 100vh;
+      }
+      .reveal .logo-lema {
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+      }
+      .slide-wrapper:has(.ilustracion) .tarjeta {
+        margin-right: 340px;
+      }
+      .reveal .tarjeta {
+        margin: 30px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section class="portada" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>l XXIX Domingo del Tiempo Ordinario</h1>
+  <h2>18 de octubre de 2026</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="entrada cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140953.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>HE VENIDO A SERVIR</h1>
+  <div class="contenido">Quien quiera ser grande,
+quien quiera ser el primero,
+sea el esclavo de todos,
+sea el más pequeño.
+No he venido a ser servido,
+que he venido a servir
+y a dar la vida por todos
+para que todos puedan vivir (2)
+en
+plenitud (3).</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="transicion_palabra" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140961.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>LITURGIA DE LA PALABRA</h1>
+  <div class="contenido">Escuchemos la Palabra de Dios</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="perdon" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140955.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ACTO PENITENCIAL</h1>
+  <div class="contenido">Yo confieso ante Dios todopoderoso
+y ante vosotros, hermanos,
+que he pecado mucho de pensamiento, palabra, obra y omisión:
+por mi culpa, por mi culpa, por mi gran culpa.
+
+Por eso ruego a Santa María, siempre Virgen,
+a los ángeles, a los santos y a vosotros, hermanos,
+que intercedáis por mí ante Dios, nuestro Señor.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="gloria cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ALABO TU BONDAD (1/2)</h1>
+  <div class="contenido">Todo mi ser canta hoy
+por las cosas que hay en mí.
+Gracias te doy mi Señor,
+Tú me haces tan feliz.
+Tú me has regalado tu amistad,
+confío en ti, me llenas de tu
+Tú me haces sentir tu gran bondad,
+yo cantaré por siempre tu fidelidad.
+
+<strong>GLORIA A TI, SEÑOR POR TU BONDAD.</strong>
+<strong>GLORIA, GLORIA,</strong>
+<strong>SIEMPRE CANTARÉ TU FIDELIDAD.</strong>
+<strong>GLORIA A TI, SEÑOR POR TU BONDAD.</strong>
+<strong>GLORIA, GLORIA,</strong>
+<strong>SIEMPRE CANTARÉ TU FIDELIDAD.</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="gloria cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ALABO TU BONDAD (2/2)</h1>
+  <div class="contenido">Siempre a tu lado estaré
+alabando tu bondad
+A mis hermanos diré
+el gran gozo que hallo en ti.
+En ti podrán siempre encontrar
+fidelidad, confianza y amistad.
+Nunca fallara tu gran amor,
+ni tu perdón. Me quieres tal como soy
+
+<strong>GLORIA A TI, SEÑOR POR TU BONDAD.</strong>
+<strong>GLORIA, GLORIA,</strong>
+<strong>SIEMPRE CANTARÉ TU FIDELIDAD.</strong>
+<strong>GLORIA A TI, SEÑOR POR TU BONDAD.</strong>
+<strong>GLORIA, GLORIA,</strong>
+<strong>SIEMPRE CANTARÉ TU FIDELIDAD.</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="primera_lectura" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PRIMERA LECTURA</h1>
+  <div class="cita">Is 45,1.4-6</div>
+  <div class="contenido">Así dice el Señor a su Ungido, a Ciro, a quien lleva de la mano: «Doblegaré ante él las naciones, desceñiré las cinturas de los reyes, abriré ante él las puertas, los batientes no se le cerrarán. Por mi siervo Jacob, por mi escogido Israel, te llamé por tu nombre, te di un título, aunque no me conocías. Yo soy el Señor y no hay otro; fuera de mí, no hay dios. Te pongo la insignia, aunque no me conoces, para que sepan de Oriente a Occidente que no hay otro fuera de mí. Yo soy el Señor, y no hay otro.»</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="salmo" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140962.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>SALMO RESPONSORIAL</h1>
+  <div class="cita">Sal 95,1 — Aclamad la gloria y el poder del Señor</div>
+  <div class="contenido">Cantad al Señor un cántico nuevo, cantad al Señor, toda la tierra.
+
+Contad a los pueblos su gloria, sus maravillas a todas las naciones.
+
+Porque es grande el Señor, y muy digno de alabanza, más temible que todos los dioses.
+
+Pues los dioses de los gentiles son apariencia, mientras que el Señor ha hecho el cielo.
+
+Familias de los pueblos, aclamad al Señor, aclamad la gloria y el poder del Señor, aclamad la gloria del nombre del Señor, entrad en sus atrios trayéndole ofrendas.
+
+Postraos ante el Señor en el atrio sagrado, tiemble en su presencia la tierra toda; decid a los pueblos: «El Señor es rey, él gobierna a los pueblos rectamente.»</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="segunda_lectura" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140960.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>SEGUNDA LECTURA</h1>
+  <div class="cita">Tes 1,1-5b</div>
+  <div class="contenido">Pablo, Silvano y Tirnoteo a la Iglesia de los tesalonicenses, en Dios Padre y en el Señor Jesucristo. A vosotros, gracia y paz. Siempre damos gracias a Dios por todos vosotros y os tenemos presentes en nuestras oraciones. Ante Dios, nuestro Padre, recordarnos sin cesar la actividad de vuestra fe, el esfuerzo de vuestro amor y el aguante de vuestra esperanza en Jesucristo, nuestro Señor. Bien sabemos, hermanos amados de Dios, que él os ha elegido y que, cuando se proclamó el Evangelio entre vosotros, no hubo sólo palabras, sino además fuerza del Espíritu Santo y convicción profunda.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="aleluya cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>ALELUYA (Leonard Cohen)</h1>
+  <div class="contenido">Quiero escuchar tu corazón,
+conozco el sonido de tu voz,
+abrázame con tu palabra, Padre.
+Ayúdanos a comprender
+que hay tantas cosas por hacer,
+regálanos tus manos, aleluya.
+
+ALELUYA, ALELUYA,
+ALELUYA, ALELU…
+ALELUYA, ALELUYA,
+ALELUYA, ALELUYA</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="evangelio" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>EVANGELIO</h1>
+  <div class="cita">Mt 22,15-21</div>
+  <div class="contenido">En aquel tiempo, se retiraron los fariseos y llegaron a un acuerdo para comprometer a Jesús con una pregunta.Le enviaron unos discípulos, con unos partidarios de Herodes, y le dijeron: «Maestro, sabemos que eres sincero y que enseñas el camino de Dios conforme a la verdad; sin que te importe nadie, porque no miras lo que la gente sea. Dinos, pues, qué opinas: ¿es licito pagar impuesto al César o no?»Comprendiendo su mala voluntad, les dijo Jesús: «Hipócritas, ¿por qué me tentáis? Enseñadme la moneda del impuesto.»Le presentaron un denario. Él les preguntó: «¿De quién son esta cara y esta inscripción?»Le respondieron: «Del César.»Entonces les replicó: «Pues pagadle al César lo que es del César y a Dios lo que es de Dios.»; Palabra del Señor</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="transicion_eucaristia" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140959.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>LITURGIA EUCARÍSTICA</h1>
+  <div class="contenido">Preparémonos para la mesa del Señor</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="credo" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/20140954.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>CREDO</h1>
+  <div class="contenido">Creo en Dios, Padre todopoderoso, 
+creador del cielo y de la tierra.
+Creo en Jesucristo, su único Hijo, nuestro Señor, 
+que fue concebido por obra y gracia del Espíritu Santo; 
+nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; 
+fue crucificado, muerto y sepultado; descendió a los infiernos; 
+al tercer día resucitó de entre los muertos; 
+subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.
+Desde allí ha de venir a juzgar a vivos y muertos.
+Creo en el Espíritu Santo, la santa Iglesia católica, 
+la comunión de los santos, el perdón de los pecados, 
+la resurrección de la carne y la vida eterna. Amén.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="ofertorio cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140952_reconócelo_al_partir_el_pan.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>TOMA MI VIDA (1/2)</h1>
+  <div class="contenido">Esto que te doy es vino y pan señor.
+Esto que te doy es mi trabajo.
+Es mi corazón, es mi alma,
+es mi cuerpo y mi razón,
+el esfuerzo de mi caminar...
+
+Esto que te doy mi vida es señor.
+es mi amor también es mi dolor.
+Es la ilusión de mis sueños,
+es mi gozo y mi llorar,
+es mi canto y mi oración.
+
+<strong>TOMA MI VIDA, PONLA EN TU CORAZÓN.</strong>
+<strong>DAME TU MANO Y LLÉVAME.</strong>
+<strong>CAMBIA MI PAN EN TU CARNE</strong>
+<strong>Y MI VINO EN TU SANGRE</strong>
+<strong>Y A MI SEÑOR RENUÉVAME,</strong>
+<strong>LÍMPIAME Y SÁLVAME</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="ofertorio cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140952_reconócelo_al_partir_el_pan.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>TOMA MI VIDA (2/2)</h1>
+  <div class="contenido">Esto te lo doy, no solo, mi Señor,
+esta voz también es mi hermano.
+Es la unión, la paz y el orden,
+la armonía y felicidad,
+es un canto en comunidad.
+
+<strong>TOMA MI VIDA, PONLA EN TU CORAZÓN.</strong>
+<strong>DAME TU MANO Y LLÉVAME.</strong>
+<strong>CAMBIA MI PAN EN TU CARNE</strong>
+<strong>Y MI VINO EN TU SANGRE</strong>
+<strong>Y A MI SEÑOR RENUÉVAME,</strong>
+<strong>LÍMPIAME Y SÁLVAME</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="santo cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140758_mi_reino_no_es_de_este_mundo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>SEÑOR SANTO</h1>
+  <div class="contenido">Señor santo, Dios del universo, Tú.
+Llenos están cielo y tierra de  tu gloria.
+Bendito aquél que viene
+en nombre del señor.
+Hosanna en el cielo. (bis)</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="padre_nuestro cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140352_un_amor_más_que_justo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PADRE NUESTRO (Gallego) (1/2)</h1>
+  <div class="contenido">En el mar he oído hoy
+Señor tu voz que me llamó
+y me pidió que me entregara
+a mis hermanos.
+Esa voz me transformó,
+mi vida entera ya cambió,
+y sólo pienso ahora Señor
+en repetirte:
+
+<strong>PADRE NUESTRO</strong>
+<strong>EN TI CREEMOS,</strong>
+<strong>PADRE NUESTRO</strong>
+<strong>TE OFRECEMOS,</strong>
+<strong>PADRE NUESTRO</strong>
+<strong>NUESTRAS MANOS</strong>
+<strong>DE HERMANOS.</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="padre_nuestro cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140352_un_amor_más_que_justo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PADRE NUESTRO (Gallego) (2/2)</h1>
+  <div class="contenido">Cuando vaya a otro lugar
+tendré Señor que abandonar
+a mi familia a mis amigos
+por seguirte.
+Pero sé que así algún día
+podré enseñar tu verdad,
+ir a mi hermano y junto a él
+yo repetirte.
+
+<strong>PADRE NUESTRO</strong>
+<strong>EN TI CREEMOS,</strong>
+<strong>PADRE NUESTRO</strong>
+<strong>TE OFRECEMOS,</strong>
+<strong>PADRE NUESTRO</strong>
+<strong>NUESTRAS MANOS</strong>
+<strong>DE HERMANOS.</strong></div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paz cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140690_la_ley_del_amor_no_pesa_ni_aplasta_sino_que_libera.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>PAZ EN LA TIERRA</h1>
+  <div class="contenido"><strong>PAZ EN LA TIERRA,</strong>
+<strong>PAZ EN LAS ALTURAS.</strong>
+<strong>QUE EL GOZO ETERNO REINE</strong>
+<strong>EN NUESTRO CORAZÓN. (BIS)</strong>
+
+Da la paz, hermano, da la paz.
+Constrúyela en tu corazón
+y con tu gesto afirmarás
+que quieres la paz.
+
+Que tu paz, hermano, sea don;
+es el mejor signo de amor
+que Tú nos puedes ofrecer,
+abrazo de paz.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="comunion cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140352_un_amor_más_que_justo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>TODO MI SER</h1>
+  <div class="contenido">Todo mi ser, todo lo que soy
+te pertenece sólo a ti.
+Desde mi pobreza,
+Tú eres la fuerza.
+Nada sé, sólo que caminaré.
+
+<strong>LLEGASTE A MI VIDA CON TU LUZ,</strong>
+<strong>CAMBIASTE MI MENTE CON TU AMOR,</strong>
+<strong>VACIASTE MI ALMA Y AHORA ESTÁS</strong>
+<strong>DENTRO DE MÍ.</strong>
+
+Todo mi ser, todo lo que soy,
+lo bueno y lo malo la pongo a tus pies.
+Aunque a veces llegues a mi templo
+y lo encuentres ya lleno,
+no es verdad, sólo se llena
+cuando Tú moras en él.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="maria cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/patite_ilustracion_52a3d8fa.jpeg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>A TU AMPARO Y PROTECCIÓN</h1>
+  <div class="contenido">A TU AMPARO Y PROTECCIÓN,
+MADRE DE DIOS, ACUDIMOS.
+NO DESOIGAS NUESTROS RUEGOS
+Y DE TODOS LOS PELIGROS,
+VIRGEN GLORIOSA Y BENDITA,
+DEFIENDE SIEMPRE A TUS HIJOS</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="paso" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h2>l XXIX Domingo del Tiempo Ordinario · Mt 22,15-21</h2>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="despedida cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140940_nueva_ley_nuevas_relaciones_nuevas_palabras_lo_renuevas_todo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>QUIERO VIVIR AMANDO (1/3)</h1>
+  <div class="contenido">No me resigno y busco siempre más,
+no me conformo con ser un mediocre.
+Quiero tenerte cerca al caminar
+sólo contigo brillaré en la noche.
+
+<strong>SI NO HAY AMOR, TODO ES MENTIRA</strong>
+<strong>SI NO HAY AMOR,</strong>
+<strong>TODO LO QUE VIVO PIERDE SU COLOR</strong>
+
+Podría amontonar todo el saber,
+y ser el tío más listo de la tierra.
+Podría dedicarme a resolver,
+todos los males y todas las guerras.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="despedida cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140940_nueva_ley_nuevas_relaciones_nuevas_palabras_lo_renuevas_todo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>QUIERO VIVIR AMANDO (2/3)</h1>
+  <div class="contenido"><strong>SI NO HAY AMOR, TODO ES MENTIRA</strong>
+<strong>SI NO HAY AMOR,</strong>
+<strong>TODO LO QUE VIVO PIERDE SU COLOR</strong>
+<strong>QUIERO VIVIR AMANDO, QUIERO VIVIR</strong>
+<strong>QUIERO VIVIR AMANDO, QUIERO VIVIR</strong>
+
+Podría querer ser tu seguidor,
+dejarme quemar vivo a fuego lento
+y ganar cada mes más de un millón
+y repartirlo todo a los hambrientos.
+
+<strong>SI NO HAY AMOR, TODO ES MENTIRA</strong>
+<strong>SI NO HAY AMOR,</strong>
+<strong>TODO LO QUE VIVO PIERDE SU COLOR</strong>
+<strong>QUIERO VIVIR AMANDO, QUIERO VIVIR</strong>
+<strong>QUIERO VIVIR AMANDO, QUIERO VIVIR</strong> O MORIR</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="despedida cancion" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_20140940_nueva_ley_nuevas_relaciones_nuevas_palabras_lo_renuevas_todo.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>QUIERO VIVIR AMANDO (3/3)</h1>
+  <div class="contenido">El amor es servicio y no lleva cuentas del mal
+el amor no presume, no es egoísta.
+El amor no se engríe,
+no se irrita ni te trata mal.
+También es comprensivo, no tiene envidia.
+Disculpa y cree sin límites.
+Espera y aguanta sin límites.
+El amor nunca pasará.
+
+<strong>SI NO HAY AMOR, TODO ES MENTIRA</strong>
+<strong>SI NO HAY AMOR,</strong>
+<strong>TODO LO QUE VIVO PIERDE SU COLOR</strong>
+<strong>QUIERO VIVIR AMANDO, QUIERO VIVIR</strong>
+<strong>QUIERO VIVIR AMANDO, QUIERO VIVIR</strong> 
+
+Quiero vivir amando, porque el amor es Dios.
+Quiero vivir amando, porque el amor es Dios.</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+<section class="portada" data-transition="fade">
+  <div class="slide-wrapper">
+    <img class="ilustracion" src="assets/fano_25_domingo_vina.jpg" alt="ilustración">
+    <div class="tarjeta">
+  <h1>¡ID EN PAZ!</h1>
+  <h2>Somos uno · 18 de octubre de 2026</h2>
+  <div class="contenido">La paz del Señor esté siempre con vosotros.
+
+«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»</div>
+    </div>
+    <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno">
+  </div>
+</section>
+
+    </div>
+  </div>
+  <img class="logo-lema" src="assets/lema_somos_uno.jpg" alt="Somos uno" style="display:none;">
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      width: 1280,
+      height: 960,
+      center: true,
+      margin: 0.04,
+      minScale: 0.2,
+      maxScale: 2.0,
+    });
+
+    // Ajustar tamaño de fuente de la tarjeta para llenar la diapositiva sin cortar
+    function ajustarTexto(slide) {
+      const tarjeta = slide.querySelector('.tarjeta');
+      if (!tarjeta) return;
+      const wrapper = slide.querySelector('.slide-wrapper');
+      const logo = slide.querySelector('.logo-lema');
+      const ilustracion = slide.querySelector('.ilustracion');
+
+      const esLectura = slide.classList.contains('primera_lectura')
+                     || slide.classList.contains('segunda_lectura')
+                     || slide.classList.contains('salmo')
+                     || slide.classList.contains('evangelio')
+                     || slide.classList.contains('lectura');
+
+      // Lecturas: un poco mas grande para mejor legibilidad
+      let fontSize = esLectura ? 48 : 48;
+      tarjeta.style.fontSize = fontSize + 'px';
+
+      const logoHeight = logo ? logo.offsetHeight + 36 : 90;
+      const topMargin = 30;
+      const bottomSafety = 20;
+      const maxHeight = wrapper.clientHeight - topMargin - logoHeight - bottomSafety;
+
+      const ilustracionWidth = ilustracion ? ilustracion.offsetWidth + 60 : 0;
+      const maxWidth = wrapper.clientWidth - 80 - ilustracionWidth;
+
+      tarjeta.style.maxHeight = maxHeight + 'px';
+
+      // Reducir hasta que el texto quepa; para lecturas permitimos bajar hasta 28px
+      const minSize = esLectura ? 28 : 16;
+      while ((tarjeta.scrollHeight > maxHeight || tarjeta.scrollWidth > maxWidth) && fontSize > minSize) {
+        fontSize -= 0.5;
+        tarjeta.style.fontSize = fontSize + 'px';
+      }
+    }
+    Reveal.on('ready', event => ajustarTexto(event.currentSlide));
+    Reveal.on('slidechanged', event => {
+      ajustarTexto(event.currentSlide);
+      if (event.previousSlide) {
+        const prevTarjeta = event.previousSlide.querySelector('.tarjeta');
+        if (prevTarjeta) prevTarjeta.style.fontSize = '';
+      }
+    });
+  </script>
+</body>
+</html>
