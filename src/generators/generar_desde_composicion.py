@@ -15,7 +15,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from .presentacion_html import GeneradorPresentacionHTML, Slide
+from .presentacion.generador import GeneradorPresentacionHTML
+from .presentacion.slide import Slide
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_DIR / "data"
