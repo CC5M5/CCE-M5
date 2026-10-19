@@ -137,3 +137,75 @@ def test_html_limpia_etiquetas_de_entrada():
 
     assert "<strong>" not in html
     assert "Todo es tuyo" in html
+
+
+def test_limpiar_texto_cancion():
+    """Elimina metadatos del blogspot."""
+    from src.parsers.acordes_parser_v3 import limpiar_texto_cancion
+
+    texto = "escuchar\nDo Re Mi\nvolver a lista de canciones\n/version/"
+    limpio = limpiar_texto_cancion(texto)
+    assert "Do Re Mi" in limpio
+    assert "escuchar" not in limpio
+    assert "volver" not in limpio
+
+
+def test_limpiar_texto_preservando_espacios():
+    from src.parsers.acordes_parser_v3 import limpiar_texto_preservando_espacios
+
+    texto = "escuchar\nDo   Re   Mi\nLínea de letra"
+    limpio = limpiar_texto_preservando_espacios(texto)
+    assert "Do   Re   Mi" in limpio
+    assert "escuchar" not in limpio
+
+
+def test_acorde_posicionado_negativo():
+    from src.parsers.acordes_parser_v3 import AcordePosicionado
+
+    try:
+        AcordePosicionado("Do", -1)
+        raise AssertionError("Debería lanzar ValueError")
+    except ValueError as exc:
+        assert "negativa" in str(exc)
+
+
+def test_es_linea_de_acordes_varios():
+    """Reconoce líneas de acordes puras y rechaza líneas de letra."""
+    parser = _crear_parser()
+    assert parser.es_linea_de_acordes("Do Re Mi") is True
+    assert parser.es_linea_de_acordes("Do Re Mi.") is False
+    assert parser.es_linea_de_acordes("Esta es una línea de letra") is False
+    assert parser.es_linea_de_acordes("[Intro] Do Re Mi") is True
+    assert parser.es_linea_de_acordes("Intro: Do Re Mi") is True
+
+
+def test_parsear_acordes_con_slash():
+    """Soporta slash chords."""
+    texto = "Do/Sol   Re/La\nLínea de letra"
+    parser = _crear_parser()
+    estructura = parser.parsear_cancion_completa(texto)
+    assert len(estructura) == 1
+    assert estructura[0].tipo == "acordes_letra"
+    acordes = [a.acorde for a in estructura[0].acordes]
+    assert "Do/Sol" in acordes
+    assert "Re/La" in acordes
+
+
+
+
+
+
+def test_detectar_tono_con_acordes():
+    """Detecta el tono más frecuente."""
+    texto = "Do Re Do\nLínea uno\nDo Mi Do"
+    parser = _crear_parser()
+    estructura = parser.parsear_cancion_completa(texto)
+    assert parser.detectar_tono(estructura) == "Do"
+
+
+def test_detectar_tono_sin_acordes():
+    """Sin acordes no detecta tono."""
+    texto = "Solo letra\nMás letra"
+    parser = _crear_parser()
+    estructura = parser.parsear_cancion_completa(texto)
+    assert parser.detectar_tono(estructura) == "No detectado"
