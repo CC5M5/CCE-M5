@@ -49,7 +49,7 @@ from src.web_admin.database import (
     update_user,
 )
 from src.web_admin.models import ComentarioRequest
-from src.web_admin.rate_limit import LoginRateLimiter
+from src.web_admin.rate_limit import IPRateLimiter, LoginRateLimiter
 from src.web_admin.workflow_engine import run_step
 
 logger = logging.getLogger(__name__)
@@ -84,6 +84,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Rate limiting global por IP (excluye health y archivos estáticos/admin).
+_ip_rate_limiter = IPRateLimiter(max_requests=120, window_seconds=60)
+
+
+@app.middleware("http")
+async def ip_rate_limit_middleware(request: Request, call_next):
+    path = request.url.path
+    if path.startswith(("/health", "/admin", "/static")):
+        return await call_next(request)
+    try:
+        _ip_rate_limiter.check_or_raise(request)
+    except HTTPException as exc:
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+    return await call_next(request)
 
 
 @app.get("/", include_in_schema=False)
