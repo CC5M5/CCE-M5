@@ -401,3 +401,117 @@ def test_viewer_cannot_create_users(client, monkeypatch) -> None:
         headers={"Authorization": f"Bearer {viewer_token}"},
     )
     assert r.status_code == 403
+
+
+def test_login_validation(client) -> None:
+    r = client.post("/auth/login", json={"username": "", "password": ""})
+    assert r.status_code in (401, 422)
+
+
+def test_workflow_index(client) -> None:
+    token = _login(client)
+    r = client.get("/workflows", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert "workflows" in r.json()
+
+
+def test_workflow_index_with_fecha(client) -> None:
+    admin_token = _login(client)
+    r = client.get("/workflows?fecha=2026-01-01", headers={"Authorization": f"Bearer {admin_token}"})
+    assert r.status_code == 200
+    assert isinstance(r.json()["workflows"], list)
+
+
+def test_workflow_detail_not_found(client) -> None:
+    token = _login(client)
+    r = client.get("/workflows/9999", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 404
+
+
+def test_goto_step_invalid(client) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/workflows",
+        json={"fecha_domingo": "2026-07-01"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    wf_id = r.json()["workflow"]["id"]
+
+    r = client.post(
+        f"/workflows/{wf_id}/goto-step",
+        json={"workflow_id": wf_id, "step": "invalido"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 422
+
+
+def test_workflow_advance_inconsistent_id(client) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/workflows",
+        json={"fecha_domingo": "2026-08-01"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    wf_id = r.json()["workflow"]["id"]
+
+    r = client.post(
+        f"/workflows/{wf_id}/advance",
+        json={"workflow_id": 9999, "action": "next"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 400
+
+
+def test_workflow_advance_not_found(client) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/workflows/9999/advance",
+        json={"workflow_id": 9999, "action": "next"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 404
+
+
+def test_change_password_wrong_current(client) -> None:
+    admin_token = _login(client)
+    r = client.post(
+        "/auth/change-password",
+        json={"current_password": "wrong", "new_password": "newpass"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 401
+
+
+def test_change_password_too_short(client) -> None:
+    from src.web_admin.config import DEFAULT_ADMIN_PASSWORD
+
+    admin_token = _login(client)
+    r = client.post(
+        "/auth/change-password",
+        json={"current_password": DEFAULT_ADMIN_PASSWORD, "new_password": "abc"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 400
+
+
+def test_list_canciones_empty(client) -> None:
+    token = _login(client)
+    r = client.get("/canciones", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert r.json() == []
+
+
+def test_update_user_last_admin(client) -> None:
+    from src.web_admin.config import DEFAULT_ADMIN_USERNAME
+
+    admin_token = _login(client)
+    # obtener admin
+    r = client.get("/auth/me", headers={"Authorization": f"Bearer {admin_token}"})
+    uid = r.json()["id"]
+
+    r = client.patch(
+        f"/users/{uid}",
+        json={"role": "viewer"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert r.status_code == 409
