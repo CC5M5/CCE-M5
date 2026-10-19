@@ -192,3 +192,31 @@ class LoginRateLimiter:
 
     def __call__(self, request: Request, username: str) -> None:
         self.check_or_raise(request, username)
+
+
+
+class IPRateLimiter:
+    """Rate limiting simple por IP para todo el tráfico HTTP."""
+
+    def __init__(self, max_requests: int = 100, window_seconds: float = 60.0):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self._storage = _MemoryStorage(max_requests, window_seconds, block_seconds=window_seconds)
+
+    def _key(self, request: Request) -> str:
+        client = request.client.host if request.client else "unknown"
+        return f"ip:{client}"
+
+    def is_allowed(self, request: Request) -> bool:
+        return not self._storage.is_blocked(self._key(request))
+
+    def record(self, request: Request) -> None:
+        self._storage.record_failure(self._key(request))
+
+    def check_or_raise(self, request: Request) -> None:
+        if not self.is_allowed(request):
+            raise HTTPException(
+                status_code=429,
+                detail="Demasiadas peticiones desde esta IP. Espera un momento.",
+            )
+        self.record(request)
