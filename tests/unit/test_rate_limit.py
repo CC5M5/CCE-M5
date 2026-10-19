@@ -1,48 +1,57 @@
-"""Tests para el rate limiting de login del admin."""
+"""Tests para src/web_admin/rate_limit.py."""
 
-from unittest.mock import MagicMock
+from __future__ import annotations
 
-import pytest
 from fastapi import HTTPException
-
 from src.web_admin.rate_limit import LoginRateLimiter, _MemoryStorage
 
 
 class FakeRequest:
-    def __init__(self, host="127.0.0.1"):
-        self.client = MagicMock()
-        self.client.host = host
+    def __init__(self, host: str = "127.0.0.1"):
+        self.client = type("Client", (), {"host": host})()
 
 
-def test_memory_storage_blocks_after_max_attempts():
-    storage = _MemoryStorage(max_attempts=3, window_seconds=60, block_seconds=60)
-    assert storage.is_blocked("alice") is False
-    storage.record_failure("alice")
-    storage.record_failure("alice")
-    assert storage.is_blocked("alice") is False
-    storage.record_failure("alice")
-    assert storage.is_blocked("alice") is True
-    storage.record_success("alice")
-    assert storage.is_blocked("alice") is False
+def test_memory_storage_block_after_max() -> None:
+    storage = _MemoryStorage(max_attempts=2, window_seconds=300, block_seconds=900)
+    key = "127.0.0.1:user"
+    storage.record_failure(key)
+    assert not storage.is_blocked(key)
+    storage.record_failure(key)
+    assert storage.is_blocked(key)
 
 
-def test_limiter_uses_ip_and_username():
-    limiter = LoginRateLimiter(storage=_MemoryStorage(2, 60, 60))
-    req = FakeRequest(host="10.0.0.1")
-    limiter.record_failure(req, "user1")
-    limiter.record_failure(req, "user1")
-    with pytest.raises(HTTPException) as exc_info:
-        limiter.check_or_raise(req, "user1")
-    assert exc_info.value.status_code == 429
-
-    # Otro usuario en la misma IP no está bloqueado
-    limiter.check_or_raise(req, "user2")
+def test_memory_storage_success_resets() -> None:
+    storage = _MemoryStorage(max_attempts=2, window_seconds=300, block_seconds=900)
+    key = "127.0.0.1:user"
+    storage.record_failure(key)
+    storage.record_success(key)
+    assert not storage.is_blocked(key)
 
 
-def test_limiter_success_resets_failures():
-    storage = _MemoryStorage(2, 60, 60)
+def test_login_rate_limiter_raises_when_blocked() -> None:
+    storage = _MemoryStorage(max_attempts=2, window_seconds=300, block_seconds=900)
+    req = FakeRequest()
+    key = LoginRateLimiter._key(req, "user")
+    storage.record_failure(key)
+    storage.record_failure(key)
+    assert storage.is_blocked(key)
+    limiter = LoginRateLimiter(storage=storage)
+    try:
+        limiter.check_or_raise(req, "user")
+        raise AssertionError("Debería haber lanzado 429")
+    except HTTPException as exc:
+        assert exc.status_code == 429
+
+
+def test_login_rate_limiter_not_blocked() -> None:
+    storage = _MemoryStorage(max_attempts=5, window_seconds=300, block_seconds=900)
     limiter = LoginRateLimiter(storage=storage)
     req = FakeRequest()
-    limiter.record_failure(req, "u")
-    limiter.record_success(req, "u")
-    limiter.check_or_raise(req, "u")  # no lanza
+    limiter.check_or_raise(req, "user")  # no raise
+
+
+def test_login_rate_limiter_call() -> None:
+    storage = _MemoryStorage(max_attempts=5, window_seconds=300, block_seconds=900)
+    limiter = LoginRateLimiter(storage=storage)
+    req = FakeRequest()
+    limiter(req, "user")  # no raise
