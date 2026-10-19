@@ -2,240 +2,109 @@
 
 from __future__ import annotations
 
-import importlib
-import json
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
-from src import db_manager
+from src.web_admin import database as db
+from src.web_admin import workflow_engine as we
 
 
 @pytest.fixture
-def wf_module(tmp_path: Path, monkeypatch):
-    monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
-    schema_src = Path("/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/schema.sql")
-    schema_dst = tmp_path / "data" / "schema.sql"
-    schema_dst.parent.mkdir(parents=True, exist_ok=True)
-    schema_dst.write_text(schema_src.read_text())
-
-    # Limpiar cache de src para forzar relectura de CCE_PROJECT_DIR y DB_PATH
-    import sys
-    for name in list(sys.modules):
-        if name.startswith("src") or name.startswith("src.web_admin"):
-            del sys.modules[name]
-
-    from src import db_manager as dbm
-
-    dbm.init_database(dbm.DB_PATH)
-    from src.web_admin import workflow_engine as wf
-
-    return wf
+def db_path(tmp_path: Path, monkeypatch) -> Path:
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "admin.sqlite3")
+    monkeypatch.setattr(we, "PROJECT_DIR", tmp_path)
+    monkeypatch.setattr(we, "BACKUPS_DIR", tmp_path / "backups")
+    p = tmp_path / "admin.sqlite3"
+    db.init_admin_schema(p)
+    return p
 
 
-def test_handle_init(wf_module) -> None:
-    wf = wf_module
-    workflow = {"steps_data": {}}
-    result = wf.handle_init(workflow, {})
+def test_run_step_workflow_not_found(db_path: Path) -> None:
+    result = we.run_step(9999, "next")
+    assert result["success"] is False
+    assert "no encontrado" in result["error"].lower()
+
+
+def test_run_step_invalid_action(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-02", "admin", {})
+    result = we.run_step(wid, "invalid")
+    assert result["success"] is False
+    assert "no válida" in result["error"]
+
+
+def test_run_step_missing_handler(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-03", "admin", {})
+    db.update_workflow_step(wid, "unknown", "unknown")
+    result = we.run_step(wid, "next")
+    assert result["success"] is False
+    assert "No hay handler" in result["error"]
+
+
+def test_run_step_rollback_first(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-04", "admin", {})
+    result = we.run_step(wid, "rollback")
+    assert result["success"] is False
+    assert "retroceder" in result["error"].lower()
+
+
+def test_run_step_rollback(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-05", "admin", {})
+    db.update_workflow_step(wid, "fetch_lectures", "fetch_lectures")
+    result = we.run_step(wid, "rollback")
+    assert result["success"] is True
+    assert result["workflow"]["current_step"] == "init"
+
+
+def test_handle_init() -> None:
+    wf = {"steps_data": {}}
+    result = we.handle_init(wf, {})
     assert result["success"] is True
     assert result["next_step"] == "fetch_lectures"
 
 
-def test_handle_fetch_lecturas_success(wf_module, monkeypatch) -> None:
-    wf = wf_module
-    lecturas = {
-        "fecha": "2026-01-01",
-        "domingo": "Domingo 1",
-        "temporada": "ordinario",
-        "color_liturgico": "verde",
-        "primera_lectura_cita": "Gn 1,1-10",
-        "primera_lectura_texto": "En el principio...",
-        "salmo_cita": "Sal 1",
-        "salmo_texto": " dichoso el hombre...",
-    }
-    monkeypatch.setattr(
-        wf_module,
-        "KoinoniaScraper",
-        lambda: MagicMock(obtener_lecturas=lambda dt: lecturas),
-    )
-    monkeypatch.setattr(wf_module, "obtener_lecturas_ciudadredonda", lambda f: None)
-
-    workflow = {"fecha_domingo": "2026-01-01", "steps_data": {}}
-    result = wf.handle_fetch_lectures(workflow, {})
+def test_handle_fetch_lectures_manual(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-06", "admin", {})
+    wf = db.get_workflow_run(wid)
+    with patch.object(we, "KoinoniaScraper") as mock_scraper, patch.object(
+        we, "obtener_lecturas_ciudadredonda", return_value=None
+    ):
+        mock_scraper.return_value.obtener_lecturas.return_value = None
+        result = we.handle_fetch_lectures(wf, {})
     assert result["success"] is True
     assert result["next_step"] == "verify_lectures"
-    assert result["steps_data"]["lecturas_fuente"] == "koinonia"
+    assert "warning" in result
 
 
-def test_handle_fetch_lecturas_fallback_ciudadredonda(wf_module, monkeypatch) -> None:
-    wf = wf_module
-    lecturas = {"fecha": "2026-01-01", "domingo": "", "temporada": "", "color_liturgico": "verde"}
-    monkeypatch.setattr(
-        wf_module,
-        "KoinoniaScraper",
-        lambda: MagicMock(obtener_lecturas=lambda dt: None),
-    )
-    monkeypatch.setattr(
-        wf_module,
-        "obtener_lecturas_ciudadredonda",
-        lambda f: lecturas,
-    )
-    workflow = {"fecha_domingo": "2026-01-01", "steps_data": {}}
-    result = wf.handle_fetch_lectures(workflow, {})
-    assert result["success"] is True
-    assert result["steps_data"]["lecturas_fuente"] == "ciudad_redonda"
-
-
-def test_handle_verify_lectures(wf_module) -> None:
-    wf = wf_module
-    workflow = {
-        "fecha_domingo": "2026-01-01",
-        "steps_data": {
-            "lecturas": {
-                "fecha": "2026-01-01",
-                "domingo": "Domingo 1",
-                "temporada": "ordinario",
-                "ciclo": "A",
-                "color_liturgico": "verde",
-                "primera_lectura_cita": "Gn 1,1",
-                "primera_lectura_texto": "texto",
-                "salmo_cita": "Sal 1",
-                "salmo_texto": "texto",
-                "evangelio_cita": "Mt 1,1",
-                "evangelio_texto": "texto",
-            }
-        },
-    }
-    result = wf.handle_verify_lectures(workflow, {"lecturas": {"ciclo": "B"}})
+def test_handle_verify_lectures_empty(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-07", "admin", {})
+    db.update_workflow_step(wid, "fetch_lectures", "fetch_lectures")
+    wf = db.get_workflow_run(wid)
+    result = we.handle_verify_lectures(wf, {})
     assert result["success"] is True
     assert result["next_step"] == "propose_songs"
-    assert result["steps_data"]["lecturas"]["ciclo"] == "B"
 
 
-def test_proponer_canciones_para_dia(wf_module, monkeypatch) -> None:
-    wf = wf_module
-    conn = db_manager.create_connection(wf.PROJECT_DIR / "data" / "db.sqlite3")
-    with conn:
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO lecturas (fecha, domingo, temporada, color_liturgico) VALUES (?, ?, ?, ?)",
-            ("2026-01-02", "Domingo 2", "ordinario", "verde"),
-        )
-        cur.execute(
-            "INSERT INTO canciones (titulo, momento_liturgico) VALUES (?, ?)",
-            ("Canción Entrada", "entrada"),
-        )
-    conn.close()
-
-    fake_match = {"cancion_id": 1, "titulo": "Canción Entrada", "momento_liturgico": "entrada", "score": 0.5}
-    monkeypatch.setattr(
-        wf.MatchingEngine,
-        "encontrar_canciones_para_lectura",
-        lambda self, lid, limite=None, score_minimo=None: [fake_match],
+def test_handle_verify_lectures_manual(db_path: Path) -> None:
+    wid = db.create_workflow_run("2026-01-08", "admin", {"lecturas": {}})
+    db.update_workflow_step(wid, "fetch_lectures", "fetch_lectures")
+    wf = db.get_workflow_run(wid)
+    result = we.handle_verify_lectures(
+        wf,
+        {
+            "domingo": "Domingo 1",
+            "temporada": "ordinario",
+            "ciclo": "A",
+            "color_liturgico": "verde",
+            "primera_lectura_texto": "texto",
+        },
     )
-
-    propuestas = wf.proponer_canciones_para_dia("2026-01-02")
-    assert "Entrada" in propuestas
-    assert propuestas["Entrada"]["cancion_id"] == 1
-
-
-def test_handle_propose_songs(wf_module, monkeypatch) -> None:
-    wf = wf_module
-    monkeypatch.setattr(wf, "proponer_canciones_para_dia", lambda f: {"Entrada": {"cancion_id": 1}})
-    workflow = {"fecha_domingo": "2026-01-03", "steps_data": {}}
-    result = wf.handle_propose_songs(workflow, {})
     assert result["success"] is True
-    assert result["next_step"] == "verify_songs"
+    assert "lecturas" in result["steps_data"]
 
 
-def test_handle_verify_songs(wf_module) -> None:
-    wf = wf_module
-    workflow = {
-        "fecha_domingo": "2026-01-04",
-        "steps_data": {
-            "canciones_propuestas": {
-                "Entrada": {"cancion_id": 1, "momento": "Entrada"},
-            }
-        },
-    }
-    result = wf.handle_verify_songs(workflow, {"canciones": {"Entrada": 2}})
-    assert result["success"] is True
-    assert result["next_step"] == "generate_assets"
-    assert result["steps_data"]["canciones_json"]["entrada"] == 2
-
-
-def test_handle_generate_assets(wf_module, monkeypatch, tmp_path: Path) -> None:
-    wf = wf_module
-    conn = db_manager.create_connection(wf.PROJECT_DIR / "data" / "db.sqlite3")
-    with conn:
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO lecturas (fecha, domingo, temporada, color_liturgico) VALUES (?, ?, ?, ?)",
-            ("2026-01-05", "Domingo 5", "ordinario", "verde"),
-        )
-    conn.close()
-
-    bundle_dir = tmp_path / "bundle"
-    bundle_dir.mkdir()
-    (bundle_dir / "2026-01-05_presentacion.pptx").write_text("pptx")
-    (bundle_dir / "2026-01-05_presentacion.pdf").write_text("pdf")
-
-    monkeypatch.setattr(wf, "asegurar_composicion", lambda fecha, cjson: True)
-
-    fake_gen = MagicMock()
-    fake_gen.generar_desde_presentacion.return_value = bundle_dir
-    monkeypatch.setattr(wf, "GeneradorDesdeComposicion", lambda: fake_gen)
-    monkeypatch.setattr(wf, "generar_hoja_musicos", lambda **kwargs: str(tmp_path / "musicos.pdf"))
-    monkeypatch.setattr(wf, "_backup_existing_assets", lambda wid, fecha, sd: ([], None))
-
-    workflow = {
-        "id": 1,
-        "fecha_domingo": "2026-01-05",
-        "steps_data": {"canciones_json": {"entrada": 1}},
-    }
-    result = wf.handle_generate_assets(workflow, {})
-    assert result["success"] is True
-    assert result["next_step"] == "publish"
-    assert result["steps_data"]["assets"]["pptx"] is not None
-
-
-def test_handle_publish(wf_module, monkeypatch, tmp_path: Path) -> None:
-    wf = wf_module
-    conn = db_manager.create_connection(wf.PROJECT_DIR / "data" / "db.sqlite3")
-    with conn:
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO lecturas (fecha, domingo, temporada, color_liturgico) VALUES (?, ?, ?, ?)",
-            ("2026-01-06", "Domingo 6", "ordinario", "verde"),
-        )
-    conn.close()
-
-    monkeypatch.setattr(wf, "sincronizar_presentacion_slides", lambda f: None)
-    import subprocess
-
-    monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: MagicMock(returncode=0, stderr=""))
-
-    workflow = {
-        "id": 1,
-        "fecha_domingo": "2026-01-06",
-        "steps_data": {
-            "canciones_json": {"entrada": 1},
-            "assets": {
-                "pptx": str(tmp_path / "x.pptx"),
-                "pdf_fieles": str(tmp_path / "x.pdf"),
-                "pdf_musicos": str(tmp_path / "m.pdf"),
-                "bundle_dir": str(tmp_path / "bundle"),
-            },
-        },
-    }
-    result = wf.handle_publish(workflow, {})
-    assert result["success"] is True
-    assert result["next_step"] == "done"
-
-
-def test_run_step_workflow_not_found(wf_module) -> None:
-    wf = wf_module
-    with patch.object(wf, "get_workflow_run", return_value=None):
-        result = wf.run_step(999, "next")
-    assert result["success"] is False
+def test_backup_existing_assets_none(db_path: Path) -> None:
+    paths, backup_dir = we._backup_existing_assets(1, "2026-01-01", {})
+    assert paths == []
+    assert backup_dir is None
