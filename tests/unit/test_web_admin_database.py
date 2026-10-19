@@ -144,3 +144,18 @@ def test_supersede_and_backups(db_path: Path) -> None:
     assert len(backups) == 1
     assert backups[0]["backup_path"] == "/tmp/backup.zip"
     assert backups[0]["original_paths"] == ["a.pptx", "b.pdf"]
+
+
+def test_update_user_no_fields(db_path: Path) -> None:
+    user_id = db.create_user("nofields", "hashed", db_path=db_path)
+    db.update_user(user_id, db_path=db_path)
+    user = db.get_user_by_id(user_id, db_path=db_path)
+    assert user is not None
+
+
+def test_update_workflow_completed_at(db_path: Path) -> None:
+    wf_id = db.create_workflow_run("2026-01-01", "admin", {}, db_path=db_path)
+    db.update_workflow_step(wf_id, "done", "done", completed_at="2026-01-01T00:00:00", db_path=db_path)
+    wf = db.get_workflow_run(wf_id, db_path=db_path)
+    assert wf["status"] == "done"
+    assert wf["completed_at"] == "2026-01-01T00:00:00"
