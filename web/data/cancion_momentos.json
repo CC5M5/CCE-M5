@@ -85,6 +85,10 @@
   },
   {
     "cancion_id": 21,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 21,
     "momento_liturgico": "general"
   },
   {
