@@ -48,7 +48,7 @@ def test_extraer_acordes_de_linea() -> None:
 def test_parsear_cancion_completa() -> None:
     parser = ap3.AcordesParser()
     resultado = parser.parsear_cancion_completa("Am    G\nAve Maria purisima")
-    assert any(l.tipo == "acordes_letra" for l in resultado)
+    assert any(linea.tipo == "acordes_letra" for linea in resultado)
 
 
 def test_parsear_cancion_completa_vacia() -> None:

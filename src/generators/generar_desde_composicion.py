@@ -1,7 +1,7 @@
 """
 Generador de presentaciones litúrgicas desde la composición guardada en presentacion_slides.
 
-Reutiliza los métodos de renderizado de presentacion_html.py para producir
+Reutiliza los métodos de renderizado del generador actual (presentacion/) para producir
 JSON + HTML + PPTX + PDF idénticos en contenido.
 """
 
@@ -14,6 +14,8 @@ from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+from src.constants import COLORES_LITURGICOS
 
 from .presentacion.generador import GeneradorPresentacionHTML
 from .presentacion.slide import Slide
@@ -402,8 +404,6 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
         return bundle_dir
 
     def _color_info(self, color: str) -> dict[str, str]:
-        from presentacion_html import COLORES_LITURGICOS
-
         return COLORES_LITURGICOS.get(color, COLORES_LITURGICOS["verde"])
 
     def _split_contenido(self, contenido: str) -> list[str]:

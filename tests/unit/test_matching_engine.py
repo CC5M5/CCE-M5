@@ -16,6 +16,7 @@ from src.matching_engine import (
     TextPreprocessor,
     ThemeExtractor,
     ThemeVector,
+    ValidationError,
 )
 
 
@@ -47,7 +48,9 @@ class TestMatchingConfig:
 
     def test_load_existing(self, tmp_path: Path) -> None:
         cfg_path = tmp_path / "matching_config.json"
-        cfg_path.write_text(json.dumps({"score_minimo": 0.3, "limite_resultados": 3}, ensure_ascii=False))
+        cfg_path.write_text(
+            json.dumps({"score_minimo": 0.3, "limite_resultados": 3}, ensure_ascii=False)
+        )
         cfg = MatchingConfig.load(cfg_path)
         assert cfg.score_minimo == 0.3
         assert cfg.limite_resultados == 3
@@ -111,7 +114,9 @@ class TestScoreNormalizer:
         sn = ScoreNormalizer(ThemeExtractor(cfg))
         v1 = ThemeVector(temas={"amor": 1.0})
         v2 = ThemeVector(temas={"amor": 1.0})
-        score = sn.calcular_score(v1, v2, momento_lectura="santo", momento_cancion="santo", boost=0.1)
+        score = sn.calcular_score(
+            v1, v2, momento_lectura="santo", momento_cancion="santo", boost=0.1
+        )
         assert score == 1.0  # se clampa a 1.0
 
 
@@ -119,19 +124,19 @@ class TestInputValidator:
     def test_validar_id(self) -> None:
         assert InputValidator.validar_id(5, "id") == 5
         assert InputValidator.validar_id("7", "id") == 7
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             InputValidator.validar_id(-1, "id")
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             InputValidator.validar_id("abc", "id")
 
     def test_validar_score(self) -> None:
         assert InputValidator.validar_score(0.5) == 0.5
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             InputValidator.validar_score(1.5)
 
     def test_validar_limite(self) -> None:
         assert InputValidator.validar_limite(3) == 3
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             InputValidator.validar_limite(0)
 
 
