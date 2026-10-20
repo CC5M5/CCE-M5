@@ -259,6 +259,8 @@ def _get_cancion_by_id(cursor, cancion_id: int) -> dict[str, Any]:
     d = dict(row)
     d["momentos"] = _get_momentos(cursor, cancion_id)
     d["slug"] = slugify(d["titulo"])
+    if not d.get("titulo_url"):
+        d["titulo_url"] = slugify(d["titulo"])
     return d
 
 
