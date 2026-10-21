@@ -13,14 +13,14 @@ import logging
 import re
 import sqlite3
 from datetime import date
-from pathlib import Path
 from typing import Any
 
+from src.config import settings
 from src.generators.composicion_catalogo import guardar_composicion, proponer_composicion
 from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 
 logger = logging.getLogger(__name__)
 

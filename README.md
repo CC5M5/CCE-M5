@@ -2,6 +2,30 @@
 
 Sistema automatizado para preparacion semanal de presentaciones liturgicas con cancionero escolapio.
 
+## Configuración
+
+La configuración se carga desde variables de entorno con validación y defaults centralizados en `src/config.py` (pydantic-settings). Para entorno de desarrollo copia `.env.example` a `.env` y ajusta los valores:
+
+```bash
+cp .env.example .env
+# edita .env con tu editor favorito
+```
+
+### Variables principales
+
+| Variable | Descripción | Default |
+|----------|-------------|---------|
+| `CCE_PROJECT_DIR` | Raíz del proyecto | `~/proyectos/CCE-M5-Web-Presentaciones` |
+| `CCE_BASE_PATH` | Base path de Astro | `/` |
+| `CCE_SITE_URL` | URL base del site local | `http://localhost:4321` |
+| `CCE_ADMIN_JWT_SECRET` | Secreto para tokens JWT | generado automáticamente |
+| `CCE_ADMIN_DEFAULT_USER` | Usuario admin inicial | `rafael.torres` |
+| `CCE_ADMIN_DEFAULT_PASSWORD` | Contraseña admin inicial | `1234` |
+| `CCE_ADMIN_REDIS_URL` | Redis para rate limiting | memoria local |
+| `CCE_NODE_BIN` | Directorio con `node`/`npm` | `/usr/bin` |
+
+Los módulos legacy que aún importan `src.web_admin.config` siguen funcionando porque delegan dinámicamente en `src.config.settings`.
+
 ## Funcionalidades
 
 - Scraping semanal de lecturas desde Koinonia
