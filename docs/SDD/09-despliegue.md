@@ -67,3 +67,14 @@ Workflow: `.github/workflows/deploy.yml`
 - No commitear `.env` ni `data/.admin_jwt_secret`.
 - Ajustar `ADMIN_CORS_ORIGINS` en `.env` si la IP local cambia.
 - Restringir CORS en producción pública.
+
+## 9.6. Limitaciones del sitio estático
+
+La web pública (`web/dist` / GitHub Pages) es **estática**. El JavaScript puede hacer peticiones (`fetch`) al backend, pero con importantes limitaciones:
+
+- **CORS:** el navegador exige que la API (`http://192.168.68.244:4323`) responda con el `Access-Control-Allow-Origin` adecuado. Revisar `ADMIN_CORS_ORIGINS` en `.env`.
+- **Red local:** los `fetch` desde GitHub Pages a la API local solo funcionarán si el navegador tiene acceso a la red local del servidor CCE-M5 (VPN, proxy o URL pública).
+- **Comentarios:** el formulario de comentarios de la web usa el proxy del admin API (`/api/comentarios`). Si el admin no está expuesto/reachable, el formulario no funciona.
+- **Panel admin excluido:** el build de GitHub Pages elimina `src/pages/admin` y `src/pages/admin.astro` para no publicar el panel de administración.
+
+> **Regla general:** la web estática sirve para lectura pública. Cualquier operación de escritura (comentarios, login, workflow) requiere alcanzar el admin API en la red local o a través de un proxy controlado.

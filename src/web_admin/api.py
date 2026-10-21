@@ -244,13 +244,11 @@ async def create_user_endpoint(
     user = get_user_by_id(user_id)
     assert user is not None
     return m.UserProfile(
-        **{
-            "id": user.id,
-            "username": user.username,
-            "full_name": user.full_name,
-            "role": user.role,
-            "is_active": 1 if user.is_active else 0,
-        }
+        id=user.id,
+        username=user.username,
+        full_name=user.full_name,
+        role=user.role,
+        is_active=1 if user.is_active else 0,
     )
 
 
@@ -282,13 +280,11 @@ async def update_user_endpoint(
     updated = get_user_by_id(user_id)
     assert updated is not None
     return m.UserProfile(
-        **{
-            "id": updated.id,
-            "username": updated.username,
-            "full_name": updated.full_name,
-            "role": updated.role,
-            "is_active": 1 if updated.is_active else 0,
-        }
+        id=updated.id,
+        username=updated.username,
+        full_name=updated.full_name,
+        role=updated.role,
+        is_active=1 if updated.is_active else 0,
     )
 
 
@@ -399,6 +395,8 @@ async def workflow_create(
 
     add_workflow_log(workflow_id, "init", f"Workflow creado por {current_user['username']}")
     wf = get_workflow_run(workflow_id)
+    if wf is None:
+        raise HTTPException(status_code=500, detail="No se pudo recargar el workflow")
     logs = get_workflow_logs(workflow_id)
     return m.WorkflowResponse(
         workflow=m.WorkflowRun(**wf),
@@ -432,6 +430,8 @@ async def workflow_goto_step(
         f"Movido manualmente al paso {payload.step} por {current_user['username']}",
     )
     updated = get_workflow_run(workflow_id)
+    if updated is None:
+        raise HTTPException(status_code=500, detail="No se pudo recargar el workflow")
     logs = get_workflow_logs(workflow_id)
     can_advance = (
         updated["current_step"] != "done" and next_step(updated["current_step"]) is not None

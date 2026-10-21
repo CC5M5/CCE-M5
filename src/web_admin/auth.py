@@ -98,7 +98,10 @@ def get_current_user(
     if not credentials:
         raise HTTPException(status_code=401, detail="No se proporcionó token")
     payload = decode_access_token(credentials.credentials)
-    user = get_user_by_username(payload.get("sub"))
+    username = payload.get("sub")
+    if not isinstance(username, str):
+        raise HTTPException(status_code=401, detail="Token inválido")
+    user = get_user_by_username(username)
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="Usuario no encontrado o inactivo")
     return {

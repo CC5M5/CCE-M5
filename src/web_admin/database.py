@@ -137,7 +137,7 @@ def create_user(
                 """,
             (username, password_hash, full_name, role, _now()),
         )
-        return int(cur.lastrowid)
+        return int(cur.lastrowid) if cur.lastrowid is not None else 0
 
 
 def get_user_by_id(user_id: int, db_path: Path | None = None) -> User | None:
@@ -163,8 +163,8 @@ def update_user(
     db_path: Path | None = None,
 ) -> None:
     with _connection(db_path) as conn, conn:
-        fields = []
-        values = []
+        fields: list[str] = []
+        values: list[str | int] = []
         if full_name is not None:
             fields.append("full_name = ?")
             values.append(full_name)
@@ -288,7 +288,7 @@ def create_workflow_run(
                     _now(),
                 ),
             )
-            return int(cur.lastrowid)
+            return int(cur.lastrowid) if cur.lastrowid is not None else 0
 
 
 def get_workflow_run(workflow_id: int, db_path: Path | None = None) -> dict[str, Any] | None:
@@ -456,7 +456,7 @@ def create_backup_record(
                     _now(),
                 ),
             )
-            return int(cur.lastrowid)
+            return int(cur.lastrowid) if cur.lastrowid is not None else 0
 
 
 def get_backups_for_date(fecha_domingo: str, db_path: Path | None = None) -> list[dict[str, Any]]:
