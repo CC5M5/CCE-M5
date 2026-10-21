@@ -20,12 +20,13 @@ import sqlite3
 import sys
 from collections import defaultdict
 from datetime import datetime
-from pathlib import Path
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-PRESENTACIONES_DIR = PROJECT_DIR / "presentaciones_html"
-SCHEMA_PATH = PROJECT_DIR / "data" / "schema_slides.sql"
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
+PRESENTACIONES_DIR = settings.project_dir / "presentaciones_html"
+SCHEMA_PATH = settings.data_dir / "schema_slides.sql"
 
 # Tipos canónicos reconocidos (deben coincidir con schema_slides.sql)
 TIPOS_CANONICOS = {

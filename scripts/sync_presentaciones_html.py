@@ -11,9 +11,10 @@ import shutil
 import sys
 from pathlib import Path
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-SRC_DIR = PROJECT_DIR / "presentaciones_html"
-DST_DIR = PROJECT_DIR / "web" / "public" / "presentaciones_html"
+from src.config import settings
+
+SRC_DIR = settings.project_dir / "presentaciones_html"
+DST_DIR = settings.web_dir / "public" / "presentaciones_html"
 
 
 def sincronizar(fecha: str | None = None) -> list[Path]:

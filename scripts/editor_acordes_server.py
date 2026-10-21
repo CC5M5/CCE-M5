@@ -26,7 +26,6 @@ import os
 import re
 import sqlite3
 import subprocess
-from pathlib import Path
 
 from flask import Flask, abort, request
 
@@ -37,11 +36,12 @@ from src.canciones_manager import (
     crear_cancion,
     listar_canciones,
 )
+from src.config import settings
 from src.parsers.acordes_parser_v3 import AcordesParser
 from src.rebuild_web import rebuild_web
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 
 app = Flask(__name__)
 EDITOR_ACORDES_HOST = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")

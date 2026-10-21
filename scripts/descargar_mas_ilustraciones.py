@@ -20,8 +20,10 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-OUT_DIR = PROJECT_DIR / "data" / "ilustraciones"
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+OUT_DIR = settings.data_dir / "ilustraciones"
 METADATA_PATH = OUT_DIR / "descargas_metadata_2.json"
 
 

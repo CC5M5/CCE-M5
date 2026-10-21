@@ -5,11 +5,12 @@ from __future__ import annotations
 import contextlib
 import json
 import sqlite3
-from pathlib import Path
 from typing import Any
 
-PROJECT_DIR = Path(__file__).resolve().parents[2]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 
 ORDEN_MOMENTOS_C: list[tuple[str, str]] = [
     ("portada", "general"),

@@ -1,18 +1,19 @@
 """Constantes compartidas del proyecto CCE-M5-Web-Presentaciones."""
 
-from pathlib import Path
 
 from pptx.util import Cm
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = PROJECT_DIR / "data"
-DB_PATH = DATA_DIR / "db.sqlite3"
-LEMA_DIR = DATA_DIR / "lemas"
-ILUSTRACIONES_DIR = DATA_DIR / "ilustraciones"
-OUTPUT_DIR_HTML = PROJECT_DIR / "presentaciones_html"
-OUTPUT_DIR_PPTX = PROJECT_DIR / "presentaciones"
-BORRADOR_DIR = PROJECT_DIR / "borradores"
-TEMPLATE_PATH = DATA_DIR / "templates" / "274_Domingo_21_06_2026.pptx"
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+DATA_DIR = settings.data_dir
+DB_PATH = settings.db_path
+LEMA_DIR = settings.data_dir / "lemas"
+ILUSTRACIONES_DIR = settings.data_dir / "ilustraciones"
+OUTPUT_DIR_HTML = settings.project_dir / "presentaciones_html"
+OUTPUT_DIR_PPTX = settings.project_dir / "presentaciones"
+BORRADOR_DIR = settings.project_dir / "borradores"
+TEMPLATE_PATH = settings.data_dir / "templates" / "274_Domingo_21_06_2026.pptx"
 
 # 4:3 en cm reales: 33,87 cm × 25,4025 cm
 SLIDE_WIDTH_INCHES = float(Cm(33.87)) / 914400
