@@ -1,0 +1,10 @@
+[Unit]
+Description=CCE-M5 periodic healthcheck
+
+[Timer]
+OnCalendar=*-*-* *:00:00
+RandomizedDelaySec=30
+Persistent=true
+
+[Install]
+WantedBy=timers.target
