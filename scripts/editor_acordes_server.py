@@ -46,6 +46,11 @@ EDITOR_ACORDES_HOST = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
 EDITOR_ACORDES_PORT = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
 
 
+def _root() -> str:
+    """Prefijo del editor bajo FastAPI (request.script_root)."""
+    return request.script_root or ""
+
+
 def _regenerar_derivados(texto_con_acordes: str) -> dict:
     """Regenera html_visual, estructura_json, letra_sin_acordes y tono."""
     parser = AcordesParser()
@@ -114,7 +119,7 @@ def _render_sidebar(active_slug: str | None = None, extra_link: str = "") -> str
     for c in canciones:
         active = ' class="active"' if active_slug and c["slug"] == active_slug else ""
         links.append(
-            f'<a href="/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>'
+            f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>'
         )
     if extra_link:
         links.append(extra_link)
@@ -186,7 +191,7 @@ def _render_base(
     <h1>🎵 Editor de Acordes CCE-M5</h1>
     <p>Edición local con commit automático. URL de origen se mantiene como referencia.</p>
     <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="/cancionero/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">➕ Nueva canción</a>
+      <a href="{_root()}/cancionero/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">➕ Nueva canción</a>
     </nav>
   </header>
   <div class="container">
@@ -210,7 +215,7 @@ NUEVA_LINK = ""
 def index():
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
+        f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
         for c in canciones
     )
     content = "<h2>Selecciona una canción</h2><p>Elige una canción del menú lateral para editar sus acordes, o añade una nueva.</p>"
@@ -225,13 +230,13 @@ def editar(slug: str):
 
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"'
+        f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}" class="active"'
         if c["slug"] == slug
-        else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
+        else f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}"'
         for c in canciones
     )
     sidebar_links = "\n".join(
-        f'{link}>{html_module.escape(c["titulo"])}</a>'
+        f"{link}>{html_module.escape(c['titulo'])}</a>"
         for c, link in zip(canciones, sidebar_links.split("\n"), strict=False)
     )
 
@@ -239,12 +244,12 @@ def editar(slug: str):
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in cancion.get("momentos", []) else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
         for m in MOMENTOS_LITURGICOS
     )
-    content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
+    content = f"""<h2>{html_module.escape(cancion["titulo"])}</h2>
     <div class="meta">
-      Tono: {html_module.escape(cancion['tono'] or 'No detectado')} |
-      ID: {cancion['id']} |
+      Tono: {html_module.escape(cancion["tono"] or "No detectado")} |
+      ID: {cancion["id"]} |
       Momentos: {html_module.escape(", ".join(cancion.get("momentos", [])).title() or "(ninguno)")} |
-      <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
+      <a href="{html_module.escape(cancion["titulo_url"] or "")}" target="_blank">Ver origen ↗</a>
     </div>
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
       <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
@@ -253,7 +258,7 @@ def editar(slug: str):
       Si no coincide al guardar, pulsa Ctrl+F5 en la web.
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
+    <form method="post" action="{_root()}/cancionero/{html_module.escape(slug)}/guardar">
       <div style="margin-bottom:12px;">
         <label><strong>Momentos litúrgicos</strong></label><br>
         {momentos_checks}
@@ -261,11 +266,11 @@ def editar(slug: str):
       <div class="two-col">
         <div>
           <label><strong>Texto con acordes</strong></label>
-          <textarea name="texto">{html_module.escape(cancion['texto'])}</textarea>
+          <textarea name="texto">{html_module.escape(cancion["texto"])}</textarea>
         </div>
         <div class="preview">
           <strong>Preview actual</strong>
-          {cancion['preview']}
+          {cancion["preview"]}
         </div>
       </div>
       <button type="submit">💾 Guardar y commitear</button>
@@ -277,7 +282,7 @@ def editar(slug: str):
 def nueva_cancion():
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
+        f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
         for c in canciones
     )
 
@@ -291,7 +296,7 @@ def nueva_cancion():
       Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/cancionero/nueva/guardar">
+    <form method="post" action="{_root()}/cancionero/nueva/guardar">
       <div style="margin-bottom:12px;">
         <label><strong>Título</strong></label>
         <input type="text" name="titulo" placeholder="Título de la canción" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
@@ -366,7 +371,7 @@ def guardar_nueva_cancion():
     return _render_base(
         "Canción creada",
         "",
-        f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente. <a href='/cancionero/{html_module.escape(cancion['slug'])}'>Editar canción</a></p>",
+        f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente. <a href='{_root()}/cancionero/{html_module.escape(cancion['slug'])}'>Editar canción</a></p>",
         mensaje,
         clase,
     )
@@ -416,11 +421,11 @@ def guardar(slug: str):
 
     sidebar = _render_sidebar(active_slug=slug, extra_link="")
 
-    content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
+    content = f"""<h2>{html_module.escape(cancion["titulo"])}</h2>
     <div class="meta">
-      Tono: {html_module.escape(derivados['tono'] or 'No detectado')} |
-      ID: {cancion['id']} |
-      <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
+      Tono: {html_module.escape(derivados["tono"] or "No detectado")} |
+      ID: {cancion["id"]} |
+      <a href="{html_module.escape(cancion["titulo_url"] or "")}" target="_blank">Ver origen ↗</a>
     </div>
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
       <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
@@ -429,7 +434,7 @@ def guardar(slug: str):
       Si no coincide al guardar, pulsa Ctrl+F5 en la web.
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
+    <form method="post" action="{_root()}/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
         <div>
           <label><strong>Texto con acordes</strong></label>
@@ -437,7 +442,7 @@ def guardar(slug: str):
         </div>
         <div class="preview">
           <strong>Preview actualizado</strong>
-          {derivados['html_visual']}
+          {derivados["html_visual"]}
         </div>
       </div>
       <button type="submit">💾 Guardar y commitear</button>
