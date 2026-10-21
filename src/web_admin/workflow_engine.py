@@ -139,6 +139,9 @@ def run_step(
         add_workflow_log(workflow_id, current_step, msg, level="error")
         return {"success": False, "error": msg, "traceback": traceback.format_exc()}
 
+    if not isinstance(result, dict):
+        return {"success": False, "error": f"Handler para {current_step} no devolvió un dict"}
+
     if not result.get("success"):
         return result
 
@@ -164,6 +167,8 @@ def run_step(
         )
 
     updated = get_workflow_run(workflow_id)
+    if updated is None:
+        return {"success": False, "error": "No se pudo recargar el workflow"}
     logs = get_workflow_logs(workflow_id)
     can_advance = (
         updated["current_step"] != "done" and next_step(updated["current_step"]) is not None
@@ -593,15 +598,15 @@ def handle_generate_assets(workflow: dict[str, Any], data: dict[str, Any]) -> di
         shutil.copy2(pdf_src, pdf_fieles_dst)
 
     # Asegurar que pdf_musicos sea string (puede ser Path)
-    pdf_musicos_path = result_pdf if isinstance(result_pdf, (str, Path)) else None
-    if pdf_musicos_path:
-        pdf_musicos_path = str(pdf_musicos_path)
+    pdf_musicos_str: str | None = None
+    if isinstance(result_pdf, (str, Path)):
+        pdf_musicos_str = str(result_pdf)
 
     steps_data["assets"] = {
         "bundle_dir": str(bundle_dir),
         "pptx": str(pptx_dst) if pptx_src.exists() else None,
         "pdf_fieles": str(pdf_fieles_dst) if pdf_src.exists() else None,
-        "pdf_musicos": pdf_musicos_path,
+        "pdf_musicos": pdf_musicos_str,
     }
 
     logs = [{"step": "generate_assets", "message": f"Presentación generada: {bundle_dir}"}]
