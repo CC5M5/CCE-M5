@@ -20,6 +20,7 @@ Funcionalidades:
 
 from __future__ import annotations
 
+import contextlib
 import html as html_module
 import json
 import os
@@ -31,12 +32,6 @@ from pathlib import Path
 from typing import Any
 
 from flask import Flask, abort, redirect, request
-
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-if str(PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(PROJECT_DIR))
-
-import contextlib
 
 from src.canciones_manager import (
     MOMENTOS_LITURGICOS,
@@ -53,6 +48,7 @@ from src.generators.composicion_catalogo import (
 )
 from src.rebuild_web import rebuild_web
 
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
 CATALOGO_PATH = ILUSTRACIONES_DIR / "catalogo.json"
@@ -800,97 +796,91 @@ def _reconstruir_composicion_desde_canciones(fecha: str) -> str:
 
 def _generar_presentacion(fecha: str) -> str:
     """Genera PPTX/HTML/PDF desde presentacion_slides y sincroniza con la web."""
-    sys.path.insert(0, str(PROJECT_DIR / "src" / "generators"))
-    try:
-        from generar_desde_composicion import GeneradorDesdeComposicion
+    from src.generators.generar_desde_composicion import GeneradorDesdeComposicion
 
-        gen = GeneradorDesdeComposicion()
-        bundle = gen.generar_desde_presentacion(fecha)
-        # Sincronizar a web/public/presentaciones_html/
-        try:
-            subprocess.run(
-                [
-                    sys.executable,
-                    str(PROJECT_DIR / "scripts" / "sync_presentaciones_html.py"),
-                    "--fecha",
-                    fecha,
-                ],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            sync_ok = f" | sincronizado a web/public/presentaciones_html/{fecha}_presentacion"
-        except subprocess.CalledProcessError as exc:
-            sync_ok = f" | ⚠️ sync falló: {exc.stderr or exc.stdout}"
-        # Reconstruir cancionero web para actualizar web/dist/
-        try:
-            subprocess.run(
-                ["npm", "run", "build"],
-                cwd=str(PROJECT_DIR / "web"),
-                check=True,
-                capture_output=True,
-                text=True,
-                timeout=300,
-            )
-            build_ok = " | web rebuild OK"
-        except subprocess.TimeoutExpired:
-            build_ok = " | ⚠️ web build timeout (5min)"
-        except subprocess.CalledProcessError as exc:
-            build_ok = f" | ⚠️ web build falló: {exc.stderr or exc.stdout}"
-        # Marcar estado como publicado
-        try:
-            conn = _get_connection()
-            cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE presentaciones SET estado = 'publicado' WHERE fecha_domingo = ?",
-                (fecha,),
-            )
-            conn.commit()
-            conn.close()
-            estado_ok = " | estado: publicado"
-        except Exception as e:
-            estado_ok = f" | ⚠️ estado falló: {e}"
-        # Commit automático incluyendo bundle web
-        try:
-            subprocess.run(
-                ["git", "add", "presentaciones_html/", "data/db.sqlite3"],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            commit_msg = f"feat(presentacion): genera bundle {fecha}"
-            result = subprocess.run(
-                [
-                    "git",
-                    "commit",
-                    "-m",
-                    commit_msg,
-                    "-m",
-                    f"Generado desde editor local: {bundle.name}",
-                ],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            subprocess.run(
-                ["git", "push", "origin", "main"],
-                cwd=PROJECT_DIR,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
-            commit_hash = m.group(1) if m else "commit OK"
-        except subprocess.CalledProcessError as exc:
-            commit_hash = f"ERROR: {exc.stderr or exc.stdout}"
-        return (
-            f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
+    gen = GeneradorDesdeComposicion()
+    bundle = gen.generar_desde_presentacion(fecha)
+    # Sincronizar a web/public/presentaciones_html/
+    try:
+        subprocess.run(
+            [
+                sys.executable,
+                str(PROJECT_DIR / "scripts" / "sync_presentaciones_html.py"),
+                "--fecha",
+                fecha,
+            ],
+            cwd=PROJECT_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
         )
+        sync_ok = f" | sincronizado a web/public/presentaciones_html/{fecha}_presentacion"
+    except subprocess.CalledProcessError as exc:
+        sync_ok = f" | ⚠️ sync falló: {exc.stderr or exc.stdout}"
+    # Reconstruir cancionero web para actualizar web/dist/
+    try:
+        subprocess.run(
+            ["npm", "run", "build"],
+            cwd=str(PROJECT_DIR / "web"),
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        build_ok = " | web rebuild OK"
+    except subprocess.TimeoutExpired:
+        build_ok = " | ⚠️ web build timeout (5min)"
+    except subprocess.CalledProcessError as exc:
+        build_ok = f" | ⚠️ web build falló: {exc.stderr or exc.stdout}"
+    # Marcar estado como publicado
+    try:
+        conn = _get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE presentaciones SET estado = 'publicado' WHERE fecha_domingo = ?",
+            (fecha,),
+        )
+        conn.commit()
+        conn.close()
+        estado_ok = " | estado: publicado"
     except Exception as e:
-        return f"⚠️ Error al generar: {e}"
+        estado_ok = f" | ⚠️ estado falló: {e}"
+    # Commit automático incluyendo bundle web
+    try:
+        subprocess.run(
+            ["git", "add", "presentaciones_html/", "data/db.sqlite3"],
+            cwd=PROJECT_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        commit_msg = f"feat(presentacion): genera bundle {fecha}"
+        result = subprocess.run(
+            [
+                "git",
+                "commit",
+                "-m",
+                commit_msg,
+                "-m",
+                f"Generado desde editor local: {bundle.name}",
+            ],
+            cwd=PROJECT_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "push", "origin", "main"],
+            cwd=PROJECT_DIR,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
+        commit_hash = m.group(1) if m else "commit OK"
+    except subprocess.CalledProcessError as exc:
+        commit_hash = f"ERROR: {exc.stderr or exc.stdout}"
+    return f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
 
 
 @app.route("/canciones/nueva")

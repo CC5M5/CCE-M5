@@ -22,8 +22,10 @@ Requires-Dist: lxml>=5.0.0
 Requires-Dist: python-dotenv>=1.0.0
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: httpx2>=2.14.0; extra == "dev"
 Requires-Dist: ruff>=0.7.0; extra == "dev"
 Requires-Dist: mypy>=1.13.0; extra == "dev"
+Requires-Dist: pre-commit>=4.7.0; extra == "dev"
 
 # CCE-M5-Web-Presentaciones
 
