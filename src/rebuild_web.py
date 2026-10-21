@@ -47,22 +47,13 @@ def rebuild_web() -> str:
             env=env,
         )
 
+        # Reiniciar el servicio systemd del servidor web estático para servir la nueva build.
         subprocess.run(
-            "ps aux | grep 'http.server 4321' | grep -v grep | awk '{print $2}' | xargs -r kill 2>/dev/null",
-            shell=True,
+            ["systemctl", "--user", "restart", "cce-m5-web.service"],
             check=False,
             capture_output=True,
         )
-        time.sleep(1)
-
-        subprocess.Popen(
-            ["/usr/bin/python3", "-m", "http.server", "4321",
-             "--directory", str(PROJECT_DIR / "web" / "dist"),
-             "--bind", "0.0.0.0"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True,
-        )
+        time.sleep(2)
 
         return "rebuild OK"
     except subprocess.CalledProcessError as exc:
