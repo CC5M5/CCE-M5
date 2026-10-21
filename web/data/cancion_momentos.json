@@ -450,5 +450,85 @@
   {
     "cancion_id": 112,
     "momento_liturgico": "gloria"
+  },
+  {
+    "cancion_id": 204,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 204,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 204,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 206,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 207,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 207,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 207,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 209,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 210,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 210,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 210,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 212,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 213,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 213,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 213,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 215,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 216,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 216,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 216,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 218,
+    "momento_liturgico": "entrada"
   }
 ]

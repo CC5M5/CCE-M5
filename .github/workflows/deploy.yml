@@ -22,11 +22,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.23.3
+          cache: npm
+          cache-dependency-path: ./web/package-lock.json
 
-      - name: Install dependencies
+      - name: Install Node dependencies
         timeout-minutes: 20
-        run: npm install
+        run: npm ci
         working-directory: ./web
 
       - name: Copy presentaciones assets to public
@@ -42,11 +44,16 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          python -m pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock.txt
 
       - name: Export data from SQLite to JSON for Astro
-        run: python scripts/export_data_for_web.py
+        run: |
+          export PYTHONPATH=$PWD
+          python scripts/export_data_for_web.py
         working-directory: .
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Build site
         run: |
