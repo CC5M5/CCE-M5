@@ -62,6 +62,12 @@ LEMA_PATH = settings.data_dir / "lemas" / "somos_uno.jpg"
 
 app_editor_diapositivas = Flask(__name__)
 
+
+def _root() -> str:
+    """Prefijo del editor bajo FastAPI (request.script_root)."""
+    return request.script_root or ""
+
+
 COLORES_LITURGICOS = {
     "verde": {"from": "#e8f5e9", "to": "#c8e6c9", "acento": "#2e7d32"},
     "blanco": {"from": "#fffdf5", "to": "#f5f5f5", "acento": "#5d4037"},
@@ -178,7 +184,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
     else:
         imagen_url = imagen or ""
 
-    lema_url = "/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
+    lema_url = "{_root()}/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
 
     clase = tipo
     if tipo in (
@@ -209,9 +215,9 @@ def _render_preview(slide: dict[str, Any]) -> str:
 
         inner = ""
         if slide.get("momento"):
-            inner += f'<h3>{html_module.escape(slide["momento"])}{f" ({idx}/{total})" if total > 1 else ""}</h3>\n'
+            inner += f"<h3>{html_module.escape(slide['momento'])}{f' ({idx}/{total})' if total > 1 else ''}</h3>\n"
         if titulo:
-            inner += f'<h1>{titulo}{f" ({idx}/{total})" if total > 1 else ""}</h1>\n'
+            inner += f"<h1>{titulo}{f' ({idx}/{total})' if total > 1 else ''}</h1>\n"
         if subtitulo:
             inner += f"<h2>{subtitulo}</h2>\n"
         if cita:
@@ -220,13 +226,13 @@ def _render_preview(slide: dict[str, Any]) -> str:
             inner += f'<div class="contenido">{contenido}</div>\n'
 
         return f"""
-        <div class="preview-frame {clase}" style="--liturgia-from:{color_info['from']};--liturgia-to:{color_info['to']};--liturgia-acento:{color_info['acento']};">
+        <div class="preview-frame {clase}" style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};">
           <div class="slide-wrapper">
-            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ''}
+            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ""}
             <div class="tarjeta">
               {inner}
             </div>
-            {f'<img class="logo-lema" src="{lema_url}" alt="Somos uno">' if lema_url else ''}
+            {f'<img class="logo-lema" src="{lema_url}" alt="Somos uno">' if lema_url else ""}
           </div>
         </div>
         """
@@ -330,9 +336,9 @@ def _render_base(
     <h1>🖼️ Editor de Diapositivas CCE-M5</h1>
     <p>Edición local del catálogo de diapositivas y presentaciones semanales.</p>
     <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
-      <a href="/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
-      <a href="/canciones/nueva" style="text-decoration:none;background:#10b981;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">🎵 Añadir canción al cancionero</a>
+      <a href="{_root()}/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
+      <a href="{_root()}/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
+      <a href="{_root()}/canciones/nueva" style="text-decoration:none;background:#10b981;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">🎵 Añadir canción al cancionero</a>
     </nav>
   </header>
   <div class="container">
@@ -358,11 +364,11 @@ def index():
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details open><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
     content = "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
@@ -393,11 +399,11 @@ def editar(id: int):
 
         def _link_for(s):
             active = ' class="active"' if s["id"] == id else ""
-            return f'<a href="/slides/{s["id"]}"{active}>{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            return f'<a href="{_root()}/slides/{s["id"]}"{active}>{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
 
         links = "\n".join(_link_for(s) for s in slides)
         sidebar_parts.append(
-            f'<details open><summary>{html_module.escape(t["nombre"])}</summary>{links}</details>'
+            f"<details open><summary>{html_module.escape(t['nombre'])}</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
@@ -429,7 +435,7 @@ def editar(id: int):
         nombre_completo = html_module.escape(Path(img).name)
         return f"""<label data-artista="{artista}" data-nombre="{html_module.escape(Path(img).name.lower())}">
           <input type="radio" name="imagen" value="{html_module.escape(img)}" {"checked" if img == imagen_actual else ""}>
-          <img src="/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
+          <img src="{_root()}/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
           <small title="{nombre_completo}">{nombre}</small>
         </label>"""
 
@@ -437,32 +443,32 @@ def editar(id: int):
 
     preview = _render_preview(slide)
 
-    content = f"""<h2>Editar diapositiva #{slide['id']}</h2>
-    <form method="post" action="/slides/{slide['id']}/guardar" id="editor-form">
+    content = f"""<h2>Editar diapositiva #{slide["id"]}</h2>
+    <form method="post" action="{_root()}/slides/{slide["id"]}/guardar" id="editor-form">
       <div class="two-col">
         <div>
           <label>Tipo</label>
           <select name="tipo">{tipo_options}</select>
 
           <label>Subtipo / variante</label>
-          <input type="text" name="subtipo" value="{html_module.escape(slide.get('subtipo') or 'general')}">
+          <input type="text" name="subtipo" value="{html_module.escape(slide.get("subtipo") or "general")}">
 
-          <label><input type="checkbox" name="es_default" value="1" {"checked" if slide.get('es_default') else ""}> Es la variante por defecto</label>
+          <label><input type="checkbox" name="es_default" value="1" {"checked" if slide.get("es_default") else ""}> Es la variante por defecto</label>
 
           <label>Título</label>
-          <input type="text" name="titulo" value="{html_module.escape(slide.get('titulo') or '')}">
+          <input type="text" name="titulo" value="{html_module.escape(slide.get("titulo") or "")}">
 
           <label>Subtítulo</label>
-          <input type="text" name="subtitulo" value="{html_module.escape(slide.get('subtitulo') or '')}">
+          <input type="text" name="subtitulo" value="{html_module.escape(slide.get("subtitulo") or "")}">
 
           <label>Cita</label>
-          <input type="text" name="cita" value="{html_module.escape(slide.get('cita') or '')}">
+          <input type="text" name="cita" value="{html_module.escape(slide.get("cita") or "")}">
 
           <label>Color litúrgico (para preview)</label>
           <select name="color_liturgico">{color_options}</select>
 
           <label>Contenido</label>
-          <textarea name="contenido" id="contenido">{html_module.escape(slide.get('contenido') or '')}</textarea>
+          <textarea name="contenido" id="contenido">{html_module.escape(slide.get("contenido") or "")}</textarea>
 
           <div class="toolbar">
             <button type="button" onclick="insertarSplit()">➗ Dividir aquí</button>
@@ -474,11 +480,11 @@ def editar(id: int):
           <div class="miniaturas">{miniaturas}</div>
 
           <label>Notas internas</label>
-          <textarea name="notas" style="min-height:80px">{html_module.escape(slide.get('notas') or '')}</textarea>
+          <textarea name="notas" style="min-height:80px">{html_module.escape(slide.get("notas") or "")}</textarea>
 
           <div class="toolbar">
             <button type="submit">💾 Guardar y commitear</button>
-            <button type="submit" formaction="/slides/{slide['id']}/duplicar" class="secondary">📄 Duplicar</button>
+            <button type="submit" formaction="{_root()}/slides/{slide["id"]}/duplicar" class="secondary">📄 Duplicar</button>
           </div>
         </div>
         <div>
@@ -831,7 +837,7 @@ def nueva_cancion_diapositivas():
       El cancionero web usa fuente monoespaciada (Courier New).
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/canciones/nueva/guardar">
+    <form method="post" action="{_root()}/canciones/nueva/guardar">
       <div style="margin-bottom:12px;">
         <label><strong>Título</strong></label>
         <input type="text" name="titulo" placeholder="Título de la canción" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
@@ -953,11 +959,11 @@ def listar_presentaciones():
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details open><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
@@ -975,14 +981,14 @@ def listar_presentaciones():
         return f'<span style="display:inline-block;padding:3px 8px;border-radius:6px;background:{color};color:#fff;font-size:12px;font-weight:600;">{label}</span>'
 
     filas = "\n".join(
-        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td><td><a href="/presentacion/{p["fecha_domingo"]}/asignar">🎵 Asignar canciones</a></td></tr>'
+        f'<tr><td><a href="{_root()}/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td><td><a href="{_root()}/presentacion/{p["fecha_domingo"]}/asignar">🎵 Asignar canciones</a></td></tr>'
         for p in pres
     )
     content = f"""<h2>Presentaciones semanales</h2>
     <p>Selecciona una fecha para armar la composición de diapositivas desde el catálogo.</p>
     <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="/presentaciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Nueva presentación</a>
-      <a href="/canciones/nueva" style="text-decoration:none;background:#475569;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
+      <a href="{_root()}/presentaciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Nueva presentación</a>
+      <a href="{_root()}/canciones/nueva" style="text-decoration:none;background:#475569;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
     </div>
     <table style="width:100%;border-collapse:collapse">
       <thead>
@@ -1022,11 +1028,11 @@ def armar_presentacion(fecha: str):
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
@@ -1035,7 +1041,7 @@ def armar_presentacion(fecha: str):
         variantes = variantes_para(item["tipo"])
         opts = "\n".join(
             f'<option value="{html_module.escape(v["subtipo"])}" {"selected" if v["subtipo"] == item["subtipo"] else ""}>'
-            f'{html_module.escape(v["titulo"])} ({html_module.escape(v["subtipo"])}{" ★" if v["es_default"] else ""})</option>'
+            f"{html_module.escape(v['titulo'])} ({html_module.escape(v['subtipo'])}{' ★' if v['es_default'] else ''})</option>"
             for v in variantes
         )
         filas.append(f"""
@@ -1066,11 +1072,11 @@ def armar_presentacion(fecha: str):
     content = f"""<h2>Armar presentación {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")} | <span style="font-weight:600;">{estado_label}</span></p>
     <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
-    <a href="/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
-    <a href="/presentacion/{fecha}/asignar">🎵 Asignar canciones</a> |
-    <a href="/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a> |
-    <a href="/presentacion/{fecha}/reconstruir" style="color:#b91c1c;font-weight:600;">🔄 Reconstruir desde canciones asignadas</a></p>
-    <form method="post" action="/presentacion/{fecha}/guardar">
+    <a href="{_root()}/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
+    <a href="{_root()}/presentacion/{fecha}/asignar">🎵 Asignar canciones</a> |
+    <a href="{_root()}/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a> |
+    <a href="{_root()}/presentacion/{fecha}/reconstruir" style="color:#b91c1c;font-weight:600;">🔄 Reconstruir desde canciones asignadas</a></p>
+    <form method="post" action="{_root()}/presentacion/{fecha}/guardar">
       <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
         <thead>
           <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Nº</th><th>Tipo</th><th>Variante</th><th>Título</th><th>Activo</th></tr>
@@ -1297,23 +1303,23 @@ def editar_momentos_cancion(cancion_id: int):
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
     content = f"""<h2>Momentos litúrgicos: {html_module.escape(row["titulo"])}</h2>
     <p>Momentos actuales: <strong>{html_module.escape(", ".join(momentos_actuales).title() or "(ninguno)")}</strong></p>
-    <form method="post" action="/cancion/{cancion_id}/momentos/guardar">
+    <form method="post" action="{_root()}/cancion/{cancion_id}/momentos/guardar">
       <div style="margin-bottom:15px;">
         {checkboxes}
       </div>
       <button type="submit">💾 Guardar momentos</button>
     </form>
-    <p><a href="/">← Volver al listado de slides</a></p>
+    <p><a href="{_root()}/">← Volver al listado de slides</a></p>
     """
     return _render_base(f"Momentos - {row['titulo']}", sidebar, content)
 
@@ -1438,7 +1444,7 @@ def nueva_presentacion():
     content = f"""
     <h2>➕ Nueva presentación</h2>
     <p>Selecciona la fecha y las canciones para cada momento musical. Se creará la presentación y se propondrá la composición desde el catálogo.</p>
-    <form method="post" action="/presentaciones/nueva/guardar">
+    <form method="post" action="{_root()}/presentaciones/nueva/guardar">
         <div style="margin-bottom:12px;">
             <label><strong>Fecha (lectura)</strong></label>
             <select name="fecha" required style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">{lectura_options}</select>
@@ -1594,11 +1600,11 @@ def asignar_canciones(fecha: str):
     <h2>🎵 Asignar canciones para {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "-")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
     <p>Cambia las canciones asignadas y guarda para reconstruir la composición.</p>
-    <form method="post" action="/presentacion/{fecha}/asignar/guardar">
+    <form method="post" action="{_root()}/presentacion/{fecha}/asignar/guardar">
         {momentos_html}
         <button type="submit">💾 Guardar asignación y reconstruir</button>
     </form>
-    <p><a href="/presentacion/{fecha}/armar">← Volver a armar presentación</a></p>
+    <p><a href="{_root()}/presentacion/{fecha}/armar">← Volver a armar presentación</a></p>
     """
     return _render_base(f"Asignar canciones {fecha}", "", content)
 
