@@ -13,6 +13,11 @@ from fastapi import HTTPException
 def auth_env(tmp_path: Path, monkeypatch):
     """Devuelve módulos auth/database/config apuntando a una DB temporal."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
+
+    # Recargar src.config primero porque es la nueva fuente de verdad
+    from src import config as core_config
+
+    importlib.reload(core_config)
     from src.web_admin import config as auth_config
 
     importlib.reload(auth_config)

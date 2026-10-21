@@ -4,7 +4,6 @@ Scraper para las lecturas dominicales de servicioskoinonia.org
 Extrae: Primera lectura, Salmo, Segunda lectura (si aplica), Evangelio
 """
 
-import os
 import re
 import sqlite3
 from datetime import datetime, timedelta
@@ -17,13 +16,14 @@ from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from src.config import settings
 from src.log_config import get_logger
 
 logger = get_logger(__name__)
 
 # Configuracion
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path(__file__).parent.parent.parent))
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 BASE_URL = "https://servicioskoinonia.org/biblico/calendario"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 FECHA_CODIGO_RE = re.compile(r"^\d{8}$")
