@@ -16,6 +16,11 @@ def client(tmp_path: Path, monkeypatch):
     """TestClient de FastAPI apuntando a una DB temporal."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
 
+    # Recargar src.config primero porque es la nueva fuente de verdad
+    from src import config as core_config
+
+    importlib.reload(core_config)
+
     # Recargar config -> db_manager -> database -> auth -> api en orden
     from src.web_admin import config as auth_config
 
@@ -272,7 +277,6 @@ def test_workflow_advance_mockeado(client, monkeypatch) -> None:
     wf_id = r.json()["workflow"]["id"]
 
     from src.web_admin import api
-    original = api.run_step
 
     def fake_run_step(wid, action, data):
         return {
@@ -502,7 +506,6 @@ def test_list_canciones_empty(client) -> None:
 
 
 def test_update_user_last_admin(client) -> None:
-    from src.web_admin.config import DEFAULT_ADMIN_USERNAME
 
     admin_token = _login(client)
     # obtener admin

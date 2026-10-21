@@ -2,19 +2,22 @@
 
 from __future__ import annotations
 
+import importlib
 from pathlib import Path
 
 import pytest
 
-from src import db_manager
+import src.db_manager as db_manager
 
 
 @pytest.fixture
 def tmp_project(tmp_path: Path, monkeypatch):
     """Redirige db_manager a un proyecto temporal."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
-    import importlib
+    # Recargar src.config primero porque es la nueva fuente de verdad
+    from src import config as core_config
 
+    importlib.reload(core_config)
     importlib.reload(db_manager)
     return tmp_path
 
