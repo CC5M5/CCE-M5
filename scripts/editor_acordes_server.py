@@ -23,9 +23,6 @@ from __future__ import annotations
 import html as html_module
 import json
 import os
-import re
-import sqlite3
-import subprocess
 
 from flask import Flask, abort, request
 
@@ -39,6 +36,7 @@ from src.canciones_manager import (
 from src.config import settings
 from src.parsers.acordes_parser_v3 import AcordesParser
 from src.rebuild_web import rebuild_web
+from src.web_admin.editores import git_commit
 
 PROJECT_DIR = settings.project_dir
 DB_PATH = settings.db_path
@@ -46,12 +44,6 @@ DB_PATH = settings.db_path
 app_editor_acordes = Flask(__name__)
 EDITOR_ACORDES_HOST = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
 EDITOR_ACORDES_PORT = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
-
-
-def _get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 def _regenerar_derivados(texto_con_acordes: str) -> dict:
@@ -90,90 +82,8 @@ def _regenerar_derivados(texto_con_acordes: str) -> dict:
 
 
 def _git_commit(titulo: str) -> str:
-    """Hace git add + commit + push. Devuelve el hash o un mensaje de error."""
-    try:
-        subprocess.run(
-            ["git", "add", "data/db.sqlite3"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        diff_check = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            cwd=PROJECT_DIR,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if diff_check.returncode == 0:
-            return "sin cambios"
-
-        result = subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"chore(acordes): editar {titulo}",
-                "-m",
-                "Actualización manual desde editor local de acordes.",
-            ],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        subprocess.run(
-            ["git", "push", "origin", "main"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
-        return m.group(1) if m else "commit OK"
-    except subprocess.CalledProcessError as exc:
-        err = exc.stderr or exc.stdout or ""
-        if (
-            "nothing to commit" in err
-            or "working tree clean" in err
-            or "No changes" in err
-            or "sin cambios agregados" in err
-        ):
-            return "sin cambios"
-        return f"ERROR: {err}"
-
-
-def _rebuild_web() -> str:
-    """Delega en el módulo compartido de reconstrucción web."""
-    return rebuild_web()
-
-
-def _get_momentos_cancion(cancion_id: int) -> list[str]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
-        (cancion_id,),
-    )
-    rows = [r["momento_liturgico"] for r in cursor.fetchall()]
-    conn.close()
-    return rows
-
-
-def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
-    for m in momentos:
-        m = m.strip().lower()
-        if m:
-            cursor.execute(
-                "INSERT OR IGNORE INTO cancion_momentos (cancion_id, momento_liturgico) VALUES (?, ?)",
-                (cancion_id, m),
-            )
-    conn.commit()
-    conn.close()
+    """Delega en helper compartido de commit automático."""
+    return git_commit(f"chore(acordes): editar {titulo}")
 
 
 def _get_canciones():
@@ -209,6 +119,11 @@ def _render_sidebar(active_slug: str | None = None, extra_link: str = "") -> str
     if extra_link:
         links.append(extra_link)
     return "\n".join(links)
+
+
+def _rebuild_web() -> str:
+    """Delega en el módulo compartido de reconstrucción web."""
+    return rebuild_web()
 
 
 def _render_base(
