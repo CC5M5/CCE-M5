@@ -10,11 +10,16 @@ services:
       - ./data:/app/data
       - ./backups:/app/backups
       - ./assets:/app/assets
+      - ./presentaciones_html:/app/presentaciones_html
       - ./.env:/app/.env:ro
     environment:
       - CCE_PROJECT_DIR=/app
       - CCE_ADMIN_HOST=0.0.0.0
       - CCE_ADMIN_PORT=4323
+      - EDITOR_ACORDES_HOST=0.0.0.0
+      - EDITOR_ACORDES_PORT=4322
+      - EDITOR_HOST=0.0.0.0
+      - EDITOR_PORT=4324
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4323/health"]
       interval: 30s
@@ -35,37 +40,4 @@ services:
     depends_on:
       admin:
         condition: service_healthy
-    restart: unless-stopped
-
-  editor-acordes:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/.venv/bin/python", "scripts/editor_acordes_server.py"]
-    ports:
-      - "4322:4322"
-    volumes:
-      - ./data:/app/data
-      - ./assets:/app/assets
-      - ./.env:/app/.env:ro
-    environment:
-      - EDITOR_ACORDES_HOST=0.0.0.0
-      - EDITOR_ACORDES_PORT=4322
-    restart: unless-stopped
-
-  editor-diapositivas:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["/app/.venv/bin/python", "scripts/editor_diapositivas_server.py"]
-    ports:
-      - "4324:4324"
-    volumes:
-      - ./data:/app/data
-      - ./assets:/app/assets
-      - ./presentaciones_html:/app/presentaciones_html
-      - ./.env:/app/.env:ro
-    environment:
-      - EDITOR_HOST=0.0.0.0
-      - EDITOR_PORT=4324
     restart: unless-stopped

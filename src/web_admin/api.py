@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json as _json
 import logging
 import urllib.request
@@ -72,11 +73,31 @@ app = FastAPI(
 
 STATIC_DIR = Path(__file__).parent / "static"
 
+# ------------------------------------------------------------------
+# Editores legacy Flask montados bajo FastAPI
+# ------------------------------------------------------------------
+with contextlib.suppress(ImportError):
+    from scripts.editor_acordes_server import app_editor_acordes
+    from scripts.editor_diapositivas_server import app_editor_diapositivas
+    from src.web_admin.wsgi_adapter import PrefixedWSGIMiddleware
+
+    app.add_route(
+        "/editor-acordes/{path:path}",
+        PrefixedWSGIMiddleware(app_editor_acordes, prefix="/editor-acordes"),
+        methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+        include_in_schema=False,
+    )
+    app.add_route(
+        "/editor-diapositivas/{path:path}",
+        PrefixedWSGIMiddleware(app_editor_diapositivas, prefix="/editor-diapositivas"),
+        methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+        include_in_schema=False,
+    )
+
 # CORS permitido para el origen local del panel admin.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

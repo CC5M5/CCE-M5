@@ -43,7 +43,7 @@ from src.rebuild_web import rebuild_web
 PROJECT_DIR = settings.project_dir
 DB_PATH = settings.db_path
 
-app = Flask(__name__)
+app_editor_acordes = Flask(__name__)
 EDITOR_ACORDES_HOST = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
 EDITOR_ACORDES_PORT = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
 
@@ -217,11 +217,20 @@ def _render_base(
     msg_html = (
         f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
     )
+    # Compatibilidad con montaje bajo FastAPI en path prefix.
+    try:
+        from flask import request
+
+        script_root = request.script_root or ""
+    except Exception:
+        script_root = ""
+    base_href = f'<base href="{html_module.escape(script_root)}/">' if script_root else ""
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {base_href}
   <title>{html_module.escape(title)} - Editor Acordes CCE-M5</title>
   <style>
     :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; }}
@@ -282,7 +291,7 @@ def _render_base(
 NUEVA_LINK = ""
 
 
-@app.route("/")
+@app_editor_acordes.route("/")
 def index():
     canciones = _get_canciones()
     sidebar_links = "\n".join(
@@ -293,7 +302,7 @@ def index():
     return _render_base("Canciones", sidebar_links, content)
 
 
-@app.route("/cancionero/<slug>")
+@app_editor_acordes.route("/cancionero/<slug>")
 def editar(slug: str):
     cancion = _get_cancion_by_slug(slug)
     if cancion is None:
@@ -349,7 +358,7 @@ def editar(slug: str):
     return _render_base(cancion["titulo"], sidebar_links, content)
 
 
-@app.route("/cancionero/nueva")
+@app_editor_acordes.route("/cancionero/nueva")
 def nueva_cancion():
     canciones = _get_canciones()
     sidebar_links = "\n".join(
@@ -395,7 +404,7 @@ def nueva_cancion():
     return _render_base("Nueva canción", sidebar_links, content)
 
 
-@app.route("/cancionero/nueva/guardar", methods=["POST"])
+@app_editor_acordes.route("/cancionero/nueva/guardar", methods=["POST"])
 def guardar_nueva_cancion():
     titulo = request.form.get("titulo", "").strip()
     texto = request.form.get("texto", "")
@@ -448,7 +457,7 @@ def guardar_nueva_cancion():
     )
 
 
-@app.route("/cancionero/<slug>/guardar", methods=["POST"])
+@app_editor_acordes.route("/cancionero/<slug>/guardar", methods=["POST"])
 def guardar(slug: str):
     cancion = _get_cancion_by_slug(slug)
     if cancion is None:
@@ -522,9 +531,9 @@ def guardar(slug: str):
 
 
 def main():
-    host = os.environ.get("EDITOR_HOST", "0.0.0.0")
-    port = int(os.environ.get("EDITOR_PORT", "4322"))
-    app.run(host=host, port=port, debug=False)
+    host = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
+    port = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
+    app_editor_acordes.run(host=host, port=port, debug=False)
 
 
 if __name__ == "__main__":
