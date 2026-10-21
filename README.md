@@ -26,6 +26,34 @@ cp .env.example .env
 
 Los módulos legacy que aún importan `src.web_admin.config` siguen funcionando porque delegan dinámicamente en `src.config.settings`.
 
+## Docker
+
+El proyecto incluye `Dockerfile` y `docker-compose.yml` para levantar todos los servicios:
+
+```bash
+# 1. Build de la web estática (host-side)
+cd web && npm install && npm run build && cd ..
+
+# 2. Levantar todos los servicios
+docker compose up -d
+
+# 3. Verificar health
+open http://localhost:4323/health
+```
+
+Servicios expuestos:
+
+| Puerto | Servicio |
+|--------|----------|
+| 4321 | Web estática (Astro) |
+| 4322 | Editor de acordes (Flask) |
+| 4323 | Admin API (FastAPI) |
+| 4324 | Editor de diapositivas (Flask) |
+
+Los datos persistentes se montan desde `./data`, `./backups`, `./assets` y `./presentaciones_html`. La configuración se carga desde `./.env`.
+
+**Nota:** El build de Docker requiere varios GB libres en el disco del host para extraer capas. En este entorno no se ha podido completar por falta de espacio; la imagen se valida con `docker compose config`.
+
 ## Funcionalidades
 
 - Scraping semanal de lecturas desde Koinonia
