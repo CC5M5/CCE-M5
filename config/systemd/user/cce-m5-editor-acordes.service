@@ -1,0 +1,21 @@
+[Unit]
+Description=CCE-M5 Editor de Acordes
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/proyectos/CCE-M5-Web-Presentaciones
+ExecStart=%h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin/python3 %h/proyectos/CCE-M5-Web-Presentaciones/scripts/editor_acordes_server.py
+Environment="PYTHONPATH=%h/proyectos/CCE-M5-Web-Presentaciones"
+Restart=always
+RestartSec=5
+Environment="HOME=%h"
+Environment="PATH=%h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin:%h/.nvm/versions/node/v22.23.3/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="EDITOR_ACORDES_HOST=0.0.0.0"
+Environment="EDITOR_ACORDES_PORT=4322"
+Environment="CCE_PROJECT_DIR=%h/proyectos/CCE-M5-Web-Presentaciones"
+Environment="CCE_NODE_BIN=%h/.nvm/versions/node/v22.23.3/bin"
+EnvironmentFile=-%h/proyectos/CCE-M5-Web-Presentaciones/.env
+
+[Install]
+WantedBy=default.target
