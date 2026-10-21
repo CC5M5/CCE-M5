@@ -38,6 +38,7 @@ from src.canciones_manager import (
     CancionCreateUpdate,
     crear_cancion,
 )
+from src.config import settings
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -48,11 +49,11 @@ from src.generators.composicion_catalogo import (
 )
 from src.rebuild_web import rebuild_web
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
+ILUSTRACIONES_DIR = settings.data_dir / "ilustraciones"
 CATALOGO_PATH = ILUSTRACIONES_DIR / "catalogo.json"
-LEMA_PATH = PROJECT_DIR / "data" / "lemas" / "somos_uno.jpg"
+LEMA_PATH = settings.data_dir / "lemas" / "somos_uno.jpg"
 
 app = Flask(__name__)
 
