@@ -2,13 +2,20 @@
 
 ## 9.1. Servicios systemd
 
-| Unit | Estado objetivo | Notas |
-|---|---|---|
-| `cce-m5-admin.service` | Habilitado, puerto 4323 | Corrige puerto cruzado anterior. |
-| `cce-m5-editor-diapositivas.service` | Habilitado, puerto 4324 | Corrige puerto cruzado anterior. |
-| `cce-m5-web.service` | Habilitado, puerto 4321 | Sirve `web/dist` estáticamente. |
-| `cce-m5-pipeline.service` | **Deshabilitado** | Trigger de Mission Control obsoleto. |
-| `cce-m5-pipeline.timer` | **Deshabilitado** | Ya no se usa. |
+Las unidades oficiales están en `config/systemd/user/` y son **portables**: usan `%h` para el home del usuario, por lo que funcionan en cualquier PC destino sin editar rutas absolutas.
+
+| Unit | Puerto | Estado objetivo | Notas |
+|---|---|---|---|
+| `cce-m5-admin.service` | 4323 | Habilitado | FastAPI. Requiere `.env` con secretos. |
+| `cce-m5-editor-diapositivas.service` | 4324 | Habilitado | Flask. Editor del catálogo de slides. |
+| `cce-m5-editor-acordes.service` | 4322 | Habilitado | Flask. Editor del cancionero. |
+| `cce-m5-web.service` | 4321 | Habilitado | Sirve `web/dist` estáticamente. |
+| `cce-m5-backup-db.service` | — | Activado por timer | Backup diario de `data/db.sqlite3`. |
+| `cce-m5-backup-db.timer` | — | Habilitado | Dispara el backup cada día. |
+| `cce-m5-pipeline.service` | — | **Eliminado** | Trigger de Mission Control obsoleto. |
+| `cce-m5-pipeline.timer` | — | **Eliminado** | Ya no se usa. |
+
+> **Nota importante:** en el PC origen había rutas absolutas `/home/pciath/...`, puertos cruzados y un drop-in de Mission Control. Todas esas configuraciones han sido limpiadas. En el destino basta con copiar las unidades de `config/systemd/user/`.
 
 ## 9.2. Variables de entorno
 
@@ -20,10 +27,14 @@ CCE_ADMIN_JWT_SECRET=cambia-esta-clave-en-produccion
 CCE_ADMIN_DEFAULT_USER=rafael.torres
 CCE_ADMIN_DEFAULT_PASSWORD=1234
 
-# Node local
+# Node local (nvm)
 CCE_NODE_BIN=/home/pciath/.nvm/versions/node/v22.23.3/bin
 
-# Despliegue
+# Rebuild web local
+CCE_BASE_PATH=/
+CCE_SITE_URL=http://192.168.68.244:4321
+
+# Despliegue (solo si se usa comentarios proxy)
 GITHUB_TOKEN_CC5M5=...
 ```
 
@@ -34,17 +45,25 @@ GITHUB_TOKEN_CC5M5=...
 Workflow: `.github/workflows/deploy.yml`
 
 - Runner: `ubuntu-22.04`.
-- Node: 22.
-- Instalación: `npm install` (no `npm ci`; `package-lock.json` está en `.gitignore`).
+- Node: 22.23.3 (via `actions/setup-node@v4`).
+- Instalación: `npm install` con `package-lock.json` congelado en el repo.
+- Instalación Python: `pip install -r requirements.lock.txt` (dependencias congeladas).
 - Copia `presentaciones/` y `presentaciones_html/` a `web/public/`.
-- Exporta SQLite a JSON con Python.
+- Exporta SQLite a JSON con `scripts/export_data_for_web.py`.
 - Build Astro con `BASE_PATH=/CCE-M5/`.
 - Publica en GitHub Pages vía `actions/deploy-pages@v4`.
 
-## 9.4. Seguridad operativa
+## 9.4. Backup de la base de datos
+
+- Script en el repo: `scripts/systemd/cce-m5-backup-db.sh`.
+- Destino por defecto: `$HOME/.config/cce-m5/backups/db/`.
+- Retención: 30 días (`CCE_BACKUP_KEEP_DAYS`).
+- Timer: `cce-m5-backup-db.timer` (una vez al día).
+
+## 9.5. Seguridad operativa
 
 - Cambiar `CCE_ADMIN_JWT_SECRET` por un token seguro ≥32 bytes.
 - Cambiar `CCE_ADMIN_DEFAULT_PASSWORD`.
 - No commitear `.env` ni `data/.admin_jwt_secret`.
+- Ajustar `ADMIN_CORS_ORIGINS` en `.env` si la IP local cambia.
 - Restringir CORS en producción pública.
-
