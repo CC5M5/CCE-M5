@@ -5,17 +5,10 @@ Uso:
     python scripts/run_admin_api.py
     python scripts/run_admin_api.py --host 0.0.0.0 --port 4323
 """
-# ruff: noqa: E402
 
 from __future__ import annotations
 
 import argparse
-import sys
-from pathlib import Path
-
-PROJECT_DIR = Path(__file__).parent.parent.resolve()
-if str(PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(PROJECT_DIR))
 
 import uvicorn
 

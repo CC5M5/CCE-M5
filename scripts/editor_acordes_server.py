@@ -26,13 +26,7 @@ import os
 import re
 import sqlite3
 import subprocess
-import sys
 from pathlib import Path
-
-# Asegurar que el directorio del proyecto está en sys.path para importar src.*
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-if str(PROJECT_DIR) not in sys.path:
-    sys.path.insert(0, str(PROJECT_DIR))
 
 from flask import Flask, abort, request
 
@@ -43,11 +37,15 @@ from src.canciones_manager import (
     crear_cancion,
     listar_canciones,
 )
+from src.parsers.acordes_parser_v3 import AcordesParser
 from src.rebuild_web import rebuild_web
 
+PROJECT_DIR = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
 
 app = Flask(__name__)
+EDITOR_ACORDES_HOST = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
+EDITOR_ACORDES_PORT = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
 
 
 def _get_connection():
@@ -58,9 +56,6 @@ def _get_connection():
 
 def _regenerar_derivados(texto_con_acordes: str) -> dict:
     """Regenera html_visual, estructura_json, letra_sin_acordes y tono."""
-    sys.path.insert(0, str(PROJECT_DIR / "src"))
-    from parsers.acordes_parser_v3 import AcordesParser
-
     parser = AcordesParser()
     estructura = parser.parsear_cancion_completa(texto_con_acordes)
     html_visual = parser.generar_html_visual(estructura)

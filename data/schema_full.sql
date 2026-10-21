@@ -1,30 +1,36 @@
--- Esquema completo de la base de datos SQLite real de CCE-M5-Web-Presentaciones
--- Generado automáticamente desde data/db.sqlite3 el 2026-10-18T09:41:30.135731
--- Incluye tablas base, catálogo de slides, cancion_momentos y tablas de administración.
+-- Schema completo exportado automáticamente desde data/db.sqlite3
+-- NO EDITAR MANUALMENTE. Usar: python scripts/init_db.py
 
-PRAGMA foreign_keys = ON;
+PRAGMA foreign_keys=ON;
+CREATE INDEX idx_automation_log_agente_fecha ON automation_log(agente, fecha)
 
-CREATE INDEX idx_canciones_momento ON canciones(momento_liturgico);
+CREATE INDEX idx_canciones_momento ON canciones(momento_liturgico)
 
-CREATE INDEX idx_lecturas_fecha ON lecturas(fecha);
+CREATE INDEX idx_canciones_titulo ON canciones(titulo)
 
-CREATE INDEX idx_presentacion_slides_presentacion ON presentacion_slides(presentacion_id, numero);
+CREATE INDEX idx_comentarios_presentacion ON comentarios(presentacion_id)
 
-CREATE INDEX idx_presentaciones_fecha ON presentaciones(fecha_domingo);
+CREATE INDEX idx_lecturas_fecha ON lecturas(fecha)
 
-CREATE INDEX idx_slides_color ON slides(color_liturgico);
+CREATE INDEX idx_presentacion_slides_presentacion ON presentacion_slides(presentacion_id, numero)
 
-CREATE INDEX idx_slides_default ON slides(tipo, subtipo, color_liturgico, es_default);
+CREATE INDEX idx_presentaciones_fecha ON presentaciones(fecha_domingo)
 
-CREATE INDEX idx_slides_subtipo ON slides(subtipo);
+CREATE INDEX idx_presentaciones_lectura ON presentaciones(lectura_id)
 
-CREATE INDEX idx_slides_tipo ON slides(tipo);
+CREATE INDEX idx_slides_color ON slides(color_liturgico)
 
-CREATE INDEX idx_workflow_logs_workflow ON workflow_logs(workflow_id);
+CREATE INDEX idx_slides_default ON slides(tipo, subtipo, color_liturgico, es_default)
 
-CREATE INDEX idx_workflow_runs_fecha ON workflow_runs(fecha_domingo);
+CREATE INDEX idx_slides_subtipo ON slides(subtipo)
 
-CREATE INDEX idx_workflow_runs_status ON workflow_runs(status);
+CREATE INDEX idx_slides_tipo ON slides(tipo)
+
+CREATE INDEX idx_workflow_logs_workflow ON workflow_logs(workflow_id)
+
+CREATE INDEX idx_workflow_runs_fecha ON workflow_runs(fecha_domingo)
+
+CREATE INDEX idx_workflow_runs_status ON workflow_runs(status)
 
 CREATE TABLE admin_users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +41,7 @@ CREATE TABLE admin_users (
                     is_active INTEGER NOT NULL DEFAULT 1,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
+                )
 
 CREATE TABLE automation_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,14 +50,14 @@ CREATE TABLE automation_log (
             estado TEXT NOT NULL,
             mensaje TEXT,
             fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+        )
 
 CREATE TABLE cancion_momentos (
         cancion_id INTEGER NOT NULL,
         momento_liturgico TEXT NOT NULL,
         PRIMARY KEY (cancion_id, momento_liturgico),
         FOREIGN KEY (cancion_id) REFERENCES canciones(id) ON DELETE CASCADE
-    );
+    )
 
 CREATE TABLE canciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,7 +74,7 @@ CREATE TABLE canciones (
             enlace_alt TEXT,
             fuente TEXT DEFAULT 'blogspot',
             fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        , estructura_json TEXT, html_visual TEXT, html_original TEXT);
+        , estructura_json TEXT, html_visual TEXT, html_original TEXT)
 
 CREATE TABLE comentarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +84,7 @@ CREATE TABLE comentarios (
             estado TEXT DEFAULT 'pendiente',
             fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (presentacion_id) REFERENCES presentaciones(id)
-        );
+        )
 
 CREATE TABLE lecturas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,7 +105,7 @@ CREATE TABLE lecturas (
             fuente_scraping TEXT DEFAULT 'koinonia',
             fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, celebracion TEXT, primera_lectura_libro TEXT, segunda_lectura_libro TEXT, evangelio_libro TEXT, salmo_libro TEXT,
             UNIQUE(fecha)
-        );
+        )
 
 CREATE TABLE presentacion_slides (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -119,7 +125,7 @@ CREATE TABLE presentacion_slides (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (presentacion_id) REFERENCES presentaciones(id) ON DELETE CASCADE,
     FOREIGN KEY (slide_id) REFERENCES slides(id)
-);
+)
 
 CREATE TABLE presentaciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -134,14 +140,14 @@ CREATE TABLE presentaciones (
             estado TEXT DEFAULT 'borrador',
             fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, lectura_json TEXT, notas TEXT, creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (lectura_id) REFERENCES lecturas(id)
-        );
+        )
 
 CREATE TABLE schema_version (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 version INTEGER NOT NULL,
                 aplicada_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(version)
-            );
+            )
 
 CREATE TABLE slides (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -159,7 +165,7 @@ CREATE TABLE slides (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tipo) REFERENCES slides_tipos(id)
-);
+)
 
 CREATE TABLE slides_tipos (
     id TEXT PRIMARY KEY,
@@ -167,9 +173,9 @@ CREATE TABLE slides_tipos (
     descripcion TEXT,
     orden INTEGER NOT NULL DEFAULT 0,
     requiere_cancion INTEGER DEFAULT 0
-);
+)
 
-CREATE TABLE sqlite_sequence(name,seq);
+CREATE TABLE sqlite_sequence(name,seq)
 
 CREATE TABLE workflow_backups (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -179,7 +185,7 @@ CREATE TABLE workflow_backups (
                     original_paths TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (workflow_id) REFERENCES workflow_runs(id) ON DELETE CASCADE
-                );
+                )
 
 CREATE TABLE workflow_logs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -189,7 +195,7 @@ CREATE TABLE workflow_logs (
                     message TEXT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (workflow_id) REFERENCES workflow_runs(id) ON DELETE CASCADE
-                );
+                )
 
 CREATE TABLE workflow_runs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -203,4 +209,4 @@ CREATE TABLE workflow_runs (
                     completed_at TIMESTAMP,
                     superseded_by INTEGER,
                     FOREIGN KEY (superseded_by) REFERENCES workflow_runs(id)
-                );
+                )

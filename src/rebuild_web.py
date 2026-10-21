@@ -2,11 +2,17 @@
 
 Usado por:
 - Editor de acordes (Flask, puerto 4322)
-- Editor de diapositivas (Flask, puerto 4323)
-- Admin API / cancionero web (FastAPI, puerto 4324)
+- Editor de diapositivas (Flask, puerto 4324)
+- Admin API / cancionero web (FastAPI, puerto 4323)
 
 Exporta SQLite a JSON, corre `npm run build` y reinicia el servidor web
 estático en el puerto 4321.
+
+Variables de entorno opcionales:
+  CCE_PROJECT_DIR  - raíz del proyecto (por defecto: directorio padre de este archivo)
+  CCE_NODE_BIN     - directorio con node/npm (por defecto: /usr/bin)
+  CCE_BASE_PATH    - base path de Astro (por defecto: /)
+  CCE_SITE_URL     - URL base del site local (por defecto: http://localhost:4321)
 """
 
 from __future__ import annotations
@@ -16,16 +22,16 @@ import subprocess
 import time
 from pathlib import Path
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-NODE_BIN = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
+PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path(__file__).resolve().parents[1]))
+NODE_BIN = os.environ.get("CCE_NODE_BIN", "/usr/bin")
 
 
 def rebuild_web() -> str:
     """Exporta datos, reconstruye Astro y reinicia el servidor web en 4321."""
     try:
         env = os.environ.copy()
-        env["BASE_PATH"] = "/"
-        env["SITE_URL"] = "http://192.168.68.244:4321"
+        env["BASE_PATH"] = os.environ.get("CCE_BASE_PATH", "/")
+        env["SITE_URL"] = os.environ.get("CCE_SITE_URL", "http://localhost:4321")
         env["PATH"] = f"{NODE_BIN}:{env.get('PATH', '')}"
 
         export_script = PROJECT_DIR / "scripts" / "export_data_for_web.py"
@@ -38,8 +44,9 @@ def rebuild_web() -> str:
             env=env,
         )
 
+        npm_cmd = os.path.join(NODE_BIN, "npm")
         subprocess.run(
-            [f"{NODE_BIN}/npm", "run", "build"],
+            [npm_cmd, "run", "build"],
             cwd=PROJECT_DIR / "web",
             check=True,
             capture_output=True,

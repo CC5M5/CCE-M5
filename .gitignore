@@ -35,7 +35,7 @@ __pycache__/
 .web/.astro/
 web/node_modules/
 web/dist/
-web/package-lock.json
+# web/package-lock.json  # CONGELADO para reproducibilidad en migración
 # La carpeta original de presentaciones SÍ debe estar en git (PPTX/PDF originales).
 # La copia en web/public/presentaciones/ se genera durante el build y no se sube.
 web/public/presentaciones/
