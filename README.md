@@ -26,6 +26,63 @@ cp .env.example .env
 
 Los módulos legacy que aún importan `src.web_admin.config` siguen funcionando porque delegan dinámicamente en `src.config.settings`.
 
+## Operación local (systemd)
+
+Para servir la web y el panel de administración de forma persistente, el
+repositorio incluye units de systemd usuario en
+`systemd/` (copiados a `~/.config/systemd/user/`):
+
+```bash
+# Copiar units (desde el repo)
+cp systemd/cce-m5-admin.service ~/.config/systemd/user/
+cp systemd/cce-m5-web.service ~/.config/systemd/user/
+cp systemd/cce-m5-healthcheck.service ~/.config/systemd/user/
+cp systemd/cce-m5-healthcheck.timer ~/.config/systemd/user/
+
+# Recargar, habilitar e iniciar
+systemctl --user daemon-reload
+systemctl --user enable --now cce-m5-admin cce-m5-web cce-m5-healthcheck.timer
+
+# Ver estado
+systemctl --user status cce-m5-admin cce-m5-web
+systemctl --user list-timers cce-m5-healthcheck.timer
+```
+
+Servicios expuestos:
+
+| Puerto | Servicio |
+|--------|----------|
+| 4321 | Web estática (Astro) |
+| 4323 | Admin API (FastAPI) + editores Flask integrados |
+
+Los editores legacy (acordes y diapositivas) se sirven bajo el mismo
+servicio FastAPI en:
+
+- http://localhost:4323/editor-acordes/
+- http://localhost:4323/editor-diapositivas/
+
+### Healthcheck
+
+El script `scripts/healthcheck.py` verifica que admin, editores y web
+respondan. Se ejecuta:
+
+- Como `ExecStartPost` de `cce-m5-admin.service` tras cada arranque.
+- Cada hora vía `cce-m5-healthcheck.timer`.
+
+```bash
+# Ejecución manual
+.venv/bin/python scripts/healthcheck.py
+```
+
+### Runbook básico
+
+1. **Ver salud**: `python scripts/healthcheck.py`.
+2. **Reiniciar admin**: `systemctl --user restart cce-m5-admin`.
+3. **Reiniciar web**: `systemctl --user restart cce-m5-web`.
+4. **Ver logs**: `journalctl --user -u cce-m5-admin -f`.
+5. **Los servicios antiguos de editores (puertos 4322 y 4324) están
+   deshabilitados**; los editores viven dentro del admin en 4323.
+
 ## Docker
 
 El proyecto incluye `Dockerfile` y `docker-compose.yml` para levantar todos los servicios:
@@ -40,25 +97,6 @@ docker compose up -d
 # 3. Verificar health
 open http://localhost:4323/health
 ```
-
-Servicios expuestos:
-
-| Puerto | Servicio |
-|--------|----------|
-| 4321 | Web estática (Astro) |
-| 4323 | Admin API (FastAPI) + editores Flask integrados |
-
-Los editores legacy (acordes y diapositivas) ahora se sirven bajo el mismo
-servicio FastAPI en:
-
-- http://localhost:4323/editor-acordes/
-- http://localhost:4323/editor-diapositivas/
-
-Los servicios systemd/docker-compose separados en los puertos 4322 y 4324
-quedan obsoletos y se han eliminado del compose.
-
-Los datos persistentes se montan desde `./data`, `./backups`, `./assets` y
-`./presentaciones_html`. La configuración se carga desde `./.env`.
 
 **Nota:** El build de Docker requiere varios GB libres en el disco del host para extraer capas. En este entorno no se ha podido completar por falta de espacio; la imagen se valida con `docker compose config`.
 
