@@ -25,7 +25,6 @@ import html as html_module
 import json
 import os
 import re
-import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -48,6 +47,12 @@ from src.generators.composicion_catalogo import (
     proponer_composicion,
 )
 from src.rebuild_web import rebuild_web
+from src.web_admin.editores import (
+    get_connection,
+    get_momentos_cancion,
+    git_commit,
+    set_momentos_cancion,
+)
 
 PROJECT_DIR = settings.project_dir
 DB_PATH = settings.db_path
@@ -67,65 +72,9 @@ COLORES_LITURGICOS = {
 }
 
 
-def _get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 def _git_commit(mensaje: str) -> str:
-    try:
-        subprocess.run(
-            ["git", "add", "data/db.sqlite3"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        # Si no hay nada staged, no hay nada que commitear (p. ej. BD sin cambios reales)
-        diff_check = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            cwd=PROJECT_DIR,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if diff_check.returncode == 0:
-            return "sin cambios"
-
-        result = subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"chore(slides): {mensaje}",
-                "-m",
-                "Actualización manual desde editor local de diapositivas.",
-            ],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        subprocess.run(
-            ["git", "push", "origin", "main"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
-        return m.group(1) if m else "commit OK"
-    except subprocess.CalledProcessError as exc:
-        err = exc.stderr or exc.stdout or ""
-        if (
-            "nothing to commit" in err
-            or "working tree clean" in err
-            or "No changes" in err
-            or "sin cambios agregados" in err
-        ):
-            return "sin cambios"
-        return f"ERROR: {err}"
+    """Delega en helper compartido de commit automático."""
+    return git_commit(f"chore(slides): {mensaje}")
 
 
 def _listar_ilustraciones() -> list[str]:
@@ -142,35 +91,8 @@ def _listar_ilustraciones() -> list[str]:
     return resultado
 
 
-def _get_momentos_cancion(cancion_id: int) -> list[str]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
-        (cancion_id,),
-    )
-    rows = [r["momento_liturgico"] for r in cursor.fetchall()]
-    conn.close()
-    return rows
-
-
-def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
-    for m in momentos:
-        m = m.strip().lower()
-        if m:
-            cursor.execute(
-                "INSERT OR IGNORE INTO cancion_momentos (cancion_id, momento_liturgico) VALUES (?, ?)",
-                (cancion_id, m),
-            )
-    conn.commit()
-    conn.close()
-
-
 def _tipos() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, nombre, descripcion, orden FROM slides_tipos ORDER BY orden")
     tipos = [
@@ -182,7 +104,7 @@ def _tipos() -> list[dict[str, Any]]:
 
 
 def _get_slides(tipo: str | None = None) -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     if tipo:
         cursor.execute(
@@ -209,7 +131,7 @@ def _get_slides(tipo: str | None = None) -> list[dict[str, Any]]:
 
 
 def _get_slide(id: int) -> dict[str, Any] | None:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM slides WHERE id = ?", (id,))
     row = cursor.fetchone()
@@ -220,7 +142,7 @@ def _get_slide(id: int) -> dict[str, Any] | None:
 
 
 def _get_presentaciones() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT p.fecha_domingo, l.celebracion, l.color_liturgico, p.estado,
@@ -620,7 +542,7 @@ def guardar(id: int):
         "activo": 1,
     }
 
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -665,7 +587,7 @@ def duplicar(id: int):
     if slide is None:
         abort(404)
 
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -756,7 +678,7 @@ def presentaciones_html_file(filename: str):
 
 
 def _get_lectura_por_fecha(fecha: str) -> dict[str, Any] | None:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "SELECT id, fecha, celebracion, color_liturgico FROM lecturas WHERE fecha = ?", (fecha,)
@@ -772,7 +694,7 @@ def _crear_presentacion_desde_lectura(fecha: str) -> dict[str, Any] | None:
     lectura = _get_lectura_por_fecha(fecha)
     if not lectura:
         return None
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -848,7 +770,7 @@ def _generar_presentacion(fecha: str) -> str:
         build_ok = f" | ⚠️ web build falló: {exc.stderr or exc.stdout}"
     # Marcar estado como publicado
     try:
-        conn = _get_connection()
+        conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE presentaciones SET estado = 'publicado' WHERE fecha_domingo = ?",
@@ -989,7 +911,7 @@ def _get_composicion_guardada(fecha: str) -> list[dict[str, Any]]:
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
         return []
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -1354,7 +1276,7 @@ def preview_presentacion(fecha: str):
 
 @app_editor_diapositivas.route("/cancion/<int:cancion_id>/momentos")
 def editar_momentos_cancion(cancion_id: int):
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, titulo FROM canciones WHERE id = ?", (cancion_id,))
     row = cursor.fetchone()
@@ -1362,7 +1284,7 @@ def editar_momentos_cancion(cancion_id: int):
     if not row:
         abort(404)
 
-    momentos_actuales = _get_momentos_cancion(cancion_id)
+    momentos_actuales = get_momentos_cancion(cancion_id)
     checkboxes = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in momentos_actuales else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
         for m in MOMENTOS_LITURGICOS
@@ -1398,7 +1320,7 @@ def editar_momentos_cancion(cancion_id: int):
 
 @app_editor_diapositivas.route("/cancion/<int:cancion_id>/momentos/guardar", methods=["POST"])
 def guardar_momentos_cancion(cancion_id: int):
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, titulo FROM canciones WHERE id = ?", (cancion_id,))
     row = cursor.fetchone()
@@ -1407,11 +1329,11 @@ def guardar_momentos_cancion(cancion_id: int):
         abort(404)
 
     nuevos_momentos = request.form.getlist("momentos")
-    _set_momentos_cancion(cancion_id, nuevos_momentos)
+    set_momentos_cancion(cancion_id, nuevos_momentos)
 
     # Actualizar campo legacy
     momento_legacy = nuevos_momentos[0] if nuevos_momentos else ""
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE canciones SET momento_liturgico = ? WHERE id = ?", (momento_legacy, cancion_id)
@@ -1444,7 +1366,7 @@ def guardar_momentos_cancion(cancion_id: int):
 
 
 def _listar_lecturas() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT fecha, domingo, celebracion, color_liturgico FROM lecturas
@@ -1457,7 +1379,7 @@ def _listar_lecturas() -> list[dict[str, Any]]:
 
 
 def _listar_canciones_para_selector() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
@@ -1571,7 +1493,7 @@ def guardar_nueva_presentacion():
     canciones_json = json.dumps(canciones_asignadas)
 
     # Crear presentación
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -1728,7 +1650,7 @@ def guardar_asignacion_canciones(fecha: str):
     canciones_json = json.dumps(canciones_asignadas)
 
     # Actualizar presentación
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"])
