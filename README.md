@@ -46,11 +46,19 @@ Servicios expuestos:
 | Puerto | Servicio |
 |--------|----------|
 | 4321 | Web estática (Astro) |
-| 4322 | Editor de acordes (Flask) |
-| 4323 | Admin API (FastAPI) |
-| 4324 | Editor de diapositivas (Flask) |
+| 4323 | Admin API (FastAPI) + editores Flask integrados |
 
-Los datos persistentes se montan desde `./data`, `./backups`, `./assets` y `./presentaciones_html`. La configuración se carga desde `./.env`.
+Los editores legacy (acordes y diapositivas) ahora se sirven bajo el mismo
+servicio FastAPI en:
+
+- http://localhost:4323/editor-acordes/
+- http://localhost:4323/editor-diapositivas/
+
+Los servicios systemd/docker-compose separados en los puertos 4322 y 4324
+quedan obsoletos y se han eliminado del compose.
+
+Los datos persistentes se montan desde `./data`, `./backups`, `./assets` y
+`./presentaciones_html`. La configuración se carga desde `./.env`.
 
 **Nota:** El build de Docker requiere varios GB libres en el disco del host para extraer capas. En este entorno no se ha podido completar por falta de espacio; la imagen se valida con `docker compose config`.
 

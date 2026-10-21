@@ -55,7 +55,7 @@ ILUSTRACIONES_DIR = settings.data_dir / "ilustraciones"
 CATALOGO_PATH = ILUSTRACIONES_DIR / "catalogo.json"
 LEMA_PATH = settings.data_dir / "lemas" / "somos_uno.jpg"
 
-app = Flask(__name__)
+app_editor_diapositivas = Flask(__name__)
 
 COLORES_LITURGICOS = {
     "verde": {"from": "#e8f5e9", "to": "#c8e6c9", "acento": "#2e7d32"},
@@ -326,11 +326,20 @@ def _render_base(
         f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
     )
     _listar_ilustraciones()
+    # Compatibilidad con montaje bajo FastAPI en path prefix.
+    try:
+        from flask import request
+
+        script_root = request.script_root or ""
+    except Exception:
+        script_root = ""
+    base_href = f'<base href="{html_module.escape(script_root)}/">' if script_root else ""
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {base_href}
   <title>{html_module.escape(title)} - Editor Diapositivas CCE-M5</title>
   <style>
     :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; }}
@@ -418,7 +427,7 @@ def _render_base(
 </html>"""
 
 
-@app.route("/")
+@app_editor_diapositivas.route("/")
 def index():
     tipos = _tipos()
     sidebar_parts = []
@@ -438,12 +447,16 @@ def index():
     return _render_base("Diapositivas", sidebar, content)
 
 
-@app.route("/slides/")
+@app_editor_diapositivas.route("/slides/")
 def index_slash_redirect():
-    return redirect("/", code=302)
+    """Compatibilidad con montaje bajo FastAPI: redirige a /editor-diapositivas/."""
+    from flask import request
+
+    prefix = request.environ.get("SCRIPT_NAME", "")
+    return redirect(f"{prefix}/", code=302)
 
 
-@app.route("/slides/<int:id>")
+@app_editor_diapositivas.route("/slides/<int:id>")
 def editar(id: int):
     slide = _get_slide(id)
     if slide is None:
@@ -587,7 +600,7 @@ def editar(id: int):
     return _render_base(slide.get("titulo") or "Diapositiva", sidebar, content)
 
 
-@app.route("/slides/<int:id>/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/slides/<int:id>/guardar", methods=["POST"])
 def guardar(id: int):
     slide = _get_slide(id)
     if slide is None:
@@ -646,7 +659,7 @@ def guardar(id: int):
     return editar_con_mensaje(id, mensaje, clase)
 
 
-@app.route("/slides/<int:id>/duplicar", methods=["POST"])
+@app_editor_diapositivas.route("/slides/<int:id>/duplicar", methods=["POST"])
 def duplicar(id: int):
     slide = _get_slide(id)
     if slide is None:
@@ -702,7 +715,7 @@ def editar_con_mensaje(id: int, mensaje: str, clase: str):
     return html
 
 
-@app.route("/__ilustraciones/<path:filename>")
+@app_editor_diapositivas.route("/__ilustraciones/<path:filename>")
 def ilustracion(filename: str):
     from flask import send_file
 
@@ -715,7 +728,7 @@ def ilustracion(filename: str):
     abort(404)
 
 
-@app.route("/__lema/<path:filename>")
+@app_editor_diapositivas.route("/__lema/<path:filename>")
 def lema(filename: str):
     if LEMA_PATH.exists():
         from flask import send_file
@@ -724,7 +737,7 @@ def lema(filename: str):
     abort(404)
 
 
-@app.route("/presentaciones_html/<path:filename>")
+@app_editor_diapositivas.route("/presentaciones_html/<path:filename>")
 def presentaciones_html_file(filename: str):
     base = PROJECT_DIR / "presentaciones_html"
     target = (base / filename).resolve()
@@ -884,7 +897,7 @@ def _generar_presentacion(fecha: str) -> str:
     return f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
 
 
-@app.route("/canciones/nueva")
+@app_editor_diapositivas.route("/canciones/nueva")
 def nueva_cancion_diapositivas():
     momentos_checks = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}"> {html_module.escape(m.replace("_", " ").title())}</label>'
@@ -918,7 +931,7 @@ def nueva_cancion_diapositivas():
     return _render_base("Nueva canción", "", content)
 
 
-@app.route("/canciones/nueva/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/canciones/nueva/guardar", methods=["POST"])
 def guardar_nueva_cancion_diapositivas():
     titulo = request.form.get("titulo", "").strip()
     texto = request.form.get("texto", "")
@@ -1009,7 +1022,7 @@ def _formatear_fecha_preview(fecha: str) -> str:
         return fecha
 
 
-@app.route("/presentaciones/")
+@app_editor_diapositivas.route("/presentaciones/")
 def listar_presentaciones():
     tipos = _tipos()
     sidebar_parts = []
@@ -1058,7 +1071,7 @@ def listar_presentaciones():
     return _render_base("Presentaciones", sidebar, content)
 
 
-@app.route("/presentacion/<fecha>/armar")
+@app_editor_diapositivas.route("/presentacion/<fecha>/armar")
 def armar_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1148,7 +1161,7 @@ def armar_presentacion(fecha: str):
     return _render_base(f"Armar {fecha}", sidebar, content)
 
 
-@app.route("/presentacion/<fecha>/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/presentacion/<fecha>/guardar", methods=["POST"])
 def guardar_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1206,7 +1219,7 @@ def guardar_presentacion(fecha: str):
     return body, status
 
 
-@app.route("/presentacion/<fecha>/reconstruir")
+@app_editor_diapositivas.route("/presentacion/<fecha>/reconstruir")
 def reconstruir_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1233,7 +1246,7 @@ def reconstruir_presentacion(fecha: str):
     return body, status
 
 
-@app.route("/presentacion/<fecha>/generar")
+@app_editor_diapositivas.route("/presentacion/<fecha>/generar")
 def generar_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1254,7 +1267,7 @@ def generar_presentacion(fecha: str):
     return body, status
 
 
-@app.route("/presentaciones_html/<path:subpath>")
+@app_editor_diapositivas.route("/presentaciones_html/<path:subpath>")
 def servir_presentacion_html(subpath: str):
     """Sirve archivos estáticos generados (HTML, PDF, PPTX, imágenes, etc.)."""
     from flask import send_from_directory
@@ -1274,7 +1287,7 @@ def servir_presentacion_html(subpath: str):
     return send_from_directory(str(file_path.parent), file_path.name)
 
 
-@app.route("/presentacion/<fecha>/preview")
+@app_editor_diapositivas.route("/presentacion/<fecha>/preview")
 def preview_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1339,7 +1352,7 @@ def preview_presentacion(fecha: str):
 # ------------------------------------------------------------------
 
 
-@app.route("/cancion/<int:cancion_id>/momentos")
+@app_editor_diapositivas.route("/cancion/<int:cancion_id>/momentos")
 def editar_momentos_cancion(cancion_id: int):
     conn = _get_connection()
     cursor = conn.cursor()
@@ -1383,7 +1396,7 @@ def editar_momentos_cancion(cancion_id: int):
     return _render_base(f"Momentos - {row['titulo']}", sidebar, content)
 
 
-@app.route("/cancion/<int:cancion_id>/momentos/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/cancion/<int:cancion_id>/momentos/guardar", methods=["POST"])
 def guardar_momentos_cancion(cancion_id: int):
     conn = _get_connection()
     cursor = conn.cursor()
@@ -1460,7 +1473,7 @@ def _listar_canciones_para_selector() -> list[dict[str, Any]]:
     return rows
 
 
-@app.route("/presentaciones/nueva")
+@app_editor_diapositivas.route("/presentaciones/nueva")
 def nueva_presentacion():
     lecturas = _listar_lecturas()
     canciones = _listar_canciones_para_selector()
@@ -1515,7 +1528,7 @@ def nueva_presentacion():
     return _render_base("Nueva presentación", "", content)
 
 
-@app.route("/presentaciones/nueva/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/presentaciones/nueva/guardar", methods=["POST"])
 def guardar_nueva_presentacion():
     fecha = request.form.get("fecha", "").strip()
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
@@ -1598,7 +1611,7 @@ def guardar_nueva_presentacion():
 # ------------------------------------------------------------------
 
 
-@app.route("/presentacion/<fecha>/asignar")
+@app_editor_diapositivas.route("/presentacion/<fecha>/asignar")
 def asignar_canciones(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1668,7 +1681,7 @@ def asignar_canciones(fecha: str):
     return _render_base(f"Asignar canciones {fecha}", "", content)
 
 
-@app.route("/presentacion/<fecha>/asignar/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/presentacion/<fecha>/asignar/guardar", methods=["POST"])
 def guardar_asignacion_canciones(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1747,7 +1760,7 @@ def guardar_asignacion_canciones(fecha: str):
 def main():
     host = os.environ.get("EDITOR_HOST", "0.0.0.0")
     port = int(os.environ.get("EDITOR_PORT", "4323"))
-    app.run(host=host, port=port, debug=False)
+    app_editor_diapositivas.run(host=host, port=port, debug=False)
 
 
 if __name__ == "__main__":

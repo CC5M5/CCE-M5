@@ -94,3 +94,4 @@ websockets==17.3
 Werkzeug==3.1.8
 xlsxwriter==3.2.9
 yt-dlp==2026.8.19
+a2wsgi==1.10.8
