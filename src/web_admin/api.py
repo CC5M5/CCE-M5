@@ -14,6 +14,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
+from src.config import settings
 from src.web_admin import models as m
 from src.web_admin.auth import (
     authenticate_user,
@@ -74,12 +75,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 # CORS permitido para el origen local del panel admin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:4321",
-        "http://localhost:4323",
-        "http://192.168.68.244:4321",
-        "http://192.168.68.244:4323",
-    ],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

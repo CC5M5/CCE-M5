@@ -19,7 +19,6 @@ Requisitos técnicos:
 from __future__ import annotations
 
 import logging
-import os
 import re
 import sqlite3
 import subprocess
@@ -224,9 +223,9 @@ def _format_fecha_es(fecha_str: str) -> str:
 
 def _default_output_path(fecha_domingo: str) -> Path:
     """Ruta por defecto: presentaciones/YYYY-MM-DD_hoja_musicos.pdf"""
-    default_project_dir = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
-    project_dir = Path(os.environ.get("CCE_PROJECT_DIR", default_project_dir))
-    output_dir = project_dir / "presentaciones"
+    from src.config import settings
+
+    output_dir = settings.project_dir / "presentaciones"
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir / f"{fecha_domingo}_hoja_musicos.pdf"
 

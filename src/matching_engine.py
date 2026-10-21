@@ -15,20 +15,20 @@ Arquitectura separada por responsabilidades:
 from __future__ import annotations
 
 import json
-import os
 import re
 import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from src.config import settings
 from src.log_config import get_logger
 
 logger = get_logger(__name__)
 
 DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 CONFIG_PATH = PROJECT_DIR / "data" / "matching_config.json"
 
 
