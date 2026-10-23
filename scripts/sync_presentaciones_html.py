@@ -3,45 +3,44 @@
 Sincroniza los bundles generados en presentaciones_html/ con web/public/presentaciones_html/.
 
 Uso:
-  python3 scripts/sync_presentaciones_html.py
-  python3 scripts/sync_presentaciones_html.py --fecha 2026-09-27
+  python3 scripts/sync_presentaciones_html.py [--project-dir DIR]
+  python3 scripts/sync_presentaciones_html.py --fecha 2026-09-27 [--project-dir DIR]
 """
 import argparse
-import importlib.util
 import shutil
 import sys
 from pathlib import Path
 
 
-def _load_settings():
-    """Carga src.config.settings sin depender de PYTHONPATH."""
-    project_root = Path(__file__).resolve().parents[1]
-    module_path = project_root / "src" / "config.py"
-    spec = importlib.util.spec_from_file_location("src.config", module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"No se pudo cargar src.config desde {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["src.config"] = module
-    spec.loader.exec_module(module)
-    return module.settings
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Sincroniza presentaciones HTML/PDF/PPTX a web/public"
+    )
+    parser.add_argument(
+        "--project-dir",
+        type=Path,
+        default=None,
+        help="Directorio raíz del proyecto (default: directorio padre de scripts/)",
+    )
+    parser.add_argument(
+        "--fecha", help="Sincroniza solo la fecha indicada (YYYY-MM-DD)"
+    )
+    return parser.parse_args()
 
 
-settings = _load_settings()
+def sincronizar(project_dir: Path, fecha: str | None = None) -> list[Path]:
+    src_dir = project_dir / "presentaciones_html"
+    dst_dir = project_dir / "web" / "public" / "presentaciones_html"
 
-SRC_DIR = settings.project_dir / "presentaciones_html"
-DST_DIR = settings.web_dir / "public" / "presentaciones_html"
-
-
-def sincronizar(fecha: str | None = None) -> list[Path]:
-    if not SRC_DIR.exists():
-        print("No existe fuente:", SRC_DIR, file=sys.stderr)
+    if not src_dir.exists():
+        print("No existe fuente:", src_dir, file=sys.stderr)
         sys.exit(1)
-    DST_DIR.mkdir(parents=True, exist_ok=True)
+    dst_dir.mkdir(parents=True, exist_ok=True)
 
     copiados: list[Path] = []
     if fecha:
-        src = SRC_DIR / f"{fecha}_presentacion"
-        dst = DST_DIR / f"{fecha}_presentacion"
+        src = src_dir / f"{fecha}_presentacion"
+        dst = dst_dir / f"{fecha}_presentacion"
         if not src.exists():
             print(f"No existe bundle para {fecha}", file=sys.stderr)
             sys.exit(1)
@@ -51,10 +50,10 @@ def sincronizar(fecha: str | None = None) -> list[Path]:
         copiados.append(dst)
     else:
         # Copia completa: limpiar destino y volver a copiar todo
-        if DST_DIR.exists():
-            shutil.rmtree(DST_DIR)
-        shutil.copytree(SRC_DIR, DST_DIR)
-        for child in DST_DIR.iterdir():
+        if dst_dir.exists():
+            shutil.rmtree(dst_dir)
+        shutil.copytree(src_dir, dst_dir)
+        for child in dst_dir.iterdir():
             if child.is_dir():
                 copiados.append(child)
 
@@ -64,7 +63,9 @@ def sincronizar(fecha: str | None = None) -> list[Path]:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Sincroniza presentaciones HTML/PDF/PPTX a web/public")
-    parser.add_argument("--fecha", help="Sincroniza solo la fecha indicada (YYYY-MM-DD)")
-    args = parser.parse_args()
-    sincronizar(args.fecha)
+    args = parse_args()
+    if args.project_dir:
+        project_dir = args.project_dir.resolve()
+    else:
+        project_dir = Path(__file__).resolve().parents[1]
+    sincronizar(project_dir, args.fecha)
