@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json as _json
 import logging
 import urllib.request
@@ -14,6 +15,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
+from src.config import settings
 from src.web_admin import models as m
 from src.web_admin.auth import (
     authenticate_user,
@@ -71,16 +73,68 @@ app = FastAPI(
 
 STATIC_DIR = Path(__file__).parent / "static"
 
+# ------------------------------------------------------------------
+# Editores legacy Flask montados bajo FastAPI
+# ------------------------------------------------------------------
+with contextlib.suppress(ImportError):
+    from scripts.editor_acordes_server import app_editor_acordes
+    from scripts.editor_diapositivas_server import app_editor_diapositivas
+    from src.web_admin.wsgi_adapter import PrefixedWSGIMiddleware
+
+    app.add_route(
+        "/editor-acordes/{path:path}",
+        PrefixedWSGIMiddleware(app_editor_acordes, prefix="/editor-acordes"),
+        methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+        include_in_schema=False,
+    )
+    app.add_route(
+        "/editor-diapositivas/{path:path}",
+        PrefixedWSGIMiddleware(app_editor_diapositivas, prefix="/editor-diapositivas"),
+        methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+        include_in_schema=False,
+    )
+
+# ------------------------------------------------------------------
+# Redirecciones de compatibilidad para URLs absolutas antiguas de editores
+# montados bajo FastAPI. Útil mientras caches de navegador o bookmarks
+# siguen apuntando a rutas de la raíz. NO deben capturar endpoints propios
+# de la API FastAPI.
+# ------------------------------------------------------------------
+
+
+@app.get("/cancionero/{path:path}", include_in_schema=False)
+async def redirect_cancionero(path: str):
+    return RedirectResponse(url=f"/editor-acordes/cancionero/{path}", status_code=307)
+
+
+@app.get("/slides/{path:path}", include_in_schema=False)
+async def redirect_slides(path: str):
+    return RedirectResponse(url=f"/editor-diapositivas/slides/{path}", status_code=307)
+
+
+@app.get("/presentaciones/", include_in_schema=False)
+async def redirect_presentaciones_root():
+    return RedirectResponse(url="/editor-diapositivas/presentaciones/", status_code=307)
+
+
+@app.get("/presentacion/{fecha}/armar", include_in_schema=False)
+@app.get("/presentacion/{fecha}/asignar", include_in_schema=False)
+@app.get("/presentacion/{fecha}/preview", include_in_schema=False)
+@app.get("/presentacion/{fecha}/generar", include_in_schema=False)
+@app.get("/presentacion/{fecha}/reconstruir", include_in_schema=False)
+async def redirect_presentacion_operaciones(fecha: str, request: Request):
+    return RedirectResponse(url=f"/editor-diapositivas{request.url.path}", status_code=307)
+
+
+@app.get("/canciones/nueva", include_in_schema=False)
+async def redirect_canciones_nueva():
+    return RedirectResponse(url="/editor-diapositivas/canciones/nueva", status_code=307)
+
+
 # CORS permitido para el origen local del panel admin.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:4321",
-        "http://localhost:4323",
-        "http://192.168.68.244:4321",
-        "http://192.168.68.244:4323",
-    ],
-    allow_credentials=True,
+    allow_origins=settings.cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -178,7 +232,11 @@ async def crear_comentario(payload: ComentarioRequest):
         logger.warning("Intento de comentario sin GITHUB_TOKEN_COMENTARIOS configurado")
         raise HTTPException(status_code=503, detail="Servicio de comentarios no configurado")
 
-    tipo_label = {"sugerencia": "🎵 Sug. musical", "correccion": "✏️ Corrección", "otro": "💬 Otro"}.get(payload.tipo, "💬 Otro")
+    tipo_label = {
+        "sugerencia": "🎵 Sug. musical",
+        "correccion": "✏️ Corrección",
+        "otro": "💬 Otro",
+    }.get(payload.tipo, "💬 Otro")
     title = f"[Comentario] {tipo_label}{f' - Domingo {payload.presentacion}' if payload.presentacion else ''}".strip()
     body = (
         f"**Autor**: {payload.nombre or 'Anónimo'}\n"
@@ -188,8 +246,12 @@ async def crear_comentario(payload: ComentarioRequest):
         f"**Mensaje**:\n{payload.mensaje}"
     )
 
-    data = _json.dumps({"title": title, "body": body, "labels": ["web-comment", "pendiente"]}).encode("utf-8")
-    url = f"https://api.github.com/repos/{GITHUB_COMENTARIOS_OWNER}/{GITHUB_COMENTARIOS_REPO}/issues"
+    data = _json.dumps(
+        {"title": title, "body": body, "labels": ["web-comment", "pendiente"]}
+    ).encode("utf-8")
+    url = (
+        f"https://api.github.com/repos/{GITHUB_COMENTARIOS_OWNER}/{GITHUB_COMENTARIOS_REPO}/issues"
+    )
     req = urllib.request.Request(
         url,
         data=data,
@@ -206,7 +268,9 @@ async def crear_comentario(payload: ComentarioRequest):
             resp.read()
     except urllib.error.HTTPError as exc:
         logger.error("GitHub rechazó el comentario: %s %s", exc.code, exc.reason)
-        raise HTTPException(status_code=502, detail="No se pudo enviar el comentario a GitHub") from exc
+        raise HTTPException(
+            status_code=502, detail="No se pudo enviar el comentario a GitHub"
+        ) from exc
     except Exception as exc:
         logger.exception("Error enviando comentario a GitHub")
         raise HTTPException(status_code=502, detail="Error de conexión con GitHub") from exc

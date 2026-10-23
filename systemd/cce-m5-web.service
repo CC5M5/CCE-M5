@@ -1,0 +1,14 @@
+[Unit]
+Description=CCE-M5 Web Static Server
+After=network.target cce-m5-admin.service
+
+[Service]
+Type=simple
+WorkingDirectory=%h/proyectos/CCE-M5-Web-Presentaciones/web/dist
+ExecStart=/usr/bin/python3 -m http.server 4321
+Restart=always
+RestartSec=5
+Environment="HOME=%h"
+
+[Install]
+WantedBy=default.target

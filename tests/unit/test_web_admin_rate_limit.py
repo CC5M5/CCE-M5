@@ -84,6 +84,7 @@ def test_login_rate_limiter_record_success() -> None:
 
 
 def test_login_rate_limiter_uses_redis_when_env(monkeypatch) -> None:
+    import importlib
     from unittest.mock import patch
 
     fake_redis = MagicMock()
@@ -93,8 +94,15 @@ def test_login_rate_limiter_uses_redis_when_env(monkeypatch) -> None:
     fake_module = MagicMock()
     fake_module.Redis.from_url.return_value = fake_redis
 
+    # Recargar src.config primero para que settings.redis_url se actualice
+    from src import config as core_config
+    from src.web_admin import rate_limit as rl_mod
+
+    importlib.reload(core_config)
+    importlib.reload(rl_mod)
+
     with patch.dict("sys.modules", {"redis": fake_module}):
-        limiter = LoginRateLimiter()
+        limiter = rl_mod.LoginRateLimiter()
         req = fake_request()
         assert limiter.is_blocked(req, "charlie") is False
         limiter.record_failure(req, "charlie")

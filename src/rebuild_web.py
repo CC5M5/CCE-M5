@@ -20,18 +20,20 @@ from __future__ import annotations
 import os
 import subprocess
 import time
-from pathlib import Path
 
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path(__file__).resolve().parents[1]))
-NODE_BIN = os.environ.get("CCE_NODE_BIN", "/usr/bin")
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+NODE_BIN = settings.node_bin
+WEB_DIR = settings.web_dir
 
 
 def rebuild_web() -> str:
     """Exporta datos, reconstruye Astro y reinicia el servidor web en 4321."""
     try:
         env = os.environ.copy()
-        env["BASE_PATH"] = os.environ.get("CCE_BASE_PATH", "/")
-        env["SITE_URL"] = os.environ.get("CCE_SITE_URL", "http://localhost:4321")
+        env["BASE_PATH"] = settings.base_path
+        env["SITE_URL"] = settings.site_url
         env["PATH"] = f"{NODE_BIN}:{env.get('PATH', '')}"
 
         export_script = PROJECT_DIR / "scripts" / "export_data_for_web.py"

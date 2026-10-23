@@ -1,0 +1,43 @@
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["/app/.venv/bin/python", "scripts/run_admin_api.py", "--host", "0.0.0.0", "--port", "4323"]
+    ports:
+      - "4323:4323"
+    volumes:
+      - ./data:/app/data
+      - ./backups:/app/backups
+      - ./assets:/app/assets
+      - ./presentaciones_html:/app/presentaciones_html
+      - ./.env:/app/.env:ro
+    environment:
+      - CCE_PROJECT_DIR=/app
+      - CCE_ADMIN_HOST=0.0.0.0
+      - CCE_ADMIN_PORT=4323
+      - EDITOR_ACORDES_HOST=0.0.0.0
+      - EDITOR_ACORDES_PORT=4322
+      - EDITOR_HOST=0.0.0.0
+      - EDITOR_PORT=4324
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4323/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python3", "-m", "http.server", "4321", "--directory", "/app/web/dist"]
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./web/dist:/app/web/dist:ro
+    depends_on:
+      admin:
+        condition: service_healthy
+    restart: unless-stopped

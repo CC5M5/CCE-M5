@@ -25,7 +25,6 @@ import html as html_module
 import json
 import os
 import re
-import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -38,6 +37,7 @@ from src.canciones_manager import (
     CancionCreateUpdate,
     crear_cancion,
 )
+from src.config import settings
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -47,14 +47,26 @@ from src.generators.composicion_catalogo import (
     proponer_composicion,
 )
 from src.rebuild_web import rebuild_web
+from src.web_admin.editores import (
+    get_connection,
+    get_momentos_cancion,
+    git_commit,
+    set_momentos_cancion,
+)
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
+ILUSTRACIONES_DIR = settings.data_dir / "ilustraciones"
 CATALOGO_PATH = ILUSTRACIONES_DIR / "catalogo.json"
-LEMA_PATH = PROJECT_DIR / "data" / "lemas" / "somos_uno.jpg"
+LEMA_PATH = settings.data_dir / "lemas" / "somos_uno.jpg"
 
-app = Flask(__name__)
+app_editor_diapositivas = Flask(__name__)
+
+
+def _root() -> str:
+    """Prefijo del editor bajo FastAPI (request.script_root)."""
+    return request.script_root or ""
+
 
 COLORES_LITURGICOS = {
     "verde": {"from": "#e8f5e9", "to": "#c8e6c9", "acento": "#2e7d32"},
@@ -66,65 +78,9 @@ COLORES_LITURGICOS = {
 }
 
 
-def _get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 def _git_commit(mensaje: str) -> str:
-    try:
-        subprocess.run(
-            ["git", "add", "data/db.sqlite3"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        # Si no hay nada staged, no hay nada que commitear (p. ej. BD sin cambios reales)
-        diff_check = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            cwd=PROJECT_DIR,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if diff_check.returncode == 0:
-            return "sin cambios"
-
-        result = subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"chore(slides): {mensaje}",
-                "-m",
-                "Actualización manual desde editor local de diapositivas.",
-            ],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        subprocess.run(
-            ["git", "push", "origin", "main"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
-        return m.group(1) if m else "commit OK"
-    except subprocess.CalledProcessError as exc:
-        err = exc.stderr or exc.stdout or ""
-        if (
-            "nothing to commit" in err
-            or "working tree clean" in err
-            or "No changes" in err
-            or "sin cambios agregados" in err
-        ):
-            return "sin cambios"
-        return f"ERROR: {err}"
+    """Delega en helper compartido de commit automático."""
+    return git_commit(f"chore(slides): {mensaje}")
 
 
 def _listar_ilustraciones() -> list[str]:
@@ -141,35 +97,8 @@ def _listar_ilustraciones() -> list[str]:
     return resultado
 
 
-def _get_momentos_cancion(cancion_id: int) -> list[str]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
-        (cancion_id,),
-    )
-    rows = [r["momento_liturgico"] for r in cursor.fetchall()]
-    conn.close()
-    return rows
-
-
-def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
-    for m in momentos:
-        m = m.strip().lower()
-        if m:
-            cursor.execute(
-                "INSERT OR IGNORE INTO cancion_momentos (cancion_id, momento_liturgico) VALUES (?, ?)",
-                (cancion_id, m),
-            )
-    conn.commit()
-    conn.close()
-
-
 def _tipos() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, nombre, descripcion, orden FROM slides_tipos ORDER BY orden")
     tipos = [
@@ -181,7 +110,7 @@ def _tipos() -> list[dict[str, Any]]:
 
 
 def _get_slides(tipo: str | None = None) -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     if tipo:
         cursor.execute(
@@ -208,7 +137,7 @@ def _get_slides(tipo: str | None = None) -> list[dict[str, Any]]:
 
 
 def _get_slide(id: int) -> dict[str, Any] | None:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM slides WHERE id = ?", (id,))
     row = cursor.fetchone()
@@ -219,7 +148,7 @@ def _get_slide(id: int) -> dict[str, Any] | None:
 
 
 def _get_presentaciones() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT p.fecha_domingo, l.celebracion, l.color_liturgico, p.estado,
@@ -255,7 +184,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
     else:
         imagen_url = imagen or ""
 
-    lema_url = "/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
+    lema_url = "{_root()}/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
 
     clase = tipo
     if tipo in (
@@ -286,9 +215,9 @@ def _render_preview(slide: dict[str, Any]) -> str:
 
         inner = ""
         if slide.get("momento"):
-            inner += f'<h3>{html_module.escape(slide["momento"])}{f" ({idx}/{total})" if total > 1 else ""}</h3>\n'
+            inner += f"<h3>{html_module.escape(slide['momento'])}{f' ({idx}/{total})' if total > 1 else ''}</h3>\n"
         if titulo:
-            inner += f'<h1>{titulo}{f" ({idx}/{total})" if total > 1 else ""}</h1>\n'
+            inner += f"<h1>{titulo}{f' ({idx}/{total})' if total > 1 else ''}</h1>\n"
         if subtitulo:
             inner += f"<h2>{subtitulo}</h2>\n"
         if cita:
@@ -297,13 +226,13 @@ def _render_preview(slide: dict[str, Any]) -> str:
             inner += f'<div class="contenido">{contenido}</div>\n'
 
         return f"""
-        <div class="preview-frame {clase}" style="--liturgia-from:{color_info['from']};--liturgia-to:{color_info['to']};--liturgia-acento:{color_info['acento']};">
+        <div class="preview-frame {clase}" style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};">
           <div class="slide-wrapper">
-            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ''}
+            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ""}
             <div class="tarjeta">
               {inner}
             </div>
-            {f'<img class="logo-lema" src="{lema_url}" alt="Somos uno">' if lema_url else ''}
+            {f'<img class="logo-lema" src="{lema_url}" alt="Somos uno">' if lema_url else ""}
           </div>
         </div>
         """
@@ -325,11 +254,20 @@ def _render_base(
         f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
     )
     _listar_ilustraciones()
+    # Compatibilidad con montaje bajo FastAPI en path prefix.
+    try:
+        from flask import request
+
+        script_root = request.script_root or ""
+    except Exception:
+        script_root = ""
+    base_href = f'<base href="{html_module.escape(script_root)}/">' if script_root else ""
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {base_href}
   <title>{html_module.escape(title)} - Editor Diapositivas CCE-M5</title>
   <style>
     :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; }}
@@ -398,9 +336,9 @@ def _render_base(
     <h1>🖼️ Editor de Diapositivas CCE-M5</h1>
     <p>Edición local del catálogo de diapositivas y presentaciones semanales.</p>
     <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
-      <a href="/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
-      <a href="/canciones/nueva" style="text-decoration:none;background:#10b981;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">🎵 Añadir canción al cancionero</a>
+      <a href="{_root()}/" style="text-decoration:none;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📑 Catálogo de diapositivas</a>
+      <a href="{_root()}/presentaciones/" style="text-decoration:none;background:#475569;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">📅 Presentaciones semanales</a>
+      <a href="{_root()}/canciones/nueva" style="text-decoration:none;background:#10b981;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">🎵 Añadir canción al cancionero</a>
     </nav>
   </header>
   <div class="container">
@@ -417,7 +355,7 @@ def _render_base(
 </html>"""
 
 
-@app.route("/")
+@app_editor_diapositivas.route("/")
 def index():
     tipos = _tipos()
     sidebar_parts = []
@@ -426,23 +364,27 @@ def index():
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details open><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
     content = "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
     return _render_base("Diapositivas", sidebar, content)
 
 
-@app.route("/slides/")
+@app_editor_diapositivas.route("/slides/")
 def index_slash_redirect():
-    return redirect("/", code=302)
+    """Compatibilidad con montaje bajo FastAPI: redirige a /editor-diapositivas/."""
+    from flask import request
+
+    prefix = request.environ.get("SCRIPT_NAME", "")
+    return redirect(f"{prefix}/", code=302)
 
 
-@app.route("/slides/<int:id>")
+@app_editor_diapositivas.route("/slides/<int:id>")
 def editar(id: int):
     slide = _get_slide(id)
     if slide is None:
@@ -457,11 +399,11 @@ def editar(id: int):
 
         def _link_for(s):
             active = ' class="active"' if s["id"] == id else ""
-            return f'<a href="/slides/{s["id"]}"{active}>{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            return f'<a href="{_root()}/slides/{s["id"]}"{active}>{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
 
         links = "\n".join(_link_for(s) for s in slides)
         sidebar_parts.append(
-            f'<details open><summary>{html_module.escape(t["nombre"])}</summary>{links}</details>'
+            f"<details open><summary>{html_module.escape(t['nombre'])}</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
@@ -493,7 +435,7 @@ def editar(id: int):
         nombre_completo = html_module.escape(Path(img).name)
         return f"""<label data-artista="{artista}" data-nombre="{html_module.escape(Path(img).name.lower())}">
           <input type="radio" name="imagen" value="{html_module.escape(img)}" {"checked" if img == imagen_actual else ""}>
-          <img src="/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
+          <img src="{_root()}/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
           <small title="{nombre_completo}">{nombre}</small>
         </label>"""
 
@@ -501,32 +443,32 @@ def editar(id: int):
 
     preview = _render_preview(slide)
 
-    content = f"""<h2>Editar diapositiva #{slide['id']}</h2>
-    <form method="post" action="/slides/{slide['id']}/guardar" id="editor-form">
+    content = f"""<h2>Editar diapositiva #{slide["id"]}</h2>
+    <form method="post" action="{_root()}/slides/{slide["id"]}/guardar" id="editor-form">
       <div class="two-col">
         <div>
           <label>Tipo</label>
           <select name="tipo">{tipo_options}</select>
 
           <label>Subtipo / variante</label>
-          <input type="text" name="subtipo" value="{html_module.escape(slide.get('subtipo') or 'general')}">
+          <input type="text" name="subtipo" value="{html_module.escape(slide.get("subtipo") or "general")}">
 
-          <label><input type="checkbox" name="es_default" value="1" {"checked" if slide.get('es_default') else ""}> Es la variante por defecto</label>
+          <label><input type="checkbox" name="es_default" value="1" {"checked" if slide.get("es_default") else ""}> Es la variante por defecto</label>
 
           <label>Título</label>
-          <input type="text" name="titulo" value="{html_module.escape(slide.get('titulo') or '')}">
+          <input type="text" name="titulo" value="{html_module.escape(slide.get("titulo") or "")}">
 
           <label>Subtítulo</label>
-          <input type="text" name="subtitulo" value="{html_module.escape(slide.get('subtitulo') or '')}">
+          <input type="text" name="subtitulo" value="{html_module.escape(slide.get("subtitulo") or "")}">
 
           <label>Cita</label>
-          <input type="text" name="cita" value="{html_module.escape(slide.get('cita') or '')}">
+          <input type="text" name="cita" value="{html_module.escape(slide.get("cita") or "")}">
 
           <label>Color litúrgico (para preview)</label>
           <select name="color_liturgico">{color_options}</select>
 
           <label>Contenido</label>
-          <textarea name="contenido" id="contenido">{html_module.escape(slide.get('contenido') or '')}</textarea>
+          <textarea name="contenido" id="contenido">{html_module.escape(slide.get("contenido") or "")}</textarea>
 
           <div class="toolbar">
             <button type="button" onclick="insertarSplit()">➗ Dividir aquí</button>
@@ -538,11 +480,11 @@ def editar(id: int):
           <div class="miniaturas">{miniaturas}</div>
 
           <label>Notas internas</label>
-          <textarea name="notas" style="min-height:80px">{html_module.escape(slide.get('notas') or '')}</textarea>
+          <textarea name="notas" style="min-height:80px">{html_module.escape(slide.get("notas") or "")}</textarea>
 
           <div class="toolbar">
             <button type="submit">💾 Guardar y commitear</button>
-            <button type="submit" formaction="/slides/{slide['id']}/duplicar" class="secondary">📄 Duplicar</button>
+            <button type="submit" formaction="{_root()}/slides/{slide["id"]}/duplicar" class="secondary">📄 Duplicar</button>
           </div>
         </div>
         <div>
@@ -586,7 +528,7 @@ def editar(id: int):
     return _render_base(slide.get("titulo") or "Diapositiva", sidebar, content)
 
 
-@app.route("/slides/<int:id>/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/slides/<int:id>/guardar", methods=["POST"])
 def guardar(id: int):
     slide = _get_slide(id)
     if slide is None:
@@ -606,7 +548,7 @@ def guardar(id: int):
         "activo": 1,
     }
 
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -645,13 +587,13 @@ def guardar(id: int):
     return editar_con_mensaje(id, mensaje, clase)
 
 
-@app.route("/slides/<int:id>/duplicar", methods=["POST"])
+@app_editor_diapositivas.route("/slides/<int:id>/duplicar", methods=["POST"])
 def duplicar(id: int):
     slide = _get_slide(id)
     if slide is None:
         abort(404)
 
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -701,7 +643,7 @@ def editar_con_mensaje(id: int, mensaje: str, clase: str):
     return html
 
 
-@app.route("/__ilustraciones/<path:filename>")
+@app_editor_diapositivas.route("/__ilustraciones/<path:filename>")
 def ilustracion(filename: str):
     from flask import send_file
 
@@ -714,7 +656,7 @@ def ilustracion(filename: str):
     abort(404)
 
 
-@app.route("/__lema/<path:filename>")
+@app_editor_diapositivas.route("/__lema/<path:filename>")
 def lema(filename: str):
     if LEMA_PATH.exists():
         from flask import send_file
@@ -723,7 +665,7 @@ def lema(filename: str):
     abort(404)
 
 
-@app.route("/presentaciones_html/<path:filename>")
+@app_editor_diapositivas.route("/presentaciones_html/<path:filename>")
 def presentaciones_html_file(filename: str):
     base = PROJECT_DIR / "presentaciones_html"
     target = (base / filename).resolve()
@@ -742,7 +684,7 @@ def presentaciones_html_file(filename: str):
 
 
 def _get_lectura_por_fecha(fecha: str) -> dict[str, Any] | None:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "SELECT id, fecha, celebracion, color_liturgico FROM lecturas WHERE fecha = ?", (fecha,)
@@ -758,7 +700,7 @@ def _crear_presentacion_desde_lectura(fecha: str) -> dict[str, Any] | None:
     lectura = _get_lectura_por_fecha(fecha)
     if not lectura:
         return None
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -834,7 +776,7 @@ def _generar_presentacion(fecha: str) -> str:
         build_ok = f" | ⚠️ web build falló: {exc.stderr or exc.stdout}"
     # Marcar estado como publicado
     try:
-        conn = _get_connection()
+        conn = get_connection()
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE presentaciones SET estado = 'publicado' WHERE fecha_domingo = ?",
@@ -883,7 +825,7 @@ def _generar_presentacion(fecha: str) -> str:
     return f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
 
 
-@app.route("/canciones/nueva")
+@app_editor_diapositivas.route("/canciones/nueva")
 def nueva_cancion_diapositivas():
     momentos_checks = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}"> {html_module.escape(m.replace("_", " ").title())}</label>'
@@ -895,7 +837,7 @@ def nueva_cancion_diapositivas():
       El cancionero web usa fuente monoespaciada (Courier New).
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/canciones/nueva/guardar">
+    <form method="post" action="{_root()}/canciones/nueva/guardar">
       <div style="margin-bottom:12px;">
         <label><strong>Título</strong></label>
         <input type="text" name="titulo" placeholder="Título de la canción" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
@@ -917,7 +859,7 @@ def nueva_cancion_diapositivas():
     return _render_base("Nueva canción", "", content)
 
 
-@app.route("/canciones/nueva/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/canciones/nueva/guardar", methods=["POST"])
 def guardar_nueva_cancion_diapositivas():
     titulo = request.form.get("titulo", "").strip()
     texto = request.form.get("texto", "")
@@ -975,7 +917,7 @@ def _get_composicion_guardada(fecha: str) -> list[dict[str, Any]]:
     pres = _get_presentacion_por_fecha(fecha)
     if not pres:
         return []
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -1008,7 +950,7 @@ def _formatear_fecha_preview(fecha: str) -> str:
         return fecha
 
 
-@app.route("/presentaciones/")
+@app_editor_diapositivas.route("/presentaciones/")
 def listar_presentaciones():
     tipos = _tipos()
     sidebar_parts = []
@@ -1017,11 +959,11 @@ def listar_presentaciones():
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details open><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details open><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
@@ -1039,14 +981,14 @@ def listar_presentaciones():
         return f'<span style="display:inline-block;padding:3px 8px;border-radius:6px;background:{color};color:#fff;font-size:12px;font-weight:600;">{label}</span>'
 
     filas = "\n".join(
-        f'<tr><td><a href="/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td><td><a href="/presentacion/{p["fecha_domingo"]}/asignar">🎵 Asignar canciones</a></td></tr>'
+        f'<tr><td><a href="{_root()}/presentacion/{p["fecha_domingo"]}/armar">{p["fecha_domingo"]}</a></td><td>{html_module.escape(p["celebracion"] or "-")}</td><td>{html_module.escape(p["color_liturgico"] or "-")}</td><td>{p["num_slides"]}</td><td>{_badge_estado(p["estado"] or "borrador")}</td><td><a href="{_root()}/presentacion/{p["fecha_domingo"]}/asignar">🎵 Asignar canciones</a></td></tr>'
         for p in pres
     )
     content = f"""<h2>Presentaciones semanales</h2>
     <p>Selecciona una fecha para armar la composición de diapositivas desde el catálogo.</p>
     <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="/presentaciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Nueva presentación</a>
-      <a href="/canciones/nueva" style="text-decoration:none;background:#475569;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
+      <a href="{_root()}/presentaciones/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Nueva presentación</a>
+      <a href="{_root()}/canciones/nueva" style="text-decoration:none;background:#475569;color:#fff;padding:10px 16px;border-radius:8px;font-size:15px;display:inline-block;">➕ Añadir canción al cancionero</a>
     </div>
     <table style="width:100%;border-collapse:collapse">
       <thead>
@@ -1057,7 +999,7 @@ def listar_presentaciones():
     return _render_base("Presentaciones", sidebar, content)
 
 
-@app.route("/presentacion/<fecha>/armar")
+@app_editor_diapositivas.route("/presentacion/<fecha>/armar")
 def armar_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1086,11 +1028,11 @@ def armar_presentacion(fecha: str):
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
@@ -1099,7 +1041,7 @@ def armar_presentacion(fecha: str):
         variantes = variantes_para(item["tipo"])
         opts = "\n".join(
             f'<option value="{html_module.escape(v["subtipo"])}" {"selected" if v["subtipo"] == item["subtipo"] else ""}>'
-            f'{html_module.escape(v["titulo"])} ({html_module.escape(v["subtipo"])}{" ★" if v["es_default"] else ""})</option>'
+            f"{html_module.escape(v['titulo'])} ({html_module.escape(v['subtipo'])}{' ★' if v['es_default'] else ''})</option>"
             for v in variantes
         )
         filas.append(f"""
@@ -1130,11 +1072,11 @@ def armar_presentacion(fecha: str):
     content = f"""<h2>Armar presentación {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")} | <span style="font-weight:600;">{estado_label}</span></p>
     <p><a href="/presentaciones_html/{fecha}_presentacion/index.html" target="_blank">🔍 Previsualizar presentación</a> |
-    <a href="/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
-    <a href="/presentacion/{fecha}/asignar">🎵 Asignar canciones</a> |
-    <a href="/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a> |
-    <a href="/presentacion/{fecha}/reconstruir" style="color:#b91c1c;font-weight:600;">🔄 Reconstruir desde canciones asignadas</a></p>
-    <form method="post" action="/presentacion/{fecha}/guardar">
+    <a href="{_root()}/presentacion/{fecha}/preview" target="_blank">📋 Storyboard</a> |
+    <a href="{_root()}/presentacion/{fecha}/asignar">🎵 Asignar canciones</a> |
+    <a href="{_root()}/presentacion/{fecha}/generar">{gen_label} PPTX/HTML/PDF</a> |
+    <a href="{_root()}/presentacion/{fecha}/reconstruir" style="color:#b91c1c;font-weight:600;">🔄 Reconstruir desde canciones asignadas</a></p>
+    <form method="post" action="{_root()}/presentacion/{fecha}/guardar">
       <table style="width:100%;border-collapse:collapse;margin-bottom:15px">
         <thead>
           <tr style="text-align:left;border-bottom:2px solid #ddd"><th>Nº</th><th>Tipo</th><th>Variante</th><th>Título</th><th>Activo</th></tr>
@@ -1147,7 +1089,7 @@ def armar_presentacion(fecha: str):
     return _render_base(f"Armar {fecha}", sidebar, content)
 
 
-@app.route("/presentacion/<fecha>/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/presentacion/<fecha>/guardar", methods=["POST"])
 def guardar_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1205,7 +1147,7 @@ def guardar_presentacion(fecha: str):
     return body, status
 
 
-@app.route("/presentacion/<fecha>/reconstruir")
+@app_editor_diapositivas.route("/presentacion/<fecha>/reconstruir")
 def reconstruir_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1232,7 +1174,7 @@ def reconstruir_presentacion(fecha: str):
     return body, status
 
 
-@app.route("/presentacion/<fecha>/generar")
+@app_editor_diapositivas.route("/presentacion/<fecha>/generar")
 def generar_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1253,7 +1195,7 @@ def generar_presentacion(fecha: str):
     return body, status
 
 
-@app.route("/presentaciones_html/<path:subpath>")
+@app_editor_diapositivas.route("/presentaciones_html/<path:subpath>")
 def servir_presentacion_html(subpath: str):
     """Sirve archivos estáticos generados (HTML, PDF, PPTX, imágenes, etc.)."""
     from flask import send_from_directory
@@ -1273,7 +1215,7 @@ def servir_presentacion_html(subpath: str):
     return send_from_directory(str(file_path.parent), file_path.name)
 
 
-@app.route("/presentacion/<fecha>/preview")
+@app_editor_diapositivas.route("/presentacion/<fecha>/preview")
 def preview_presentacion(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1338,9 +1280,9 @@ def preview_presentacion(fecha: str):
 # ------------------------------------------------------------------
 
 
-@app.route("/cancion/<int:cancion_id>/momentos")
+@app_editor_diapositivas.route("/cancion/<int:cancion_id>/momentos")
 def editar_momentos_cancion(cancion_id: int):
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, titulo FROM canciones WHERE id = ?", (cancion_id,))
     row = cursor.fetchone()
@@ -1348,7 +1290,7 @@ def editar_momentos_cancion(cancion_id: int):
     if not row:
         abort(404)
 
-    momentos_actuales = _get_momentos_cancion(cancion_id)
+    momentos_actuales = get_momentos_cancion(cancion_id)
     checkboxes = "\n".join(
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in momentos_actuales else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
         for m in MOMENTOS_LITURGICOS
@@ -1361,30 +1303,30 @@ def editar_momentos_cancion(cancion_id: int):
         if not slides:
             continue
         links = "\n".join(
-            f'<a href="/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
+            f'<a href="{_root()}/slides/{s["id"]}">{html_module.escape(s["titulo"] or "(sin título)")} <small>({html_module.escape(s["subtipo"])}{" ★" if s["es_default"] else ""})</small></a>'
             for s in slides
         )
         sidebar_parts.append(
-            f'<details><summary>{html_module.escape(t["nombre"])} ({len(slides)})</summary>{links}</details>'
+            f"<details><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
 
     content = f"""<h2>Momentos litúrgicos: {html_module.escape(row["titulo"])}</h2>
     <p>Momentos actuales: <strong>{html_module.escape(", ".join(momentos_actuales).title() or "(ninguno)")}</strong></p>
-    <form method="post" action="/cancion/{cancion_id}/momentos/guardar">
+    <form method="post" action="{_root()}/cancion/{cancion_id}/momentos/guardar">
       <div style="margin-bottom:15px;">
         {checkboxes}
       </div>
       <button type="submit">💾 Guardar momentos</button>
     </form>
-    <p><a href="/">← Volver al listado de slides</a></p>
+    <p><a href="{_root()}/">← Volver al listado de slides</a></p>
     """
     return _render_base(f"Momentos - {row['titulo']}", sidebar, content)
 
 
-@app.route("/cancion/<int:cancion_id>/momentos/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/cancion/<int:cancion_id>/momentos/guardar", methods=["POST"])
 def guardar_momentos_cancion(cancion_id: int):
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, titulo FROM canciones WHERE id = ?", (cancion_id,))
     row = cursor.fetchone()
@@ -1393,11 +1335,11 @@ def guardar_momentos_cancion(cancion_id: int):
         abort(404)
 
     nuevos_momentos = request.form.getlist("momentos")
-    _set_momentos_cancion(cancion_id, nuevos_momentos)
+    set_momentos_cancion(cancion_id, nuevos_momentos)
 
     # Actualizar campo legacy
     momento_legacy = nuevos_momentos[0] if nuevos_momentos else ""
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE canciones SET momento_liturgico = ? WHERE id = ?", (momento_legacy, cancion_id)
@@ -1430,7 +1372,7 @@ def guardar_momentos_cancion(cancion_id: int):
 
 
 def _listar_lecturas() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT fecha, domingo, celebracion, color_liturgico FROM lecturas
@@ -1443,7 +1385,7 @@ def _listar_lecturas() -> list[dict[str, Any]]:
 
 
 def _listar_canciones_para_selector() -> list[dict[str, Any]]:
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
@@ -1459,7 +1401,7 @@ def _listar_canciones_para_selector() -> list[dict[str, Any]]:
     return rows
 
 
-@app.route("/presentaciones/nueva")
+@app_editor_diapositivas.route("/presentaciones/nueva")
 def nueva_presentacion():
     lecturas = _listar_lecturas()
     canciones = _listar_canciones_para_selector()
@@ -1502,7 +1444,7 @@ def nueva_presentacion():
     content = f"""
     <h2>➕ Nueva presentación</h2>
     <p>Selecciona la fecha y las canciones para cada momento musical. Se creará la presentación y se propondrá la composición desde el catálogo.</p>
-    <form method="post" action="/presentaciones/nueva/guardar">
+    <form method="post" action="{_root()}/presentaciones/nueva/guardar">
         <div style="margin-bottom:12px;">
             <label><strong>Fecha (lectura)</strong></label>
             <select name="fecha" required style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:14px;">{lectura_options}</select>
@@ -1514,7 +1456,7 @@ def nueva_presentacion():
     return _render_base("Nueva presentación", "", content)
 
 
-@app.route("/presentaciones/nueva/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/presentaciones/nueva/guardar", methods=["POST"])
 def guardar_nueva_presentacion():
     fecha = request.form.get("fecha", "").strip()
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
@@ -1557,7 +1499,7 @@ def guardar_nueva_presentacion():
     canciones_json = json.dumps(canciones_asignadas)
 
     # Crear presentación
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -1597,7 +1539,7 @@ def guardar_nueva_presentacion():
 # ------------------------------------------------------------------
 
 
-@app.route("/presentacion/<fecha>/asignar")
+@app_editor_diapositivas.route("/presentacion/<fecha>/asignar")
 def asignar_canciones(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1658,16 +1600,16 @@ def asignar_canciones(fecha: str):
     <h2>🎵 Asignar canciones para {fecha}</h2>
     <p><strong>{html_module.escape(pres.get("celebracion") or "-")}</strong> | Color: {html_module.escape(pres.get("color_liturgico") or "-")}</p>
     <p>Cambia las canciones asignadas y guarda para reconstruir la composición.</p>
-    <form method="post" action="/presentacion/{fecha}/asignar/guardar">
+    <form method="post" action="{_root()}/presentacion/{fecha}/asignar/guardar">
         {momentos_html}
         <button type="submit">💾 Guardar asignación y reconstruir</button>
     </form>
-    <p><a href="/presentacion/{fecha}/armar">← Volver a armar presentación</a></p>
+    <p><a href="{_root()}/presentacion/{fecha}/armar">← Volver a armar presentación</a></p>
     """
     return _render_base(f"Asignar canciones {fecha}", "", content)
 
 
-@app.route("/presentacion/<fecha>/asignar/guardar", methods=["POST"])
+@app_editor_diapositivas.route("/presentacion/<fecha>/asignar/guardar", methods=["POST"])
 def guardar_asignacion_canciones(fecha: str):
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", fecha):
         abort(400)
@@ -1714,7 +1656,7 @@ def guardar_asignacion_canciones(fecha: str):
     canciones_json = json.dumps(canciones_asignadas)
 
     # Actualizar presentación
-    conn = _get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE presentaciones SET canciones_json = ? WHERE id = ?", (canciones_json, pres["id"])
@@ -1746,7 +1688,7 @@ def guardar_asignacion_canciones(fecha: str):
 def main():
     host = os.environ.get("EDITOR_HOST", "0.0.0.0")
     port = int(os.environ.get("EDITOR_PORT", "4323"))
-    app.run(host=host, port=port, debug=False)
+    app_editor_diapositivas.run(host=host, port=port, debug=False)
 
 
 if __name__ == "__main__":

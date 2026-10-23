@@ -2,13 +2,13 @@
 """Exporta datos de SQLite a JSON para el build estático de Astro."""
 
 import json
-import os
 import sqlite3
-from pathlib import Path
 
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", Path(__file__).parent.parent.resolve()))
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-WEB_DATA_DIR = PROJECT_DIR / "web" / "data"
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
+WEB_DATA_DIR = settings.web_dir / "data"
 
 
 def get_connection():

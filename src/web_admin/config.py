@@ -1,24 +1,40 @@
-"""Configuración del panel de administración."""
-
-from __future__ import annotations
-
 import logging
 import os
 import secrets
-from pathlib import Path
+
+import src.config as _core_config
 
 logger = logging.getLogger(__name__)
 
-# Rutas del proyecto
-DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))
-DATA_DIR = PROJECT_DIR / "data"
-DB_PATH = DATA_DIR / "db.sqlite3"
-BACKUPS_DIR = PROJECT_DIR / "backups"
-
-# Auth
 JWT_ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get("CCE_ADMIN_TOKEN_TTL", "480"))
+
+
+def __getattr__(name: str):
+    """Delega la lectura de variables a src.config.settings."""
+    s = _core_config.settings
+    if name == "PROJECT_DIR":
+        return s.project_dir
+    if name == "DATA_DIR":
+        return s.data_dir
+    if name == "DB_PATH":
+        return s.db_path
+    if name == "BACKUPS_DIR":
+        return s.backups_dir
+    if name == "ACCESS_TOKEN_EXPIRE_MINUTES":
+        return s.jwt_ttl_minutes
+    if name == "DEFAULT_ADMIN_USERNAME":
+        return s.default_admin_username
+    if name == "DEFAULT_ADMIN_PASSWORD":
+        return s.default_admin_password
+    if name == "DEFAULT_ADMIN_NAME":
+        return s.default_admin_name
+    if name == "GITHUB_TOKEN_COMENTARIOS":
+        return s.github_token_comentarios
+    if name == "GITHUB_COMENTARIOS_OWNER":
+        return s.github_comentarios_owner
+    if name == "GITHUB_COMENTARIOS_REPO":
+        return s.github_comentarios_repo
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def _load_jwt_secret() -> str:
@@ -32,7 +48,8 @@ def _load_jwt_secret() -> str:
             )
         return env_secret
 
-    secret_file = DATA_DIR / ".admin_jwt_secret"
+    s = _core_config.settings
+    secret_file = s.data_dir / ".admin_jwt_secret"
     try:
         if secret_file.exists():
             return secret_file.read_text().strip()
@@ -41,7 +58,7 @@ def _load_jwt_secret() -> str:
 
     generated = secrets.token_urlsafe(48)
     try:
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        s.data_dir.mkdir(parents=True, exist_ok=True)
         secret_file.write_text(generated)
         logger.warning(
             "No se definió CCE_ADMIN_JWT_SECRET. Se generó un secreto aleatorio en %s "
@@ -54,13 +71,3 @@ def _load_jwt_secret() -> str:
 
 
 JWT_SECRET = _load_jwt_secret()
-
-# Usuario inicial por defecto (debe cambiarse en producción)
-DEFAULT_ADMIN_USERNAME = os.environ.get("CCE_ADMIN_DEFAULT_USER", "rafael.torres")
-DEFAULT_ADMIN_PASSWORD = os.environ.get("CCE_ADMIN_DEFAULT_PASSWORD", "1234")
-DEFAULT_ADMIN_NAME = os.environ.get("CCE_ADMIN_DEFAULT_NAME", "Rafael Torres")
-
-# GitHub para proxy de comentarios (se mantiene en servidor, nunca expuesto al navegador)
-GITHUB_TOKEN_COMENTARIOS = os.environ.get("GITHUB_TOKEN_CC5M5", "")
-GITHUB_COMENTARIOS_OWNER = os.environ.get("CCE_GITHUB_COMENTARIOS_OWNER", "cce-m5")
-GITHUB_COMENTARIOS_REPO = os.environ.get("CCE_GITHUB_COMENTARIOS_REPO", "cce-m5-music")
