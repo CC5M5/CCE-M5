@@ -125,10 +125,12 @@ def test_auto_rebuild_tras_cancion(arb_module, monkeypatch) -> None:
         )
     conn.close()
 
-    with patch.object(arb_module, "proponer_composicion", return_value=[{"tipo": "entrada", "slide_id": 1}]):
-        with patch.object(arb_module, "guardar_composicion"):
-            with patch.object(arb_module.GeneradorDesdeComposicion, "generar_desde_presentacion", return_value=None):
-                result = arb.auto_rebuild_tras_cancion(cid, solo_futuras=True)
+    with (
+        patch.object(arb_module, "proponer_composicion", return_value=[{"tipo": "entrada", "slide_id": 1}]),
+        patch.object(arb_module, "guardar_composicion"),
+        patch.object(arb_module.GeneradorDesdeComposicion, "generar_desde_presentacion", return_value=None),
+    ):
+        result = arb.auto_rebuild_tras_cancion(cid, solo_futuras=True)
 
     assert len(result["slides_creadas"]) == 1
     assert future in result["presentaciones_afectadas"]

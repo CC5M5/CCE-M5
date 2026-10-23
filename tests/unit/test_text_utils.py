@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from src.generators.presentacion import text_utils as tu
 
 

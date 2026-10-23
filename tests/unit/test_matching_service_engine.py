@@ -36,7 +36,7 @@ def engine(tmp_path: Path) -> MatchingEngine:
     conn.close()
 
     config = MatchingConfig.from_dict({"db_path": str(tmp_path / "db.sqlite3"), "score_minimo": 0.0, "limite_resultados": 10})
-    service = MatchingService(config)
+    MatchingService(config)
     return MatchingEngine(tmp_path / "db.sqlite3")
 
 
