@@ -2,11 +2,7 @@
 
 from __future__ import annotations
 
-import sqlite3
 from pathlib import Path
-from unittest.mock import patch
-
-import pytest
 
 from src.generators.presentacion import builder as b
 
