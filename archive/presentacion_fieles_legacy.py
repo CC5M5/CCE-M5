@@ -4,13 +4,11 @@ Generador de presentaciones PPTX para la asamblea (sin acordes)
 Formato 16:9 basado en 274 Domingo 21 06 2026.pptx
 """
 
-import os
 import logging
+import os
 import re
-import copy
 import sqlite3
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 from pptx import Presentation
 from pptx.dml.color import RGBColor
@@ -57,7 +55,7 @@ MARGEN_SUPERIOR = Inches(0.3)
 ANCHO_UTIL = Inches(12.333)
 
 # Momentos del culto en orden
-MOMENTOS: List[str] = [
+MOMENTOS: list[str] = [
     "entrada", "perdon", "gloria", "salmo", "aleluya",
     "ofertorio", "santo", "padre_nuestro", "paz",
     "comunion", "maria", "despedida",
@@ -80,7 +78,7 @@ def _sanitizar_nombre_archivo(nombre: str) -> str:
     return nombre_limpio or "presentacion"
 
 
-def _sanitizar_xml(texto: Optional[str]) -> str:
+def _sanitizar_xml(texto: str | None) -> str:
     """Elimina caracteres de control ilegales en XML (0x00-0x08, 0x0B-0x0C, 0x0E-0x1F)."""
     if not texto:
         return ""
@@ -90,7 +88,7 @@ def _sanitizar_xml(texto: Optional[str]) -> str:
 def _aplicar_fuente_y_margen(text_frame, color: RGBColor, font_size: Pt,
                               bold: bool = False, italic: bool = False,
                               alignment: PP_ALIGN = PP_ALIGN.LEFT,
-                              line_spacing: Optional[float] = None) -> None:
+                              line_spacing: float | None = None) -> None:
     """Aplica fuente, tamaño, color, estilo y alineación a un párrafo."""
     p = text_frame.paragraphs[0]
     p.font.name = FUENTE_PRINCIPAL
@@ -108,9 +106,9 @@ class GeneradorPPTX:
 
     def __init__(
         self,
-        db_path: Optional[Union[str, Path]] = None,
-        template_path: Optional[Union[str, Path]] = None,
-        output_dir: Optional[Union[str, Path]] = None,
+        db_path: str | Path | None = None,
+        template_path: str | Path | None = None,
+        output_dir: str | Path | None = None,
     ) -> None:
         self.db_path = Path(db_path) if db_path else DB_PATH
         self.template_path = Path(template_path) if template_path else TEMPLATE_PATH
@@ -154,7 +152,7 @@ class GeneradorPPTX:
         bold: bool = False,
         italic: bool = False,
         alignment: PP_ALIGN = PP_ALIGN.LEFT,
-        line_spacing: Optional[float] = None,
+        line_spacing: float | None = None,
         word_wrap: bool = True,
     ) -> None:
         """Crea un textbox en la diapositiva y aplica estilos consistentes."""
@@ -187,7 +185,6 @@ class GeneradorPPTX:
 
     def _crear_logo_lema(self, slide) -> None:
         """Añade el logo del lema en la esquina inferior izquierda de la diapositiva."""
-        from pptx.enum.shapes import MSO_SHAPE
         # Usar la imagen del lema desde la plantilla (image2.jpeg)
         # Como la imagen ya está en la plantilla, la referenciamos
         # Para simplificar, usamos un textbox con el lema como fallback
@@ -364,14 +361,12 @@ class GeneradorPPTX:
         )
 
         # Letra limpia: quitar metadatos del blogspot y líneas de acordes sueltas.
-        from src.parsers.acordes_parser_v3 import limpiar_texto_cancion, AcordesParser
+        from src.parsers.acordes_parser_v3 import AcordesParser, limpiar_texto_cancion
         letra_limpia = limpiar_texto_cancion(letra)
         parser = AcordesParser()
         lineas_letra: list[str] = []
         for linea in parser.parsear_cancion_completa(letra_limpia):
-            if linea.tipo == "letra" and linea.letra.strip():
-                lineas_letra.append(linea.letra.strip())
-            elif linea.tipo == "acordes_letra" and linea.letra.strip():
+            if linea.tipo == "letra" and linea.letra.strip() or linea.tipo == "acordes_letra" and linea.letra.strip():
                 lineas_letra.append(linea.letra.strip())
             elif linea.tipo == "sección" and linea.texto.strip():
                 lineas_letra.append(f"[{linea.texto.strip().strip('[]')}]")
@@ -400,8 +395,8 @@ class GeneradorPPTX:
     def _precargar_canciones(
         self,
         cursor: sqlite3.Cursor,
-        canciones_ids: Dict[str, int],
-    ) -> Dict[int, sqlite3.Row]:
+        canciones_ids: dict[str, int],
+    ) -> dict[int, sqlite3.Row]:
         """Precarga todas las canciones necesarias con un único query IN(...)."""
         ids = [cid for cid in canciones_ids.values() if isinstance(cid, int) and cid > 0]
         if not ids:
@@ -418,8 +413,8 @@ class GeneradorPPTX:
         self,
         fecha_domingo: str,
         lectura_id: int,
-        canciones_ids: Dict[str, int],
-    ) -> Optional[Path]:
+        canciones_ids: dict[str, int],
+    ) -> Path | None:
         """Genera una presentación completa y devuelve la ruta del archivo generado."""
         logger.info("Generando presentación para: %s", fecha_domingo)
 

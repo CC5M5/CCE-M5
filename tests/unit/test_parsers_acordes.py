@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from src.parsers import acordes_parser as ap
 from src.parsers import acordes_parser_v2 as ap2
 

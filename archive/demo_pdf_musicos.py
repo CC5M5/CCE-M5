@@ -11,7 +11,6 @@ Uso:
 """
 
 import logging
-from pathlib import Path
 
 # Asegura que el proyecto raíz está en sys.path cuando se ejecuta directamente.
 from src.generators.pdf_musicos import generar_hoja_musicos

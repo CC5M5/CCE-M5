@@ -2,7 +2,6 @@
 """Script de demostracion del scraper de Koinonia."""
 
 import logging
-from pathlib import Path
 
 from src.scrapers.koinonia_scraper import KoinoniaClient, KoinoniaRepository, KoinoniaScraper
 

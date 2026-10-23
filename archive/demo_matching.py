@@ -3,7 +3,6 @@
 
 import logging
 import sqlite3
-from pathlib import Path
 
 from src.matching_engine import MatchingEngine
 
