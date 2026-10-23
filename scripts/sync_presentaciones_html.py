@@ -7,13 +7,29 @@ Uso:
   python3 scripts/sync_presentaciones_html.py --fecha 2026-09-27
 """
 import argparse
+import importlib.util
 import shutil
 import sys
 from pathlib import Path
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-SRC_DIR = PROJECT_DIR / "presentaciones_html"
-DST_DIR = PROJECT_DIR / "web" / "public" / "presentaciones_html"
+
+def _load_settings():
+    """Carga src.config.settings sin depender de PYTHONPATH."""
+    project_root = Path(__file__).resolve().parents[1]
+    module_path = project_root / "src" / "config.py"
+    spec = importlib.util.spec_from_file_location("src.config", module_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"No se pudo cargar src.config desde {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["src.config"] = module
+    spec.loader.exec_module(module)
+    return module.settings
+
+
+settings = _load_settings()
+
+SRC_DIR = settings.project_dir / "presentaciones_html"
+DST_DIR = settings.web_dir / "public" / "presentaciones_html"
 
 
 def sincronizar(fecha: str | None = None) -> list[Path]:

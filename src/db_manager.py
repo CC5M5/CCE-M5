@@ -3,18 +3,18 @@
 Gestor de base de datos SQLite para CCE-M5-Web-Presentaciones
 """
 
-import os
 import sqlite3
 from pathlib import Path
 
+from src.config import settings
 from src.log_config import get_logger
 
 logger = get_logger(__name__)
 
 DEFAULT_PROJECT_DIR = Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
-PROJECT_DIR = Path(os.environ.get("CCE_PROJECT_DIR", DEFAULT_PROJECT_DIR))
-DATA_DIR = PROJECT_DIR / "data"
-DB_PATH = DATA_DIR / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DATA_DIR = settings.data_dir
+DB_PATH = settings.db_path
 SCHEMA_PATH = DATA_DIR / "schema.sql"
 
 
@@ -74,7 +74,7 @@ def _ensure_schema_version(conn: sqlite3.Connection) -> None:
 def init_database(db_path: Path | None = None) -> None:
     """Inicializa la base de datos con el esquema, índices y control de versiones."""
     target = db_path or DB_PATH
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    target.parent.mkdir(parents=True, exist_ok=True)
 
     with create_connection(target) as conn:
         _ensure_schema_version(conn)

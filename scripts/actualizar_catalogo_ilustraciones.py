@@ -18,8 +18,10 @@ from typing import Any
 
 from PIL import Image
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-ILUSTRACIONES_DIR = PROJECT_DIR / "data" / "ilustraciones"
+from src.config import settings
+
+PROJECT_DIR = settings.project_dir
+ILUSTRACIONES_DIR = settings.data_dir / "ilustraciones"
 CATALOGO_PATH = ILUSTRACIONES_DIR / "catalogo.json"
 EXTENDED_PATH = ILUSTRACIONES_DIR / "catalogo_extendido.json"
 

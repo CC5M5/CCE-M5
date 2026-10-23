@@ -17,15 +17,15 @@ import re
 import sqlite3
 import unicodedata
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
+from src.config import settings
 from src.log_config import get_logger
 
 logger = get_logger(__name__)
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 
 MOMENTOS_LITURGICOS = [
     "entrada",

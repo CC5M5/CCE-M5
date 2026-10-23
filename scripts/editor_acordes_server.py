@@ -23,10 +23,6 @@ from __future__ import annotations
 import html as html_module
 import json
 import os
-import re
-import sqlite3
-import subprocess
-from pathlib import Path
 
 from flask import Flask, abort, request
 
@@ -37,21 +33,22 @@ from src.canciones_manager import (
     crear_cancion,
     listar_canciones,
 )
+from src.config import settings
 from src.parsers.acordes_parser_v3 import AcordesParser
 from src.rebuild_web import rebuild_web
+from src.web_admin.editores import git_commit
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
 
-app = Flask(__name__)
+app_editor_acordes = Flask(__name__)
 EDITOR_ACORDES_HOST = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
 EDITOR_ACORDES_PORT = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
 
 
-def _get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+def _root() -> str:
+    """Prefijo del editor bajo FastAPI (request.script_root)."""
+    return request.script_root or ""
 
 
 def _regenerar_derivados(texto_con_acordes: str) -> dict:
@@ -90,90 +87,8 @@ def _regenerar_derivados(texto_con_acordes: str) -> dict:
 
 
 def _git_commit(titulo: str) -> str:
-    """Hace git add + commit + push. Devuelve el hash o un mensaje de error."""
-    try:
-        subprocess.run(
-            ["git", "add", "data/db.sqlite3"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        diff_check = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            cwd=PROJECT_DIR,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if diff_check.returncode == 0:
-            return "sin cambios"
-
-        result = subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"chore(acordes): editar {titulo}",
-                "-m",
-                "Actualización manual desde editor local de acordes.",
-            ],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        subprocess.run(
-            ["git", "push", "origin", "main"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
-        return m.group(1) if m else "commit OK"
-    except subprocess.CalledProcessError as exc:
-        err = exc.stderr or exc.stdout or ""
-        if (
-            "nothing to commit" in err
-            or "working tree clean" in err
-            or "No changes" in err
-            or "sin cambios agregados" in err
-        ):
-            return "sin cambios"
-        return f"ERROR: {err}"
-
-
-def _rebuild_web() -> str:
-    """Delega en el módulo compartido de reconstrucción web."""
-    return rebuild_web()
-
-
-def _get_momentos_cancion(cancion_id: int) -> list[str]:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id = ? ORDER BY momento_liturgico",
-        (cancion_id,),
-    )
-    rows = [r["momento_liturgico"] for r in cursor.fetchall()]
-    conn.close()
-    return rows
-
-
-def _set_momentos_cancion(cancion_id: int, momentos: list[str]) -> None:
-    conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
-    for m in momentos:
-        m = m.strip().lower()
-        if m:
-            cursor.execute(
-                "INSERT OR IGNORE INTO cancion_momentos (cancion_id, momento_liturgico) VALUES (?, ?)",
-                (cancion_id, m),
-            )
-    conn.commit()
-    conn.close()
+    """Delega en helper compartido de commit automático."""
+    return git_commit(f"chore(acordes): editar {titulo}")
 
 
 def _get_canciones():
@@ -204,11 +119,16 @@ def _render_sidebar(active_slug: str | None = None, extra_link: str = "") -> str
     for c in canciones:
         active = ' class="active"' if active_slug and c["slug"] == active_slug else ""
         links.append(
-            f'<a href="/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>'
+            f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}"{active}>{html_module.escape(c["titulo"])}</a>'
         )
     if extra_link:
         links.append(extra_link)
     return "\n".join(links)
+
+
+def _rebuild_web() -> str:
+    """Delega en el módulo compartido de reconstrucción web."""
+    return rebuild_web()
 
 
 def _render_base(
@@ -217,11 +137,20 @@ def _render_base(
     msg_html = (
         f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
     )
+    # Compatibilidad con montaje bajo FastAPI en path prefix.
+    try:
+        from flask import request
+
+        script_root = request.script_root or ""
+    except Exception:
+        script_root = ""
+    base_href = f'<base href="{html_module.escape(script_root)}/">' if script_root else ""
     return f"""<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {base_href}
   <title>{html_module.escape(title)} - Editor Acordes CCE-M5</title>
   <style>
     :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; }}
@@ -262,7 +191,7 @@ def _render_base(
     <h1>🎵 Editor de Acordes CCE-M5</h1>
     <p>Edición local con commit automático. URL de origen se mantiene como referencia.</p>
     <nav style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="/cancionero/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">➕ Nueva canción</a>
+      <a href="{_root()}/cancionero/nueva" style="text-decoration:none;background:#7C3AED;color:#fff;padding:8px 14px;border-radius:8px;font-size:14px;">➕ Nueva canción</a>
     </nav>
   </header>
   <div class="container">
@@ -282,18 +211,18 @@ def _render_base(
 NUEVA_LINK = ""
 
 
-@app.route("/")
+@app_editor_acordes.route("/")
 def index():
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
+        f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
         for c in canciones
     )
     content = "<h2>Selecciona una canción</h2><p>Elige una canción del menú lateral para editar sus acordes, o añade una nueva.</p>"
     return _render_base("Canciones", sidebar_links, content)
 
 
-@app.route("/cancionero/<slug>")
+@app_editor_acordes.route("/cancionero/<slug>")
 def editar(slug: str):
     cancion = _get_cancion_by_slug(slug)
     if cancion is None:
@@ -301,13 +230,13 @@ def editar(slug: str):
 
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}" class="active"'
+        f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}" class="active"'
         if c["slug"] == slug
-        else f'<a href="/cancionero/{html_module.escape(c["slug"])}"'
+        else f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}"'
         for c in canciones
     )
     sidebar_links = "\n".join(
-        f'{link}>{html_module.escape(c["titulo"])}</a>'
+        f"{link}>{html_module.escape(c['titulo'])}</a>"
         for c, link in zip(canciones, sidebar_links.split("\n"), strict=False)
     )
 
@@ -315,12 +244,12 @@ def editar(slug: str):
         f'<label style="display:inline-block;margin-right:12px;margin-bottom:6px;"><input type="checkbox" name="momentos" value="{html_module.escape(m)}" {"checked" if m in cancion.get("momentos", []) else ""}> {html_module.escape(m.replace("_", " ").title())}</label>'
         for m in MOMENTOS_LITURGICOS
     )
-    content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
+    content = f"""<h2>{html_module.escape(cancion["titulo"])}</h2>
     <div class="meta">
-      Tono: {html_module.escape(cancion['tono'] or 'No detectado')} |
-      ID: {cancion['id']} |
+      Tono: {html_module.escape(cancion["tono"] or "No detectado")} |
+      ID: {cancion["id"]} |
       Momentos: {html_module.escape(", ".join(cancion.get("momentos", [])).title() or "(ninguno)")} |
-      <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
+      <a href="{html_module.escape(cancion["titulo_url"] or "")}" target="_blank">Ver origen ↗</a>
     </div>
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
       <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
@@ -329,7 +258,7 @@ def editar(slug: str):
       Si no coincide al guardar, pulsa Ctrl+F5 en la web.
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
+    <form method="post" action="{_root()}/cancionero/{html_module.escape(slug)}/guardar">
       <div style="margin-bottom:12px;">
         <label><strong>Momentos litúrgicos</strong></label><br>
         {momentos_checks}
@@ -337,11 +266,11 @@ def editar(slug: str):
       <div class="two-col">
         <div>
           <label><strong>Texto con acordes</strong></label>
-          <textarea name="texto">{html_module.escape(cancion['texto'])}</textarea>
+          <textarea name="texto">{html_module.escape(cancion["texto"])}</textarea>
         </div>
         <div class="preview">
           <strong>Preview actual</strong>
-          {cancion['preview']}
+          {cancion["preview"]}
         </div>
       </div>
       <button type="submit">💾 Guardar y commitear</button>
@@ -349,11 +278,11 @@ def editar(slug: str):
     return _render_base(cancion["titulo"], sidebar_links, content)
 
 
-@app.route("/cancionero/nueva")
+@app_editor_acordes.route("/cancionero/nueva")
 def nueva_cancion():
     canciones = _get_canciones()
     sidebar_links = "\n".join(
-        f'<a href="/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
+        f'<a href="{_root()}/cancionero/{html_module.escape(c["slug"])}">{html_module.escape(c["titulo"])}</a>'
         for c in canciones
     )
 
@@ -367,7 +296,7 @@ def nueva_cancion():
       Coloca cada acorde encima de la sílaba/letra correspondiente usando espacios.
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/cancionero/nueva/guardar">
+    <form method="post" action="{_root()}/cancionero/nueva/guardar">
       <div style="margin-bottom:12px;">
         <label><strong>Título</strong></label>
         <input type="text" name="titulo" placeholder="Título de la canción" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;box-sizing:border-box;">
@@ -395,7 +324,7 @@ def nueva_cancion():
     return _render_base("Nueva canción", sidebar_links, content)
 
 
-@app.route("/cancionero/nueva/guardar", methods=["POST"])
+@app_editor_acordes.route("/cancionero/nueva/guardar", methods=["POST"])
 def guardar_nueva_cancion():
     titulo = request.form.get("titulo", "").strip()
     texto = request.form.get("texto", "")
@@ -442,13 +371,13 @@ def guardar_nueva_cancion():
     return _render_base(
         "Canción creada",
         "",
-        f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente. <a href='/cancionero/{html_module.escape(cancion['slug'])}'>Editar canción</a></p>",
+        f"<h2>{html_module.escape(cancion['titulo'])}</h2><p>Canción creada correctamente. <a href='{_root()}/cancionero/{html_module.escape(cancion['slug'])}'>Editar canción</a></p>",
         mensaje,
         clase,
     )
 
 
-@app.route("/cancionero/<slug>/guardar", methods=["POST"])
+@app_editor_acordes.route("/cancionero/<slug>/guardar", methods=["POST"])
 def guardar(slug: str):
     cancion = _get_cancion_by_slug(slug)
     if cancion is None:
@@ -492,11 +421,11 @@ def guardar(slug: str):
 
     sidebar = _render_sidebar(active_slug=slug, extra_link="")
 
-    content = f"""<h2>{html_module.escape(cancion['titulo'])}</h2>
+    content = f"""<h2>{html_module.escape(cancion["titulo"])}</h2>
     <div class="meta">
-      Tono: {html_module.escape(derivados['tono'] or 'No detectado')} |
-      ID: {cancion['id']} |
-      <a href="{html_module.escape(cancion['titulo_url'] or '')}" target="_blank">Ver origen ↗</a>
+      Tono: {html_module.escape(derivados["tono"] or "No detectado")} |
+      ID: {cancion["id"]} |
+      <a href="{html_module.escape(cancion["titulo_url"] or "")}" target="_blank">Ver origen ↗</a>
     </div>
     <div class="nota-editor" style="background:#fffbeb; border:1px solid #f59e0b; border-radius:8px; padding:10px; margin-bottom:15px; color:#92400e; font-size:14px;">
       <strong>ℹ️ Importante:</strong> El cancionero web usa fuente monoespaciada (Courier New).
@@ -505,7 +434,7 @@ def guardar(slug: str):
       Si no coincide al guardar, pulsa Ctrl+F5 en la web.
       <br><strong>Negrita:</strong> usa <code>**texto en negrita**</code>. El estribillo se detecta automáticamente si pasa de minúsculas a MAYÚSCULAS.
     </div>
-    <form method="post" action="/cancionero/{html_module.escape(slug)}/guardar">
+    <form method="post" action="{_root()}/cancionero/{html_module.escape(slug)}/guardar">
       <div class="two-col">
         <div>
           <label><strong>Texto con acordes</strong></label>
@@ -513,7 +442,7 @@ def guardar(slug: str):
         </div>
         <div class="preview">
           <strong>Preview actualizado</strong>
-          {derivados['html_visual']}
+          {derivados["html_visual"]}
         </div>
       </div>
       <button type="submit">💾 Guardar y commitear</button>
@@ -522,9 +451,9 @@ def guardar(slug: str):
 
 
 def main():
-    host = os.environ.get("EDITOR_HOST", "0.0.0.0")
-    port = int(os.environ.get("EDITOR_PORT", "4322"))
-    app.run(host=host, port=port, debug=False)
+    host = os.environ.get("EDITOR_ACORDES_HOST", "0.0.0.0")
+    port = int(os.environ.get("EDITOR_ACORDES_PORT", "4322"))
+    app_editor_acordes.run(host=host, port=port, debug=False)
 
 
 if __name__ == "__main__":

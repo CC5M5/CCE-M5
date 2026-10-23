@@ -29,14 +29,15 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
+from src.config import settings
 from src.log_config import get_logger
 from src.parsers.acordes_parser_v3 import AcordesParser
 
 logger = get_logger(__name__)
 
-PROJECT_DIR = Path(__file__).resolve().parents[1]
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-OUTPUT_DIR = PROJECT_DIR / "docs" / "correcciones_acordes"
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
+OUTPUT_DIR = settings.project_dir / "docs" / "correcciones_acordes"
 
 # Líneas de metadatos del blogspot (insensibles a mayúsculas).
 _METADATA_RES = [

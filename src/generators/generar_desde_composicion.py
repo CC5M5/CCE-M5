@@ -15,17 +15,18 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from src.config import settings
 from src.constants import COLORES_LITURGICOS
 
 from .presentacion.generador import GeneradorPresentacionHTML
 from .presentacion.slide import Slide
 
-PROJECT_DIR = Path(__file__).resolve().parents[2]
-DATA_DIR = PROJECT_DIR / "data"
-DB_PATH = DATA_DIR / "db.sqlite3"
-LEMA_DIR = DATA_DIR / "lemas"
-ILUSTRACIONES_DIR = DATA_DIR / "ilustraciones"
-OUTPUT_DIR = PROJECT_DIR / "presentaciones_html"
+PROJECT_DIR = settings.project_dir
+DATA_DIR = settings.data_dir
+DB_PATH = settings.db_path
+LEMA_DIR = settings.data_dir / "lemas"
+ILUSTRACIONES_DIR = settings.data_dir / "ilustraciones"
+OUTPUT_DIR = settings.project_dir / "presentaciones_html"
 
 logger = logging.getLogger(__name__)
 
