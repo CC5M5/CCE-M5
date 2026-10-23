@@ -13,7 +13,7 @@ ExecStart=%h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin/python3 %h/proyectos/
 Environment="PYTHONPATH=%h/proyectos/CCE-M5-Web-Presentaciones"
 Restart=always
 RestartSec=5
-ExecStartPost=/bin/sh -c 'for i in 1 2 3 4 5; do %h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin/python %h/proyectos/CCE-M5-Web-Presentaciones/scripts/healthcheck.py --timeout 3 && exit 0; sleep 1; done; exit 1'
+ExecStartPost=/bin/sh -c 'for i in 1 2 3 4 5; do %h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin/python %h/proyectos/CCE-M5-Web-Presentaciones/scripts/healthcheck.py --admin-url http://127.0.0.1:4323 --timeout 3 && exit 0; sleep 1; done; exit 1'
 
 [Install]
 WantedBy=default.target
