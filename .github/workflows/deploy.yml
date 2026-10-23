@@ -51,10 +51,12 @@ jobs:
       - name: Export data from SQLite to JSON for Astro
         run: |
           export PYTHONPATH=$PWD
+          export CCE_PROJECT_DIR=$PWD
           python scripts/export_data_for_web.py
         working-directory: .
         env:
           PYTHONPATH: ${{ github.workspace }}
+          CCE_PROJECT_DIR: ${{ github.workspace }}
 
       - name: Build site
         run: |
