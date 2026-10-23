@@ -50,9 +50,12 @@ jobs:
 
       - name: Export data from SQLite to JSON for Astro
         run: |
+          # Ignorar .env versionado para usar solo variables del workflow.
+          mv .env .env.bak 2>/dev/null || true
           export PYTHONPATH=$PWD
           export CCE_PROJECT_DIR=$PWD
           python scripts/export_data_for_web.py
+          mv .env.bak .env 2>/dev/null || true
         working-directory: .
         env:
           PYTHONPATH: ${{ github.workspace }}
