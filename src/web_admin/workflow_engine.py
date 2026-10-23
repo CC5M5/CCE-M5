@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from src.config import settings
 from src.constants import MOMENTO_A_KEY, MOMENTOS_ES, MOMENTOS_KEY
 from src.db_manager import get_connection
 from src.generators.composicion_catalogo import (
@@ -26,7 +27,6 @@ from src.generators.pdf_musicos import generar_hoja_musicos
 from src.matching_engine import MatchingEngine
 from src.scrapers.ciudadredonda_scraper import obtener_lecturas_ciudadredonda
 from src.scrapers.koinonia_scraper import KoinoniaScraper
-from src.web_admin.config import BACKUPS_DIR, PROJECT_DIR
 from src.web_admin.database import (
     WORKFLOW_STEPS,
     add_workflow_log,
@@ -39,6 +39,9 @@ from src.web_admin.database import (
 )
 
 logger = logging.getLogger(__name__)
+
+PROJECT_DIR = settings.project_dir
+BACKUPS_DIR = settings.backups_dir
 
 
 def _now() -> str:

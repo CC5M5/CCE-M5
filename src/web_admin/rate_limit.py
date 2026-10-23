@@ -13,16 +13,17 @@ Variables de entorno:
 
 from __future__ import annotations
 
-import os
 import time
 from dataclasses import dataclass
 from typing import Protocol
 
 from fastapi import HTTPException, Request
 
-DEFAULT_MAX_ATTEMPTS = int(os.environ.get("CCE_ADMIN_RATE_LIMIT_MAX_ATTEMPTS", "5"))
-DEFAULT_WINDOW_SECONDS = float(os.environ.get("CCE_ADMIN_RATE_LIMIT_WINDOW_SECONDS", "300"))
-DEFAULT_BLOCK_SECONDS = float(os.environ.get("CCE_ADMIN_RATE_LIMIT_BLOCK_SECONDS", "900"))
+from src.config import settings
+
+DEFAULT_MAX_ATTEMPTS = settings.rate_limit_max_attempts
+DEFAULT_WINDOW_SECONDS = settings.rate_limit_window_seconds
+DEFAULT_BLOCK_SECONDS = settings.rate_limit_block_seconds
 
 
 class _Storage(Protocol):
@@ -162,7 +163,7 @@ class LoginRateLimiter:
         storage: _Storage | None = None,
     ):
         if storage is None:
-            redis_url = os.environ.get("CCE_ADMIN_REDIS_URL")
+            redis_url = settings.redis_url
             if redis_url:
                 storage = _RedisStorage(redis_url, max_attempts, window_seconds, block_seconds)
             else:

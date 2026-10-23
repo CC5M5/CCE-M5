@@ -10,7 +10,6 @@ import random
 import re
 import sqlite3
 import time
-from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urljoin, urlparse
 
@@ -20,11 +19,20 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from parsers.acordes_parser_v3 import AcordesParser
+from src.config import settings
 from src.log_config import get_logger
 
 logger = get_logger(__name__)
 
-# Detecci\u00f3n de momento lit\u00fargico basada en texto del cancionero
+# Configuracion con variable de entorno
+PROJECT_DIR = settings.project_dir
+DB_PATH = settings.db_path
+DEFAULT_BASE_URL = "https://ccem5music.blogspot.com/p/cancionero-escolapio.html"
+DEFAULT_ALLOWED_HOSTS = {"ccem5music.blogspot.com"}
+PROGRESS_PATH = settings.data_dir / "scraper_progress.json"
+MAX_RESPONSE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+# Detección de momento litúrgico basada en texto del cancionero
 PALABRAS_MOMENTO = {
     "entrada": ["entrada", "abrir", "puertas", "preparad el camino"],
     "perdon": ["perdon", "misericordia", "kyrie", "senor ten piedad", "cristo ten piedad"],
@@ -49,17 +57,6 @@ def detectar_momento_liturgico(texto: str) -> str:
     max_momento = max(conteos, key=conteos.get, default="")
     return max_momento if conteos.get(max_momento, 0) > 0 else "general"
 
-
-
-# Configuracion con variable de entorno
-PROJECT_DIR = Path(
-    os.environ.get("CCE_PROJECT_DIR", Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones")
-)
-DB_PATH = PROJECT_DIR / "data" / "db.sqlite3"
-DEFAULT_BASE_URL = "https://ccem5music.blogspot.com/p/cancionero-escolapio.html"
-DEFAULT_ALLOWED_HOSTS = {"ccem5music.blogspot.com"}
-PROGRESS_PATH = PROJECT_DIR / "data" / "scraper_progress.json"
-MAX_RESPONSE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 # User-Agent rotativo para evitar bloqueos
 USER_AGENTS = [

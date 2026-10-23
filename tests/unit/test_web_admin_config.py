@@ -6,24 +6,29 @@ import os
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 
 def test_project_dir_default() -> None:
     import importlib
+
+    from src import config as core_config
     from src.web_admin import config as cfg
+
+    importlib.reload(core_config)
     importlib.reload(cfg)
-    assert cfg.PROJECT_DIR == Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones"
+    assert Path.home() / "proyectos" / "CCE-M5-Web-Presentaciones" == cfg.PROJECT_DIR
 
 
 def test_project_dir_from_env(tmp_path: Path) -> None:
     with patch.dict(os.environ, {"CCE_PROJECT_DIR": str(tmp_path)}):
         # Importar de nuevo para capturar env
         import importlib
+
+        from src import config as core_config
         from src.web_admin import config as cfg
 
+        importlib.reload(core_config)
         importlib.reload(cfg)
-        assert cfg.PROJECT_DIR == tmp_path
+        assert tmp_path == cfg.PROJECT_DIR
 
 
 def test_load_jwt_secret_from_env() -> None:
@@ -49,8 +54,11 @@ def test_default_admin_values(tmp_path: Path) -> None:
         },
     ):
         import importlib
+
+        from src import config as core_config
         from src.web_admin import config as cfg
 
+        importlib.reload(core_config)
         importlib.reload(cfg)
         assert cfg.DEFAULT_ADMIN_USERNAME == "admin"
         assert cfg.DEFAULT_ADMIN_PASSWORD == "secret"

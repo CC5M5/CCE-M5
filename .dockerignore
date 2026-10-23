@@ -1,0 +1,59 @@
+# Entornos
+.env
+.venv/
+venv/
+
+# Git
+.git/
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node / web
+node_modules/
+web/node_modules/
+web/dist/
+!web/dist
+!web/package.json
+!web/astro.config.mjs
+!web/tailwind.config.mjs
+!web/tsconfig.json
+!web/public/.gitkeep
+
+# Datos y assets generados (se montan como volúmenes en runtime)
+data/
+backups/
+presentaciones/
+presentaciones_html/
+assets/
+borradores/
+web/public/presentaciones_html/
+web/public/data/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LFS / lockfiles grandes no necesarios en build
+*.lock
+!requirements.lock.txt
+!web/package-lock.json
