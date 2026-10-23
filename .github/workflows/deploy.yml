@@ -45,6 +45,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
+          sed -i '/^-e git+/d' requirements.lock.txt
           python -m pip install -r requirements.lock.txt
 
       - name: Export data from SQLite to JSON for Astro
