@@ -59,6 +59,9 @@ jobs:
         run: |
           # Excluir el panel de administración del build estático de GitHub Pages.
           rm -rf ./src/pages/admin ./src/pages/admin.astro
+          # Asegurar que npm run sync usa el mismo Python que setup-python.
+          export PYTHON="$(which python)"
+          export PATH="$(dirname "$PYTHON"):$PATH"
           npm run build
         working-directory: ./web
         env:
