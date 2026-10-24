@@ -48,12 +48,21 @@ export function getPresentacionByFecha(fecha) {
 
 export function getRecentPresentaciones(limit = 6) {
   const data = loadData();
-  return data.presentaciones.slice(0, limit).map(enrichPresentacion);
+  const seen = new Set();
+  const unique = [];
+  for (const p of data.presentaciones) {
+    if (!seen.has(p.fecha_domingo)) {
+      seen.add(p.fecha_domingo);
+      unique.push(p);
+    }
+    if (unique.length >= limit) break;
+  }
+  return unique.map(enrichPresentacion);
 }
 
 export function getAllPresentacionesFechas() {
   const data = loadData();
-  return data.presentaciones.map((p) => p.fecha_domingo);
+  return [...new Set(data.presentaciones.map((p) => p.fecha_domingo))];
 }
 
 export function getCanciones() {
