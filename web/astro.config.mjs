@@ -38,9 +38,4 @@ export default defineConfig({
       customPages: buildSitemapEntries(),
     }),
   ],
-  vite: {
-    ssr: {
-      external: [],
-    },
-  },
 });
