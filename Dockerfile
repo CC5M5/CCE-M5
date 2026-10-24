@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Dependencias Python
-COPY requirements.lock.txt /app/
-RUN sed -i '/^-e git+/d' /app/requirements.lock.txt \
+COPY requirements.runtime.txt /app/
+RUN sed -i '/^-e git+/d' /app/requirements.runtime.txt \
     && python -m venv /app/.venv \
-    && /app/.venv/bin/pip install --no-cache-dir -r /app/requirements.lock.txt
+    && /app/.venv/bin/pip install --no-cache-dir -r /app/requirements.runtime.txt
 
 # Fuentes
 COPY src /app/src
