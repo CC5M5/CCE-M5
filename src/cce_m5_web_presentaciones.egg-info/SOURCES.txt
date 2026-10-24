@@ -38,3 +38,7 @@ src/web_admin/database.py
 src/web_admin/models.py
 src/web_admin/rate_limit.py
 src/web_admin/workflow_engine.py
+src/web_admin/wsgi_adapter.py
+src/web_admin/editores/__init__.py
+src/web_admin/editores/db.py
+src/web_admin/editores/git.py
