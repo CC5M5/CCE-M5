@@ -9,7 +9,7 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_DIR / "src"))
 
-from matching_engine import MatchingEngine
+from matching_engine import MatchingEngine  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,

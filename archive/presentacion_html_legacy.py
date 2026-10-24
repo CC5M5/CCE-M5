@@ -14,6 +14,7 @@ Características:
 """
 
 import json
+import logging
 import re
 import shutil
 import sqlite3
@@ -26,6 +27,8 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.text import MSO_ANCHOR
 from pptx.util import Cm, Inches, Pt
+
+logger = logging.getLogger(__name__)
 
 PROJECT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_DIR / "data"
@@ -555,7 +558,7 @@ class GeneradorPresentacionHTML:
         if not texto:
             return ""
 
-        lineas = [l.strip() for l in texto.splitlines() if l.strip()]
+        lineas = [linea.strip() for linea in texto.splitlines() if linea.strip()]
         if not lineas:
             return ""
 

@@ -8,7 +8,7 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_DIR / "src"))
 
-from scrapers.koinonia_scraper import KoinoniaClient, KoinoniaRepository, KoinoniaScraper
+from scrapers.koinonia_scraper import KoinoniaClient, KoinoniaRepository, KoinoniaScraper  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,

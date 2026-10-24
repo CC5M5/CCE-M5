@@ -141,7 +141,7 @@ class GeneradorPPTXMaster:
                                     media_output.write_bytes(media_content)
                             except KeyError:
                                 pass
-                except:
+                except Exception:  # noqa: S110
                     pass
 
                 return True

@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from src.generators.pdf_musicos import generar_hoja_musicos
+from src.generators.pdf_musicos import generar_hoja_musicos  # noqa: E402
 
 
 def main() -> None:
