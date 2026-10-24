@@ -31,10 +31,24 @@ jobs:
         run: npm ci
         working-directory: ./web
 
+      - name: Set up runtime data from seeds
+        run: |
+          mkdir -p data presentaciones_html
+          if [ ! -f data/db.sqlite3 ]; then
+            cp data/seeds/db.empty.sqlite3 data/db.sqlite3
+          fi
+          # Asegurar que presentaciones_html existe aunque esté vacío (no versionado)
+          touch presentaciones_html/.gitkeep
+
       - name: Copy presentaciones assets to public
         run: |
-          cp -r ../presentaciones ./public/presentaciones
-          cp -r ../presentaciones_html ./public/presentaciones_html
+          mkdir -p ./public/presentaciones ./public/presentaciones_html
+          if [ -d ../presentaciones ] && [ "$(ls -A ../presentaciones)" ]; then
+            cp -r ../presentaciones/* ./public/presentaciones/
+          fi
+          if [ -d ../presentaciones_html ] && [ "$(ls -A ../presentaciones_html)" ]; then
+            cp -r ../presentaciones_html/* ./public/presentaciones_html/
+          fi
         working-directory: ./web
 
       - name: Set up Python
