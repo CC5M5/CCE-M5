@@ -1,0 +1,43 @@
+# Runtime dependencies for CCE-M5 Web Presentaciones Docker image.
+# Keep this minimal; dev/test tools belong to requirements.lock.txt / pyproject.toml.
+
+# Web framework and admin APIs
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+
+# Auth
+pyjwt>=2.9.0
+bcrypt>=4.2.0
+
+# Configuration loading from environment
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# HTTP / scraping
+requests>=2.32.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# Office / PDF generation
+python-pptx>=1.0.0
+fpdf2>=2.8.0
+reportlab>=4.0.0
+
+# Image / plotting
+Pillow>=10.0.0
+matplotlib>=3.8.0
+
+# Browser-based PDF rendering
+playwright>=1.40.0
+
+# Misc
+markdown>=3.5.0
+jinja2>=3.1.0
+
+# Database
+# sqlite3 is built into Python; no extra driver needed.
+email-validator>=2.0.0
+requests-cache>=1.0.0
+flask>=3.0.0
+a2wsgi>=1.10.0
