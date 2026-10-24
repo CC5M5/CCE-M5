@@ -1,17 +1,17 @@
 services:
-  admin:
+  cce-m5:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["/app/.venv/bin/python", "scripts/run_admin_api.py", "--host", "0.0.0.0", "--port", "4323"]
     ports:
+      - "4321:4321"
       - "4323:4323"
     volumes:
       - ./data:/app/data
       - ./backups:/app/backups
       - ./assets:/app/assets
       - ./presentaciones_html:/app/presentaciones_html
-      - ./.env:/app/.env:ro
+      - ./web/dist:/app/web/dist:ro
     environment:
       - CCE_PROJECT_DIR=/app
       - CCE_ADMIN_HOST=0.0.0.0
@@ -20,24 +20,12 @@ services:
       - EDITOR_ACORDES_PORT=4322
       - EDITOR_HOST=0.0.0.0
       - EDITOR_PORT=4324
+      - HEALTHCHECK_NOTIFY_CHANNEL=${HEALTHCHECK_NOTIFY_CHANNEL:-}
+      - HEALTHCHECK_NOTIFY_TARGET=${HEALTHCHECK_NOTIFY_TARGET:-}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4323/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:4323/health"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 15s
-    restart: unless-stopped
-
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["python3", "-m", "http.server", "4321", "--directory", "/app/web/dist"]
-    ports:
-      - "4321:4321"
-    volumes:
-      - ./web/dist:/app/web/dist:ro
-    depends_on:
-      admin:
-        condition: service_healthy
+      start_period: 30s
     restart: unless-stopped

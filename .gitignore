@@ -1,45 +1,78 @@
-# Metadata de setuptools editable install
-src/*.egg-info/
+# Entornos
+.env
+.env.local
+.env.*.backup.*
+.venv/
+venv/
 
-# Snapshots manuales guardados fuera del repo principal
-archive/data-snapshots/
+# Git
+.git/
+.gitignore
 
-# Archivos temporales SQLite
-*.sqlite3-shm
-*.sqlite3-wal
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
-# Backups locales generados automáticamente
-backups/*
+# Node / web
+node_modules/
+web/node_modules/
+web/dist/
+!web/dist
+!web/package.json
+!web/astro.config.mjs
+!web/tailwind.config.mjs
+!web/tsconfig.json
+!web/public/.gitkeep
 
-# Backups manuales de SQLite
+# Datos de runtime (binarios, generados, backups). Se montan como volúmenes.
+data/db.sqlite3
+data/db.sqlite3-shm
+data/db.sqlite3-wal
 data/db.sqlite3.backup.*
-data/templates/*.backup
-
-# Snapshots manuales de la base de datos
 data/*.snapshot.*
+data/seeds/*.backup
+presentaciones_html/*
+!presentaciones_html/.gitkeep
+!presentaciones_html/README.md
+presentaciones/
+backups/*
+!backups/.gitkeep
+assets/*
+!assets/.gitkeep
+borradores/*
+!borradores/.gitkeep
 
-# Generados automáticamente (se regeneran en build)
-# NOTA: presentaciones_html/ en la raíz contiene la fuente original y se copia a web/public/presentaciones_html/ durante el build.
-# La copia en web/public/presentaciones_html/ no se sube a git.
+# Copias generadas durante el build
 web/public/presentaciones_html/
 web/public/fano_preview.png
 web/public/presentaciones/
+web/public/data/
 
 # PNGs fallback generados de SVGs
 data/ilustraciones/*.png
 
-# Otros generados y locales
-.env
-*.pyc
-__pycache__/
-.web/.astro/
-web/node_modules/
-web/dist/
-# web/package-lock.json  # CONGELADO para reproducibilidad en migración
-# La carpeta original de presentaciones SÍ debe estar en git (PPTX/PDF originales).
-# La copia en web/public/presentaciones/ se genera durante el build y no se sube.
-web/public/presentaciones/
-docs/INFORME_ESTRATEGICO_*.pdf
-web/src/pages/admin
-web/src/pages/admin.astro
-data/.admin_jwt_secret
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LFS / lockfiles grandes no necesarios en build
+*.lock
+!requirements.lock.txt
+!web/package-lock.json
