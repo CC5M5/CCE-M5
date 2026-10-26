@@ -127,6 +127,8 @@ jobs:
           if [ -d ../presentaciones_html ] && [ "$(ls -A ../presentaciones_html)" ]; then
             cp -r ../presentaciones_html/* ./public/presentaciones_html/
           fi
+          # Asegurar que al menos existe .gitkeep para evitar errores si las carpetas quedan vacias
+          touch ./public/presentaciones/.gitkeep ./public/presentaciones_html/.gitkeep
         working-directory: ./web
 
       - name: Set up Python
