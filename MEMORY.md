@@ -416,6 +416,15 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
   - Se añade `_existing_paths()` para no intentar `git add` de archivos inexistentes.
 - **Archivos cambiados:** `src/web_admin/editores/git.py`, `tests/unit/web_admin/test_editores.py`.
 - **Coherencia con MEMORY.md:** el workflow de Pages consume `web/data/*.json` y la BD se sincroniza vía `scripts/seed_sync.py` cuando se necesita un seed canónico.
+- **Nota de servicio:** el servicio `cce-m5-admin.service` debió reiniciarse tras el fix para limpiar la caché de Python; ver `systemctl --user restart cce-m5-admin.service`.
+
+### Fix: parser de acordes reconoce séptima mayor (`m7M`, `mM7`, `M7`, `7M`)
+
+<!-- observed: 2026-10-26 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+- **Problema:** en "COMO TUS BRAZOS", la línea `Sol            Si7     Mim7M        Do   Dom   Sol` no se reconocía como acordes. `Mim7M` (La menor con séptima mayor) no era una extensión válida para `AcordesParser`.
+- **Solución:** añadidas las extensiones `m7M`, `mM7`, `M7`, `7M` a `EXTENSIONES` en `src/parsers/acordes_parser_v3.py`, ordenadas antes de extensiones más genéricas para evitar que `m7` o `M` las consuman parcialmente.
+- **Archivos cambiados:** `src/parsers/acordes_parser_v3.py`, `tests/unit/test_acordes_parser_v3.py`.
 
 ## Estado Actual del Proyecto
 

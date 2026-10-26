@@ -6,7 +6,7 @@ from src.parsers import acordes_parser_v3 as ap3
 
 
 def test_limpiar_texto_cancion() -> None:
-    texto = "\u003cb\u003eAm\u003c/b\u003e\nescuchar\nvolver a lista de canciones\nLetra"
+    texto = "<b>Am</b>\nescuchar\nvolver a lista de canciones\nLetra"
     resultado = ap3.limpiar_texto_cancion(texto)
     assert "escuchar" not in resultado
     assert "volver" not in resultado
@@ -14,7 +14,7 @@ def test_limpiar_texto_cancion() -> None:
 
 
 def test_limpiar_texto_preservando_espacios() -> None:
-    texto = "\u003cb\u003eAm\u003c/b\u003e\nvolver a lista\nLinea"
+    texto = "<b>Am</b>\nvolver a lista\nLinea"
     resultado = ap3.limpiar_texto_preservando_espacios(texto)
     assert "volver" not in resultado
     assert "Linea" in resultado
@@ -62,6 +62,15 @@ def test_detectar_tono() -> None:
     estructura = parser.parsear_cancion_completa("Am\nAve\nAm\nMaria")
     tono = parser.detectar_tono(estructura)
     assert tono == "Am"
+
+
+def test_reconoce_septima_mayor_minuscula() -> None:
+    """Reconoce la notación m7M / mM7 / M7 / 7M para séptima mayor."""
+    parser = ap3.AcordesParser()
+    linea = "Sol            Si7     Mim7M        Do   Dom   Sol"
+    assert parser.es_linea_de_acordes(linea) is True
+    acordes = parser.extraer_acordes_de_linea(linea)
+    assert [a.acorde for a in acordes] == ["Sol", "Si7", "Mim7M", "Do", "Dom", "Sol"]
 
 
 def test_generar_html_visual() -> None:

@@ -151,10 +151,14 @@ class AcordesParser:
     # Extensiones permitidas, ordenadas de más específicas a menos para evitar
     # que "m7" se consuma como "m" + "7".
     EXTENSIONES = (
+        r"m7M",
+        r"mM7",
         r"maj7",
         r"maj9",
         r"maj11",
         r"maj13",
+        r"M7",
+        r"7M",
         r"m7",
         r"m9",
         r"m11",
