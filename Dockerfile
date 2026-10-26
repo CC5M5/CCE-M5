@@ -11,7 +11,7 @@ WORKDIR /build
 
 # Instalar Python 3.13 para que el script `npm run sync` pueda ejecutar scripts Python.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 \
+    python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 

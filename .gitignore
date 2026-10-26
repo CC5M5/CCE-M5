@@ -76,3 +76,4 @@ Thumbs.db
 *.lock
 !requirements.lock.txt
 !web/package-lock.json
+*.egg-info/
