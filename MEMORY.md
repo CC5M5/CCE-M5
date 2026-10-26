@@ -400,6 +400,23 @@ sudo systemctl disable cce-m5-web.service  # Deshabilitar inicio automático
 4. Agente envía enlaces a borradores y pregunta: **"¿Publico la presentación?"**.
 5. `generar_semana.py --fecha YYYY-MM-DD --modo publicar --forzar` → publicar.
 
+### Fix: commit automático ya no intenta versionar data/db.sqlite3
+
+<!-- observed: 2026-10-26 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+- **Problema:** `src/web_admin/editores/git.py` intentaba commitear `data/db.sqlite3`, que está en `.gitignore` como binario de runtime. Al editar una canción se guardaba en BD, pero el commit fallaba con: `ERROR: Las siguientes rutas son ignoradas por uno de tus archivos .gitignore: data/db.sqlite3`.
+- **Causa:** confusión entre datos de runtime (SQLite) y datos versionados (JSON exportados para Astro/GitHub Pages).
+- **Solución:**
+  - `git_commit()` ahora commitea los JSON generados por `scripts/export_data_for_web.py`:
+    - `web/data/canciones.json`
+    - `web/data/cancion_momentos.json`
+    - `web/data/presentaciones.json`
+    - `web/data/comentarios.json`
+  - Se mantiene `extra_paths` para casos especiales (por ejemplo, presentaciones HTML/PPTX).
+  - Se añade `_existing_paths()` para no intentar `git add` de archivos inexistentes.
+- **Archivos cambiados:** `src/web_admin/editores/git.py`, `tests/unit/web_admin/test_editores.py`.
+- **Coherencia con MEMORY.md:** el workflow de Pages consume `web/data/*.json` y la BD se sincroniza vía `scripts/seed_sync.py` cuando se necesita un seed canónico.
+
 ## Estado Actual del Proyecto
 
 | Componente | Estado | Notas |
