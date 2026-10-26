@@ -57,13 +57,14 @@
 
 | Servicio | Puerto | Tecnología | Unit systemd | Descripción |
 |---|---|---|---|---|
-| Admin API | **4323** | FastAPI + uvicorn | `cce-m5-admin.service` | Workflow de presentaciones, auth JWT, gestión de usuarios. |
-| Panel admin UI | 4323 | HTML estático servido por FastAPI | (mismo servicio) | `/admin/` y `/admin/login.html`. |
-| Editor de diapositivas | **4324** | Flask | `cce-m5-editor-diapositivas.service` | Catálogo de slides, composición por fecha, preview 4:3. |
-| Editor de acordes | **4322** | Flask | (sin unit; arranque manual) | CRUD de canciones, regeneración de derivados. |
+| Admin API | **4323** | FastAPI + uvicorn | `cce-m5-admin.service` | Workflow, auth JWT, gestión de usuarios y editores integrados. |
+| Editor de diapositivas | 4323 | Flask montado en FastAPI | (mismo servicio) | `/editor-diapositivas/`. |
+| Editor de acordes | 4323 | Flask montado en FastAPI | (mismo servicio) | `/editor-acordes/`. |
 | Cancionero web | **4321** | Astro estático + http.server | `cce-m5-web.service` | `web/dist` servido en LAN. |
+| Healthcheck | — | Python | `cce-m5-healthcheck.service` | Ejecutado por timer cada hora. |
+| Backup BD | — | Bash | `cce-m5-backup-db.service` | Activado por timer diario. |
 
-> **Nota histórica:** durante semanas los units tenían los puertos cruzados (`admin→4324`, `editor→4323`) y había procesos manuales corriendo. Desde 2026-10-18 los units están corregidos, pero el arranque limpio requiere que no haya procesos manuales ocupando esos puertos.
+> **Nota histórica:** durante semanas los editores corrieron en puertos independientes (4322/4324). Desde 2026-10-18 están integrados dentro del admin en el puerto 4323. El arranque limpio requiere que no haya procesos manuales ocupando los puertos 4321/4323.
 
 ## 2.3. Decisiones arquitectónicas clave
 

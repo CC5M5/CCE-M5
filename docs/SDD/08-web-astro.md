@@ -36,7 +36,7 @@
 - Requiere **Node 22.23.3**. Node 24 rompe Astro 4.16/4.19.
 - `.nvmrc` fija la versión.
 - `BASE_PATH` y `SITE_URL` vienen de variables de entorno.
-- Local: `BASE_PATH=/`, `SITE_URL=http://192.168.68.244:4321`.
+- Local: `BASE_PATH=/`, `SITE_URL=http://<IP_LOCAL>:4321`.
 - GitHub Pages: `BASE_PATH=/CCE-M5/`, `SITE_URL=https://cc5m5.github.io`.
 
 ## 8.5. Integración con assets de presentaciones

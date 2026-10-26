@@ -684,12 +684,13 @@ def handle_publish(workflow: dict[str, Any], data: dict[str, Any]) -> dict[str, 
         # 4. Build de Astro con Node 22 (evita bug de Node 24 + Astro 4.16)
         import os
 
-        node_bin = "/home/pciath/.nvm/versions/node/v22.23.3/bin"
+        node_bin = str(settings.node_bin)
         build_env = os.environ.copy()
         build_env["PATH"] = f"{node_bin}:{build_env.get('PATH', '')}"
 
+        npm_cmd = os.path.join(node_bin, "npm")
         result_build = subprocess.run(
-            [f"{node_bin}/npm", "run", "build"],
+            [npm_cmd, "run", "build"],
             cwd=PROJECT_DIR / "web",
             capture_output=True,
             text=True,
