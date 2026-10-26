@@ -58,6 +58,23 @@ def client(tmp_path: Path, monkeypatch):
     db_manager.init_database(auth_config.DB_PATH)
     db_manager.init_database(cm.DB_PATH)
 
+    # Sobreescribir el admin con el password por defecto para que _login
+    # sea fiable incluso cuando el seed traiga un hash distinto.
+    conn = db_manager.create_connection(auth_config.DB_PATH)
+    with conn:
+        conn.execute("DELETE FROM admin_users WHERE username = ?", (auth_config.DEFAULT_ADMIN_USERNAME,))
+        conn.execute(
+            "INSERT INTO admin_users (username, password_hash, full_name, role, is_active) VALUES (?, ?, ?, ?, ?)",
+            (
+                auth_config.DEFAULT_ADMIN_USERNAME,
+                auth_mod._hash_password(auth_config.DEFAULT_ADMIN_PASSWORD),
+                auth_config.DEFAULT_ADMIN_NAME,
+                "admin",
+                1,
+            ),
+        )
+    conn.close()
+
     # Mockear rebuild_web para no tocar el filesystem real
     monkeypatch.setattr("src.rebuild_web.rebuild_web", lambda: None)
 
