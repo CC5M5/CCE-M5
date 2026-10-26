@@ -50,6 +50,7 @@ from src.web_admin.database import (
     supersede_workflow_run,
     update_user,
 )
+from src.web_admin.health import full_health_report
 from src.web_admin.models import ComentarioRequest
 from src.web_admin.rate_limit import IPRateLimiter, LoginRateLimiter
 from src.web_admin.workflow_engine import run_step
@@ -183,8 +184,8 @@ async def admin_login_html():
 
 @app.get("/health", response_model=dict)
 async def health():
-    """Healthcheck ligero para monitoreo."""
-    return {"status": "ok", "service": "cce-m5-admin"}
+    """Healthcheck que incluye accesibilidad de BD y web estática."""
+    return full_health_report()
 
 
 @app.exception_handler(Exception)

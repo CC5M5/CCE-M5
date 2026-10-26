@@ -16,6 +16,11 @@ def client(tmp_path: Path, monkeypatch):
     """TestClient de FastAPI apuntando a una DB temporal."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
 
+    # Crear un web/dist mínimo para que el healthcheck de web estática pase.
+    web_dist = tmp_path / "web" / "dist"
+    web_dist.mkdir(parents=True, exist_ok=True)
+    (web_dist / "index.html").write_text("<html></html>")
+
     # Recargar src.config primero porque es la nueva fuente de verdad
     from src import config as core_config
 
@@ -77,7 +82,10 @@ def _login(
 def test_health(client) -> None:
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json()["status"] == "ok"
+    data = r.json()
+    assert data["status"] == "ok"
+    assert data["database"]["ok"] is True
+    assert data["static_web"]["ok"] is True
 
 
 def test_login_default_admin(client) -> None:
