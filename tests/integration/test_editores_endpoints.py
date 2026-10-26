@@ -54,6 +54,11 @@ def client(tmp_path: Path, monkeypatch):
     monkeypatch.setattr(cm, "DB_PATH", tmp_path / "data" / "db.sqlite3")
 
     (tmp_path / "data").mkdir(parents=True, exist_ok=True)
+    # El healthcheck busca web/dist/index.html; crearlo evita estado degraded.
+    web_dist = tmp_path / "web" / "dist"
+    web_dist.mkdir(parents=True, exist_ok=True)
+    (web_dist / "index.html").write_text("<html></html>")
+
     project_dir = Path(__file__).resolve().parents[2]
     schema_src = project_dir / "data" / "schema.sql"
     seed_src = project_dir / "data" / "seeds" / "db.empty.sqlite3"
