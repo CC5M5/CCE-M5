@@ -12,7 +12,7 @@ DB_PATH = settings.db_path
 
 def get_connection():
     """Conexión SQLite con acceso por columnas como dict."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     return conn
 
