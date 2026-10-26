@@ -7,10 +7,13 @@ services:
       - "4321:4321"
       - "4323:4323"
     volumes:
+      # Datos de runtime y assets generados (persisten fuera del contenedor).
       - ./data:/app/data
       - ./backups:/app/backups
       - ./assets:/app/assets
       - ./presentaciones_html:/app/presentaciones_html
+      # Web estática: se sirve desde el host si existe build local; en
+      # producción la imagen ya incluye web/dist copiado desde el stage builder.
       - ./web/dist:/app/web/dist:ro
     environment:
       - CCE_PROJECT_DIR=/app
@@ -23,9 +26,9 @@ services:
       - HEALTHCHECK_NOTIFY_CHANNEL=${HEALTHCHECK_NOTIFY_CHANNEL:-}
       - HEALTHCHECK_NOTIFY_TARGET=${HEALTHCHECK_NOTIFY_TARGET:-}
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:4323/health"]
+      test: ["CMD", "/app/.venv/bin/python", "/app/scripts/healthcheck_docker.py"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 60s
     restart: unless-stopped
