@@ -48,6 +48,8 @@ jobs:
           mkdir -p data presentaciones_html
           cp data/seeds/db.empty.sqlite3 data/db.sqlite3
           touch presentaciones_html/.gitkeep
+        env:
+          CCE_PROJECT_DIR: ${{ github.workspace }}
 
       - name: Lint with ruff
         run: ruff check .
@@ -88,6 +90,7 @@ jobs:
         run: python scripts/seed_sync.py --check
         env:
           PYTHONPATH: "src:scripts:."
+          CCE_PROJECT_DIR: ${{ github.workspace }}
 
   build:
     needs: lint-and-test
@@ -112,6 +115,8 @@ jobs:
           cp data/seeds/db.empty.sqlite3 data/db.sqlite3
           # Asegurar que presentaciones_html existe aunque esté vacío (no versionado)
           touch presentaciones_html/.gitkeep
+        env:
+          CCE_PROJECT_DIR: ${{ github.workspace }}
 
       - name: Copy presentaciones assets to public
         run: |
