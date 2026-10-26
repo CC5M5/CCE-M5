@@ -50,9 +50,22 @@ def _validate_integrity(conn: sqlite3.Connection) -> None:
 
 
 def _load_schema_sql() -> str:
-    """Carga el esquema desde data/schema.sql si existe."""
+    """Carga el esquema desde data/schema.sql si existe.
+
+    El dump de sqlite3.iterdump() usa CREATE TABLE sin IF NOT EXISTS y
+    INSERT INTO con valores fijos. Lo post-procesamos para que sea
+    idempotente: las tablas e índices se crean solo si no existen y los
+    inserts se ignoran cuando ya hay una fila con la misma PK (por ejemplo
+    al inicializar una DB que ya contiene datos de seed).
+    """
     if SCHEMA_PATH.exists():
-        return SCHEMA_PATH.read_text(encoding="utf-8")
+        raw = SCHEMA_PATH.read_text(encoding="utf-8")
+        transformed = (
+            raw.replace("CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ")
+            .replace("CREATE INDEX ", "CREATE INDEX IF NOT EXISTS ")
+            .replace('INSERT INTO "', 'INSERT OR IGNORE INTO "')
+        )
+        return transformed
     return ""
 
 
