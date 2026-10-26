@@ -817,3 +817,24 @@ El workflow `Deploy to GitHub Pages` volvió a pasar tras una serie de fixes.
 7. **Healthcheck degradado en CI**. Sin el build real de `web/dist`, `full_health_report()` devolvía `"degraded"`. El fixture ahora crea un `web/dist/index.html` mínimo y el test acepta `"ok"` o `"degraded"`.
 
 **Resultado**: 269 tests passed, workflow verde en `main`.
+
+
+## Unificación de servicios locales (2026-10-26)
+
+<!-- observed: 2026-10-26 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+Los editores Flask y el admin API ya estaban unificados en código bajo FastAPI en el puerto 4323 (`/editor-acordes/`, `/editor-diapositivas/`, `/presentaciones/`), pero los antiguos servicios systemd seguían arrancando en los puertos 4322 y 4324.
+
+**Acción realizada**:
+- Parar y deshabilitar `cce-m5-editor-acordes.service` y `cce-m5-editor-diapositivas.service`.
+- Recargar unidades con `systemctl --user daemon-reload`.
+- Dejar activos únicamente:
+  - `cce-m5-web.service` -> puerto 4321 (web estática)
+  - `cce-m5-admin.service` -> puerto 4323 (admin + editores + presentaciones)
+
+**URLs activas**:
+- `http://192.168.68.244:4321/` — web pública estática
+- `http://192.168.68.244:4323/editor-acordes/` — editor de acordes
+- `http://192.168.68.244:4323/editor-diapositivas/` — editor de diapositivas
+
+**Resultado**: Servicios locales unificados en dos puertos. Los puertos 4322 y 4324 quedan libres.
