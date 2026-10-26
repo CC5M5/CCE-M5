@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib
 import shutil
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -48,6 +49,13 @@ def client(tmp_path: Path, monkeypatch):
         (tmp_path / "data" / "schema.sql").write_text(schema_src.read_text())
         db_manager.init_database(auth_config.DB_PATH)
         db_manager.init_database(cm.DB_PATH)
+        # El editor de diapositivas necesita el catálogo base de slides;
+        # el schema.sql solo tiene CREATE TABLE, así que copiamos las filas
+        # del seed para las tablas que el editor consulta.
+        if seed_src.exists():
+            _copy_seed_tables(
+                str(seed_src), str(auth_config.DB_PATH), ["slides_tipos", "slides"]
+            )
     elif seed_src.exists():
         shutil.copy(seed_src, auth_config.DB_PATH)
         shutil.copy(seed_src, cm.DB_PATH)
@@ -57,6 +65,23 @@ def client(tmp_path: Path, monkeypatch):
 
     with TestClient(api.app) as tc:
         yield tc
+
+
+def _copy_seed_tables(seed_db: str, target_db: str, tables: list[str]) -> None:
+    """Copia las filas de *tables* desde seed_db a target_db (vacía primero)."""
+    src = sqlite3.connect(seed_db)
+    dst = sqlite3.connect(target_db)
+    for table in tables:
+        dst.execute(f"DELETE FROM {table}")
+        cur = src.execute(f"SELECT * FROM {table}")
+        columns = [desc[0] for desc in cur.description]
+        placeholders = ",".join("?" for _ in columns)
+        insert_sql = f"INSERT INTO {table} ({','.join(columns)}) VALUES ({placeholders})"
+        rows = cur.fetchall()
+        dst.executemany(insert_sql, rows)
+    dst.commit()
+    src.close()
+    dst.close()
 
 
 def test_editor_acordes_index(client):
