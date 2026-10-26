@@ -35,6 +35,18 @@ def client(tmp_path: Path, monkeypatch):
 
     importlib.reload(api)
 
+    # Recargar módulos del editor de diapositivas para que recojan el
+    # CCE_PROJECT_DIR temporal en lugar de las rutas por defecto.
+    from src.web_admin import editores as editores_mod
+
+    importlib.reload(editores_mod)
+    from src.web_admin.editores import db as editores_db
+
+    importlib.reload(editores_db)
+    import scripts.editor_diapositivas_server as eds
+
+    importlib.reload(eds)
+
     from src import canciones_manager as cm
 
     importlib.reload(cm)
