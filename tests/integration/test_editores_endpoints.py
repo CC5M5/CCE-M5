@@ -170,7 +170,11 @@ def test_editor_diapositivas_nueva_get(client):
 
 
 def test_admin_health(client):
-    """El healthcheck responde 200."""
+    """El healthcheck responde 200 con un estado valido."""
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    data = response.json()
+    assert data["service"] == "cce-m5-admin"
+    # En CI el build de web estatica no siempre existe, asi que 'degraded'
+    # es aceptable mientras el propio endpoint responda 200.
+    assert data["status"] in ("ok", "degraded")
