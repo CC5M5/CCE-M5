@@ -1,5 +1,0 @@
-[console_scripts]
-cce-m5-admin-api = scripts.run_admin_api:main
-cce-m5-editor-acordes = scripts.editor_acordes_server:main
-cce-m5-editor-diapositivas = scripts.editor_diapositivas_server:main
-cce-m5-init-db = scripts.init_db:main
