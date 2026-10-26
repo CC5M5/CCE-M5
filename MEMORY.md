@@ -790,3 +790,30 @@ Para cambiar el lema en años futivos (ej. 2027-28):
   - [ ] Sistema de corrección de acordes (edición local + commit automático)
   - [ ] Script de corrección masiva desde web de origen (una sola vez, validación humana)
   - [ ] Editor web local para ajustes manuales de acordes con commit automático
+
+
+## CI/CD recovery (2026-10-26)
+
+<!-- observed: 2026-10-26 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+El workflow `Deploy to GitHub Pages` volvió a pasar tras una serie de fixes.
+
+**Commits clave**: `410de92` (fix final), `6985453`, `ac1314a`, `4740199`, `a54d110`, `17560f0`, `ef75c4a`, `a89c1f8`.
+
+**Problemas solucionados**:
+
+1. **Seed no encontrado en CI**. `src.config.settings` defaultea a `~/proyectos/CCE-M5-Web-Presentaciones/`, pero GitHub Actions clona en `~/work/...`. Se añadió `CCE_PROJECT_DIR: ${{ github.workspace }}` a los pasos que inicializan/verifican el seed.
+
+2. **Tests con rutas hardcodeadas**. Varios tests apuntaban a `Path.home() / "proyectos" / ...` para encontrar `schema.sql`. Se cambiaron a rutas relativas al directorio del test.
+
+3. **`init_database()` no idempotente**. El seed `schema.sql` usaba `CREATE TABLE` simple, lo que provocaba errores `table already exists` en algunos tests. `_load_schema_sql()` ahora convierte a `CREATE TABLE IF NOT EXISTS` e `INSERT OR IGNORE`.
+
+4. **Fixture de admin devolvía 401 en CI**. El seed podía traer un admin con hash distinto al password por omisión. El fixture de `test_web_admin_api.py` ahora borra y recrea el admin con `DEFAULT_ADMIN_PASSWORD`.
+
+5. **Editor de diapositivas Flask leía DB del repo real**. Los módulos `scripts.editor_diapositivas_server` y `src.web_admin.editores.db` capturan `settings.db_path` al importar. El fixture los recarga después de fijar `CCE_PROJECT_DIR`, y copia `slides_tipos`/`slides` desde el seed.
+
+6. **`cp dir/*` fallaba con directorios vacíos**. En el job `build`, el paso de copiar `presentaciones`/`presentaciones_html` fallaba cuando solo contenían `.gitkeep`. Se reemplazó por `shopt -s nullglob` + arrays.
+
+7. **Healthcheck degradado en CI**. Sin el build real de `web/dist`, `full_health_report()` devolvía `"degraded"`. El fixture ahora crea un `web/dist/index.html` mínimo y el test acepta `"ok"` o `"degraded"`.
+
+**Resultado**: 269 tests passed, workflow verde en `main`.
