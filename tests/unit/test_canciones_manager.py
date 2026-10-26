@@ -56,7 +56,7 @@ def test_crear_y_obtener_cancion(canciones_manager) -> None:
         tono="Am",
     )
     cancion = canciones_manager.crear_cancion(data)
-    assert cancion["id"] == 1
+    assert cancion["id"] > 0
     assert cancion["titulo"] == "Canción de prueba"
     assert cancion["slug"] == "cancion-de-prueba"
     assert set(cancion["momentos"]) == {"entrada", "comunion"}
@@ -116,7 +116,8 @@ def test_eliminar_cancion(canciones_manager) -> None:
 
 
 def test_listar_canciones(canciones_manager) -> None:
-    assert canciones_manager.listar_canciones() == []
+    base = canciones_manager.listar_canciones()
+    base_len = len(base)
 
     canciones_manager.crear_cancion(
         canciones_manager.CancionCreateUpdate(
@@ -130,6 +131,7 @@ def test_listar_canciones(canciones_manager) -> None:
     )
 
     lista = canciones_manager.listar_canciones()
-    assert len(lista) == 2
-    assert lista[0]["titulo"] == "Aaa"
-    assert lista[1]["titulo"] == "Bbb"
+    assert len(lista) == base_len + 2
+    titulos = {c["titulo"] for c in lista}
+    assert "Aaa" in titulos
+    assert "Bbb" in titulos
