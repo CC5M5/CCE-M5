@@ -49,7 +49,7 @@ def client(tmp_path: Path, monkeypatch):
     monkeypatch.setattr(cm, "DB_PATH", tmp_path / "data" / "db.sqlite3")
 
     # Copiar schema.sql real
-    schema_src = Path("/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/schema.sql")
+    schema_src = Path(__file__).resolve().parents[2] / "data" / "schema.sql"
     schema_dst = tmp_path / "data" / "schema.sql"
     schema_dst.parent.mkdir(parents=True, exist_ok=True)
     schema_dst.write_text(schema_src.read_text())

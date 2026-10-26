@@ -53,7 +53,7 @@ def test_ilustracion_para_sin_catalogo(tmp_path: Path, monkeypatch) -> None:
 def test_get_lectura_y_canciones(tmp_path: Path, monkeypatch) -> None:
     from src import db_manager
 
-    schema_src = Path("/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/schema.sql")
+    schema_src = Path(__file__).resolve().parents[2] / "data" / "schema.sql"
     schema_dst = tmp_path / "data" / "schema.sql"
     schema_dst.parent.mkdir(parents=True, exist_ok=True)
     schema_dst.write_text(schema_src.read_text())
@@ -88,7 +88,7 @@ def test_get_lectura_y_canciones(tmp_path: Path, monkeypatch) -> None:
 def test_construir_slides(tmp_path: Path, monkeypatch) -> None:
     from src import db_manager
 
-    schema_src = Path("/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/schema.sql")
+    schema_src = Path(__file__).resolve().parents[2] / "data" / "schema.sql"
     schema_dst = tmp_path / "data" / "schema.sql"
     schema_dst.parent.mkdir(parents=True, exist_ok=True)
     schema_dst.write_text(schema_src.read_text())

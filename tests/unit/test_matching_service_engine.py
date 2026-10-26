@@ -12,7 +12,7 @@ from src.matching_engine import MatchingConfig, MatchingEngine, MatchingService
 
 @pytest.fixture
 def engine(tmp_path: Path) -> MatchingEngine:
-    schema_src = Path("/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/schema.sql")
+    schema_src = Path(__file__).resolve().parents[2] / "data" / "schema.sql"
     schema_dst = tmp_path / "data" / "schema.sql"
     schema_dst.parent.mkdir(parents=True, exist_ok=True)
     schema_dst.write_text(schema_src.read_text())
