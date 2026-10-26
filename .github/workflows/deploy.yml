@@ -61,7 +61,14 @@ jobs:
 
       - name: Print pytest log on failure
         if: failure()
-        run: cat pytest.log | tail -n 200
+        run: |
+          echo "::group::pytest log"
+          tail -n 200 pytest.log
+          echo "::endgroup::"
+          # Emit each relevant line as a workflow annotation so it surfaces without auth
+          tail -n 50 pytest.log | while IFS= read -r line; do
+            echo "::error::${line}"
+          done
 
       - name: Verify seed is canonical and up to date
         run: python scripts/seed_sync.py --check
