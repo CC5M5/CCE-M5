@@ -80,7 +80,7 @@ jobs:
           title="CI pytest failure on $(git rev-parse --short HEAD)"
           body="<details><summary>pytest log</summary>\n\n\`\`\`\n$(tail -n 200 pytest.log)\n\`\`\`\n</details>\n\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }} \
+            -H "Authorization: Bearer *** secrets.GITHUB_TOKEN }} \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "${{ github.api_url }}/repos/${{ github.repository }}/issues" \
@@ -121,13 +121,18 @@ jobs:
       - name: Copy presentaciones assets to public
         run: |
           mkdir -p ./public/presentaciones ./public/presentaciones_html
-          if [ -d ../presentaciones ] && [ "$(ls -A ../presentaciones)" ]; then
-            cp -r ../presentaciones/* ./public/presentaciones/
+          # Copiar archivos con nullglob para no fallar si el directorio solo contiene .gitkeep
+          shopt -s nullglob
+          files_presentaciones=(../presentaciones/*)
+          files_html=(../presentaciones_html/*)
+          shopt -u nullglob
+          if [ ${#files_presentaciones[@]} -gt 0 ]; then
+            cp -r "${files_presentaciones[@]}" ./public/presentaciones/
           fi
-          if [ -d ../presentaciones_html ] && [ "$(ls -A ../presentaciones_html)" ]; then
-            cp -r ../presentaciones_html/* ./public/presentaciones_html/
+          if [ ${#files_html[@]} -gt 0 ]; then
+            cp -r "${files_html[@]}" ./public/presentaciones_html/
           fi
-          # Asegurar que al menos existe .gitkeep para evitar errores si las carpetas quedan vacias
+          # Asegurar que las carpetas de destino no queden vacias
           touch ./public/presentaciones/.gitkeep ./public/presentaciones_html/.gitkeep
         working-directory: ./web
 
