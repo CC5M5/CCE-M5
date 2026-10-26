@@ -787,39 +787,13 @@ def _generar_presentacion(fecha: str) -> str:
         estado_ok = " | estado: publicado"
     except Exception as e:
         estado_ok = f" | ⚠️ estado falló: {e}"
-    # Commit automático incluyendo bundle web
+    # Commit automático incluyendo bundle web.
+    # Usamos git_commit() centralizado para evitar añadir data/db.sqlite3 (ignorado en git).
     try:
-        subprocess.run(
-            ["git", "add", "presentaciones_html/", "data/db.sqlite3"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
+        commit_hash = git_commit(
+            f"feat(presentacion): genera bundle {fecha}",
+            extra_paths=["presentaciones_html/"],
         )
-        commit_msg = f"feat(presentacion): genera bundle {fecha}"
-        result = subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                commit_msg,
-                "-m",
-                f"Generado desde editor local: {bundle.name}",
-            ],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        subprocess.run(
-            ["git", "push", "origin", "main"],
-            cwd=PROJECT_DIR,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        m = re.search(r"\[main ([a-f0-9]+)\]", result.stdout)
-        commit_hash = m.group(1) if m else "commit OK"
     except subprocess.CalledProcessError as exc:
         commit_hash = f"ERROR: {exc.stderr or exc.stdout}"
     return f"✅ Presentación generada en {bundle} {sync_ok}{build_ok}{estado_ok} | {commit_hash}"
