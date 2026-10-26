@@ -17,7 +17,7 @@ from src import db_manager
 def arb_module(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
     # Copiar schema.sql real al proyecto temporal
-    schema_src = Path("/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/schema.sql")
+    schema_src = Path(__file__).resolve().parents[2] / "data" / "schema.sql"
     schema_dst = tmp_path / "data" / "schema.sql"
     schema_dst.parent.mkdir(parents=True, exist_ok=True)
     schema_dst.write_text(schema_src.read_text())
