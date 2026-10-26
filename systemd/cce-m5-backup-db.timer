@@ -1,9 +1,0 @@
-[Unit]
-Description=Timer para backup diario de la base de datos CCE-M5
-
-[Timer]
-OnCalendar=daily
-Persistent=true
-
-[Install]
-WantedBy=timers.target

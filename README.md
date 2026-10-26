@@ -30,22 +30,24 @@ Los módulos legacy que aún importan `src.web_admin.config` siguen funcionando 
 
 Para servir la web y el panel de administración de forma persistente, el
 repositorio incluye units de systemd usuario en
-`systemd/` (copiados a `~/.config/systemd/user/`):
+`config/systemd/user/`:
 
 ```bash
 # Copiar units (desde el repo)
-cp systemd/cce-m5-admin.service ~/.config/systemd/user/
-cp systemd/cce-m5-web.service ~/.config/systemd/user/
-cp systemd/cce-m5-healthcheck.service ~/.config/systemd/user/
-cp systemd/cce-m5-healthcheck.timer ~/.config/systemd/user/
+cp config/systemd/user/cce-m5-admin.service ~/.config/systemd/user/
+cp config/systemd/user/cce-m5-web.service ~/.config/systemd/user/
+cp config/systemd/user/cce-m5-healthcheck.service ~/.config/systemd/user/
+cp config/systemd/user/cce-m5-healthcheck.timer ~/.config/systemd/user/
+cp config/systemd/user/cce-m5-backup-db.service ~/.config/systemd/user/
+cp config/systemd/user/cce-m5-backup-db.timer ~/.config/systemd/user/
 
 # Recargar, habilitar e iniciar
 systemctl --user daemon-reload
-systemctl --user enable --now cce-m5-admin cce-m5-web cce-m5-healthcheck.timer
+systemctl --user enable --now cce-m5-admin cce-m5-web cce-m5-healthcheck.timer cce-m5-backup-db.timer
 
 # Ver estado
 systemctl --user status cce-m5-admin cce-m5-web
-systemctl --user list-timers cce-m5-healthcheck.timer
+systemctl --user list-timers cce-m5-healthcheck.timer cce-m5-backup-db.timer
 ```
 
 Servicios expuestos:

@@ -6,10 +6,10 @@ Las unidades oficiales están en `config/systemd/user/` y son **portables**: usa
 
 | Unit | Puerto | Estado objetivo | Notas |
 |---|---|---|---|
-| `cce-m5-admin.service` | 4323 | Habilitado | FastAPI. Requiere `.env` con secretos. |
-| `cce-m5-editor-diapositivas.service` | 4324 | Habilitado | Flask. Editor del catálogo de slides. |
-| `cce-m5-editor-acordes.service` | 4322 | Habilitado | Flask. Editor del cancionero. |
+| `cce-m5-admin.service` | 4323 | Habilitado | FastAPI con editores Flask integrados. Requiere `.env` con secretos. |
 | `cce-m5-web.service` | 4321 | Habilitado | Sirve `web/dist` estáticamente. |
+| `cce-m5-healthcheck.service` | — | Activado por timer | Healthcheck cada hora. |
+| `cce-m5-healthcheck.timer` | — | Habilitado | Dispara el healthcheck. |
 | `cce-m5-backup-db.service` | — | Activado por timer | Backup diario de `data/db.sqlite3`. |
 | `cce-m5-backup-db.timer` | — | Habilitado | Dispara el backup cada día. |
 | `cce-m5-pipeline.service` | — | **Eliminado** | Trigger de Mission Control obsoleto. |
@@ -22,17 +22,17 @@ Las unidades oficiales están en `config/systemd/user/` y son **portables**: usa
 Archivo: `.env` (no commiteado; leído por systemd con `EnvironmentFile=`).
 
 ```ini
-# Panel de administración
-CCE_ADMIN_JWT_SECRET=cambia-esta-clave-en-produccion
-CCE_ADMIN_DEFAULT_USER=rafael.torres
-CCE_ADMIN_DEFAULT_PASSWORD=1234
+# Panel de administración (cambiar valores por defecto en producción)
+CCE_ADMIN_JWT_SECRET=cambia-esta-clave-en-produccion-minimo-32-bytes
+CCE_ADMIN_DEFAULT_USER=admin
+CCE_ADMIN_DEFAULT_PASSWORD=cambia-esta-contrasena
 
-# Node local (nvm)
-CCE_NODE_BIN=/home/pciath/.nvm/versions/node/v22.23.3/bin
+# Node local (ajustar al path de nvm o node del destino)
+CCE_NODE_BIN=/home/usuario/.nvm/versions/node/v22.23.3/bin
 
 # Rebuild web local
 CCE_BASE_PATH=/
-CCE_SITE_URL=http://192.168.68.244:4321
+CCE_SITE_URL=http://localhost:4321
 
 # Despliegue (solo si se usa comentarios proxy)
 GITHUB_TOKEN_CC5M5=...
@@ -72,7 +72,7 @@ Workflow: `.github/workflows/deploy.yml`
 
 La web pública (`web/dist` / GitHub Pages) es **estática**. El JavaScript puede hacer peticiones (`fetch`) al backend, pero con importantes limitaciones:
 
-- **CORS:** el navegador exige que la API (`http://192.168.68.244:4323`) responda con el `Access-Control-Allow-Origin` adecuado. Revisar `ADMIN_CORS_ORIGINS` en `.env`.
+- **CORS:** el navegador exige que la API (`http://<IP_LOCAL>:4323`) responda con el `Access-Control-Allow-Origin` adecuado. Revisar `ADMIN_CORS_ORIGINS` en `.env`.
 - **Red local:** los `fetch` desde GitHub Pages a la API local solo funcionarán si el navegador tiene acceso a la red local del servidor CCE-M5 (VPN, proxy o URL pública).
 - **Comentarios:** el formulario de comentarios de la web usa el proxy del admin API (`/api/comentarios`). Si el admin no está expuesto/reachable, el formulario no funciona.
 - **Panel admin excluido:** el build de GitHub Pages elimina `src/pages/admin` y `src/pages/admin.astro` para no publicar el panel de administración.

@@ -4,31 +4,28 @@
 
 ```bash
 # Estado de servicios
-systemctl --user status cce-m5-admin cce-m5-editor-diapositivas cce-m5-editor-acordes cce-m5-web
+systemctl --user status cce-m5-admin cce-m5-web cce-m5-healthcheck.timer cce-m5-backup-db.timer
 
 # Logs en vivo
 journalctl --user -u cce-m5-admin -f
-journalctl --user -u cce-m5-editor-diapositivas -f
-journalctl --user -u cce-m5-editor-acordes -f
+journalctl --user -u cce-m5-web -f
 
 # Puertos en uso
-ss -tlnp | grep -E '4321|4322|4323|4324'
+ss -tlnp | grep -E '4321|4323'
 
-# Rebuild web manual
-export CCE_PROJECT_DIR=/home/pciath/proyectos/CCE-M5-Web-Presentaciones
-export CCE_NODE_BIN=/home/pciath/.nvm/versions/node/v22.23.3/bin
+# Rebuild web manual (ajustar CCE_NODE_BIN si node no está en PATH)
+export CCE_PROJECT_DIR="$HOME/proyectos/CCE-M5-Web-Presentaciones"
+export CCE_NODE_BIN="$HOME/.nvm/versions/node/v22.23.3/bin"
 export CCE_BASE_PATH=/
-export CCE_SITE_URL=http://192.168.68.244:4321
+export CCE_SITE_URL="http://$(hostname -I | awk '{print $1}'):4321"
 .venv/bin/python scripts/export_data_for_web.py
-cd web
-npm run build
-cd ..
+cd web && npm run build && cd ..
 
 # Generar presentación desde consola
 .venv/bin/python -c "from src.generators.generar_desde_composicion import GeneradorDesdeComposicion; GeneradorDesdeComposicion().generar_desde_presentacion('YYYY-MM-DD')"
 
 # Backup manual de la BD
-CCE_PROJECT_DIR=/home/pciath/proyectos/CCE-M5-Web-Presentaciones bash scripts/systemd/cce-m5-backup-db.sh
+bash scripts/systemd/cce-m5-backup-db.sh
 ```
 
 ## 11.2. Problemas conocidos

@@ -27,12 +27,12 @@ El sistema prepara semanalmente presentaciones litúrgicas para la Comunidad Cri
 | Recurso | Ubicación |
 |---|---|
 | Repositorio | `https://github.com/CC5M5/CCE-M5` |
-| Proyecto local | `/home/pciath/proyectos/CCE-M5-Web-Presentaciones` |
+| Proyecto local | `~/proyectos/CCE-M5-Web-Presentaciones` |
 | Sitio público | `https://cc5m5.github.io/CCE-M5/` |
-| Panel admin local | `http://192.168.68.244:4324/admin/` |
-| Cancionero local | `http://192.168.68.244:4321/` |
-| Editor de acordes | `http://192.168.68.244:4322/` |
-| Editor de diapositivas | `http://192.168.68.244:4323/` |
+| Panel admin local | `http://<IP_LOCAL>:4323/admin/` |
+| Cancionero local | `http://<IP_LOCAL>:4321/` |
+| Editor de acordes | `http://<IP_LOCAL>:4323/editor-acordes/` |
+| Editor de diapositivas | `http://<IP_LOCAL>:4323/editor-diapositivas/` |
 
 ## Términos y definiciones
 

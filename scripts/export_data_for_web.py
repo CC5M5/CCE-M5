@@ -9,6 +9,7 @@ import argparse
 import json
 import sqlite3
 from pathlib import Path
+from typing import Any
 
 
 def parse_args() -> argparse.Namespace:
@@ -38,6 +39,23 @@ def main() -> None:
 
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
+
+    def _relativize(row: dict[str, Any]) -> dict[str, Any]:
+        """Convierte rutas absolutas del proyecto a relativas para el build web."""
+        copy = dict(row)
+        for key in ("ruta_pptx", "ruta_pdf_fieles", "ruta_pdf_musicos", "ruta_web"):
+            value = copy.get(key)
+            if not isinstance(value, str):
+                continue
+            try:
+                path = Path(value)
+                if path.is_absolute():
+                    copy[key] = str(path.relative_to(project_dir))
+            except ValueError:
+                # La ruta no está bajo project_dir; se deja tal cual.
+                pass
+        return copy
+
     try:
         for tabla, query in [
             ("canciones.json", "SELECT * FROM canciones ORDER BY id"),
@@ -52,7 +70,7 @@ def main() -> None:
             ("comentarios.json", "SELECT * FROM comentarios ORDER BY fecha_creacion DESC"),
         ]:
             rows = conn.execute(query).fetchall()
-            data = [dict(r) for r in rows]
+            data = [_relativize(dict(r)) if tabla == "presentaciones.json" else dict(r) for r in rows]
             out = web_data_dir / tabla
             out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
             print(f"  {tabla}: {len(data)} registros")

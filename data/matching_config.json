@@ -1,5 +1,4 @@
 {
-  "db_path": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/data/db.sqlite3",
   "score_minimo": 0.15,
   "limite_resultados": 5,
   "momento_liturgico_boost": 0.12,

@@ -1,6 +1,0 @@
-[Unit]
-Description=Backup diario de la base de datos CCE-M5
-
-[Service]
-Type=oneshot
-ExecStart=%h/proyectos/CCE-M5-Web-Presentaciones/scripts/systemd/cce-m5-backup-db.sh

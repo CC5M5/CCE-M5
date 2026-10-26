@@ -141,7 +141,7 @@ const letras = Object.keys(cancionesPorLetra).sort((a, b) => a.localeCompare(b, 
   </script>
 
   <script>
-    const ADMIN_API_URL = 'http://192.168.68.244:4324';
+    const ADMIN_API_URL = `${window.location.protocol}//${window.location.hostname}:4323`;
     let adminToken = localStorage.getItem('cce_admin_token');
 
     function checkAdmin() {
