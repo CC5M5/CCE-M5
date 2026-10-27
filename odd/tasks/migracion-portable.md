@@ -18,11 +18,11 @@ S3. **Identificar qué cosas tienen que cambiar para migrarlo al otro PC.**
 
 | ID | Spec | Descripción | Ruta | Estado | Commit |
 |---|---|---|---|---|---|
-| T1 | S1-S3 | Auditar y consolidar unidades systemd: eliminar duplicados, eliminar servicios legacy de editores separados, dejar como fuente canónica `config/systemd/user/` y asegurar que usan `%h` y variables de entorno. | `config/systemd/user/`, `systemd/` | completed | (sin commit aún) |
-| T2 | S1-S3 | Eliminar rutas/IPs hardcodeadas del código fuente: `workflow_engine.py` (node path), `data/matching_config.json` (db_path absoluto), `web/src/pages/cancionero/index.astro` (admin API URL). | `src/web_admin/workflow_engine.py`, `data/matching_config.json`, `web/src/pages/cancionero/index.astro` | completed | (sin commit aún) |
-| T3 | S2 | Hacer que `scripts/export_data_for_web.py` convierta rutas absolutas del PC origen a rutas relativas al proyecto. | `scripts/export_data_for_web.py` | completed | (sin commit aún) |
-| T4 | S3 | Actualizar `docs/SDD/10-migracion-nuevo-pc.md`, `docs/SDD/09-despliegue.md` y `README.md` con instrucciones precisas y lista de valores que el destino debe configurar. | `docs/SDD/*.md`, `README.md` | completed | (sin commit aún) |
-| T5 | S2 | Verificar portabilidad: tests unitarios pasan, build Astro OK, healthcheck pasa localmente. | `tests/`, `web/` | completed | (sin commit aún) |
+| T1 | S1-S3 | Auditar y consolidar unidades systemd: eliminar duplicados, eliminar servicios legacy de editores separados, dejar como fuente canónica `config/systemd/user/` y asegurar que usan `%h` y variables de entorno. | `config/systemd/user/`, `systemd/` | completed | 6e383fe |
+| T2 | S1-S3 | Eliminar rutas/IPs hardcodeadas del código fuente: `workflow_engine.py` (node path), `data/matching_config.json` (db_path absoluto), `web/src/pages/cancionero/index.astro` (admin API URL). | `src/web_admin/workflow_engine.py`, `data/matching_config.json`, `web/src/pages/cancionero/index.astro` | completed | 6e383fe |
+| T3 | S2 | Hacer que `scripts/export_data_for_web.py` convierta rutas absolutas del PC origen a rutas relativas al proyecto. | `scripts/export_data_for_web.py` | completed | 6e383fe |
+| T4 | S3 | Actualizar `docs/SDD/10-migracion-nuevo-pc.md`, `docs/SDD/09-despliegue.md` y `README.md` con instrucciones precisas y lista de valores que el destino debe configurar. | `docs/SDD/*.md`, `README.md` | completed | 6e383fe |
+| T5 | S2 | Verificar portabilidad: tests unitarios pasan, build Astro OK, healthcheck pasa localmente. | `tests/`, `web/` | completed | verificación local (healthcheck exit 0, 2026-10-27) |
 
 ## Log
 
@@ -36,3 +36,5 @@ L2. Hallazgos de la auditoría inicial:
 - `scripts/export_data_for_web.py` exporta rutas absolutas de `presentaciones` a `web/data/presentaciones.json`.
 - `docs/SDD/10-migracion-nuevo-pc.md` dice copiar units desde `config/systemd/user/` pero el contenido de esa carpeta no coincide con la arquitectura unificada actual.
 - `.env` no está versionado y contiene valores destino-específicos (JWT secret, IP local, credenciales admin) que deben migrarse manualmente.
+
+L3. Auditoría post-migración (2026-10-27): el commit `6e383fe` cubre T1-T4 (21 ficheros, +136/-152); T5 verificada localmente (build de `web/dist/` con node v24.22.1, healthcheck exit 0). Correcciones posteriores en `odd/tasks/migracion-post-auditoria.md`.

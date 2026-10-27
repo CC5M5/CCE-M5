@@ -33,8 +33,8 @@
 
 ## 8.4. Build
 
-- Requiere **Node 22.23.3**. Node 24 rompe Astro 4.16/4.19.
-- `.nvmrc` fija la versión.
+- Requiere **Node ≥ 22**. Build verificado con Node 24.22.1 (migración 2026-10-27, `web/dist/` 165 archivos).
+- `.nvmrc` fija 22.23.3 como referencia para nvm; el node del sistema (`/usr/bin/node`) también funciona.
 - `BASE_PATH` y `SITE_URL` vienen de variables de entorno.
 - Local: `BASE_PATH=/`, `SITE_URL=http://<IP_LOCAL>:4321`.
 - GitHub Pages: `BASE_PATH=/CCE-M5/`, `SITE_URL=https://cc5m5.github.io`.
