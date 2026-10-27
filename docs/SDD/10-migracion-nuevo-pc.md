@@ -4,7 +4,7 @@
 
 - Linux (preferiblemente Debian/Ubuntu).
 - Python 3.13.
-- Node.js 22.23.3 (gestionar con nvm es lo más habitual).
+- Node.js ≥ 22 (node del sistema o nvm; verificado también con 24.22.1).
 - `git`, `npm`, `sqlite3`.
 - Usuario sin privilegios para ejecutar los servicios.
 - Conexión a Internet para clonar, instalar dependencias y publicar en GitHub Pages (opcional).
@@ -43,21 +43,21 @@
    .venv/bin/python -m pip install -r requirements.lock.txt
    .venv/bin/python -m pip install -e .
    ```
-3. Instalar Node 22.23.3 (ejemplo con nvm):
+3. Asegurar Node ≥ 22 (node del sistema o nvm):
    ```bash
-   nvm install 22.23.3
-   nvm use 22.23.3
+   node --version   # debe ser >= 22
    cd web && npm install
    cd ..
    ```
+   Con nvm (alternativa): `nvm install 22.23.3 && nvm use 22.23.3`.
 4. Restaurar `data/db.sqlite3` desde el backup.
 5. Crear `.env` con los valores del origen (mínimo recomendado):
    ```ini
    CCE_ADMIN_JWT_SECRET=<tu-secreto-seguro>
    CCE_ADMIN_DEFAULT_PASSWORD=<tu-password>
    GITHUB_TOKEN_CC5M5=<tu-token-github>
-   # Ajustar si node no está en el path habitual de nvm:
-   CCE_NODE_BIN=/home/<usuario>/.nvm/versions/node/v22.23.3/bin
+   # Ajustar si node no está en el path habitual:
+   CCE_NODE_BIN=/usr/bin
    # Opcional: IP/nombre del servidor destino para CORS y rebuild
    CCE_SITE_URL=http://<IP_LOCAL>:4321
    ADMIN_CORS_ORIGINS=http://localhost:4321,http://<IP_LOCAL>:4321,http://<IP_LOCAL>:4323
@@ -97,7 +97,7 @@
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | Admin no arranca en 4323 | `PYTHONPATH` no apunta al proyecto o `.env` falta | Revisar `Environment=PYTHONPATH=%h/proyectos/CCE-M5-Web-Presentaciones` y que `.env` exista. |
-| Build Astro falla | Node 24 o `package-lock.json` ausente | Usar Node 22.23.3 y `npm install`. |
+| Build Astro falla | `package-lock.json` ausente o Node < 22 | Reinstalar dependencias con `npm install` (Node ≥ 22 verificado, incluida la 24.x). |
 | Web local no sirve | `web/dist` no existe | Ejecutar `cd web && npm run build`. |
 | Login admin falla | JWT secret diferente | Sincronizar `.env` o borrar `data/.admin_jwt_secret` para regenerarlo. |
 | `src` no se encuentra | No se instaló el paquete editable | Ejecutar `.venv/bin/python -m pip install -e .` |

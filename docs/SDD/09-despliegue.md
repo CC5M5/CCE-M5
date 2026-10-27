@@ -27,8 +27,8 @@ CCE_ADMIN_JWT_SECRET=cambia-esta-clave-en-produccion-minimo-32-bytes
 CCE_ADMIN_DEFAULT_USER=admin
 CCE_ADMIN_DEFAULT_PASSWORD=cambia-esta-contrasena
 
-# Node local (ajustar al path de nvm o node del destino)
-CCE_NODE_BIN=/home/usuario/.nvm/versions/node/v22.23.3/bin
+# Node local (ajustar al path de node del destino; /usr/bin con node del sistema)
+CCE_NODE_BIN=/usr/bin
 
 # Rebuild web local
 CCE_BASE_PATH=/
