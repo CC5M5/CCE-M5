@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS presentacion_slides (
 ## Editor local (Fase B)
 
 - Servidor Flask en `scripts/editor_diapositivas_server.py`.
-- Puerto `4323`, bind `0.0.0.0`, accesible en `http://192.168.68.244:4323`.
+- Puerto `4323`, bind `0.0.0.0`, accesible en `http://<ip-local>:4323` (en el destino actual: `192.168.68.240`).
 - Listado lateral por tipo canónico.
 - Formulario de edición:
   - Tipo (selector).

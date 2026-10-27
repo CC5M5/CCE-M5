@@ -5,5 +5,5 @@ After=cce-m5-admin.service cce-m5-web.service
 [Service]
 Type=oneshot
 WorkingDirectory=%h/proyectos/CCE-M5-Web-Presentaciones
-Environment="PATH=%h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin:%h/.nvm/versions/node/v22.23.3/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PATH=%h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
 ExecStart=%h/proyectos/CCE-M5-Web-Presentaciones/.venv/bin/python %h/proyectos/CCE-M5-Web-Presentaciones/scripts/healthcheck.py

@@ -36,7 +36,7 @@ El flujo semanal se ejecuta desde el panel de administración (`/admin/`). Es **
 
 1. `export_data_for_web.py` genera `web/data/*.json`.
 2. `sync_presentaciones_html.py` copia assets a `web/public/`.
-3. `npm run build` (Node 22.23.3) genera `web/dist/`.
+3. `npm run build` (Node ≥ 22) genera `web/dist/`.
 4. `git add` + `git commit` + `git push origin main`.
 5. GitHub Actions ejecuta `.github/workflows/deploy.yml` y publica en Pages.
 

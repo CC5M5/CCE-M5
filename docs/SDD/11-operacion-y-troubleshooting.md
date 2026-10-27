@@ -15,7 +15,7 @@ ss -tlnp | grep -E '4321|4323'
 
 # Rebuild web manual (ajustar CCE_NODE_BIN si node no está en PATH)
 export CCE_PROJECT_DIR="$HOME/proyectos/CCE-M5-Web-Presentaciones"
-export CCE_NODE_BIN="$HOME/.nvm/versions/node/v22.23.3/bin"
+export CCE_NODE_BIN="/usr/bin"  # o el path de node/nvm del destino
 export CCE_BASE_PATH=/
 export CCE_SITE_URL="http://$(hostname -I | awk '{print $1}'):4321"
 .venv/bin/python scripts/export_data_for_web.py
