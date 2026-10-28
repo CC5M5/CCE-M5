@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Regression invariants for the post-audit migration fix (S1, S4, S6)."""
-import json, pathlib, re, sys
+import json
+import pathlib
+import re
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 fails = []
@@ -36,5 +39,6 @@ for p in (ROOT / "docs/SDD").rglob("*.md"):
         fails.append(f"S6: dead nvm path in {p.relative_to(ROOT)}")
 
 if fails:
-    print("\n".join(fails)); sys.exit(1)
+    print("\n".join(fails))
+    sys.exit(1)
 print("migration invariants OK")
