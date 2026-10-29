@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     jwt_secret: str | None = Field(default=None, alias="CCE_ADMIN_JWT_SECRET")
     jwt_ttl_minutes: int = Field(default=480, alias="CCE_ADMIN_TOKEN_TTL")
     default_admin_username: str = Field(default="rafael.torres", alias="CCE_ADMIN_DEFAULT_USER")
-    default_admin_password: str = Field(default="1234", alias="CCE_ADMIN_DEFAULT_PASSWORD")
+    default_admin_password: str | None = Field(default=None, alias="CCE_ADMIN_DEFAULT_PASSWORD")
     default_admin_name: str = Field(default="Rafael Torres", alias="CCE_ADMIN_DEFAULT_NAME")
     cors_origins_raw: str = Field(
         default="http://localhost:4321,http://localhost:4323",

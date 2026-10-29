@@ -61,12 +61,27 @@ def decode_access_token(token: str) -> dict:
 
 
 def seed_default_admin() -> None:
-    """Crea el usuario administrador inicial si no existe."""
+    """Crea el usuario administrador inicial si no existe.
+
+    Fail-fast (S1): si no existe el admin y no se definió
+    CCE_ADMIN_DEFAULT_PASSWORD, el arranque falla en lugar de crear un
+    administrador con una contraseña débil por defecto.
+    """
     init_admin_schema()
     existing = get_user_by_username(DEFAULT_ADMIN_USERNAME)
     if existing:
         logger.info("Usuario admin '%s' ya existe", DEFAULT_ADMIN_USERNAME)
         return
+
+    if not DEFAULT_ADMIN_PASSWORD:
+        logger.error(
+            "No existe el usuario administrador '%s' y no está definido "
+            "CCE_ADMIN_DEFAULT_PASSWORD. Defina la variable de entorno para "
+            "crear el administrador inicial; no se usará ninguna contraseña "
+            "por defecto.",
+            DEFAULT_ADMIN_USERNAME,
+        )
+        raise RuntimeError("Falta CCE_ADMIN_DEFAULT_PASSWORD para crear el administrador inicial")
 
     hashed = _hash_password(DEFAULT_ADMIN_PASSWORD)
     user_id = create_user(

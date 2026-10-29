@@ -20,7 +20,7 @@ cp .env.example .env
 | `CCE_SITE_URL` | URL base del site local | `http://localhost:4321` |
 | `CCE_ADMIN_JWT_SECRET` | Secreto para tokens JWT | generado automáticamente |
 | `CCE_ADMIN_DEFAULT_USER` | Usuario admin inicial | `rafael.torres` |
-| `CCE_ADMIN_DEFAULT_PASSWORD` | Contraseña admin inicial | `1234` |
+| `CCE_ADMIN_DEFAULT_PASSWORD` | Contraseña del admin inicial (solo si aún no existe el admin) | *(sin valor por defecto; obligatorio en primera instalación)* |
 | `CCE_ADMIN_REDIS_URL` | Redis para rate limiting | memoria local |
 | `CCE_NODE_BIN` | Directorio con `node`/`npm` | `/usr/bin` |
 
