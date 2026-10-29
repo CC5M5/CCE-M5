@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     rate_limit_window_seconds: float = Field(default=300.0, alias="CCE_ADMIN_RATE_LIMIT_WINDOW_SECONDS")
     rate_limit_block_seconds: float = Field(default=900.0, alias="CCE_ADMIN_RATE_LIMIT_BLOCK_SECONDS")
     redis_url: str | None = Field(default=None, alias="CCE_ADMIN_REDIS_URL")
+    comentarios_rate_limit_max: int = Field(default=5, alias="CCE_ADMIN_COMENTARIOS_RATE_LIMIT_MAX")
 
     # ------------------------------------------------------------------
     # Node / build
