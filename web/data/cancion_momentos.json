@@ -100,6 +100,10 @@
     "momento_liturgico": "entrada"
   },
   {
+    "cancion_id": 22,
+    "momento_liturgico": "perdon"
+  },
+  {
     "cancion_id": 23,
     "momento_liturgico": "paz"
   },
@@ -442,5 +446,37 @@
   {
     "cancion_id": 109,
     "momento_liturgico": "salmo"
+  },
+  {
+    "cancion_id": 228,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 228,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 228,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 230,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 231,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 231,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 231,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 233,
+    "momento_liturgico": "entrada"
   }
 ]
