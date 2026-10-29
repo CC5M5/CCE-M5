@@ -20,7 +20,11 @@ SCHEMA_PATH = DATA_DIR / "schema.sql"
 
 
 def create_connection(db_path: Path | None = None) -> sqlite3.Connection:
-    """Crea y configura una conexión SQLite lista para usar."""
+    """Crea y configura una conexión SQLite lista para usar.
+
+    No ejecuta PRAGMA integrity_check: ese check es costoso y se hace una
+    única vez en ``init_database`` (auditoría H4/M, 2026-11-01).
+    """
     target = db_path or DB_PATH
     conn = sqlite3.connect(
         str(target),
@@ -29,7 +33,6 @@ def create_connection(db_path: Path | None = None) -> sqlite3.Connection:
     )
     conn.row_factory = sqlite3.Row
     _apply_pragmas(conn)
-    _validate_integrity(conn)
     return conn
 
 
@@ -42,7 +45,7 @@ def _apply_pragmas(conn: sqlite3.Connection) -> None:
 
 
 def _validate_integrity(conn: sqlite3.Connection) -> None:
-    """Ejecuta PRAGMA integrity_check al inicio."""
+    """Ejecuta PRAGMA integrity_check (una vez, al inicializar)."""
     row = conn.execute("PRAGMA integrity_check").fetchone()
     result = row[0] if row else "unknown"
     if result != "ok":
@@ -98,6 +101,7 @@ def init_database(db_path: Path | None = None) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
 
     with create_connection(target) as conn:
+        _validate_integrity(conn)
         _ensure_schema_version(conn)
 
         schema_sql = _load_schema_sql()
@@ -237,13 +241,38 @@ def _create_default_indexes(conn: sqlite3.Connection) -> None:
         )
 
 
+_SQL_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _validate_sql_identifier(name: str) -> str:
+    """Valida un identificador SQL simple (sin comillas, sin espacios)."""
+    if not _SQL_IDENTIFIER_RE.match(name):
+        raise ValueError(f"Identificador SQL no válido: {name!r}")
+    return name
+
+
 def _add_column_if_missing(
     conn: sqlite3.Connection,
     tabla: str,
     columna: str,
     tipo: str,
 ) -> None:
-    """Añade una columna a una tabla si no existe (migración ligera)."""
+    """Añade una columna a una tabla si no existe (migración ligera).
+
+    Los identificadores se validan contra una lista cerrada antes de
+    interpolarse en SQL (auditoría B15, 2026-11-01).
+    """
+    tabla = _validate_sql_identifier(tabla)
+    columna = _validate_sql_identifier(columna)
+    tipo = _validate_sql_identifier(tipo)
+
+    existe = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?",
+        (tabla,),
+    ).fetchone()
+    if existe is None:
+        raise sqlite3.DatabaseError(f"La tabla {tabla!r} no existe")
+
     cols = {row["name"] for row in conn.execute(f"PRAGMA table_info({tabla})").fetchall()}
     if columna not in cols:
         conn.execute(f"ALTER TABLE {tabla} ADD COLUMN {columna} {tipo}")

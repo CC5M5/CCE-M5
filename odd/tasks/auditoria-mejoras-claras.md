@@ -30,7 +30,7 @@ S8. Auditoría B15 — SQL por f-string en `_add_column_if_missing` (`PRAGMA tab
 
 | ID | Spec | Descripción | Ruta | Estado | Commit |
 |---|---|---|---|---|---|
-| T1 | S1 | Fail-fast en `seed_default_admin` + default `None` en config + `.env.example`/`README.md` + tests (auth, api). | inline | pending | — |
+| T1 | S1 | Fail-fast en `seed_default_admin` + default `None` en config + `README.md` + tests (auth, api). `.env.example` pendiente (bloqueado por política de seguridad). | inline | done | `2a5624a` |
 | T2 | S4 | `integrity_check` solo en `init_database` + tests. | inline | pending | — |
 | T3 | S2 | Rate limit por IP en `/comentarios` + email fuera del issue público + tests. | inline | pending | — |
 | T4 | S3 | `scripts/backup_db.py` (API backup de sqlite3) + script de systemd + tests. | inline | pending | — |
@@ -43,3 +43,7 @@ S8. Auditoría B15 — SQL por f-string en `_add_column_if_missing` (`PRAGMA tab
 L1. "Implementa las mejoras que claramente identificas teniendo en cuenta que la web posteriormente se va a exponer a internet y no solo a LAN. Si te encuentras con puntos que no te queden claros puedes pausar y preguntarme al final como quiero resolverlo." (usuario, 2026-11-01)
 
 L2. (evidencia, 2026-11-01) Baseline pytest pre-cambios: `277 passed, 1 warning in 75.88s` (warning: `StarletteDeprecationWarning` por httpx en starlette.testclient; no bloqueante). Entorno: `.venv/bin/python` (Python 3.13.5).
+
+L3. (decisión, 2026-11-01) El edit de `.env.example` fue bloqueado por la política de seguridad del entorno ("Gentle AI safety policy blocked access to sensitive path"). Se pospone la edición de ese archivo a las preguntas finales del usuario; el código y el README ya reflejan el fail-fast.
+
+L4. (evidencia, 2026-11-01) T1: RED `test_seed_sin_password_y_sin_admin_falla` (DID NOT RAISE) → GREEN tras implementar el fail-fast. Descubrimiento: los fixtures de test no eran herméticos al `.env` del proyecto (pydantic-settings lo carga relativo al CWD y define `CCE_ADMIN_DEFAULT_PASSWORD` fuerte); se corrigió con `monkeypatch.chdir(tmp_path)` + `CCE_ADMIN_DEFAULT_PASSWORD` explícito en fixtures de `test_web_admin_auth.py` y `test_web_admin_api.py`. GREEN: `64 passed` en auth/api/config/database; commit `2a5624a`.
