@@ -2,6 +2,10 @@
 """
 Parser de acordes para el Cancionero Escolapio - VERSION CORREGIDA
 Separa letra y acordes, identifica momentos liturgicos
+
+NOTA (auditoría M8): versión 1, solo de referencia. El parser canónico de
+producción es `src/parsers/acordes_parser_v3.py`; este módulo no debe
+usarse para nuevas funcionalidades.
 """
 
 import re

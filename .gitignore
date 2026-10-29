@@ -24,7 +24,6 @@ htmlcov/
 node_modules/
 web/node_modules/
 web/dist/
-!web/dist
 !web/package.json
 !web/astro.config.mjs
 !web/tailwind.config.mjs

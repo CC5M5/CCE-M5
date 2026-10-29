@@ -33,8 +33,8 @@ S8. Auditoría B15 — SQL por f-string en `_add_column_if_missing` (`PRAGMA tab
 | T1 | S1 | Fail-fast en `seed_default_admin` + default `None` en config + `README.md` + tests (auth, api). `.env.example` pendiente (bloqueado por política de seguridad). | inline | done | `2a5624a` |
 | T2 | S4,S8 | `integrity_check` solo en `init_database` + `_add_column_if_missing` con validación de identificadores y check de existencia de tabla + tests. | inline | done | `321c1d9` |
 | T3 | S2 | Rate limit por IP en `/comentarios` + email fuera del issue público + tests. | inline | done | `056aaee` |
-| T4 | S3 | `scripts/backup_db.py` (API backup de sqlite3) + script de systemd + tests. | inline | done | (cometido a continuación) |
-| T5 | S5,S6,S7 | `rebuild_web` (sys.executable + checks de systemctl), docstrings de parsers, `.gitignore`/`.coverage` + tests. | inline | pending | — |
+| T4 | S3 | `scripts/backup_db.py` (API backup de sqlite3) + script de systemd + tests. | inline | done | `bdfe7bd` |
+| T5 | S5,S6,S7 | `rebuild_web` (sys.executable + checks de systemctl), docstrings de parsers, `.gitignore`/`.coverage` + tests. | inline | done | `por escribir` |
 | T6 | — | Full pytest post-cambios y comparación con baseline (277 passed). | inline | pending | — |
 | T7 | — | Actualizar Log de este doc, mirror Engram, informe final con preguntas abiertas. | inline | pending | — |
 
