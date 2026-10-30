@@ -20,7 +20,7 @@ cp .env.example .env
 | `CCE_SITE_URL` | URL base del site local | `http://localhost:4321` |
 | `CCE_ADMIN_JWT_SECRET` | Secreto para tokens JWT | generado automáticamente |
 | `CCE_ADMIN_DEFAULT_USER` | Usuario admin inicial | `rafael.torres` |
-| `CCE_ADMIN_DEFAULT_PASSWORD` | Contraseña admin inicial | `1234` |
+| `CCE_ADMIN_DEFAULT_PASSWORD` | Contraseña del admin inicial (solo si aún no existe el admin) | *(sin valor por defecto; obligatorio en primera instalación)* |
 | `CCE_ADMIN_REDIS_URL` | Redis para rate limiting | memoria local |
 | `CCE_NODE_BIN` | Directorio con `node`/`npm` | `/usr/bin` |
 
@@ -101,6 +101,41 @@ open http://localhost:4323/health
 ```
 
 **Nota:** El build de Docker requiere varios GB libres en el disco del host para extraer capas. En este entorno no se ha podido completar por falta de espacio; la imagen se valida con `docker compose config`.
+
+## Exponer a Internet (requisitos)
+
+El servicio está pensado para LAN: los orígenes CORS por defecto son locales,
+el rate limiting vive en memoria y ninguno de los servicios emite TLS. Para
+exponerlo a Internet se deben cubrir estos puntos:
+
+1. **TLS / reverse proxy.** El admin API (4323) y la web estática (4321) no
+   emiten TLS. Servirlos detrás de un reverse proxy con HTTPS (Caddy, nginx,
+   etc.) que redirija `http → https`. Si se sirve bajo un subpath
+   (p. ej. `https://dominio/cce/`), fijar `CCE_BASE_PATH=/cce/` y
+   `CCE_SITE_URL=https://dominio/cce/` en `.env`.
+2. **Secreto JWT.** Definir `CCE_ADMIN_JWT_SECRET` explícitamente en `.env`
+   (mínimo 32 bytes). Sin valor, se genera uno aleatorio y se persiste en
+   `data/.admin_jwt_secret`; si ese archivo no viaja con la instalación, los
+   tokens existentes quedan inválidos en cada arranque.
+3. **CORS.** El default solo permite orígenes locales. Para el dominio
+   público, añadir `ADMIN_CORS_ORIGINS` con los orígenes exactos (sin `*`):
+   `ADMIN_CORS_ORIGINS=https://dominio,https://dominio/cce`.
+4. **Primera instalación.** `CCE_ADMIN_DEFAULT_PASSWORD` es **obligatorio**
+   mientras no exista el usuario admin: el arranque falla explícitamente
+   (fail-fast) si falta. Usar una contraseña fuerte; una vez creado el admin,
+   la variable deja de usarse y puede eliminarse de `.env`.
+5. **Comentarios.** `POST /comentarios` requiere autenticación (401 sin
+   token) y está limitado por IP (`CCE_ADMIN_COMENTARIOS_RATE_LIMIT_MAX`,
+   default 5 por hora). El proxy usa `GITHUB_TOKEN_CC5M5` solo en el servidor;
+   el issue público de GitHub no incluye el email del visitante. Si se corren
+   varias instancias de la API tras el proxy, el rate limiting en memoria no
+   se comparte: definir `CCE_ADMIN_REDIS_URL` (p. ej. `redis://localhost:6379/0`)
+   para un backend común. Con una sola instancia no es necesario.
+6. **Backups.** `cce-m5-backup-db.timer` hace un backup diario consistente
+   (API de backup de SQLite, salida gzip con permisos 600, retención de 30
+   días) en `~/.config/cce-m5/backups/db/` (configurable con
+   `CCE_BACKUP_DIR`). Para exposición pública conviene copiar esos backups a
+   otro sitio.
 
 ## Funcionalidades
 

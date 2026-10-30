@@ -13,6 +13,9 @@ from fastapi import HTTPException
 def auth_env(tmp_path: Path, monkeypatch):
     """Devuelve módulos auth/database/config apuntando a una DB temporal."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
+    monkeypatch.setenv("CCE_ADMIN_DEFAULT_PASSWORD", "pass-admin-test")
+    # chdir para que pydantic-settings no cargue el .env del proyecto.
+    monkeypatch.chdir(tmp_path)
 
     # Recargar src.config primero porque es la nueva fuente de verdad
     from src import config as core_config
@@ -153,10 +156,43 @@ def test_seed_default_admin(auth_env) -> None:
     admin = db_mod.get_user_by_username(cfg.DEFAULT_ADMIN_USERNAME)
     assert admin is not None
     assert admin.role == "admin"
+    assert auth._verify_password("pass-admin-test", admin.password_hash)
 
     # Idempotente
     auth.seed_default_admin()
     assert db_mod.count_admins() == 1
+
+
+def test_seed_sin_password_y_sin_admin_falla(auth_env, monkeypatch) -> None:
+    """Sin CCE_ADMIN_DEFAULT_PASSWORD y sin admin, el seed debe fallar (S1)."""
+    auth, db_mod, cfg = auth_env
+    monkeypatch.delenv("CCE_ADMIN_DEFAULT_PASSWORD")
+    from src import config as core_config
+
+    importlib.reload(core_config)
+    importlib.reload(cfg)
+    importlib.reload(auth)
+
+    with pytest.raises(RuntimeError, match="CCE_ADMIN_DEFAULT_PASSWORD"):
+        auth.seed_default_admin()
+    assert db_mod.get_user_by_username(cfg.DEFAULT_ADMIN_USERNAME) is None
+
+
+def test_seed_con_admin_existente_no_requiere_password(auth_env, monkeypatch) -> None:
+    """Si el admin ya existe, el seed no necesita la variable de entorno (S1)."""
+    auth, db_mod, cfg = auth_env
+    monkeypatch.delenv("CCE_ADMIN_DEFAULT_PASSWORD")
+    from src import config as core_config
+
+    importlib.reload(core_config)
+    importlib.reload(cfg)
+    importlib.reload(auth)
+
+    db_mod.create_user(cfg.DEFAULT_ADMIN_USERNAME, auth.hash_password("otra-clave"), role="admin")
+    auth.seed_default_admin()  # no debe lanzar error
+    admin = db_mod.get_user_by_username(cfg.DEFAULT_ADMIN_USERNAME)
+    assert admin is not None
+    assert auth._verify_password("otra-clave", admin.password_hash)
 
 
 def test_change_user_password(auth_env) -> None:

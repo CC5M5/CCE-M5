@@ -15,6 +15,10 @@ from src import db_manager
 def client(tmp_path: Path, monkeypatch):
     """TestClient de FastAPI apuntando a una DB temporal."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
+    # Password explícito para los tests (sin default de fábrica desde S1).
+    monkeypatch.setenv("CCE_ADMIN_DEFAULT_PASSWORD", "pass-admin-test")
+    # chdir para que pydantic-settings no cargue el .env del proyecto.
+    monkeypatch.chdir(tmp_path)
 
     # Crear un web/dist mínimo para que el healthcheck de web estática pase.
     web_dist = tmp_path / "web" / "dist"
@@ -286,9 +290,19 @@ def test_root_redirect(client) -> None:
     assert r.status_code in (200, 307, 302)
 
 
-def test_comentarios_sin_config(client, monkeypatch) -> None:
-    monkeypatch.setattr("src.web_admin.api.GITHUB_TOKEN_COMENTARIOS", "")
+def test_comentarios_sin_token_auth_devuelve_401(client) -> None:
     r = client.post("/comentarios", json={"tipo": "sugerencia", "mensaje": "hola", "presentacion": "2026-01-01", "nombre": "Ana", "email": "a@b.com"})
+    assert r.status_code == 401
+
+
+def test_comentarios_autenticado_sin_token_github_devuelve_503(client, monkeypatch) -> None:
+    monkeypatch.setattr("src.web_admin.api.GITHUB_TOKEN_COMENTARIOS", "")
+    admin_token = _login(client)
+    r = client.post(
+        "/comentarios",
+        json={"tipo": "sugerencia", "mensaje": "hola", "presentacion": "2026-01-01", "nombre": "Ana", "email": "a@b.com"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
     assert r.status_code == 503
 
 

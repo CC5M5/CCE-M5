@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -93,6 +94,50 @@ def test_add_column_if_missing(tmp_project: Path) -> None:
     assert "nuevo" in cols
     # Idempotente
     db_manager._add_column_if_missing(conn, "test_table", "nuevo", "TEXT")
+    conn.close()
+
+
+def test_create_connection_no_valida_integridad(tmp_project: Path, monkeypatch) -> None:
+    """S4: la integridad no se comprueba en cada creación de conexión."""
+    db_path = tmp_project / "data" / "t1.sqlite3"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    calls: list = []
+    monkeypatch.setattr(db_manager, "_validate_integrity", lambda conn: calls.append(conn))
+    conn = db_manager.create_connection(db_path)
+    conn.close()
+    assert calls == []
+
+
+def test_init_database_valida_integridad(tmp_project: Path, monkeypatch) -> None:
+    """S4: init_database ejecuta integrity_check una única vez."""
+    db_path = tmp_project / "data" / "t2.sqlite3"
+    calls: list = []
+    monkeypatch.setattr(db_manager, "_validate_integrity", lambda conn: calls.append(conn))
+    db_manager.init_database(db_path)
+    assert len(calls) == 1
+
+
+def test_add_column_if_missing_rechaza_inyeccion(tmp_project: Path) -> None:
+    """S8: identificadores no válidos lanzan ValueError."""
+    db_path = tmp_project / "data" / "inj.sqlite3"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = db_manager.create_connection(db_path)
+    with conn:
+        conn.execute("CREATE TABLE test_table (id INTEGER PRIMARY KEY)")
+    with pytest.raises(ValueError):
+        db_manager._add_column_if_missing(conn, "test_table; DROP TABLE x", "nuevo", "TEXT")
+    with pytest.raises(ValueError):
+        db_manager._add_column_if_missing(conn, "test_table", "nuevo) TEXT, x TEXT", "TEXT")
+    conn.close()
+
+
+def test_add_column_if_missing_tabla_inexistente(tmp_project: Path) -> None:
+    """S8: tabla inexistente lanza sqlite3.DatabaseError."""
+    db_path = tmp_project / "data" / "nolibre.sqlite3"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = db_manager.create_connection(db_path)
+    with pytest.raises(sqlite3.DatabaseError):
+        db_manager._add_column_if_missing(conn, "no_existe", "nuevo", "TEXT")
     conn.close()
 
 
