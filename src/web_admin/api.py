@@ -200,6 +200,9 @@ async def generic_exception_handler(request, exc):
 
 
 _rate_limiter = LoginRateLimiter()
+_comentarios_limiter = IPRateLimiter(
+    max_requests=settings.comentarios_rate_limit_max, window_seconds=3600.0
+)
 
 
 @app.post("/auth/login", response_model=m.TokenResponse)
@@ -224,11 +227,19 @@ async def me(current_user: dict[str, Any] = Depends(get_current_user)):
 
 
 @app.post("/comentarios", response_model=dict)
-async def crear_comentario(payload: ComentarioRequest):
+async def crear_comentario(
+    request: Request,
+    payload: ComentarioRequest,
+    current_user: dict[str, Any] = Depends(get_current_user),
+):
     """Recibe un comentario de la web y crea un issue en GitHub vía proxy.
 
-    El token de GitHub nunca se expone al navegador; se lee del servidor.
+    Requiere autenticación (401 sin token). El token de GitHub nunca se expone
+    al navegador; se lee del servidor. Limitado por IP (por defecto 5/hora,
+    CCE_ADMIN_COMENTARIOS_RATE_LIMIT_MAX) y el issue público no incluye el
+    email del visitante.
     """
+    _comentarios_limiter.check_or_raise(request)
     if not GITHUB_TOKEN_COMENTARIOS:
         logger.warning("Intento de comentario sin GITHUB_TOKEN_COMENTARIOS configurado")
         raise HTTPException(status_code=503, detail="Servicio de comentarios no configurado")
@@ -241,7 +252,6 @@ async def crear_comentario(payload: ComentarioRequest):
     title = f"[Comentario] {tipo_label}{f' - Domingo {payload.presentacion}' if payload.presentacion else ''}".strip()
     body = (
         f"**Autor**: {payload.nombre or 'Anónimo'}\n"
-        f"**Email**: {payload.email or 'No proporcionado'}\n"
         f"**Tipo**: {tipo_label}\n"
         f"**Presentación**: {payload.presentacion or 'No especificada'}\n"
         f"**Mensaje**:\n{payload.mensaje}"

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 import time
 
 from src.config import settings
@@ -38,7 +39,7 @@ def rebuild_web() -> str:
 
         export_script = PROJECT_DIR / "scripts" / "export_data_for_web.py"
         subprocess.run(
-            ["python3", str(export_script)],
+            [sys.executable, str(export_script)],
             cwd=PROJECT_DIR,
             check=True,
             capture_output=True,
@@ -57,11 +58,21 @@ def rebuild_web() -> str:
         )
 
         # Reiniciar el servicio systemd del servidor web estático para servir la nueva build.
-        subprocess.run(
-            ["systemctl", "--user", "restart", "cce-m5-web.service"],
-            check=False,
-            capture_output=True,
-        )
+        try:
+            subprocess.run(
+                ["systemctl", "--user", "restart", "cce-m5-web.service"],
+                check=True,
+                capture_output=True,
+            )
+        except FileNotFoundError:
+            # Entornos sin systemd (p. ej. Docker): la build quedó lista en web/dist.
+            return "rebuild OK (sin reinicio: systemctl no disponible)"
+        except subprocess.CalledProcessError as exc:
+            err = exc.stderr or exc.stdout or ""
+            err_short = err.strip().splitlines()[-1] if err else "error desconocido"
+            if ": " in err_short:
+                err_short = err_short.rsplit(": ", 1)[-1]
+            return f"rebuild OK con error al reiniciar web: {err_short}"
         time.sleep(2)
 
         return "rebuild OK"

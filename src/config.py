@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     jwt_secret: str | None = Field(default=None, alias="CCE_ADMIN_JWT_SECRET")
     jwt_ttl_minutes: int = Field(default=480, alias="CCE_ADMIN_TOKEN_TTL")
     default_admin_username: str = Field(default="rafael.torres", alias="CCE_ADMIN_DEFAULT_USER")
-    default_admin_password: str = Field(default="1234", alias="CCE_ADMIN_DEFAULT_PASSWORD")
+    default_admin_password: str | None = Field(default=None, alias="CCE_ADMIN_DEFAULT_PASSWORD")
     default_admin_name: str = Field(default="Rafael Torres", alias="CCE_ADMIN_DEFAULT_NAME")
     cors_origins_raw: str = Field(
         default="http://localhost:4321,http://localhost:4323",
@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     rate_limit_window_seconds: float = Field(default=300.0, alias="CCE_ADMIN_RATE_LIMIT_WINDOW_SECONDS")
     rate_limit_block_seconds: float = Field(default=900.0, alias="CCE_ADMIN_RATE_LIMIT_BLOCK_SECONDS")
     redis_url: str | None = Field(default=None, alias="CCE_ADMIN_REDIS_URL")
+    comentarios_rate_limit_max: int = Field(default=5, alias="CCE_ADMIN_COMENTARIOS_RATE_LIMIT_MAX")
 
     # ------------------------------------------------------------------
     # Node / build

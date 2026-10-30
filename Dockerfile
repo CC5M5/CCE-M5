@@ -40,6 +40,7 @@ WORKDIR /app
 
 # Dependencias del sistema necesarias para WeasyPrint, python-pptx y SQLite.
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-dejavu \
     libpango-1.0-0 \
     libpangoft2-1.0-0 \
     libharfbuzz0b \
