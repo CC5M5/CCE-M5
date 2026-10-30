@@ -40,10 +40,10 @@ S9. Seguimiento — autenticación en `POST /comentarios`. Cambio: el endpoint r
 | T6 | — | Full pytest post-cambios y comparación con baseline (277 passed) → 292 passed, 0 fallos. | inline | done | — (job-2) |
 | T7 | — | Actualizar Log de este doc, mirror Engram, informe final con preguntas abiertas. | inline | done | — |
 | T8 | S9 | Autenticación en `crear_comentario` (`Depends(get_current_user)`) + tests de endpoint (401, 503 autenticado) + update de `test_web_admin_api.py` + ignore B008 en `pyproject.toml` para el test. | inline | done | `1ee66de` |
-| T9 | — | Instrucciones de terminal para actualizar `.env.example` (edit directa bloqueada por política de seguridad). | inline | pending | — |
-| T10 | — | Integrar el WIP de `main` en la rama (`Dockerfile`, `src/generators/pdf_musicos.py`, `web/data/presentaciones.json`, `tests/unit/test_pdf_musicos_fonts.py`). | inline | pending | — |
-| T11 | — | Documentar en `README.md` los requisitos de exposición a internet (HTTPS, `CCE_ADMIN_JWT_SECRET`, base path, rate limit, auth en `/comentarios`). | inline | pending | — |
-| T12 | — | Mirror Engram final del seguimiento + informe final de seguimiento en español. | inline | pending | — |
+| T9 | — | Instrucciones de terminal para actualizar `.env.example` (edit directa bloqueada por política de seguridad); entregadas en el informe de seguimiento. | inline | done | — |
+| T10 | — | Integrar el WIP de `main` en la rama (`Dockerfile` +fonts-dejavu, `src/generators/pdf_musicos.py` fallback monoespaciado, `tests/unit/test_pdf_musicos_fonts.py`). `web/data/presentaciones.json` ya estaba integrado por commits preexistentes. | inline | done | `fb7a6c8` |
+| T11 | — | Documentar en `README.md` los requisitos de exposición a internet (HTTPS, `CCE_ADMIN_JWT_SECRET`, CORS, base path, rate limit/Redis, auth en `/comentarios`, backups). | inline | done | (con T12) |
+| T12 | — | Mirror Engram final del seguimiento + informe final de seguimiento en español. | inline | done | — |
 
 ## Log
 
@@ -72,3 +72,11 @@ L11. (usuario, seguimiento) "(1) te doy el paso a paso del `.env.example` para t
 L12. (evidencia, seguimiento) T8: tests de endpoint escritos antes de aplicar auth (`test_endpoint_sin_token_devuelve_401`, `test_endpoint_con_token_authenticado`) → se aplicó `Depends(get_current_user)` en `crear_comentario`. GREEN: `8 passed` en `test_comentarios_proxy.py`; vecinos `73 passed`. `test_comentarios_sin_config` de `test_web_admin_api.py` actualizado (sin token de auth → 401, antes esperaba 503); nuevo `test_comentarios_autenticado_sin_token_github_devuelve_503`. Ignore `B008` por archivo en `pyproject.toml` para el test (patrón FastAPI ya usado en `src/web_admin/api.py` y `auth.py`). Suite completa (job-3): `295 passed, 1 warning in 71.46s` → sin regresiones (+3 tests vs. 292). Commit `1ee66de`.
 
 L13. (evidencia, seguimiento) Slice actual: 953 líneas en 8 commits desde `origin/main`, de los cuales `b626068` y `84e5f08` (`chore(acordes): editar Canción editable`, OpenClaw Agent, 2026-10-29) son commits de datos preexistentes en `main` local (por delante de `origin/main`); los authored por esta rama son ~699 líneas. Se mantiene `single-pr`.
+
+L14. (evidencia, seguimiento) T9: lista canónica de variables confirmada contra `README.md` (tablas de config) y `src/web_admin/config.py` (delegación `GITHUB_TOKEN_COMENTARIOS`→`s.github_token_comentarios`, `GITHUB_COMENTARIOS_OWNER`/`REPO`→settings, fallback JWT en `config.py:59`). Las instrucciones paso a paso para `.env.example` se entregan en el informe final de seguimiento (el edit directo sigue bloqueado por política de seguridad).
+
+L15. (evidencia, seguimiento) T10: el WIP de `main` se inspeccionó diff por diff (`Dockerfile` +`fonts-dejavu`; `pdf_musicos.py` con `_fc_match_family_file`, `_find_monospace_pair`, `MONOSPACE_FALLBACK_FAMILIES` y fallback de `FONT_ACORDES`/`FONT_LETRA` a la monoespaciada del sistema cuando falta Courier New; `web/data/presentaciones.json` ya integrado por los commits preexistentes). Se corrigió el orden de imports de `tests/unit/test_pdf_musicos_fonts.py` (Ruff I001). Ruff check/format limpio en los tres archivos; `6 passed` en `test_pdf_musicos_fonts.py`; suite completa (job-4): `295 passed, 1 warning in 69.06s` → sin regresiones. Commit `fb7a6c8`. `data/db.sqlite3.bak-before-normalize` no se commitea (artefacto local).
+
+L16. (evidencia, seguimiento) T11: sección `## Exponer a Internet (requisitos)` añadida a `README.md` (TLS/reverse proxy, `CCE_ADMIN_JWT_SECRET` ≥32 bytes, `ADMIN_CORS_ORIGINS`, fail-fast de `CCE_ADMIN_DEFAULT_PASSWORD`, auth+rate limit en `/comentarios` con `CCE_ADMIN_REDIS_URL` para multi-instancia, backups diarios a `~/.config/cce-m5/backups/db/` (`CCE_BACKUP_DIR`)). Commit `dd94b38` (amendado tras corregir la ruta de backups).
+
+L17. (cierre, seguimiento) Slice final: 11 commits desde `origin/main`, 1211 líneas de cambios en total; `b626068` (246) y `84e5f08` (8) son datos preexistentes de `main` local (OpenClaw Agent), así que esta rama authored ~957 líneas. Se mantiene `single-pr`; push/PR/merge son decisión del usuario. Suite final (job-4): `295 passed, 1 warning in 69.06s`. Todo el seguimiento (T8-T12) cerrado.
