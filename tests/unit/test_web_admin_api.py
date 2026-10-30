@@ -290,9 +290,19 @@ def test_root_redirect(client) -> None:
     assert r.status_code in (200, 307, 302)
 
 
-def test_comentarios_sin_config(client, monkeypatch) -> None:
-    monkeypatch.setattr("src.web_admin.api.GITHUB_TOKEN_COMENTARIOS", "")
+def test_comentarios_sin_token_auth_devuelve_401(client) -> None:
     r = client.post("/comentarios", json={"tipo": "sugerencia", "mensaje": "hola", "presentacion": "2026-01-01", "nombre": "Ana", "email": "a@b.com"})
+    assert r.status_code == 401
+
+
+def test_comentarios_autenticado_sin_token_github_devuelve_503(client, monkeypatch) -> None:
+    monkeypatch.setattr("src.web_admin.api.GITHUB_TOKEN_COMENTARIOS", "")
+    admin_token = _login(client)
+    r = client.post(
+        "/comentarios",
+        json={"tipo": "sugerencia", "mensaje": "hola", "presentacion": "2026-01-01", "nombre": "Ana", "email": "a@b.com"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
     assert r.status_code == 503
 
 

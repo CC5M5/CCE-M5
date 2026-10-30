@@ -26,6 +26,8 @@ S7. Auditoría B13/B14 — higiene de repo. Evidencia: `.gitignore` tiene `web/d
 
 S8. Auditoría B15 — SQL por f-string en `_add_column_if_missing` (`PRAGMA table_info({tabla})`, `ALTER TABLE {tabla} ADD COLUMN {columna} {tipo}`). Cambio: validación de identificadores (regex `^[A-Za-z_][A-Za-z0-9_]*$`) con `ValueError` si no califican; `sqlite3.DatabaseError` si la tabla no existe; `PRAGMA table_info` con parámetro en `sqlite_master` para el check de existencia.
 
+S9. Seguimiento — autenticación en `POST /comentarios`. Cambio: el endpoint requiere token válido vía `Depends(get_current_user)` (401 sin token); se conserva el rate limit por IP (429) y el contrato `503` sin `GITHUB_TOKEN_COMENTARIOS` (ahora alcanzable solo autenticado) y `502` en error de GitHub. `tests/unit/test_comentarios_proxy.py` cubre el comportamiento autenticado y no autenticado; `tests/unit/test_web_admin_api.py` actualiza `test_comentarios_sin_config` (503→401) y añade el endpoint 503 autenticado.
+
 ## Tasks
 
 | ID | Spec | Descripción | Ruta | Estado | Commit |
@@ -34,9 +36,14 @@ S8. Auditoría B15 — SQL por f-string en `_add_column_if_missing` (`PRAGMA tab
 | T2 | S4,S8 | `integrity_check` solo en `init_database` + `_add_column_if_missing` con validación de identificadores y check de existencia de tabla + tests. | inline | done | `321c1d9` |
 | T3 | S2 | Rate limit por IP en `/comentarios` + email fuera del issue público + tests. | inline | done | `056aaee` |
 | T4 | S3 | `scripts/backup_db.py` (API backup de sqlite3) + script de systemd + tests. | inline | done | `bdfe7bd` |
-| T5 | S5,S6,S7 | `rebuild_web` (sys.executable + checks de systemctl), docstrings de parsers, `.gitignore`/`.coverage` + tests. | inline | done | `por escribir` |
-| T6 | — | Full pytest post-cambios y comparación con baseline (277 passed). | inline | pending | — |
-| T7 | — | Actualizar Log de este doc, mirror Engram, informe final con preguntas abiertas. | inline | pending | — |
+| T5 | S5,S6,S7 | `rebuild_web` (sys.executable + checks de systemctl), docstrings de parsers, `.gitignore`/`.coverage` + tests. | inline | done | `d9557b4` |
+| T6 | — | Full pytest post-cambios y comparación con baseline (277 passed) → 292 passed, 0 fallos. | inline | done | — (job-2) |
+| T7 | — | Actualizar Log de este doc, mirror Engram, informe final con preguntas abiertas. | inline | done | — |
+| T8 | S9 | Autenticación en `crear_comentario` (`Depends(get_current_user)`) + tests de endpoint (401, 503 autenticado) + update de `test_web_admin_api.py` + ignore B008 en `pyproject.toml` para el test. | inline | pending | — |
+| T9 | — | Instrucciones de terminal para actualizar `.env.example` (edit directa bloqueada por política de seguridad). | inline | pending | — |
+| T10 | — | Integrar el WIP de `main` en la rama (`Dockerfile`, `src/generators/pdf_musicos.py`, `web/data/presentaciones.json`, `tests/unit/test_pdf_musicos_fonts.py`). | inline | pending | — |
+| T11 | — | Documentar en `README.md` los requisitos de exposición a internet (HTTPS, `CCE_ADMIN_JWT_SECRET`, base path, rate limit, auth en `/comentarios`). | inline | pending | — |
+| T12 | — | Mirror Engram final del seguimiento + informe final de seguimiento en español. | inline | pending | — |
 
 ## Log
 
@@ -47,3 +54,19 @@ L2. (evidencia, 2026-11-01) Baseline pytest pre-cambios: `277 passed, 1 warning 
 L3. (decisión, 2026-11-01) El edit de `.env.example` fue bloqueado por la política de seguridad del entorno ("Gentle AI safety policy blocked access to sensitive path"). Se pospone la edición de ese archivo a las preguntas finales del usuario; el código y el README ya reflejan el fail-fast.
 
 L4. (evidencia, 2026-11-01) T1: RED `test_seed_sin_password_y_sin_admin_falla` (DID NOT RAISE) → GREEN tras implementar el fail-fast. Descubrimiento: los fixtures de test no eran herméticos al `.env` del proyecto (pydantic-settings lo carga relativo al CWD y define `CCE_ADMIN_DEFAULT_PASSWORD` fuerte); se corrigió con `monkeypatch.chdir(tmp_path)` + `CCE_ADMIN_DEFAULT_PASSWORD` explícito en fixtures de `test_web_admin_auth.py` y `test_web_admin_api.py`. GREEN: `64 passed` en auth/api/config/database; commit `2a5624a`.
+
+L5. (evidencia, 2026-11-01) T2: tests RED de colocación (spy sobre `_validate_integrity`) + validación de identificadores de `_add_column_if_missing` (ValueError por inyección, DatabaseError por tabla inexistente) → GREEN. Suite completa: `283 passed, 2 warnings`; commit `321c1d9`.
+
+L6. (evidencia, 2026-11-01) T3: RED (sin setting, sin rate limit, email en issue) → GREEN. `crear_comentario` ahora recibe `Request`, aplica `IPRateLimiter` dedicado (`CCE_ADMIN_COMENTARIOS_RATE_LIMIT_MAX`, default 5/h → 429) y el cuerpo del issue público ya no incluye el email (el campo queda en `ComentarioRequest` por compatibilidad del formulario). `503` sin token y `502` error GitHub preservados. `6 passed` en `test_comentarios_proxy.py`; vecinos `62 passed`; commit `056aaee`.
+
+L7. (evidencia, 2026-11-01) T4: RED por falta de `scripts/backup_db.py` → GREEN con 4 tests (gzip consistente, datos WAL comitados incluidos, exit 1 sin fuente, retención por días). El backup usa `sqlite3.Connection.backup()` + `integrity_check` de la copia + gzip 600 + retención 30 días; el script de systemd ahora delega en el script Python. Commit `bdfe7bd`.
+
+L8. (evidencia, 2026-11-01) T5: RED (3 tests de `rebuild_web`) → GREEN. `rebuild_web` usa `sys.executable` para el export y ahora distingue systemctl ausente vs. reinicio fallido; notas de deprecación en `acordes_parser.py` (v1) y `acordes_parser_v2.py` señalando v3 como canónico; `.gitignore` sin la contradicción `!web/dist`; `.coverage` fuera del índice (archivo local conservado). `58 passed` en rebuild+parser; commit `d9557b4`.
+
+L9. (evidencia, 2026-11-01) T6: suite completa post-cambios (job-2): `292 passed, 2 warnings in 80.65s` vs. baseline `277 passed, 1 warning in 75.88s` → +15 tests nuevos, 0 fallos, sin regresiones. Warnings: `StarletteDeprecationWarning` (httpx en testclient, preexistente) y `DeprecationWarning` de WeasyPrint/HarfBuzz (librería, no del código). Log: `/tmp/gpYe2HuC/gentle-jobs-lVhiiw/job-2.log`.
+
+L10. (decisión, 2026-11-01) Slice final: 825 líneas de cambios en 6 commits desde `origin/main`, muy por encima del umbral de ~400; se mantiene `single-pr` (un único PR al final), push/PR/merge son decisión del usuario.
+
+L11. (usuario, seguimiento) "(1) te doy el paso a paso del `.env.example` para terminal, (2) implemento autenticación en comentarios, (3) integro el WIP de `main` en el branch, (4) documento los requisitos de internet en el README y te explico qué hacer" (asistente, confirmado por "continua" del usuario, 2026-11-01).
+
+L12. (evidencia, seguimiento) T8: tests de endpoint escritos antes de aplicar auth (`test_endpoint_sin_token_devuelve_401`, `test_endpoint_con_token_authenticado`) → se aplicó `Depends(get_current_user)` en `crear_comentario`. GREEN: `8 passed` en `test_comentarios_proxy.py`; vecinos `73 passed`. `test_comentarios_sin_config` de `test_web_admin_api.py` actualizado (sin token de auth → 401, antes esperaba 503); nuevo `test_comentarios_autenticado_sin_token_github_devuelve_503`. Ignore `B008` por archivo en `pyproject.toml` para el test (patrón FastAPI ya usado en `src/web_admin/api.py` y `auth.py`). Suite completa en curso (job-3).
