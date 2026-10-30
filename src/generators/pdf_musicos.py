@@ -196,6 +196,81 @@ def _find_font_path(
     )
 
 
+# Familias monoespaciadas de respaldo, en orden de preferencia, para el caso
+# de que la familia preferida (Courier New / TeX Gyre Cursor) no esté
+# instalada.  El alias de fontconfig "monospace" se consulta antes que esta
+# lista y, en Debian/Ubuntu, resuelve a DejaVu Sans Mono.
+MONOSPACE_FALLBACK_FAMILIES: list[str] = [
+    "dejavu sans mono",
+    "liberation mono",
+    "noto sans mono",
+    "ubuntu mono",
+    "roboto mono",
+    "free mono",
+]
+
+
+def _fc_match_family_file(spec: str) -> tuple[str, Path] | None:
+    """Resuelve (familia, archivo) vía fontconfig para un spec como 'monospace'."""
+    try:
+        result = subprocess.run(
+            ["fc-match", "-f", "%{family}|%{file}\n", spec],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return None
+    if result.returncode != 0:
+        return None
+    line = result.stdout.strip()
+    family, sep, file_str = line.partition("|")
+    if not sep:
+        return None
+    path = Path(file_str.strip())
+    if path.suffix.lower() in {".ttf", ".otf"} and path.is_file():
+        return family.strip().lower(), path
+    return None
+
+
+def _find_monospace_pair(index: dict[tuple[str, str], Path]) -> tuple[Path, Path]:
+    """
+    Busca un par (regular, bold) de la misma familia monoespaciada.
+
+    Es el respaldo cuando la familia preferida no está disponible.  Orden de
+    preferencia:
+    1. El alias monospace de fontconfig (fc-match), normalmente DejaVu Sans Mono.
+    2. Familias monoespaciadas conocidas presentes en el índice de fc-list.
+
+    Si la variante bold de la familia no existe, se reutiliza el archivo
+    regular: la métrica de carácter queda idéntica (lo crítico para la
+    alineación por índice de carácter del parser) y solo se pierde el peso
+    visual.
+    """
+    candidates: list[tuple[str, Path | None]] = []
+    matched = _fc_match_family_file("monospace")
+    if matched is not None:
+        candidates.append(matched)
+    candidates.extend((family, None) for family in MONOSPACE_FALLBACK_FAMILIES)
+
+    for family, hinted_regular in candidates:
+        regular = hinted_regular
+        if regular is None:
+            regular = (
+                index.get((family, "regular"))
+                or index.get((family, "book"))
+                or index.get((family, ""))
+            )
+        bold = index.get((family, "bold"))
+        if regular is not None:
+            return regular, bold if bold is not None else regular
+    raise FuenteNoDisponibleError(
+        "No se encontró ninguna fuente monoespaciada del sistema "
+        f"(familias buscadas: {', '.join(MONOSPACE_FALLBACK_FAMILIES)}). "
+        "Instala una, por ejemplo con: apt install fonts-dejavu"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Formato y utilidades de texto
 # ---------------------------------------------------------------------------
@@ -574,16 +649,27 @@ def _registrar_fuentes(pdf: PDFMusicos) -> None:
     """Añade al PDF las fuentes necesarias, buscándolas en el sistema."""
     index = _build_font_index()
 
-    courier_regular = _find_font_path(
-        ["Courier New", "TeX Gyre Cursor", "Courier"],
-        ["Regular", ""],
-        index,
-    )
-    courier_bold = _find_font_path(
-        ["Courier New", "TeX Gyre Cursor", "Courier"],
-        ["Bold"],
-        index,
-    )
+    try:
+        monospace_regular = _find_font_path(
+            ["Courier New", "TeX Gyre Cursor", "Courier"],
+            ["Regular", ""],
+            index,
+        )
+        monospace_bold = _find_font_path(
+            ["Courier New", "TeX Gyre Cursor", "Courier"],
+            ["Bold"],
+            index,
+        )
+    except FuenteNoDisponibleError:
+        # La alineación de acordes solo exige monoespaciado, no una familia
+        # concreta: si Courier New no está, usa la monoespaciada del sistema.
+        monospace_regular, monospace_bold = _find_monospace_pair(index)
+        logger.warning(
+            "Familia 'Courier New' no disponible; se usa la monoespaciada de "
+            "respaldo (regular=%s, bold=%s)",
+            monospace_regular.name,
+            monospace_bold.name,
+        )
 
     # Letra y acordes comparten la familia monoespaciada para mantener la
     # alineación exacta calculada por el parser (posición por carácter).
@@ -597,20 +683,20 @@ def _registrar_fuentes(pdf: PDFMusicos) -> None:
     letra_bold = (FONT_LETRA + "B").lower()
 
     if acordes_regular not in existing_keys:
-        pdf.add_font(FONT_ACORDES, "", str(courier_regular))
+        pdf.add_font(FONT_ACORDES, "", str(monospace_regular))
         existing_keys.add(acordes_regular)
     if acordes_bold not in existing_keys:
-        pdf.add_font(FONT_ACORDES, "B", str(courier_bold))
+        pdf.add_font(FONT_ACORDES, "B", str(monospace_bold))
         existing_keys.add(acordes_bold)
     if letra_regular not in existing_keys:
-        pdf.add_font(FONT_LETRA, "", str(courier_regular))
+        pdf.add_font(FONT_LETRA, "", str(monospace_regular))
         existing_keys.add(letra_regular)
     if letra_bold not in existing_keys:
-        pdf.add_font(FONT_LETRA, "B", str(courier_bold))
+        pdf.add_font(FONT_LETRA, "B", str(monospace_bold))
     logger.debug(
         "Fuente monoespaciada registrada: regular=%s bold=%s",
-        courier_regular,
-        courier_bold,
+        monospace_regular,
+        monospace_bold,
     )
 
 
