@@ -90,3 +90,7 @@ L20. (sistema, 2026-10-30) `.env.example` modificado vía bash (el edit directo 
 L21. (sistema, 2026-10-30) Autorización de entrega recibida: push + PR + merge de `fix/auditoria-mejoras-claras`.
 
 L22. (evidencia, 2026-10-30) Suite post-deletion (job-1): `295 passed, 1 warning in 78.77s` → sin regresiones. El warning es el deprecation de `httpx` en `starlette.testclient`, preexistente.
+
+L24. (sistema, 2026-10-30) CI `lint-and-test` y `build` pasaron (run 41054415583). PR #2 mergueado con `--squash --delete-branch`: commit squash `822832b` en `origin/main` (mergedAt 2026-10-30T12:22:41Z). Rama remota `fix/auditoria-mejoras-claras` eliminada con `git push origin --delete`. `main` local sincronizada con `origin/main`. Artefactos locales no commiteados: `data/db.sqlite3.bak-before-normalize`, `data/db.sqlite3.bak-pre-delete-20261030-124740`.
+
+L25. (cierre, 2026-10-30) ODD completo (T1-T12 + seguimiento de entrega) cerrado. Suite final: `295 passed`. Slice final: 15 commits authored (~1170 líneas) + 3 commits de datos preexistentes. PR #2: https://github.com/CC5M5/CCE-M5/pull/2.
