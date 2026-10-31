@@ -118,6 +118,59 @@ jobs:
         env:
           CCE_PROJECT_DIR: ${{ github.workspace }}
 
+      - name: Install system dependencies for WeasyPrint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b \
+            libfontconfig1 libfreetype6 libgdk-pixbuf-2.0-0 \
+            libffi8 libpq5 curl ca-certificates fonts-dejavu-core
+          fc-cache -fv
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          sed -i '/^-e git+/d' requirements.lock.txt
+          python -m pip install -r requirements.lock.txt
+
+      - name: Generate presentacion bundles from seed
+        run: |
+          set -euo pipefail
+          FECHAS=$(python - <<'PY'
+          import sqlite3
+
+          conn = sqlite3.connect("data/db.sqlite3")
+          try:
+              rows = conn.execute(
+                  """
+                  SELECT DISTINCT p.fecha_domingo
+                  FROM presentaciones p
+                  JOIN presentacion_slides ps ON ps.presentacion_id = p.id
+                  ORDER BY p.fecha_domingo
+                  """
+              ).fetchall()
+          finally:
+              conn.close()
+          print(" ".join(fecha for (fecha,) in rows))
+          PY
+          )
+          if [ -z "$FECHAS" ]; then
+            echo "No hay fechas con composicion en presentacion_slides; nada que generar."
+            exit 0
+          fi
+          for FECHA in $FECHAS; do
+            echo "::group::Generando bundle $FECHA"
+            PYTHONPATH=src:scripts:. python -m src.generators.generar_desde_composicion --fecha "$FECHA"
+            echo "::endgroup::"
+          done
+        env:
+          CCE_PROJECT_DIR: ${{ github.workspace }}
+
       - name: Copy presentaciones assets to public
         run: |
           mkdir -p ./public/presentaciones ./public/presentaciones_html
@@ -135,17 +188,6 @@ jobs:
           # Asegurar que las carpetas de destino no queden vacias
           touch ./public/presentaciones/.gitkeep ./public/presentaciones_html/.gitkeep
         working-directory: ./web
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          sed -i '/^-e git+/d' requirements.lock.txt
-          python -m pip install -r requirements.lock.txt
 
       - name: Export data from SQLite to JSON for Astro
         run: |
