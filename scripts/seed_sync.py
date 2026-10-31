@@ -112,7 +112,16 @@ def _build_canonical_seed(source_path: Path, output_path: Path) -> dict[str, int
     """
     if output_path.exists():
         output_path.unlink()
-    shutil.copy2(source_path, output_path)
+    # Copia consistente vía la API de backup de SQLite: incluye los datos que
+    # siguen en el WAL sin checkpoint (una copia byte a byte del archivo base
+    # los perdería).
+    src_conn = sqlite3.connect(str(source_path))
+    dst_conn = sqlite3.connect(str(output_path))
+    try:
+        src_conn.backup(dst_conn)
+    finally:
+        src_conn.close()
+        dst_conn.close()
     conn = sqlite3.connect(str(output_path))
     try:
         conn.execute("PRAGMA foreign_keys = OFF")
