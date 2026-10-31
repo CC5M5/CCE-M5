@@ -123,3 +123,33 @@ def test_check_returns_error_when_outdated(sample_db, tmp_path, monkeypatch):
     monkeypatch.setattr(seed_sync, "SEED_PATH", seed)
 
     assert seed_sync.main(["--check"]) == 1
+
+
+def test_build_canonical_seed_includes_uncheckpointed_wal_rows(tmp_path):
+    """El seed debe ser una copia consistente: no perder filas que estén en el WAL sin checkpoint."""
+    source = tmp_path / "source.sqlite3"
+    conn = sqlite3.connect(str(source))
+    # Schema y primera fila en el archivo base (journal_mode default).
+    conn.executescript(
+        """
+        CREATE TABLE canciones (id INTEGER PRIMARY KEY, titulo TEXT, letra_con_acordes TEXT);
+        INSERT INTO canciones VALUES (1, 'Canción base', 'x' * 3000);
+        """
+    )
+    conn.commit()
+    # Cambiar a WAL: la segunda fila queda en el WAL sin checkpoint.
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.execute("INSERT INTO canciones VALUES (2, 'Canción WAL', 'x' * 3000)")
+    conn.commit()
+    seed_path = tmp_path / "seed.sqlite3"
+    try:
+        seed_sync._build_canonical_seed(source, seed_path)
+    finally:
+        conn.close()
+
+    check = sqlite3.connect(str(seed_path))
+    try:
+        count = check.execute("SELECT COUNT(*) FROM canciones").fetchone()[0]
+    finally:
+        check.close()
+    assert count == 2
