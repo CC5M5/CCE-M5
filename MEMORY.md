@@ -864,3 +864,74 @@ Los editores Flask y el admin API ya estaban unificados en código bajo FastAPI 
 - `http://192.168.68.244:4323/editor-diapositivas/` — editor de diapositivas
 
 **Resultado**: Servicios locales unificados en dos puertos. Los puertos 4322 y 4324 quedan libres.
+
+## Migración a otro PC (2026-10-26–27)
+
+<!-- observed: 2026-10-27 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+El proyecto quedó preparado para funcionar en otro PC sin depender del usuario actual.
+
+**Commits clave**: `6e383fe` (preparación), `5770d63` (PR #1, correcciones post-auditoria), `1131251` (parser de acordes), `a688a81` (lint).
+
+**Cambios**:
+
+- Rutas relativas al directorio del proyecto en vez de `~/proyectos/CCE-M5-Web-Presentaciones` hardcodeado; `CCE_PROJECT_DIR` controla la raíz.
+- `nvm` limpio: sin rutas de Node absolutas; CI usa `CCE_NODE_BIN`.
+- `.env.example` completo con las variables de configuración (`CCE_PROJECT_DIR`, credenciales admin, rate limits, CORS, token GitHub).
+- DB normalizada y `schema.sql` regenerado con los datos del seed; `init_database()` idempotente.
+- Parser de acordes reconoce séptima mayor (`m7M`/`M7`/`7M`).
+
+**ODD**: `odd/tasks/migracion-portable.md` y `odd/tasks/migracion-post-auditoria.md`. PR #1 mergueado a `main`.
+
+## Auditoría para exposición a Internet (2026-10-28–30)
+
+<!-- observed: 2026-10-30 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+Mejoras de seguridad y operación identificadas en una auditoría técnica, implementadas bajo el ODD `odd/tasks/auditoria-mejoras-claras.md` (T1–T12) y mergueadas como PR #2.
+
+**Commits clave**: squash `822832b` (PR #2, CI `41054415583`), cierre `4450751`.
+
+**Mejoras implementadas**:
+
+1. **Credenciales admin fail-fast**: sin password por defecto débil en producción; `CCE_ADMIN_JWT_SECRET` exigido.
+2. **Migración e integridad segura**: `init_database`/migraciones con verificación de invariancias; `PRAGMA integrity_check` en los controles.
+3. **Rate limit y email en comentarios**: límite de intentos para el login y para `POST /comentarios` (`CCE_ADMIN_COMENTARIOS_RATE_LIMIT_MAX`); el campo `email` se mantiene visible en el formulario.
+4. **Backups WAL-consistentes**: `scripts/backup_db.py` usa la API de backup de SQLite (copia point-in-time); el directorio real es `~/.config/cce-m5/backups/db/` (corregido en README, antes decía `data/backups/`); service systemd `cce-m5-backup-db.sh`.
+5. **Robustez del rebuild**: `src/rebuild_web.py` tolera fallos de build/npm y limpia derivados; `web/dist` nunca se edita a mano.
+6. **Auth en `POST /comentarios`**: el proxy de comentarios requiere token admin.
+7. **`.env.example`**: sin placeholder de password débil (`98017e9`).
+8. **README**: sección con los requisitos de exposición a Internet (TLS/reverse proxy, secreto JWT, `ADMIN_CORS_ORIGINS` con dominio real).
+
+**Decisiones del usuario**: mantener el email visible; eliminar las 4 presentaciones del 2026-11-05 (ids 166/168/169/171) con backup WAL-consistente previo (`data/db.sqlite3.bak-pre-delete-20261030-124740`); push/PR/merge autorizados. La canción compartida id 229 no se tocó (la usa la presentación del 2026-10-22).
+
+**Resultado**: PR #2 mergueado a `main`; suite 295 passed tras la limpieza.
+
+## Fix del seed y bundles en GitHub (2026-10-31)
+
+<!-- observed: 2026-10-31 | status: active | project: CCE-M5-Web-Presentaciones -->
+
+`2026-11-01` no aparecía en GitHub aunque existía localmente: la BD local `data/db.sqlite3` está gitignored, el seed canónico era la base de la CI y los bundles `presentaciones_html/*` tampoco se versionan. ODD `odd/tasks/seed-y-bundle-github.md` (T1–T2 + verificación), cerrado.
+
+**Commits clave**: `69f7460` (fix `seed_sync`), `8308296` (seed), `54844dc` (pipeline), `876a1b5` (tests), `8e132a3` (cierre).
+
+**Cambios**:
+
+1. **`scripts/seed_sync.py` copia consistente**: `shutil.copy2` se reemplazó por la API de backup de SQLite (`src_conn.backup(dst_conn)`); con la BD fuente en WAL sin checkpoint, la copia anterior perdía filas. Test-first: `test_build_canonical_seed_includes_uncheckpointed_wal_rows` (RED `assert 1 == 2` → GREEN).
+2. **Seed sincronizado** (`data/seeds/db.empty.sqlite3`): 18 presentaciones, incluye `2026-11-01` (id 165, `publicada`, 28 slides); tablas runtime (`admin_users`, `workflow_*`) limpias por diseño.
+3. **La pipeline CI genera los bundles**: el job `build` de `.github/workflows/deploy.yml` añade deps apt de WeasyPrint y el paso `Generate presentacion bundles from seed` (`python -m src.generators.generar_desde_composicion --fecha <f>` por cada fecha con slides, `PYTHONPATH=src:scripts:.` y `CCE_PROJECT_DIR=${{ github.workspace }}`) entre la copia del seed y la copia de assets a `web/public/`.
+4. **Tests de regresión**: `tests/ci/test_deploy_workflow.py` (orden y contenido de los pasos del job `build`) y `tests/unit/test_seed_presentation_2026_11_01.py` (fecha, estado y 28 slides en el seed).
+
+**Evidencia**:
+
+- Verificación independiente: 0 bloqueadores (advisories: rutas absolutas del seed se mascarizan en CI antes del export; 14 ilustraciones gitignored faltan en los bundles CI, degradación esperada).
+- CI real `41193136809`: `lint-and-test`, `build` y `deploy` todos success.
+- Sitio en vivo: `https://cc5m5.github.io/CCE-M5/presentacion/` lista `2026-11-01`; `.../presentaciones_html/2026-11-01_presentacion/index.html` → 200; página de detalle → 200; bundle de `2026-10-25` → 200 (antes 404 en todas las fechas).
+- Suite final: 302 passed, 1 warning.
+
+**Notas**:
+
+- `seed_sync.py --check` reporta `Seed desactualizado: True` por filas runtime de la fuente (`admin_users`, `workflow_*`) que el seed limpia por diseño; las tablas de contenido coinciden.
+- Residuos `-wal`/`-shm` del seed eliminados (el seed queda en modo WAL; son cero contenido y se regeneran al abrirlo).
+- Localmente no versionados a propósito: 3 backups (`data/db.sqlite3.bak-before-normalize`, `data/db.sqlite3.bak-pre-delete-20261030-124740`, `data/seeds/db.empty.sqlite3.backup.seed_sync`).
+
+**Pendiente para exposición real a Internet**: TLS/reverse proxy, `CCE_ADMIN_JWT_SECRET` ≥32 bytes, `ADMIN_CORS_ORIGINS` con dominio real; build Docker con `fonts-dejavu` pendiente de validar (límite de disco).
