@@ -40,7 +40,6 @@ data/seeds/*.backup
 presentaciones_html/*
 !presentaciones_html/.gitkeep
 !presentaciones_html/README.md
-presentaciones/
 backups/*
 !backups/.gitkeep
 assets/*
