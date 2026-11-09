@@ -6,15 +6,20 @@ import asyncio
 import contextlib
 import json as _json
 import logging
+import os
+import subprocess
+import tempfile
 import urllib.request
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
+import httpx
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
+from src import db_manager
 from src.config import settings
 from src.web_admin import models as m
 from src.web_admin.auth import (
@@ -27,6 +32,7 @@ from src.web_admin.auth import (
     seed_default_admin,
 )
 from src.web_admin.config import (
+    DB_PATH,
     GITHUB_COMENTARIOS_OWNER,
     GITHUB_COMENTARIOS_REPO,
     GITHUB_TOKEN_COMENTARIOS,
@@ -34,6 +40,7 @@ from src.web_admin.config import (
 from src.web_admin.database import (
     WORKFLOW_STEPS,
     add_workflow_log,
+    checkpoint_wal,
     count_admins,
     create_workflow_run,
     delete_user,
@@ -63,6 +70,13 @@ async def lifespan(app: FastAPI):
     init_admin_schema()
     seed_default_admin()
     yield
+    # Cierre endurecido: consolida el WAL en el main file aunque alguna
+    # conexión se haya quedado abierta. Best-effort: un fallo aquí no debe
+    # interrumpir el shutdown.
+    try:
+        checkpoint_wal()
+    except Exception as exc:
+        logger.warning("lifespan: no se pudo checkpointear el WAL al cerrar: %s", exc)
 
 
 app = FastAPI(
@@ -287,6 +301,294 @@ async def crear_comentario(
         raise HTTPException(status_code=502, detail="Error de conexión con GitHub") from exc
 
     return {"success": True, "message": "Comentario recibido"}
+
+
+# ---------------------------------------------------------------------------
+# Deploy a GitHub Pages (solo admin)
+# ---------------------------------------------------------------------------
+
+DEPLOY_REPO = "CC5M5/CCE-M5"
+DEPLOY_WORKFLOW = "deploy.yml"
+DEPLOY_DISPATCH_URL = (
+    f"https://api.github.com/repos/{DEPLOY_REPO}/actions/workflows/{DEPLOY_WORKFLOW}/dispatches"
+)
+PUBLISH_SEED_FILE = "data/seeds/db.empty.sqlite3"
+PUBLISH_COMMIT_MESSAGE = "chore(seed): actualizar seed canónica desde el panel admin"
+
+
+class GithubApiError(Exception):
+    """Error de la API de GitHub con código HTTP y detalle legible."""
+
+    def __init__(self, status_code: int, detail: Any):
+        super().__init__(detail)
+        self.status_code = status_code
+        self.detail = detail
+
+
+def _github_api_request(
+    url: str, *, method: str = "GET", payload: dict[str, Any] | None = None
+) -> httpx.Response:
+    """Ejecuta una petición a la API de GitHub con el token configurado.
+
+    El token se usa el mismo de comentarios (GITHUB_TOKEN_CC5M5). Lanza
+    GithubApiError si el token falta (503) o si GitHub responde con 4xx/5xx;
+    los fallos de red se propagan como httpx.HTTPError.
+    """
+    if not GITHUB_TOKEN_COMENTARIOS:
+        raise GithubApiError(
+            503,
+            "GITHUB_TOKEN_CC5M5 no está configurado en el servidor.",
+        )
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {GITHUB_TOKEN_COMENTARIOS}",
+    }
+    response = httpx.request(url, method=method, headers=headers, json=payload, timeout=20.0)
+    if response.status_code >= 400:
+        raise GithubApiError(response.status_code, _github_error_detail(response))
+    return response
+
+
+def _github_error_detail(response: httpx.Response) -> str:
+    """Extrae el mensaje de error de una respuesta de la API de GitHub."""
+    try:
+        data = response.json()
+        message = str(data.get("message", ""))[:300]
+        return message or response.text[:300]
+    except Exception:
+        return response.text[:300]
+
+
+def _seed_sync_module():
+    """Carga scripts/seed_sync.py.
+
+    En pruebas el paquete es importable directamente (pythonpath incluye
+    scripts/); en producción se carga por archivo desde el directorio del
+    proyecto para no depender del sys.path.
+    """
+    try:
+        import seed_sync
+
+        return seed_sync
+    except ModuleNotFoundError:
+        import importlib.util
+
+        script_path = settings.project_dir / "scripts" / "seed_sync.py"
+        spec = importlib.util.spec_from_file_location("cce_seed_sync", script_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+
+def _checkpoint_source_db() -> None:
+    """Checkpoint WAL para que el main file de la BD refleje todo el contenido."""
+    conn = db_manager.create_connection(DB_PATH)
+    try:
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        conn.close()
+
+
+def _git(*args: str) -> subprocess.CompletedProcess[str]:
+    """Ejecuta un comando git en la raíz del proyecto (sin check)."""
+    return subprocess.run(
+        ["git", *args],
+        cwd=settings.project_dir,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+
+
+def _seed_status() -> dict[str, Any]:
+    """Estado de la seed canónica (frescura y validez de la BD de origen).
+
+    La seed se considera "al día" cuando la forma canónica de la BD de origen
+    (sin tablas de runtime, compactada) coincide con la seed actual. No
+    comparamos el archivo crudo con la seed: la seed nunca es idéntica al
+    working DB porque se limpia y se compacta al generarse.
+    """
+    seed_sync = _seed_sync_module()
+    seed_path = Path(seed_sync.SEED_PATH)
+    source_path = Path(seed_sync.SOURCE_PATH)
+    try:
+        _checkpoint_source_db()
+    except Exception:
+        logger.exception("No se pudo hacer checkpoint WAL de la BD de origen")
+    try:
+        errors = seed_sync._validate_source(source_path)
+    except Exception as exc:
+        errors = [f"No se pudo validar la BD de origen: {exc}"]
+
+    exists = seed_path.exists()
+    up_to_date = False
+    if exists and not errors and source_path.exists():
+        tmp: Path | None = None
+        try:
+            fd, tmp_name = tempfile.mkstemp(suffix=".sqlite3", prefix="seed_canon_")
+            os.close(fd)
+            tmp = Path(tmp_name)
+            seed_sync._build_canonical_seed(source_path, tmp)
+            up_to_date = tmp.read_bytes() == seed_path.read_bytes()
+        except Exception:
+            logger.exception("No se pudo construir la seed canónica provisional")
+        finally:
+            if tmp is not None:
+                with contextlib.suppress(OSError):
+                    tmp.unlink()
+
+    return {
+        "exists": exists,
+        "up_to_date": up_to_date,
+        "valid": not errors,
+        "errors": errors,
+    }
+
+
+def _git_status() -> dict[str, Any]:
+    """Estado git local: si es repo y rama actual."""
+    try:
+        repo_check = _git("rev-parse", "--is-inside-work-tree")
+    except (subprocess.SubprocessError, OSError):
+        return {"is_repo": False, "branch": None}
+    if repo_check.returncode != 0:
+        return {"is_repo": False, "branch": None}
+    branch = None
+    try:
+        branch_check = _git("rev-parse", "--abbrev-ref", "HEAD")
+        if branch_check.returncode == 0:
+            branch = branch_check.stdout.strip() or None
+    except (subprocess.SubprocessError, OSError):
+        pass
+    return {"is_repo": True, "branch": branch}
+
+
+@app.post("/admin/deploy")
+async def admin_deploy(current_user: dict[str, Any] = Depends(require_admin)):
+    """Dispara workflow_dispatch del workflow deploy.yml sobre main.
+
+    GitHub ejecuta lint-and-test → build → deploy-pages y publica el sitio.
+    """
+    try:
+        _github_api_request(DEPLOY_DISPATCH_URL, method="POST", payload={"ref": "main"})
+    except GithubApiError as exc:
+        mapped = exc.status_code if exc.status_code in (403, 404, 503) else 502
+        raise HTTPException(
+            status_code=mapped,
+            detail=f"Error en la petición a GitHub: {exc.detail}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Error de conexión con GitHub: {exc}") from exc
+    return {
+        "triggered": True,
+        "ref": "main",
+        "workflow": DEPLOY_WORKFLOW,
+        "repo": DEPLOY_REPO,
+        "run": {"html_url": f"https://github.com/{DEPLOY_REPO}/actions/workflows/{DEPLOY_WORKFLOW}"},
+    }
+
+
+@app.get("/admin/deploy/status")
+async def admin_deploy_status(current_user: dict[str, Any] = Depends(require_admin)):
+    """Estado del despliegue: última ejecución, seed canónica y git local."""
+    latest_run = None
+    runs_url = (
+        f"https://api.github.com/repos/{DEPLOY_REPO}/actions/workflows/{DEPLOY_WORKFLOW}"
+        f"/runs?per_page=1&branch=main"
+    )
+    try:
+        data = _github_api_request(runs_url)
+        data = data.json() if isinstance(data, httpx.Response) else data
+        runs = data.get("workflow_runs", [])
+        if runs:
+            run = runs[0]
+            latest_run = {
+                "status": run.get("status"),
+                "conclusion": run.get("conclusion"),
+                "head_branch": run.get("head_branch"),
+                "created_at": run.get("created_at"),
+                "html_url": run.get("html_url"),
+            }
+    except (GithubApiError, httpx.HTTPError):
+        latest_run = None
+    return {
+        "deploy": {
+            "repo": DEPLOY_REPO,
+            "workflow": DEPLOY_WORKFLOW,
+            "latest_run": latest_run,
+        },
+        "seed": _seed_status(),
+        "git": _git_status(),
+    }
+
+
+@app.post("/admin/publish")
+async def admin_publish(current_user: dict[str, Any] = Depends(require_admin)):
+    """Publica el estado local: seed canónica + commit + push a main.
+
+    Sincroniza data/db.sqlite3 → data/seeds/db.empty.sqlite3 vía
+    scripts/seed_sync.py, comite la seed (respetando .gitignore) y hace
+    push a origin main; el workflow de GitHub Pages se ejecuta con el push.
+    """
+    # Verificar que el token puede acceder al repo antes de publicar.
+    try:
+        _github_api_request(f"https://api.github.com/repos/{DEPLOY_REPO}")
+    except GithubApiError as exc:
+        mapped = exc.status_code if exc.status_code in (403, 404, 503) else 502
+        raise HTTPException(
+            status_code=mapped,
+            detail=f"GitHub no permite publicar: {exc.detail}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"Error de conexión con GitHub: {exc}") from exc
+
+    branch_check = _git("rev-parse", "--abbrev-ref", "HEAD")
+    if branch_check.returncode != 0:
+        raise HTTPException(status_code=409, detail="El directorio no es un repositorio git.")
+    branch = branch_check.stdout.strip()
+    if branch != "main":
+        raise HTTPException(
+            status_code=409,
+            detail=f"Estás en la rama '{branch}'; la publicación requiere estar en 'main'.",
+        )
+
+    seed_sync = _seed_sync_module()
+    _checkpoint_source_db()
+    source_errors = seed_sync._validate_source(seed_sync.SOURCE_PATH)
+    if source_errors:
+        raise HTTPException(
+            status_code=409,
+            detail="La base de datos de origen no es válida para la seed: " + "; ".join(source_errors),
+        )
+
+    seed_sync._apply_sync()
+
+    status_check = _git("status", "--porcelain")
+    changed = sorted(
+        {
+            line[3:].strip()
+            for line in status_check.stdout.splitlines()
+            if line and line[3:].strip() == PUBLISH_SEED_FILE
+        }
+    )
+    if not changed:
+        return {"committed": False, "pushed": False, "files": []}
+
+    _git("add", "--", *changed)
+    _git("commit", "-m", PUBLISH_COMMIT_MESSAGE)
+    push = _git("push", "origin", "main")
+    if push.returncode != 0:
+        raise HTTPException(
+            status_code=500,
+            detail=f"git push falló: {push.stderr.strip()[:300] or push.stdout.strip()[:300]}",
+        )
+    return {
+        "committed": True,
+        "pushed": True,
+        "files": changed,
+        "commit_message": PUBLISH_COMMIT_MESSAGE,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -662,7 +964,7 @@ async def fechas_presentaciones(
     """Devuelve las fechas de presentaciones ya publicadas (visible para viewer)."""
     from src.db_manager import get_connection
 
-    with get_connection() as conn:
+    with contextlib.closing(get_connection()) as conn:
         rows = conn.execute(
             "SELECT fecha_domingo FROM presentaciones ORDER BY fecha_domingo DESC"
         ).fetchall()

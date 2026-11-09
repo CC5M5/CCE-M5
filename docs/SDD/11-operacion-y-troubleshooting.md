@@ -37,6 +37,7 @@ bash scripts/systemd/cce-m5-backup-db.sh
 | 404 en presentación publicada | Revisar `ruta_web` relativa en BD, re-exportar JSON y rebuild. |
 | Workflow no avanza | Revisar logs en `workflow_logs`; hacer rollback y retry. |
 | Servicio falla con `ModuleNotFoundError: No module named 'src'` | Comprobar que `PYTHONPATH` apunta al directorio raíz del proyecto o que el paquete editable está instalado (`pip install -e .`). |
+| El admin deja `-wal`/`-shm` o file descriptors abiertos | Las conexiones deben cerrarse con `contextlib.closing` (DA-007); el lifespan checkpointea el WAL al cerrar. Verificar con `tests/unit/test_web_admin_api.py::test_lifespan_startup_cierra_conexiones` y `test_lifespan_shutdown_trunca_wal`. |
 
 ## 11.3. Backups
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import os
 from pathlib import Path
 
 import pytest
@@ -11,9 +12,8 @@ from fastapi.testclient import TestClient
 from src import db_manager
 
 
-@pytest.fixture
-def client(tmp_path: Path, monkeypatch):
-    """TestClient de FastAPI apuntando a una DB temporal."""
+def build_client(tmp_path: Path, monkeypatch) -> TestClient:
+    """Construye un TestClient de FastAPI apuntando a una DB temporal (sin entrar en su contexto)."""
     monkeypatch.setenv("CCE_PROJECT_DIR", str(tmp_path))
     # Password explícito para los tests (sin default de fábrica desde S1).
     monkeypatch.setenv("CCE_ADMIN_DEFAULT_PASSWORD", "pass-admin-test")
@@ -82,8 +82,116 @@ def client(tmp_path: Path, monkeypatch):
     # Mockear rebuild_web para no tocar el filesystem real
     monkeypatch.setattr("src.rebuild_web.rebuild_web", lambda: None)
 
-    with TestClient(api.app) as tc:
+    return TestClient(api.app)
+
+
+@pytest.fixture
+def client(tmp_path: Path, monkeypatch) -> TestClient:
+    """TestClient de FastAPI apuntando a una DB temporal (contexto ya entrado)."""
+    tc = build_client(tmp_path, monkeypatch)
+    with tc:
         yield tc
+
+
+def _sqlite_fd_count(tmp_path: Path) -> int:
+    """Cuenta file descriptors del proceso que apuntan a la BD temporal.
+
+    Cubre `db.sqlite3`, `db.sqlite3-wal` y `db.sqlite3-shm`. `close()` libera
+    el fd de forma determinista incluso con ciclos de referencias, así que
+    esta señal no depende de GC ni de queries cruzando threads (que lanzan
+    `ProgrammingError` por thread affinity aunque la conexión siga abierta).
+    Devuelve -1 si `/proc/self/fd` no está disponible.
+    """
+    root = os.path.abspath(str(tmp_path))
+    fd_dir = Path("/proc/self/fd")
+    if not fd_dir.is_dir():
+        return -1
+    count = 0
+    for entry in os.listdir(fd_dir):
+        try:
+            target = os.readlink(fd_dir / entry)
+        except OSError:
+            continue
+        if target.startswith(root) and (
+            target.endswith(".sqlite3")
+            or target.endswith(".sqlite3-wal")
+            or target.endswith(".sqlite3-shm")
+        ):
+            count += 1
+    return count
+
+
+def test_lifespan_startup_cierra_conexiones(tmp_path: Path, monkeypatch) -> None:
+    """Las conexiones abiertas durante el arranque (init_admin_schema,
+    seed_default_admin) deben cerrarse de forma determinista, no
+    depender de GC: una conexión viva mantiene -wal/-shm y bloquea un
+    cierre limpio de la app.
+
+    Señal: al salir del TestClient (shutdown de la lifespan) no debe
+    quedar ningún file descriptor apuntando a la BD temporal.
+    """
+    import sqlite3 as _sqlite3
+
+    if not Path("/proc/self/fd").is_dir():
+        pytest.skip("conteo de fds requiere /proc/self/fd (Linux)")
+
+    tc = build_client(tmp_path, monkeypatch)
+
+    started: list[_sqlite3.Connection] = []
+    real_connect = _sqlite3.connect
+
+    def _traced(*args, **kwargs):
+        conn = real_connect(*args, **kwargs)
+        started.append(conn)
+        return conn
+
+    monkeypatch.setattr(_sqlite3, "connect", _traced)
+
+    baseline = _sqlite_fd_count(tmp_path)
+    assert baseline == 0, f"{baseline} fds apuntan a la BD antes de entrar a la app"
+
+    with tc:
+        assert tc.get("/health").status_code == 200
+        assert started, "el arranque de la app debe abrir conexiones de BD"
+
+    remaining = _sqlite_fd_count(tmp_path)
+    assert remaining == 0, (
+        f"quedan {remaining} file descriptors apuntando a la BD tras el shutdown "
+        f"sin GC: las conexiones del arranque no se cerraron de forma determinista"
+    )
+
+
+def test_lifespan_shutdown_trunca_wal(tmp_path: Path, monkeypatch) -> None:
+    """Al cerrar la app, la lifespan checkpointea el WAL.
+
+    Se abre una conexión externa con una fila recién escrita (queda en el
+    -wal) y, al terminar el TestClient, el -wal debe quedar truncado a 0
+    bytes: el TRUNCATE del shutdown no puede borrar el archivo mientras la
+    conexión externa lo mantiene abierto, pero sí vaciarlo.
+    """
+    import sqlite3
+
+    from src.web_admin import config as auth_config
+
+    tc = build_client(tmp_path, monkeypatch)
+    db_path = auth_config.DB_PATH
+    ext = sqlite3.connect(str(db_path))
+    ext.execute("CREATE TABLE wal_probe (id INTEGER PRIMARY KEY, valor TEXT NOT NULL)")
+    ext.execute("INSERT INTO wal_probe (valor) VALUES ('probe')")
+    ext.commit()
+    with tc:
+        assert tc.get("/health").status_code == 200
+    wal = Path(str(db_path) + "-wal")
+    try:
+        assert wal.exists(), (
+            "con la conexión externa abierta el -wal no puede borrarse; "
+            "si no existe, el shutdown no dejó el TRUNCATE"
+        )
+        assert wal.stat().st_size == 0, (
+            f"el -wal no quedó truncado en el shutdown: {wal.stat().st_size} bytes"
+        )
+    finally:
+        ext.close()
 
 
 def _login(

@@ -98,6 +98,11 @@
 - **Decisión:** `auto_rebuild_presentaciones.py` crea slides y regenera presentaciones futuras automáticamente.
 - **Consecuencias:** +Menos trabajo manual, -Posible regeneración no deseada si se edita una canción antigua.
 
+### DA-007: Cierre determinista de conexiones SQLite (2026-11-09)
+- **Contexto:** El panel admin dejaba conexiones SQLite abiertas tras el shutdown (file descriptors vivos, `-wal`/`-shm` persistentes). Causa raíz: en CPython 3.13 el runtime envuelve `sqlite3.Connection` con un `functools._lru_cache_wrapper` interno que forma un ciclo de referencias; la conexión solo se liberaba al hacer GC, aunque `close()` era determinista. `with conn:` solo gestiona la transacción, no cierra.
+- **Decisión:** Toda apertura de conexión en `db_manager.py`, `web_admin/database.py`, `web_admin/api.py` y `web_admin/workflow_engine.py` usa `contextlib.closing(conn)` (o `with contextlib.closing(conn) as conn, conn:` para transacción). El lifespan de la API hace `PRAGMA wal_checkpoint(TRUNCATE)` best-effort al cerrar (`checkpoint_wal()`).
+- **Consecuencias:** +Cierre determinista sin depender de GC, +WAL truncado en shutdown limpio, +Test determinista por conteo de `/proc/self/fd` (`test_lifespan_startup_cierra_conexiones`, `test_lifespan_shutdown_trunca_wal`, `test_init_database_cierra_la_conexion_que_abre`). -Cualquier call site nuevo de `_connection()`/`get_connection()` debe usar el mismo patrón.
+
 ## 2.4. Flujo de datos semanal
 
 ```

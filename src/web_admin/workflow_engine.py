@@ -6,6 +6,7 @@ devuelve un resultado con el nuevo estado, datos y mensajes de log.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import shutil
@@ -331,7 +332,7 @@ def handle_verify_lectures(workflow: dict[str, Any], data: dict[str, Any]) -> di
 
 def _save_lecturas_to_db(fecha: str, lecturas: dict[str, Any]) -> None:
     """Inserta o actualiza lecturas en la tabla lecturas de db.sqlite3."""
-    with get_connection() as conn, conn:
+    with contextlib.closing(get_connection()) as conn, conn:
         existing = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
 
         fields = {
@@ -375,7 +376,7 @@ def proponer_canciones_para_dia(fecha: str) -> dict[str, Any]:
     cae a canciones del mismo momento litúrgico y, en último caso, a
     cualquier canción no usada, para evitar propuestas vacías.
     """
-    with get_connection() as conn:
+    with contextlib.closing(get_connection()) as conn:
         lectura_row = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
         if not lectura_row:
             raise ValueError(f"No hay lecturas guardadas para {fecha}")
@@ -544,7 +545,7 @@ def handle_generate_assets(workflow: dict[str, Any], data: dict[str, Any]) -> di
 
     # Obtener lectura_id recién guardada
     lectura_id = None
-    with get_connection() as conn:
+    with contextlib.closing(get_connection()) as conn:
         row = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
         if row:
             lectura_id = row["id"]
@@ -552,7 +553,7 @@ def handle_generate_assets(workflow: dict[str, Any], data: dict[str, Any]) -> di
         return {"success": False, "error": f"No se encontró lectura guardada para {fecha}"}
 
     # Asegurar que existe una fila presentaciones para la fecha (puede no existir hasta publish)
-    with get_connection() as conn:
+    with contextlib.closing(get_connection()) as conn:
         existing = conn.execute(
             "SELECT id FROM presentaciones WHERE fecha_domingo = ?", (fecha,)
         ).fetchone()
@@ -720,7 +721,7 @@ def _save_presentacion_to_db(workflow: dict[str, Any], steps_data: dict[str, Any
     canciones_json = steps_data.get("canciones_json", {})
     assets = steps_data.get("assets", {})
 
-    with get_connection() as conn, conn:
+    with contextlib.closing(get_connection()) as conn, conn:
         lectura_row = conn.execute("SELECT id FROM lecturas WHERE fecha = ?", (fecha,)).fetchone()
         lectura_id = lectura_row["id"] if lectura_row else None
 

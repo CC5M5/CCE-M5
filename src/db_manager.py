@@ -3,6 +3,7 @@
 Gestor de base de datos SQLite para CCE-M5-Web-Presentaciones
 """
 
+import contextlib
 import re
 import sqlite3
 from pathlib import Path
@@ -100,7 +101,10 @@ def init_database(db_path: Path | None = None) -> None:
     target = db_path or DB_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
 
-    with create_connection(target) as conn:
+    # contextlib.closing cierra la conexión al salir del bloque: el `with`
+    # de sqlite3.Connection solo gestiona la transacción (commit/rollback)
+    # y no cierra; dejarla viva mantiene vivo el archivo -wal.
+    with contextlib.closing(create_connection(target)) as conn:
         _validate_integrity(conn)
         _ensure_schema_version(conn)
 

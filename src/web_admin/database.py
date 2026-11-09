@@ -6,6 +6,7 @@ usuarios, workflow manual y backups.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import sqlite3
@@ -34,9 +35,23 @@ def _now() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def checkpoint_wal(db_path: Path | None = None) -> None:
+    """Consolida el WAL en el archivo principal y lo trunca.
+
+    Se usa para endurecer el cierre de la app: aunque alguna conexión se
+    haya quedado abierta, tras el checkpoint el main file queda completo.
+    Cierra siempre su propia conexión.
+    """
+    conn = _connection(db_path)
+    try:
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        conn.close()
+
+
 def init_admin_schema(db_path: Path | None = None) -> None:
     """Crea las tablas de administración si no existen."""
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         conn.executescript(
             """
                 CREATE TABLE IF NOT EXISTS admin_users (
@@ -108,7 +123,7 @@ class User:
 
 
 def get_user_by_username(username: str, db_path: Path | None = None) -> User | None:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         row = conn.execute("SELECT * FROM admin_users WHERE username = ?", (username,)).fetchone()
         if not row:
             return None
@@ -129,7 +144,7 @@ def create_user(
     role: str = "viewer",
     db_path: Path | None = None,
 ) -> int:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         cur = conn.execute(
             """
                 INSERT INTO admin_users (username, password_hash, full_name, role, updated_at)
@@ -141,7 +156,7 @@ def create_user(
 
 
 def get_user_by_id(user_id: int, db_path: Path | None = None) -> User | None:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         row = conn.execute("SELECT * FROM admin_users WHERE id = ?", (user_id,)).fetchone()
         if not row:
             return None
@@ -162,7 +177,7 @@ def update_user(
     is_active: bool | None = None,
     db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         fields: list[str] = []
         values: list[str | int] = []
         if full_name is not None:
@@ -190,7 +205,7 @@ def set_user_password(
     password_hash: str,
     db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         conn.execute(
             "UPDATE admin_users SET password_hash = ?, updated_at = ? WHERE id = ?",
             (password_hash, _now(), user_id),
@@ -198,12 +213,12 @@ def set_user_password(
 
 
 def delete_user(user_id: int, db_path: Path | None = None) -> None:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         conn.execute("DELETE FROM admin_users WHERE id = ?", (user_id,))
 
 
 def count_admins(db_path: Path | None = None) -> int:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         row = conn.execute(
             "SELECT COUNT(*) AS c FROM admin_users WHERE role = 'admin' AND is_active = 1"
         ).fetchone()
@@ -211,7 +226,7 @@ def count_admins(db_path: Path | None = None) -> int:
 
 
 def list_users(db_path: Path | None = None) -> list[dict[str, Any]]:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         rows = conn.execute(
             "SELECT id, username, full_name, role, is_active, created_at FROM admin_users"
         ).fetchall()
@@ -256,7 +271,7 @@ def goto_workflow_step(
     """Mueve el workflow a un paso arbitrario conservando steps_data."""
     if target_step not in WORKFLOW_STEPS:
         raise ValueError(f"Paso no válido: {target_step}")
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         conn.execute(
             """
                 UPDATE workflow_runs
@@ -273,7 +288,7 @@ def create_workflow_run(
     steps_data: dict[str, Any] | None = None,
     db_path: Path | None = None,
 ) -> int:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
             cur = conn.execute(
                 """
                 INSERT INTO workflow_runs (fecha_domingo, status, current_step, steps_data, created_by, updated_at)
@@ -292,7 +307,7 @@ def create_workflow_run(
 
 
 def get_workflow_run(workflow_id: int, db_path: Path | None = None) -> dict[str, Any] | None:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         row = conn.execute("SELECT * FROM workflow_runs WHERE id = ?", (workflow_id,)).fetchone()
         if not row:
             return None
@@ -304,7 +319,7 @@ def get_workflow_run(workflow_id: int, db_path: Path | None = None) -> dict[str,
 def get_latest_workflow_run(
     fecha_domingo: str, db_path: Path | None = None
 ) -> dict[str, Any] | None:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         row = conn.execute(
             """
             SELECT * FROM workflow_runs
@@ -326,7 +341,7 @@ def list_workflow_runs(
     limit: int = 50,
     db_path: Path | None = None,
 ) -> list[dict[str, Any]]:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         if fecha_domingo:
             rows = conn.execute(
                 """
@@ -359,7 +374,7 @@ def update_workflow_step(
     completed_at: str | None = None,
     db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
             if steps_data is not None:
                 conn.execute(
                     """
@@ -390,7 +405,7 @@ def update_workflow_step(
 def supersede_workflow_run(
     old_workflow_id: int, new_workflow_id: int, db_path: Path | None = None
 ) -> None:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         conn.execute(
             """
                 UPDATE workflow_runs
@@ -408,7 +423,7 @@ def add_workflow_log(
     level: str = "info",
     db_path: Path | None = None,
 ) -> None:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
         conn.execute(
             """
                 INSERT INTO workflow_logs (workflow_id, step, level, message, created_at)
@@ -419,7 +434,7 @@ def add_workflow_log(
 
 
 def get_workflow_logs(workflow_id: int, db_path: Path | None = None) -> list[dict[str, Any]]:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         rows = conn.execute(
             """
             SELECT * FROM workflow_logs WHERE workflow_id = ?
@@ -442,7 +457,7 @@ def create_backup_record(
     original_paths: list[str],
     db_path: Path | None = None,
 ) -> int:
-    with _connection(db_path) as conn, conn:
+    with contextlib.closing(_connection(db_path)) as conn, conn:
             cur = conn.execute(
                 """
                 INSERT INTO workflow_backups (workflow_id, fecha_domingo, backup_path, original_paths, created_at)
@@ -460,7 +475,7 @@ def create_backup_record(
 
 
 def get_backups_for_date(fecha_domingo: str, db_path: Path | None = None) -> list[dict[str, Any]]:
-    with _connection(db_path) as conn:
+    with contextlib.closing(_connection(db_path)) as conn:
         rows = conn.execute(
             """
             SELECT * FROM workflow_backups WHERE fecha_domingo = ?

@@ -239,6 +239,24 @@
           <tbody id="workflows-tbody"></tbody>
         </table>
       </section>
+
+      <section id="deploy-section" class="card" style="display:none;">
+        <h2>🚀 Deploy GitHub Pages</h2>
+        <p style="color:#64748b;font-size:0.85rem;">
+          Publica el sitio en <strong>cc5m5.github.io/CCE-M5</strong> con el workflow
+          <code>deploy.yml</code> del repositorio <code>CC5M5/CCE-M5</code>.
+        </p>
+        <div id="deploy-status" class="alert" style="margin-bottom:0.75rem;"></div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button id="deploy-refresh-btn" class="secondary" style="font-size:0.85rem;">Actualizar estado</button>
+          <button id="deploy-main-btn" class="primary" style="font-size:0.85rem;">Desplegar main</button>
+          <button id="publish-btn" style="font-size:0.85rem;background:#1e5631;color:#fff;border:none;border-radius:0.5rem;padding:0.5rem 0.9rem;cursor:pointer;">
+            Publicar estado local (seed + push)
+          </button>
+        </div>
+        <div id="deploy-alert" class="alert"></div>
+      </section>
+
       <section id="users-section" class="card" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
           <h2>👤 Usuarios</h2>
@@ -695,6 +713,71 @@
           loadUsers();
         }
       })();
+
+      // ---- Deploy GitHub Pages (solo admin) ----
+      function renderDeployStatus(data) {
+        const el = document.getElementById('deploy-status');
+        if (!el) return;
+        const run = data.deploy?.latest_run;
+        const seed = data.seed;
+        const git = data.git;
+        const seedTxt = seed?.up_to_date
+          ? '🟢 seed canónica al día'
+          : '🟡 seed canónica desactualizada';
+        const runTxt = run
+          ? `última ejecución: ${escapeHtml(run.conclusion || run.status)} — ` +
+            `<a href="${escapeHtml(run.html_url || '')}" target="_blank" rel="noopener">ver en GitHub</a>`
+          : 'sin ejecuciones visibles (o sin token de GitHub)';
+        const gitTxt = git?.is_repo ? `git: rama ${escapeHtml(git.branch || '—')}` : 'git: sin repositorio';
+        el.innerHTML = `${seedTxt} · ${gitTxt} · ${runTxt}`;
+        el.className = seed?.up_to_date ? 'alert' : 'alert warn';
+      }
+
+      async function loadDeployStatus() {
+        try {
+          renderDeployStatus(await api('/admin/deploy/status'));
+        } catch (err) {
+          show('deploy-alert', err.message, 'error');
+        }
+      }
+
+      document.getElementById('deploy-refresh-btn')?.addEventListener('click', loadDeployStatus);
+
+      document.getElementById('deploy-main-btn')?.addEventListener('click', async () => {
+        show('deploy-alert', 'Disparando el workflow deploy.yml…', '');
+        try {
+          const r = await api('/admin/deploy', { method: 'POST' });
+          show('deploy-alert',
+            `✅ Deploy de main disparado (${r.workflow}). GitHub ejecutará lint, build y deploy a Pages.`,
+            '');
+          loadDeployStatus();
+        } catch (err) {
+          show('deploy-alert', err.message, 'error');
+        }
+      });
+
+      document.getElementById('publish-btn')?.addEventListener('click', async () => {
+        if (!confirm('¿Publicar el estado local?\nSe actualizará la seed canónica, se hará commit y se hará push a main.')) return;
+        show('deploy-alert', 'Sincronizando seed y publicando…', '');
+        try {
+          const r = await api('/admin/publish', { method: 'POST' });
+          if (r.committed) {
+            show('deploy-alert',
+              `✅ Publicado: ${r.files.join(', ')} → push a main. El workflow de GitHub Pages se ejecutará.`,
+              '');
+          } else {
+            show('deploy-alert', 'Nada que publicar: la seed canónica ya está al día.', 'warn');
+          }
+          loadDeployStatus();
+        } catch (err) {
+          show('deploy-alert', err.message, 'error');
+        }
+      });
+
+      if (currentUser().role === 'admin') {
+        document.getElementById('deploy-section').style.display = 'block';
+        loadDeployStatus();
+      }
 
       listWorkflows();
       loadPublished();

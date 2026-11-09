@@ -78,3 +78,12 @@ La web pública (`web/dist` / GitHub Pages) es **estática**. El JavaScript pued
 - **Panel admin excluido:** el build de GitHub Pages elimina `src/pages/admin` y `src/pages/admin.astro` para no publicar el panel de administración.
 
 > **Regla general:** la web estática sirve para lectura pública. Cualquier operación de escritura (comentarios, login, workflow) requiere alcanzar el admin API en la red local o a través de un proxy controlado.
+
+## 9.7. Despliegue desde el panel admin
+
+El panel admin puede disparar el deploy sin salir del navegador:
+
+- `POST /admin/deploy`: dispara el `workflow_dispatch` de `deploy.yml` en `CC5M5/CCE-M5` usando `GITHUB_TOKEN_CC5M5`.
+- `GET /admin/deploy/status`: consulta el run más reciente del workflow.
+
+El token se guarda en `.env` como `GITHUB_TOKEN_CC5M5` (nunca commiteado). Verificado en 2026-11-09 en solo lectura contra la API: el repo `CC5M5/CCE-M5` y el workflow `deploy.yml` son alcanzables y el workflow tiene `workflow_dispatch` disponible. Los permisos del token son mayores que `read-only`; para un deploy efectivo conviene reducirlos al mínimo (`public_repo` o `contents: write`).

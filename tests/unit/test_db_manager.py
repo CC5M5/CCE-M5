@@ -147,3 +147,35 @@ def test_get_connection(tmp_project: Path) -> None:
     conn = db_manager.get_connection()
     assert conn is not None
     conn.close()
+
+
+def test_init_database_cierra_la_conexion_que_abre(tmp_project: Path, monkeypatch) -> None:
+    """init_database debe cerrar la conexión que crea.
+
+    El `with create_connection(...)` de sqlite3.Connection solo gestiona la
+    transacción (commit/rollback) y no cierra la conexión: con la conexión
+    viva el archivo -wal permanece. Espiamos la conexión creada y exigimos
+    que quede cerrada al terminar init_database.
+    """
+    db_path = tmp_project / "data" / "db.sqlite3"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    opened: list[sqlite3.Connection] = []
+    original_create = db_manager.create_connection
+
+    def spy(*args, **kwargs):
+        conn = original_create(*args, **kwargs)
+        opened.append(conn)
+        return conn
+
+    monkeypatch.setattr(db_manager, "create_connection", spy)
+    db_manager.init_database(db_path)
+
+    assert opened, "init_database no abrió ninguna conexión"
+    for conn in opened:
+        try:
+            conn.execute("SELECT 1")
+            is_open = True
+        except sqlite3.ProgrammingError:
+            is_open = False
+        assert not is_open, "init_database deja su conexión abierta (el -wal queda vivo)"
