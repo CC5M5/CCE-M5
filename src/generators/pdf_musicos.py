@@ -18,6 +18,7 @@ Requisitos técnicos:
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import re
 import sqlite3
@@ -906,7 +907,7 @@ def generar_hoja_musicos(
     try:
         from src.db_manager import get_connection
 
-        with get_connection() as conn:
+        with contextlib.closing(get_connection()) as conn:
             canciones = _cargar_canciones(conn, canciones_por_momento)
 
         pdf = PDFMusicos(fecha_domingo)

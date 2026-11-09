@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib
 import json
+import os
+import sqlite3
 from datetime import date, timedelta
 from pathlib import Path
 from unittest.mock import patch
@@ -135,3 +137,81 @@ def test_auto_rebuild_tras_cancion(arb_module, monkeypatch) -> None:
     assert len(result["slides_creadas"]) == 1
     assert future in result["presentaciones_afectadas"]
     assert result["resultados"][0]["status"] == "ok"
+
+
+def _sqlite_fd_count(root: Path) -> int:
+    """Cuenta file descriptors del proceso que apuntan a la BD bajo root.
+
+    Cubre `db.sqlite3`, `db.sqlite3-wal` y `db.sqlite3-shm`. `close()` libera
+    el fd de forma determinista incluso con ciclos de referencias (el
+    functools._lru_cache_wrapper de CPython 3.13), así que esta señal no
+    depende de GC. Devuelve -1 si `/proc/self/fd` no está disponible.
+    """
+    fd_dir = Path("/proc/self/fd")
+    if not fd_dir.is_dir():
+        return -1
+    prefix = os.path.abspath(str(root))
+    count = 0
+    for entry in os.listdir(fd_dir):
+        try:
+            target = os.readlink(fd_dir / entry)
+        except OSError:
+            continue
+        if target.startswith(prefix) and target.endswith(
+            (".sqlite3", ".sqlite3-wal", ".sqlite3-shm")
+        ):
+            count += 1
+    return count
+
+
+def test_crear_slides_para_cancion_cierra_la_conexion_en_error(
+    arb_module, tmp_path, monkeypatch
+) -> None:
+    """crear_slides_para_cancion debe cerrar su conexión aunque falle la BD.
+
+    DA-007: con una BD vacía (sin tablas) el SELECT inicial lanza
+    sqlite3.OperationalError con la conexión abierta; sin close() determinista
+    la conexión queda viva hasta GC (ciclo del _lru_cache_wrapper de CPython
+    3.13) y mantiene el -wal. Señal: sin GC no debe quedar ni conexión abierta
+    ni file descriptor apuntando a la BD temporal.
+    """
+    if not Path("/proc/self/fd").is_dir():
+        pytest.skip("conteo de fds requiere /proc/self/fd (Linux)")
+
+    arb = arb_module
+    empty_db = tmp_path / "empty.sqlite3"
+    sqlite3.connect(str(empty_db)).close()
+    monkeypatch.setattr(arb, "DB_PATH", empty_db)
+
+    opened: list[sqlite3.Connection] = []
+    real_connect = sqlite3.connect
+
+    def _traced(*args, **kwargs):
+        conn = real_connect(*args, **kwargs)
+        opened.append(conn)
+        return conn
+
+    monkeypatch.setattr(sqlite3, "connect", _traced)
+
+    baseline = _sqlite_fd_count(tmp_path)
+    assert baseline == 0, f"{baseline} fds apuntan a la BD antes de la llamada"
+
+    with pytest.raises(sqlite3.OperationalError):
+        arb.crear_slides_para_cancion(1)
+
+    for conn in opened:
+        try:
+            conn.execute("SELECT 1")
+            is_open = True
+        except sqlite3.ProgrammingError:
+            is_open = False
+        assert not is_open, (
+            "crear_slides_para_cancion deja su conexión abierta sin GC: "
+            "el -wal queda vivo (DA-007)"
+        )
+
+    remaining = _sqlite_fd_count(tmp_path)
+    assert remaining == 0, (
+        f"quedan {remaining} file descriptors apuntando a la BD tras la llamada "
+        f"sin GC: la conexión no se cerró de forma determinista"
+    )

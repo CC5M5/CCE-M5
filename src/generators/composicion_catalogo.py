@@ -91,26 +91,28 @@ def _canciones_asignadas(canciones_json: str | None) -> dict[str, int]:
 
 def _get_slide_variantes(tipo: str) -> list[dict[str, Any]]:
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT id, subtipo, titulo, es_default
-        FROM slides
-        WHERE tipo = ? AND activo = 1
-        ORDER BY es_default DESC, titulo
-    """,
-        (tipo,),
-    )
-    rows = [
-        {
-            "id": r["id"],
-            "subtipo": r["subtipo"],
-            "titulo": r["titulo"],
-            "es_default": r["es_default"],
-        }
-        for r in cursor.fetchall()
-    ]
-    conn.close()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            SELECT id, subtipo, titulo, es_default
+            FROM slides
+            WHERE tipo = ? AND activo = 1
+            ORDER BY es_default DESC, titulo
+        """,
+            (tipo,),
+        )
+        rows = [
+            {
+                "id": r["id"],
+                "subtipo": r["subtipo"],
+                "titulo": r["titulo"],
+                "es_default": r["es_default"],
+            }
+            for r in cursor.fetchall()
+        ]
+    finally:
+        conn.close()
     return rows
 
 
@@ -123,53 +125,57 @@ def _slide_para_momento(tipo: str, subtipo_sugerido: str) -> dict[str, Any] | No
     3. cualquier slide activa del tipo.
     """
     conn = _get_connection()
-    cursor = conn.cursor()
-    # 1. subtipo exacto (primera coincidencia por id)
-    cursor.execute(
-        """
-        SELECT * FROM slides
-        WHERE tipo = ? AND subtipo = ? AND activo = 1
-        ORDER BY id
-        LIMIT 1
-    """,
-        (tipo, subtipo_sugerido),
-    )
-    row = cursor.fetchone()
-    if not row:
-        # 2. cualquier subtipo default
+    try:
+        cursor = conn.cursor()
+        # 1. subtipo exacto (primera coincidencia por id)
         cursor.execute(
             """
             SELECT * FROM slides
-            WHERE tipo = ? AND es_default = 1 AND activo = 1
+            WHERE tipo = ? AND subtipo = ? AND activo = 1
             ORDER BY id
             LIMIT 1
         """,
-            (tipo,),
+            (tipo, subtipo_sugerido),
         )
         row = cursor.fetchone()
-    if not row:
-        # 3. cualquier slide activa del tipo
-        cursor.execute(
-            """
-            SELECT * FROM slides
-            WHERE tipo = ? AND activo = 1
-            ORDER BY id
-            LIMIT 1
-        """,
-            (tipo,),
-        )
-        row = cursor.fetchone()
-    conn.close()
-    return dict(row) if row else None
+        if not row:
+            # 2. cualquier subtipo default
+            cursor.execute(
+                """
+                SELECT * FROM slides
+                WHERE tipo = ? AND es_default = 1 AND activo = 1
+                ORDER BY id
+                LIMIT 1
+            """,
+                (tipo,),
+            )
+            row = cursor.fetchone()
+        if not row:
+            # 3. cualquier slide activa del tipo
+            cursor.execute(
+                """
+                SELECT * FROM slides
+                WHERE tipo = ? AND activo = 1
+                ORDER BY id
+                LIMIT 1
+            """,
+                (tipo,),
+            )
+            row = cursor.fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
 
 
 def _get_presentacion_por_fecha(fecha: str) -> dict[str, Any] | None:
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM presentaciones WHERE fecha_domingo = ?", (fecha,))
-    row = cursor.fetchone()
-    conn.close()
-    return dict(row) if row else None
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM presentaciones WHERE fecha_domingo = ?", (fecha,))
+        row = cursor.fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
 
 
 def proponer_composicion(fecha: str) -> list[dict[str, Any]]:
@@ -180,21 +186,23 @@ def proponer_composicion(fecha: str) -> list[dict[str, Any]]:
     canciones = _canciones_asignadas(pres.get("canciones_json"))
 
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
-        FROM canciones c
-        LEFT JOIN cancion_momentos cm ON cm.cancion_id = c.id
-        GROUP BY c.id
-    """)
-    {
-        r["id"]: {
-            "titulo": r["titulo"],
-            "momento": r["momentos"].split(",")[0] if r["momentos"] else "",
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT c.id, c.titulo, GROUP_CONCAT(cm.momento_liturgico, ',') as momentos
+            FROM canciones c
+            LEFT JOIN cancion_momentos cm ON cm.cancion_id = c.id
+            GROUP BY c.id
+        """)
+        {
+            r["id"]: {
+                "titulo": r["titulo"],
+                "momento": r["momentos"].split(",")[0] if r["momentos"] else "",
+            }
+            for r in cursor.fetchall()
         }
-        for r in cursor.fetchall()
-    }
-    conn.close()
+    finally:
+        conn.close()
 
     items: list[dict[str, Any]] = []
     numero = 1
@@ -259,48 +267,50 @@ def guardar_composicion(fecha: str, items: list[dict[str, Any]]) -> None:
     if not pres:
         raise ValueError(f"No existe presentación para {fecha}")
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
-    for item in items:
-        slide_id = item.get("slide_id")
-        if slide_id:
-            cursor.execute(
-                """
-                INSERT INTO presentacion_slides
-                (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
-                SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
-                FROM slides s
-                WHERE s.id = ?
-            """,
-                (
-                    pres["id"],
-                    item["numero"],
-                    item["tipo"],
-                    item["subtipo"],
-                    item["activo"],
-                    slide_id,
-                ),
-            )
-            if cursor.rowcount == 0:
-                slide_id = None
-        if not slide_id:
-            cursor.execute(
-                """
-                INSERT INTO presentacion_slides
-                (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
-                VALUES (?, NULL, ?, ?, ?, ?, '', ?)
-            """,
-                (
-                    pres["id"],
-                    item["numero"],
-                    item["tipo"],
-                    item["subtipo"],
-                    item["titulo"],
-                    item["activo"],
-                ),
-            )
-    conn.commit()
-    conn.close()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],))
+        for item in items:
+            slide_id = item.get("slide_id")
+            if slide_id:
+                cursor.execute(
+                    """
+                    INSERT INTO presentacion_slides
+                    (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
+                    SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
+                    FROM slides s
+                    WHERE s.id = ?
+                """,
+                    (
+                        pres["id"],
+                        item["numero"],
+                        item["tipo"],
+                        item["subtipo"],
+                        item["activo"],
+                        slide_id,
+                    ),
+                )
+                if cursor.rowcount == 0:
+                    slide_id = None
+            if not slide_id:
+                cursor.execute(
+                    """
+                    INSERT INTO presentacion_slides
+                    (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
+                    VALUES (?, NULL, ?, ?, ?, ?, '', ?)
+                """,
+                    (
+                        pres["id"],
+                        item["numero"],
+                        item["tipo"],
+                        item["subtipo"],
+                        item["titulo"],
+                        item["activo"],
+                    ),
+                )
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def sincronizar_presentacion_slides(fecha: str) -> int:
@@ -314,22 +324,24 @@ def sincronizar_presentacion_slides(fecha: str) -> int:
     if not pres:
         return 0
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        UPDATE presentacion_slides
-        SET titulo = (SELECT s.titulo FROM slides s WHERE s.id = presentacion_slides.slide_id),
-            contenido = (SELECT s.contenido FROM slides s WHERE s.id = presentacion_slides.slide_id),
-            cita = (SELECT s.cita FROM slides s WHERE s.id = presentacion_slides.slide_id),
-            subtitulo = (SELECT s.subtitulo FROM slides s WHERE s.id = presentacion_slides.slide_id),
-            imagen = (SELECT s.imagen FROM slides s WHERE s.id = presentacion_slides.slide_id)
-        WHERE presentacion_id = ? AND slide_id IS NOT NULL
-    """,
-        (pres["id"],),
-    )
-    updated = cursor.rowcount
-    conn.commit()
-    conn.close()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE presentacion_slides
+            SET titulo = (SELECT s.titulo FROM slides s WHERE s.id = presentacion_slides.slide_id),
+                contenido = (SELECT s.contenido FROM slides s WHERE s.id = presentacion_slides.slide_id),
+                cita = (SELECT s.cita FROM slides s WHERE s.id = presentacion_slides.slide_id),
+                subtitulo = (SELECT s.subtitulo FROM slides s WHERE s.id = presentacion_slides.slide_id),
+                imagen = (SELECT s.imagen FROM slides s WHERE s.id = presentacion_slides.slide_id)
+            WHERE presentacion_id = ? AND slide_id IS NOT NULL
+        """,
+            (pres["id"],),
+        )
+        updated = cursor.rowcount
+        conn.commit()
+    finally:
+        conn.close()
     return updated
 
 
@@ -357,32 +369,33 @@ def asegurar_composicion(fecha: str, canciones_json: str | None = None) -> bool:
     json_nuevo = _normalizar(canciones_json)
 
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT COUNT(*) AS n FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],)
-    )
-    count = cursor.fetchone()["n"]
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT COUNT(*) AS n FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],)
+        )
+        count = cursor.fetchone()["n"]
 
-    if count == 0 or (canciones_json is not None and json_actual != json_nuevo):
-        # Actualizar canciones_json si se proporcionó
-        if canciones_json is not None:
-            cursor.execute(
-                "UPDATE presentaciones SET canciones_json = ? WHERE id = ?",
-                (canciones_json, pres["id"]),
-            )
-            conn.commit()
-        # Si ya existía composición, borrarla para regenerar
-        if count > 0:
-            cursor.execute(
-                "DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],)
-            )
-            conn.commit()
-        conn.close()
-        items = proponer_composicion(fecha)
-        if items:
-            guardar_composicion(fecha, items)
-            return True
+        if count == 0 or (canciones_json is not None and json_actual != json_nuevo):
+            # Actualizar canciones_json si se proporcionó
+            if canciones_json is not None:
+                cursor.execute(
+                    "UPDATE presentaciones SET canciones_json = ? WHERE id = ?",
+                    (canciones_json, pres["id"]),
+                )
+                conn.commit()
+            # Si ya existía composición, borrarla para regenerar
+            if count > 0:
+                cursor.execute(
+                    "DELETE FROM presentacion_slides WHERE presentacion_id = ?", (pres["id"],)
+                )
+                conn.commit()
+            items = proponer_composicion(fecha)
+            if items:
+                guardar_composicion(fecha, items)
+                return True
+            return False
+
         return False
-
-    conn.close()
-    return False
+    finally:
+        conn.close()

@@ -60,37 +60,39 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
 
     def generar_desde_presentacion(self, fecha: str) -> Path:
         conn = _get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            SELECT p.*, l.celebracion, l.color_liturgico,
-                   l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
-                   l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
-                   l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
-                   l.evangelio_libro, l.evangelio_cita, l.evangelio_texto
-            FROM presentaciones p
-            LEFT JOIN lecturas l ON l.id = p.lectura_id
-            WHERE p.fecha_domingo = ?
-        """,
-            (fecha,),
-        )
-        pres = cursor.fetchone()
-        if not pres:
-            raise ValueError(f"No existe presentación para {fecha}")
-        pres = dict(pres)
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT p.*, l.celebracion, l.color_liturgico,
+                       l.primera_lectura_libro, l.primera_lectura_cita, l.primera_lectura_texto,
+                       l.salmo_libro, l.salmo_cita, l.salmo_antifona, l.salmo_texto,
+                       l.segunda_lectura_libro, l.segunda_lectura_cita, l.segunda_lectura_texto,
+                       l.evangelio_libro, l.evangelio_cita, l.evangelio_texto
+                FROM presentaciones p
+                LEFT JOIN lecturas l ON l.id = p.lectura_id
+                WHERE p.fecha_domingo = ?
+            """,
+                (fecha,),
+            )
+            pres = cursor.fetchone()
+            if not pres:
+                raise ValueError(f"No existe presentación para {fecha}")
+            pres = dict(pres)
 
-        cursor.execute(
-            """
-            SELECT ps.*, s.contenido AS slide_contenido, s.imagen AS slide_imagen
-            FROM presentacion_slides ps
-            LEFT JOIN slides s ON s.id = ps.slide_id
-            WHERE ps.presentacion_id = ? AND ps.activo = 1
-            ORDER BY ps.numero
-        """,
-            (pres["id"],),
-        )
-        items = [dict(r) for r in cursor.fetchall()]
-        conn.close()
+            cursor.execute(
+                """
+                SELECT ps.*, s.contenido AS slide_contenido, s.imagen AS slide_imagen
+                FROM presentacion_slides ps
+                LEFT JOIN slides s ON s.id = ps.slide_id
+                WHERE ps.presentacion_id = ? AND ps.activo = 1
+                ORDER BY ps.numero
+            """,
+                (pres["id"],),
+            )
+            items = [dict(r) for r in cursor.fetchall()]
+        finally:
+            conn.close()
 
         if not items:
             raise ValueError(f"La presentación {fecha} no tiene composición guardada")
@@ -381,26 +383,28 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
 
         # Actualizar BD con rutas
         conn = _get_connection()
-        cursor = conn.cursor()
-        ruta_base = str(bundle_dir.relative_to(PROJECT_DIR))
-        cursor.execute(
-            """
-            UPDATE presentaciones
-            SET estado = 'generado',
-                ruta_web = ?,
-                ruta_pptx = ?,
-                ruta_pdf_fieles = ?
-            WHERE id = ?
-        """,
-            (
-                f"{ruta_base}/index.html",
-                f"{ruta_base}/{base_name}.pptx",
-                f"{ruta_base}/{base_name}.pdf",
-                pres["id"],
-            ),
-        )
-        conn.commit()
-        conn.close()
+        try:
+            cursor = conn.cursor()
+            ruta_base = str(bundle_dir.relative_to(PROJECT_DIR))
+            cursor.execute(
+                """
+                UPDATE presentaciones
+                SET estado = 'generado',
+                    ruta_web = ?,
+                    ruta_pptx = ?,
+                    ruta_pdf_fieles = ?
+                WHERE id = ?
+            """,
+                (
+                    f"{ruta_base}/index.html",
+                    f"{ruta_base}/{base_name}.pptx",
+                    f"{ruta_base}/{base_name}.pdf",
+                    pres["id"],
+                ),
+            )
+            conn.commit()
+        finally:
+            conn.close()
 
         return bundle_dir
 

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib
+import os
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -135,3 +137,76 @@ def test_listar_canciones(canciones_manager) -> None:
     titulos = {c["titulo"] for c in lista}
     assert "Aaa" in titulos
     assert "Bbb" in titulos
+
+
+def _sqlite_fd_count(root: Path) -> int:
+    """Cuenta file descriptors del proceso que apuntan a la BD bajo root.
+
+    Cubre `db.sqlite3`, `db.sqlite3-wal` y `db.sqlite3-shm`. `close()` libera
+    el fd de forma determinista incluso con ciclos de referencias (el
+    functools._lru_cache_wrapper de CPython 3.13), así que esta señal no
+    depende de GC. Devuelve -1 si `/proc/self/fd` no está disponible.
+    """
+    fd_dir = Path("/proc/self/fd")
+    if not fd_dir.is_dir():
+        return -1
+    prefix = os.path.abspath(str(root))
+    count = 0
+    for entry in os.listdir(fd_dir):
+        try:
+            target = os.readlink(fd_dir / entry)
+        except OSError:
+            continue
+        if target.startswith(prefix) and target.endswith(
+            (".sqlite3", ".sqlite3-wal", ".sqlite3-shm")
+        ):
+            count += 1
+    return count
+
+
+def test_obtener_cancion_inexistente_cierra_la_conexion(
+    canciones_manager, monkeypatch
+) -> None:
+    """obtener_cancion debe cerrar su conexión aunque la canción no exista.
+
+    DA-007: un `conn = _get_connection()` sin finally no cierra en el camino
+    del error; sin close() determinista la conexión queda viva hasta GC
+    (ciclo del _lru_cache_wrapper de CPython 3.13) y mantiene el -wal.
+    Señal: sin GC no debe quedar ni conexión abierta ni file descriptor
+    apuntando a la BD temporal.
+    """
+    if not Path("/proc/self/fd").is_dir():
+        pytest.skip("conteo de fds requiere /proc/self/fd (Linux)")
+
+    opened: list[sqlite3.Connection] = []
+    real_connect = sqlite3.connect
+
+    def _traced(*args, **kwargs):
+        conn = real_connect(*args, **kwargs)
+        opened.append(conn)
+        return conn
+
+    monkeypatch.setattr(sqlite3, "connect", _traced)
+
+    root = Path(canciones_manager.PROJECT_DIR)
+    baseline = _sqlite_fd_count(root)
+    assert baseline == 0, f"{baseline} fds apuntan a la BD antes de la llamada"
+
+    with pytest.raises(ValueError, match="No existe canción"):
+        canciones_manager.obtener_cancion(9999)
+
+    for conn in opened:
+        try:
+            conn.execute("SELECT 1")
+            is_open = True
+        except sqlite3.ProgrammingError:
+            is_open = False
+        assert not is_open, (
+            "obtener_cancion deja su conexión abierta sin GC: el -wal queda vivo (DA-007)"
+        )
+
+    remaining = _sqlite_fd_count(root)
+    assert remaining == 0, (
+        f"quedan {remaining} file descriptors apuntando a la BD tras la llamada "
+        f"sin GC: la conexión no se cerró de forma determinista"
+    )

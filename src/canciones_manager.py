@@ -119,33 +119,35 @@ def crear_cancion(data: CancionCreateUpdate) -> dict[str, Any]:
     derivados = _regenerar_derivados(texto)
 
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        INSERT INTO canciones (
-            titulo, titulo_url, letra_con_acordes, letra_sin_acordes,
-            acordes_json, estructura_json, html_visual, tono, fuente, fecha_creacion
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        """,
-        (
-            titulo,
-            slugify(titulo),
-            texto,
-            derivados["letra_sin_acordes"],
-            derivados["acordes_json"],
-            derivados["estructura_json"],
-            derivados["html_visual"],
-            data.tono or derivados["tono"],
-            data.fuente or "manual",
-        ),
-    )
-    cancion_id = cursor.lastrowid
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO canciones (
+                titulo, titulo_url, letra_con_acordes, letra_sin_acordes,
+                acordes_json, estructura_json, html_visual, tono, fuente, fecha_creacion
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """,
+            (
+                titulo,
+                slugify(titulo),
+                texto,
+                derivados["letra_sin_acordes"],
+                derivados["acordes_json"],
+                derivados["estructura_json"],
+                derivados["html_visual"],
+                data.tono or derivados["tono"],
+                data.fuente or "manual",
+            ),
+        )
+        cancion_id = cursor.lastrowid
 
-    _sync_momentos(cursor, cancion_id, data.momentos or [])
-    conn.commit()
+        _sync_momentos(cursor, cancion_id, data.momentos or [])
+        conn.commit()
 
-    cancion = _get_cancion_by_id(cursor, cancion_id)
-    conn.close()
+        cancion = _get_cancion_by_id(cursor, cancion_id)
+    finally:
+        conn.close()
 
     try:
         from src.auto_rebuild_presentaciones import auto_rebuild_tras_cancion
@@ -169,43 +171,44 @@ def actualizar_cancion(cancion_id: int, data: CancionCreateUpdate) -> dict[str, 
     derivados = _regenerar_derivados(texto)
 
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        UPDATE canciones SET
-            titulo = ?,
-            titulo_url = ?,
-            letra_con_acordes = ?,
-            letra_sin_acordes = ?,
-            acordes_json = ?,
-            estructura_json = ?,
-            html_visual = ?,
-            tono = ?,
-            fuente = ?
-        WHERE id = ?
-        """,
-        (
-            titulo,
-            slugify(titulo),
-            texto,
-            derivados["letra_sin_acordes"],
-            derivados["acordes_json"],
-            derivados["estructura_json"],
-            derivados["html_visual"],
-            data.tono or derivados["tono"],
-            data.fuente or "manual",
-            cancion_id,
-        ),
-    )
-    if cursor.rowcount == 0:
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE canciones SET
+                titulo = ?,
+                titulo_url = ?,
+                letra_con_acordes = ?,
+                letra_sin_acordes = ?,
+                acordes_json = ?,
+                estructura_json = ?,
+                html_visual = ?,
+                tono = ?,
+                fuente = ?
+            WHERE id = ?
+            """,
+            (
+                titulo,
+                slugify(titulo),
+                texto,
+                derivados["letra_sin_acordes"],
+                derivados["acordes_json"],
+                derivados["estructura_json"],
+                derivados["html_visual"],
+                data.tono or derivados["tono"],
+                data.fuente or "manual",
+                cancion_id,
+            ),
+        )
+        if cursor.rowcount == 0:
+            raise ValueError(f"No existe canción con id={cancion_id}")
+
+        _sync_momentos(cursor, cancion_id, data.momentos or [])
+        conn.commit()
+
+        cancion = _get_cancion_by_id(cursor, cancion_id)
+    finally:
         conn.close()
-        raise ValueError(f"No existe canción con id={cancion_id}")
-
-    _sync_momentos(cursor, cancion_id, data.momentos or [])
-    conn.commit()
-
-    cancion = _get_cancion_by_id(cursor, cancion_id)
-    conn.close()
 
     try:
         from src.auto_rebuild_presentaciones import auto_rebuild_tras_cancion
@@ -222,14 +225,15 @@ def actualizar_cancion(cancion_id: int, data: CancionCreateUpdate) -> dict[str, 
 def eliminar_cancion(cancion_id: int) -> None:
     """Elimina una canción y sus momentos asociados."""
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
-    cursor.execute("DELETE FROM canciones WHERE id = ?", (cancion_id,))
-    if cursor.rowcount == 0:
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM cancion_momentos WHERE cancion_id = ?", (cancion_id,))
+        cursor.execute("DELETE FROM canciones WHERE id = ?", (cancion_id,))
+        if cursor.rowcount == 0:
+            raise ValueError(f"No existe canción con id={cancion_id}")
+        conn.commit()
+    finally:
         conn.close()
-        raise ValueError(f"No existe canción con id={cancion_id}")
-    conn.commit()
-    conn.close()
 
 
 def _sync_momentos(cursor, cancion_id: int, momentos: list[str]) -> None:
@@ -266,19 +270,23 @@ def _get_cancion_by_id(cursor, cancion_id: int) -> dict[str, Any]:
 
 def listar_canciones() -> list[dict[str, Any]]:
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, titulo FROM canciones ORDER BY titulo")
-    result = []
-    for r in cursor.fetchall():
-        cancion = _get_cancion_by_id(cursor, r["id"])
-        result.append(cancion)
-    conn.close()
-    return result
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, titulo FROM canciones ORDER BY titulo")
+        result = []
+        for r in cursor.fetchall():
+            cancion = _get_cancion_by_id(cursor, r["id"])
+            result.append(cancion)
+        return result
+    finally:
+        conn.close()
 
 
 def obtener_cancion(cancion_id: int) -> dict[str, Any]:
     conn = _get_connection()
-    cursor = conn.cursor()
-    cancion = _get_cancion_by_id(cursor, cancion_id)
-    conn.close()
-    return cancion
+    try:
+        cursor = conn.cursor()
+        cancion = _get_cancion_by_id(cursor, cancion_id)
+        return cancion
+    finally:
+        conn.close()

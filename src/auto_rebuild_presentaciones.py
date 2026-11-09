@@ -80,58 +80,59 @@ def crear_slides_para_cancion(cancion_id: int) -> list[tuple[str, int]]:
     Devuelve la lista de (momento, slide_id) creados o ya existentes.
     """
     conn = _get_connection()
-    cursor = conn.cursor()
+    try:
+        cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT titulo, html_visual, letra_sin_acordes, letra_con_acordes FROM canciones WHERE id=?",
-        (cancion_id,),
-    )
-    row = cursor.fetchone()
-    if not row:
+        cursor.execute(
+            "SELECT titulo, html_visual, letra_sin_acordes, letra_con_acordes FROM canciones WHERE id=?",
+            (cancion_id,),
+        )
+        row = cursor.fetchone()
+        if not row:
+            return []
+
+        titulo = row["titulo"]
+        contenido = _limpiar_letra(
+            row["html_visual"], row["letra_sin_acordes"], row["letra_con_acordes"]
+        )
+
+        cursor.execute(
+            "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id=?",
+            (cancion_id,),
+        )
+        momentos = [r["momento_liturgico"] for r in cursor.fetchall()]
+
+        creados: list[tuple[str, int]] = []
+        for momento in momentos:
+            # Normalizar variantes de clave
+            momento_norm = "perdon" if momento == "acto_penitencial" else momento
+            if momento_norm not in MOMENTOS_CON_SLIDE:
+                continue
+
+            subtipo = f"cancion_{cancion_id}"
+            slide_titulo = MOMENTO_A_TITULO.get(momento_norm, "{titulo}").format(titulo=titulo)
+
+            cursor.execute(
+                "SELECT id FROM slides WHERE tipo=? AND subtipo=?",
+                (momento_norm, subtipo),
+            )
+            existing = cursor.fetchone()
+            if existing:
+                creados.append((momento_norm, existing["id"]))
+                continue
+
+            cursor.execute(
+                """
+                INSERT INTO slides (tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, es_default, activo, notas)
+                VALUES (?, ?, ?, ?, '', '', '', 0, 1, 'Auto-creada desde canción')
+                """,
+                (momento_norm, subtipo, slide_titulo, contenido),
+            )
+            creados.append((momento_norm, cursor.lastrowid))
+
+        conn.commit()
+    finally:
         conn.close()
-        return []
-
-    titulo = row["titulo"]
-    contenido = _limpiar_letra(
-        row["html_visual"], row["letra_sin_acordes"], row["letra_con_acordes"]
-    )
-
-    cursor.execute(
-        "SELECT momento_liturgico FROM cancion_momentos WHERE cancion_id=?",
-        (cancion_id,),
-    )
-    momentos = [r["momento_liturgico"] for r in cursor.fetchall()]
-
-    creados: list[tuple[str, int]] = []
-    for momento in momentos:
-        # Normalizar variantes de clave
-        momento_norm = "perdon" if momento == "acto_penitencial" else momento
-        if momento_norm not in MOMENTOS_CON_SLIDE:
-            continue
-
-        subtipo = f"cancion_{cancion_id}"
-        slide_titulo = MOMENTO_A_TITULO.get(momento_norm, "{titulo}").format(titulo=titulo)
-
-        cursor.execute(
-            "SELECT id FROM slides WHERE tipo=? AND subtipo=?",
-            (momento_norm, subtipo),
-        )
-        existing = cursor.fetchone()
-        if existing:
-            creados.append((momento_norm, existing["id"]))
-            continue
-
-        cursor.execute(
-            """
-            INSERT INTO slides (tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, es_default, activo, notas)
-            VALUES (?, ?, ?, ?, '', '', '', 0, 1, 'Auto-creada desde canción')
-            """,
-            (momento_norm, subtipo, slide_titulo, contenido),
-        )
-        creados.append((momento_norm, cursor.lastrowid))
-
-    conn.commit()
-    conn.close()
     return creados
 
 
@@ -166,25 +167,27 @@ def encontrar_presentaciones_afectadas(
 ) -> list[dict[str, Any]]:
     """Busca presentaciones cuya asignación incluya la canción."""
     conn = _get_connection()
-    cursor = conn.cursor()
+    try:
+        cursor = conn.cursor()
 
-    today = date.today().isoformat()
-    sql = "SELECT id, fecha_domingo, canciones_json, estado FROM presentaciones"
-    params = []
-    if solo_futuras:
-        sql += " WHERE fecha_domingo >= ?"
-        params.append(today)
-    sql += " ORDER BY fecha_domingo"
+        today = date.today().isoformat()
+        sql = "SELECT id, fecha_domingo, canciones_json, estado FROM presentaciones"
+        params = []
+        if solo_futuras:
+            sql += " WHERE fecha_domingo >= ?"
+            params.append(today)
+        sql += " ORDER BY fecha_domingo"
 
-    cursor.execute(sql, params)
-    afectadas = []
-    for row in cursor.fetchall():
-        asignadas = _canciones_asignadas(row["canciones_json"])
-        if cancion_id in asignadas.values():
-            afectadas.append(dict(row))
+        cursor.execute(sql, params)
+        afectadas = []
+        for row in cursor.fetchall():
+            asignadas = _canciones_asignadas(row["canciones_json"])
+            if cancion_id in asignadas.values():
+                afectadas.append(dict(row))
 
-    conn.close()
-    return afectadas
+        return afectadas
+    finally:
+        conn.close()
 
 
 def regenerar_presentacion(fecha: str) -> dict[str, str]:
@@ -195,13 +198,15 @@ def regenerar_presentacion(fecha: str) -> dict[str, str]:
 
     # Forzar regeneración completa borrando la composición anterior
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "DELETE FROM presentacion_slides WHERE presentacion_id=(SELECT id FROM presentaciones WHERE fecha_domingo=?)",
-        (fecha,),
-    )
-    conn.commit()
-    conn.close()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "DELETE FROM presentacion_slides WHERE presentacion_id=(SELECT id FROM presentaciones WHERE fecha_domingo=?)",
+            (fecha,),
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
     guardar_composicion(fecha, items)
     try:

@@ -107,28 +107,32 @@ def _extraer_frase_evangelio(lectura: sqlite3.Row) -> str:
 
 def _get_lectura(lectura_id: int) -> sqlite3.Row | None:
     conn = _get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM lecturas WHERE id=?", (lectura_id,))
-    row = cursor.fetchone()
-    conn.close()
-    return row
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM lecturas WHERE id=?", (lectura_id,))
+        row = cursor.fetchone()
+        return row
+    finally:
+        conn.close()
 
 
 def _get_canciones(canciones_ids: dict[str, int]) -> dict[str, dict[str, Any]]:
     conn = _get_connection()
-    cursor = conn.cursor()
-    canciones: dict[str, dict[str, Any]] = {}
-    for key, cid in canciones_ids.items():
-        cursor.execute(
-            "SELECT id, titulo, letra_sin_acordes, letra_con_acordes, acordes_json, momento_liturgico "
-            "FROM canciones WHERE id=?",
-            (cid,),
-        )
-        row = cursor.fetchone()
-        if row:
-            canciones[key] = dict(row)
-    conn.close()
-    return canciones
+    try:
+        cursor = conn.cursor()
+        canciones: dict[str, dict[str, Any]] = {}
+        for key, cid in canciones_ids.items():
+            cursor.execute(
+                "SELECT id, titulo, letra_sin_acordes, letra_con_acordes, acordes_json, momento_liturgico "
+                "FROM canciones WHERE id=?",
+                (cid,),
+            )
+            row = cursor.fetchone()
+            if row:
+                canciones[key] = dict(row)
+        return canciones
+    finally:
+        conn.close()
 
 
 def _add_cancion_slide(
