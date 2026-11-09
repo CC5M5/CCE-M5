@@ -478,5 +478,37 @@
   {
     "cancion_id": 233,
     "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 234,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 234,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 234,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 236,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 237,
+    "momento_liturgico": "acto_penitencial"
+  },
+  {
+    "cancion_id": 237,
+    "momento_liturgico": "comunion"
+  },
+  {
+    "cancion_id": 237,
+    "momento_liturgico": "entrada"
+  },
+  {
+    "cancion_id": 239,
+    "momento_liturgico": "entrada"
   }
 ]
