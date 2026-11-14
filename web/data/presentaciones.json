@@ -1,5 +1,37 @@
 [
   {
+    "id": 187,
+    "fecha_domingo": "2026-11-21",
+    "lectura_id": null,
+    "canciones_json": "{\"entrada\": {\"id\": 248}}",
+    "evento_especial": null,
+    "ruta_pptx": null,
+    "ruta_pdf_fieles": null,
+    "ruta_pdf_musicos": null,
+    "ruta_web": null,
+    "estado": "borrador",
+    "fecha_creacion": "2026-11-14 21:34:34",
+    "lectura_json": null,
+    "notas": null,
+    "creado_en": "2026-11-14 21:34:34"
+  },
+  {
+    "id": 185,
+    "fecha_domingo": "2026-11-21",
+    "lectura_id": null,
+    "canciones_json": "{\"entrada\": {\"id\": 247}}",
+    "evento_especial": null,
+    "ruta_pptx": null,
+    "ruta_pdf_fieles": null,
+    "ruta_pdf_musicos": null,
+    "ruta_web": null,
+    "estado": "borrador",
+    "fecha_creacion": "2026-11-14 21:34:34",
+    "lectura_json": null,
+    "notas": null,
+    "creado_en": "2026-11-14 21:34:34"
+  },
+  {
     "id": 184,
     "fecha_domingo": "2026-11-16",
     "lectura_id": null,
@@ -142,6 +174,22 @@
     "lectura_json": null,
     "notas": null,
     "creado_en": "2026-11-06 16:23:39"
+  },
+  {
+    "id": 186,
+    "fecha_domingo": "2026-11-07",
+    "lectura_id": null,
+    "canciones_json": "{\"entrada\": {\"id\": 247}}",
+    "evento_especial": null,
+    "ruta_pptx": null,
+    "ruta_pdf_fieles": null,
+    "ruta_pdf_musicos": null,
+    "ruta_web": null,
+    "estado": "borrador",
+    "fecha_creacion": "2026-11-14 21:34:34",
+    "lectura_json": null,
+    "notas": null,
+    "creado_en": "2026-11-14 21:34:34"
   },
   {
     "id": 183,
