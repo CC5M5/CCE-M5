@@ -7,160 +7,167 @@
   },
   "imagenes": {
     "portada": [
-      "fano/20140953.jpg",
-      "fano/20140954.jpg",
-      "fano/20140956.jpg",
-      "fano/20140962.jpg",
-      "fano/fano_20140346_busca_las_7_diferencias_y_pasa_tu_tiempo_con_jesús.jpg",
-      "patite/patite_detalle_de_la_portada_del_libro_76824a63.jpg",
-      "patite/patite_detalle_de_la_portada_del_libro_7d200bf9.jpg",
-      "patite/patite_ilustracion_152d4a3e.jpg"
+      "fano/fano_20140331_titulo.jpg",
+      "fano/fano_20140332_titulo.jpg",
+      "fano/fano_20140333_titulo.jpg",
+      "fano/fano_20140334_no_te_pierdas_yo_soy_el_camino_y_voy_hacia_el_sur.jpg",
+      "fano/fano_20140335_haced_discípulos_a_todos_pues_todos_caben_en_la_iglesia.jpg",
+      "patite/patite_adorno_74de110f.jpg",
+      "patite/patite_calendario262_fc0a2c77.jpeg",
+      "patite/patite_detalle_de_la_portada_del_libro_76824a63.jpg"
     ],
     "entrada": [
+      "fano/fano_20140340_venid_a_descansar_en_mi_amor.jpg",
       "fano/fano_20140362_venid_vosotros_benditos_de_mi_padre.jpg",
+      "fano/fano_20140379_la_cruz_en_el_cruce_del_camino.jpg",
       "fano/fano_20140412_sácame_del_borde_del_camino_y_ayúdame_a_caminar_domingo_25_d.jpg",
-      "fano/fano_20140418_prepara_el_camino_domingo_6_diciembre_2015.jpg",
-      "fano/fano_20140572_jesús_está_a_la_puerta_se_le_abre_desde_el_interior.jpg",
-      "fano/fano_20140577_segundo_domingo_de_adviento_ponte_en_camino.jpg"
+      "fano/fano_20140418_prepara_el_camino_domingo_6_diciembre_2015.jpg"
     ],
     "transicion_palabra": [
-      "fano/fano_20140348_une_cada_sombra_con_su_dibujo_y_descubre_dónde_está_jesús.jpg",
-      "fano/fano_20140349_cada_uno_tenemos_nuestra_propia_cruz_busca_la_cruz_que_no_se.jpg",
-      "fano/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg",
-      "fano/fano_20140351_la_cruz_une_el_cielo_y_la_tierra.jpg",
-      "fano/fano_20140352_un_amor_más_que_justo.jpg",
-      "patite/patite_ilustracion_1cc5316f.png",
-      "patite/patite_ilustracion_2b49066b.jpg",
-      "patite/patite_ilustracion_3b40eec3.jpeg"
+      "fano/fano_20140336_el_espíritu_nos_lleva_por_todo_el_mundo_a_renovar_la_faz_de_.jpg",
+      "fano/fano_20140337_jesús_mi_salvavidas.jpg",
+      "fano/fano_20140338_al_comulgar_soy_sagrario_y_custodia_que_sale_a_la_calle_feli.jpg",
+      "fano/fano_20140339_unámonos_en_la_oración_a_la_tarea_de_pedro_de_atar_la_tierra.jpg",
+      "fano/fano_20140342_tu_palabra_es_siembra.jpg",
+      "patite/patite_detalle_de_la_portada_del_libro_7d200bf9.jpg",
+      "patite/patite_ecclesia_al_dia_raquel_caldas_ac9e1dec.jpeg",
+      "patite/patite_ecclesia_alvaro_saez_9b9e8d17.jpeg"
     ],
     "perdon": [
+      "fano/fano_20140438_amor-misericordia-alegría_domingo_v_de_pascua_24_de_abril_de.jpg",
+      "fano/fano_20140911_iv_domingo_de_cuaresma_msrc_la_misericordia_del_dios_amor_es.jpg",
       "fano/fano_20140936_es_el_cordero_de_dios_que_limpia_el_pecado_del_mundo.jpg",
-      "fano/fano_20140569_porque_creo_veo_quita_la_venda_de_mis_ojos.jpg",
-      "fano/fano_20140513_domingo_xxvi_del_tiempo_ordinario_1_de_octubre_de_2017_para_.jpg",
-      "fano/fano_20140921_los_ricos_se_hunden_en_las_pateras.jpg",
-      "fano/fano_20140690_la_ley_del_amor_no_pesa_ni_aplasta_sino_que_libera.jpg"
+      "fano/fano_20140824_tomás_desde_sus_dudas_y_preguntas_nos_dice_vive.jpg",
+      "fano/fano_20140765_querido_reyes_magos_regaladnos_todo_lo_bueno_que_no_se_puede.jpg"
     ],
     "paso": [
-      "fano/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg",
-      "fano/fano_20140354_no_des_la_espalda_a_jesús_tiene_el_regalo_que_necesitas.jpg",
-      "fano/fano_20140355_vivamos_en_fiesta.jpg",
-      "fano/fano_20140356_dónde_comulgas_cómo_es_tu_corazón.jpg",
-      "fano/fano_20140357_dios_sigue_esperando_buenos_frutos.jpg",
-      "patite/patite_ilustracion_4b316317.jpg",
-      "patite/patite_ilustracion_524c8ca4.png",
-      "patite/patite_ilustracion_52a3d8fa.jpeg"
+      "fano/fano_20140343_jesús_espera_y_no_condena.jpg",
+      "fano/fano_20140344_la_eucaristía_es_la_perla_preciosa_que_hemos_encontrado.jpg",
+      "fano/fano_20140345_cuenta_y_calcula_por_qué_número_están_multiplicados_los_5_pa.jpg",
+      "fano/fano_20140346_busca_las_7_diferencias_y_pasa_tu_tiempo_con_jesús.jpg",
+      "fano/fano_20140348_une_cada_sombra_con_su_dibujo_y_descubre_dónde_está_jesús.jpg",
+      "patite/patite_encargos_web_3691fa6b.jpg",
+      "patite/patite_foto_cedida_por_carlos_leáñez_fa99c84a.jpg",
+      "patite/patite_fotolibrotiendafinal_884c465a.jpg"
     ],
     "gloria": [
-      "fano/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg",
-      "fano/fano_20140458_me_buscas_me_encuentras_y_hay_fiesta_domingo_xxiv_tiempo_ord.jpg",
-      "fano/fano_20140468_solemnidad_de_jesucristo_rey_del_universo_20_de_noviembre_de.jpg",
-      "fano/fano_20140521_solemnidad_de_jesucristo_rey_del_universo_26_de_noviembre_de.jpg",
-      "fano/fano_20140526_fiesta_de_la_sagrada_familia_31_de_diciembre_de_2017_tú_eres.jpg"
+      "fano/fano_20140351_la_cruz_une_el_cielo_y_la_tierra.jpg",
+      "fano/fano_20140355_vivamos_en_fiesta.jpg",
+      "fano/fano_20140370_se_oyó_una_voz_del_cielo_tú_eres_mi_hijo_amado.jpg",
+      "fano/fano_20140381_tu_cruz_nos_lleva_al_cielo.jpg",
+      "fano/fano_20140382_pasemos_la_luz_del_resucitado.jpg",
+      "sarabg/sarabg_cartas_del_cielo_envíos_dentro_de_españa_d7368006.jpg"
     ],
     "primera_lectura": [
+      "fano/fano_20140384_descarga_tu_palabra_en_nuestro_corazón_para_cambiar_nuestro_.jpg",
       "fano/fano_20140405_limpia_mis_oídos_para_poder_escuchar_tu_palabra_domingo_6_se.jpg",
       "fano/fano_20140422_la_palabra_se_hizo_carne_y_habitó_entre_nosotros_domingo_3_d.jpg",
-      "fano/fano_20140757_tu_palabra_no_pasará.jpg",
-      "fano/fano_20140835_no_temas_gorrión_tú_anuncia_el_evangelio_que_yo_te_protegeré.jpg",
-      "fano/fano_20140844_el_evangelio_funciona_con_amor_y_no_con_dinero.jpg"
+      "fano/fano_20140425_jesús_es_la_palabra_de_dios_que_se_cumple_domingo_24_de_ener.jpg",
+      "fano/fano_20140439_habitaremos_en_quien_me_ama_y_guarda_mi_palabra_y_recibirá_m.jpg"
     ],
     "salmo": [
       "fano/fano_20140360_recibimos_para_hacer_crecer.jpg",
+      "fano/fano_20140437_el_buen_pastor_llevará_a_sus_ovejas_hasta_el_cielo_domingo_i.jpg",
       "fano/fano_20140452_dela_el_lado_oscuro_y_vente_a_la_luz_yo_soy_tu_padre_campame.jpg",
-      "fano/fano_20140578_segundo_domingo_de_adviento_móvil_ponte_en_camino.jpg",
-      "fano/fano_20140636_tu_amor_me_hace_descender_y_crecer_convierteme.jpg",
-      "fano/fano_20140697_sagrada_familia_casas_con_luz.jpg"
+      "fano/fano_20140485_domingo_iii_cuaresma_19_de_marzo_de_2017_jesús_es_agua.jpg",
+      "fano/fano_20140486_domingo_iv_de_cuaresma_26_de_marzo_de_2017_jesús_es_luz.jpg",
+      "sarabg/sarabg_el_buen_pastor_7ca4e133.jpg"
     ],
     "segunda_lectura": [
-      "fano/fano_20140941_aprende_a_elegir_el_pan_de_la_palabra.jpg",
-      "fano/fano_20140698_sagrada_familia_pesebre.jpg",
-      "fano/fano_20140508_domingo_xxi_del_tiempo_ordinario_27_de_agosto_de_2017_vosotr.jpg",
-      "fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg",
-      "fano/fano_20140524_domingo_iii_de_adviento_17_de_diciembre_de_2017_alegre_esper.jpg"
+      "fano/fano_20140549_domingo_x_del_tiempo_ordinario_10_junio_2018_su_palabra_crea.jpg",
+      "fano/fano_20140611_la_palabra_de_dios_es_jesús_y_resuena_para_mí_por_la_acción_.jpg",
+      "fano/fano_20140646_jesús_es_la_palabra_de_dios_el_verbo_se_hizo_carne.jpg",
+      "fano/fano_20140757_tu_palabra_no_pasará.jpg",
+      "fano/fano_20140767_el_espíritu_y_la_palabra_siempre_nos_mueven_hacia_los_que_su.jpg"
     ],
     "aleluya": [
-      "fano/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg",
-      "fano/fano_20140687_viste_tu_corazón_de_fiesta_que_jesús_te_invita_a_un_banquete.jpg",
-      "fano/fano_20140793_en_el_cielo_será_distinto.jpg",
-      "fano/fano_20140803_jesús_rey_del_universo.jpg",
-      "fano/fano_20140806_alégrate_y_prepara_la_fiesta_que_ya_viene.jpg"
+      "fano/fano_20140383_la_paz_del_resucitado_para_el_mundo.jpg",
+      "fano/fano_20140421_jesús_es_la_estrella_fiesta_de_la_sagrada_familia_27_diciemb.jpg",
+      "fano/fano_20140423_bajó_una_voz_del_cielo_domingo_10_de_enero_bautismo_del_seño.jpg",
+      "fano/fano_20140435_que_jesús_resucitado_en_medio_de_nosotros_nos_alegre_y_dé_su.jpg",
+      "fano/fano_20140458_me_buscas_me_encuentras_y_hay_fiesta_domingo_xxiv_tiempo_ord.jpg"
     ],
     "evangelio": [
-      "fano/fano_20140639_sin_titulo.jpg",
-      "fano/fano_20140640_viene_a_visitarnos_la_verdad_y_la_vida_despierta.jpg",
-      "fano/fano_20140583_adviento_2018_de_fano.jpg",
-      "fano/fano_20140463_domingo_xxix_del_tiempo_ordinario_16_de_octubre_de_2016_oers.jpg",
-      "fano/fano_20140957_movidos_por_la_ola_del_espíritu.jpg"
+      "fano/fano_20140787_nos_unes_para_anunciar_el_evangelio.jpg",
+      "fano/fano_20140825_los_de_emaús_desde_la_fracción_del_pan_y_la_palabra_que_hace.jpg",
+      "fano/fano_20140832_palabrería_o_la_palabra_qué_nos_sostiene.jpg",
+      "fano/fano_20140835_no_temas_gorrión_tú_anuncia_el_evangelio_que_yo_te_protegeré.jpg",
+      "fano/fano_20140844_el_evangelio_funciona_con_amor_y_no_con_dinero.jpg"
     ],
     "transicion_eucaristia": [
-      "fano/fano_20140358_en_la_casa_de_mi_padre_hay_muchas_estancias.jpg",
-      "fano/fano_20140359_destruiré_el_templo_y_lo_resucitaré.jpg",
-      "fano/fano_20140363_tiempo_de_vigilar.jpg",
-      "fano/fano_20140365_tiempo_de_cambiar.jpg",
-      "fano/fano_20140367_tiempo_de_alegrarse.jpg",
-      "patite/patite_ilustracion_6d809aa6.png",
-      "patite/patite_ilustracion_70e41153.jpg",
-      "patite/patite_ilustracion_945c845f.png"
+      "fano/fano_20140349_cada_uno_tenemos_nuestra_propia_cruz_busca_la_cruz_que_no_se.jpg",
+      "fano/fano_20140350_nuestra_victoria_está_en_saber_que_siendo_2_estamos_3.jpg",
+      "fano/fano_20140352_un_amor_más_que_justo.jpg",
+      "fano/fano_20140353_lo_imprescindible_es_abrazarse_a_cristo.jpg",
+      "fano/fano_20140354_no_des_la_espalda_a_jesús_tiene_el_regalo_que_necesitas.jpg",
+      "patite/patite_ilustracion_152d4a3e.jpg",
+      "patite/patite_ilustracion_1cc5316f.png",
+      "patite/patite_ilustracion_2b49066b.jpg"
     ],
     "credo": [
-      "fano/fano_20140794_una_semillita_de_fe_es_un_sueño_de_amor_para_mí_siémbrala.jpg",
-      "fano/fano_20140915_el_dialogo_del_padre_y_el_hijo_hace_brotar_el_espíritu.jpg",
-      "fano/fano_20140923_el_bastón_de_la_fe_nos_salva_y_sostiene.jpg",
-      "fano/fano_20140935_en_el_bautismo_de_jesús_se_manifiesta_la_trinidad.jpg",
-      "sarabg/sarabg_cuadro_si_tienes_fe_72debf50.jpg"
+      "fano/fano_20140358_en_la_casa_de_mi_padre_hay_muchas_estancias.jpg",
+      "fano/fano_20140398_cuarto_mandamiento_honrarás_a_tu_padre_y_a_tu_madre.jpg",
+      "fano/fano_20140434_éste_es_el_sacramento_de_nuestra_fe_anunciamos_tu_muerte_y_p.jpg",
+      "fano/fano_20140442_dios_trinidad_dios_3d_domingo_de_la_santísima_trinidad_22_de.jpg",
+      "fano/fano_20140497_solemnidad_de_la_santísima_trinidad_11_de_junio_de_2017_dios.jpg",
+      "sarabg/sarabg_cuadro_si_tienes_fe_72debf50.jpg",
+      "sarabg/sarabg_día_cuarto_54fe7e8d.png",
+      "sarabg/sarabg_espíritu_santo_fcfe574d.jpg"
     ],
     "ofertorio": [
-      "fano/fano_20140880_dadles_vosotros_de_comer.jpg",
-      "fano/fano_20140881_yo_soy_el_pan_de_la_vida.jpg",
-      "fano/fano_20140882_tu_pan_nos_lleva_al_cielo.jpg",
-      "fano/fano_20140883_el_pan_que_os_daré_es_mi_propio_cuerpo.jpg",
-      "fano/fano_20140952_reconócelo_al_partir_el_pan.jpg"
+      "fano/fano_20140392_corpus_christi_acoger_y_compartir_el_pan.jpg",
+      "fano/fano_20140433_éste_es_el_cordero_de_dios_el_sacrificio_de_dios_que_nos_da_.jpg",
+      "fano/fano_20140590_llenamos_de_agua_confiando_en_que_la_transformarás_en_vino.jpg",
+      "fano/fano_20140663_quien_escucha_a_jesús_y_comparte_su_pan_encuentra_un_proyect.jpg",
+      "fano/fano_20140733_tu_pan_fue_es_y_será.jpg",
+      "sarabg/sarabg_calendario_de_mesa_2027_3e818f60.png"
     ],
     "santo": [
-      "fano/fano_20140896_ii_domingo_de_adviento_dile_sí.jpg",
-      "fano/fano_20140740_caminar_y_servir_hasta_llegar_a_jesús.jpg",
-      "fano/fano_20140515_domingo_xxviii_del_tiempo_ordinario_15_de_octubre_de_2017_pa.jpg",
-      "fano/fano_20140626_santa_maría_de_la_victoria_durante_el_verano_patxi_nos_regal.jpg",
-      "fano/fano_20140889_subir_o_servir.jpg"
+      "fano/fano_20140547_solemnidad_de_la_santísima_trinidad_27_de_mayo_de_2018_dios_.jpg",
+      "fano/fano_20140609_jesús_buen_pastor_nos_lleva_al_padre.jpg",
+      "fano/fano_20140615_vivimos_por_el_padre_movidos_por_el_espíritu_por_la_entrega_.jpg",
+      "fano/fano_20140662_entra_en_mi_vida_sin_llamar_con_fe_te_abro_mi_corazón.jpg",
+      "fano/fano_20140666_quien_se_suscribe_al_hijo_se_suscribe_al_padre_y_él_descarga.jpg"
     ],
     "padre_nuestro": [
-      "fano/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg",
-      "fano/fano_20140940_nueva_ley_nuevas_relaciones_nuevas_palabras_lo_renuevas_todo.jpg",
-      "fano/fano_20140877_la_revolución_del_hijo_del_carpintero.jpg",
-      "fano/fano_20140693_al_final_nos_examinarán_del_amor.jpg",
-      "fano/fano_20140791_jesús_buscador_de_los_perdidos_encuéntrame.jpg"
+      "fano/fano_20140668_espíritu_santo_fuego_y_viento_fuente_de_energía_renovable_y_.jpg",
+      "fano/fano_20140669_trinidad_un_mismo_dios_en_tres_estados.jpg",
+      "fano/fano_20140713_san_josé_padre_amado.jpg",
+      "fano/fano_20140714_san_josé_padre_de_la_ternura.jpg",
+      "fano/fano_20140715_san_josé_padre_de_la_obediencia.jpg"
     ],
     "paz": [
+      "fano/fano_20140371_dibujo_de_fano_por_la_paz.jpg",
+      "fano/fano_20140373_deja_que_te_pesque_su_amor.jpg",
       "fano/fano_20140408_arranca_lo_que_te_impida_dar_frutos_de_amor_domingo_27_de_se.jpg",
       "fano/fano_20140409_jesús_ayúdanos_a_unir_a_la_familia_y_a_acoger_a_los_niños_do.jpg",
       "fano/fano_20140411_el_primero_sirviendo_a_todos_al_mundo_a_la_familia_y_a_la_ig.jpg",
-      "fano/fano_20140457_el_señor_de_los_amigos_la_comunidad_del_cariño_campamentos_d.jpg",
-      "fano/fano_20140571_lo_poco_y_pequeño_con_amor_es_muchísimo.jpg",
       "sarabg/sarabg_cuadro_sagrada_familia_vivo_8f108aa4.jpg"
     ],
     "comunion": [
-      "fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg",
-      "fano/fano_20140937_navegad_en_mi_amar.jpg",
-      "fano/fano_20140934_sin_titulo.jpg",
-      "fano/fano_20140467_domingo_xxxiii_del_tiempo_ordinario_13_de_noviembre_de_2016_.jpg",
-      "fano/fano_20140927_como_jesús_contundentes_con_el_abuso.jpg"
+      "fano/fano_20140766_como_siervos_llenamos_de_agua_solo_tu_lo_convertirás_en_vino.jpg",
+      "fano/fano_20140813_dios_habla_y_se_posa_en_jesús_es_su_cordero.jpg",
+      "fano/fano_20140880_dadles_vosotros_de_comer.jpg",
+      "fano/fano_20140881_yo_soy_el_pan_de_la_vida.jpg",
+      "fano/fano_20140882_tu_pan_nos_lleva_al_cielo.jpg"
     ],
     "maria": [
       "fano/fano_20140474_solemnidad_de_santa_maria_madre_de_dios_1_de_enero_de_2017_j.jpg",
       "fano/fano_20140587_familia_de_nazaret.jpg",
+      "fano/fano_20140622_maría_inmaculada_durante_el_verano_patxi_nos_regala_una_seri.jpg",
       "fano/fano_20140625_virgen_de_medjugorje_durante_el_verano_patxi_nos_regala_una_.jpg",
       "fano/fano_20140627_en_el_ave_maria_leemos_ama.jpg",
       "patite/patite_maria_fatima.jpg",
       "patite/patite_maria_mirame.jpg",
-      "patite/patite_portada_de_la_virgen_maría_nuestra_madre_dice_sí_87a0c4c8.jpg",
-      "patite/patite_virgen_abrazada_nina.jpg"
+      "patite/patite_portada_de_la_virgen_maría_nuestra_madre_dice_sí_87a0c4c8.jpg"
     ],
     "despedida": [
       "fano/fano_20140414_la_ternura_de_los_humildes_salva_al_mundo_domingo_8_de_novie.jpg",
-      "fano/fano_20140758_mi_reino_no_es_de_este_mundo.jpg",
-      "fano/fano_20140808_jesús_nos_hace_a_todos_campeones_del_mundo.jpg",
-      "fano/fano_20140811_paz_y_amor_para_el_nuevo_año.jpg",
-      "fano/fano_20140890_quien_no_está_en_el_camino_está_ciego.jpg"
+      "fano/fano_20140561_verano_con_san_manuel_gonzález_la_vida_es_un_camino_de_ida_y.jpg",
+      "fano/fano_20140577_segundo_domingo_de_adviento_ponte_en_camino.jpg",
+      "fano/fano_20140578_segundo_domingo_de_adviento_móvil_ponte_en_camino.jpg",
+      "fano/fano_20140618_revisa_tu_vida_con_jesús_y_ponte_en_camino.jpg",
+      "patite/patite_misioneros_por_el_mundo_trece_4996e3b4.jpeg"
     ]
   }
 }
