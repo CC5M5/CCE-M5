@@ -225,6 +225,17 @@ class KoinoniaClient:
         self.session.close()
 
 
+def normalizar_celebracion(texto: str | None) -> str | None:
+    """Quita el prefijo tipográfico «l » (minúscula L + espacio) de un título.
+
+    Algunos scrapings devuelven celebraciones como «l XXXII Domingo del
+    Tiempo Ordinario»; se normaliza a «XXXII Domingo del Tiempo Ordinario».
+    """
+    if isinstance(texto, str) and texto.startswith("l "):
+        return texto[2:].lstrip()
+    return texto
+
+
 class KoinoniaParser:
     """Parser HTML de las lecturas de Koinonia."""
 
@@ -256,7 +267,7 @@ class KoinoniaParser:
 
         titulo = soup.find("h1") or soup.find("h2")
         if titulo:
-            resultado["celebracion"] = titulo.get_text(strip=True)
+            resultado["celebracion"] = normalizar_celebracion(titulo.get_text(strip=True))
 
         primera = self._extraer_seccion(soup, ["primera lectura", "lectura del día"])
         if primera:

@@ -137,6 +137,17 @@ PALABRAS_PREVIAS_LIBRO = (
 )
 
 
+def normalizar_celebracion(texto: str | None) -> str | None:
+    """Quita el prefijo tipográfico «l » (minúscula L + espacio) de un título.
+
+    Algunos scrapings devuelven celebraciones como «l XXXII Domingo del
+    Tiempo Ordinario»; se normaliza a «XXXII Domingo del Tiempo Ordinario».
+    """
+    if isinstance(texto, str) and texto.startswith("l "):
+        return texto[2:].lstrip()
+    return texto
+
+
 class CiudadRedondaClient:
     """Cliente HTTP simple para ciudadredonda.org."""
 
@@ -220,7 +231,7 @@ class CiudadRedondaParser:
             titulo_texto = re.sub(
                 r"^Evangelio\s+y\s+Lecturas\s+de\s*", "", titulo_texto, flags=re.IGNORECASE
             ).strip()
-            resultado["celebracion"] = titulo_texto
+            resultado["celebracion"] = normalizar_celebracion(titulo_texto)
 
         # Extraer secciones
         secciones = self._extraer_secciones(soup)
