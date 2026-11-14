@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import re
 import shutil
 import sqlite3
 from pathlib import Path
@@ -223,3 +224,65 @@ def test_admin_health(client):
     # En CI el build de web estatica no siempre existe, asi que 'degraded'
     # es aceptable mientras el propio endpoint responda 200.
     assert data["status"] in ("ok", "degraded")
+
+
+def test_editor_diapositivas_ajustes_guardar(client):
+    """El panel 'Ajustes generales' guarda tamaños y el preview los escala."""
+    import scripts.editor_diapositivas_server as eds
+    from src.web_admin import config as auth_config
+
+    # La página de inicio expone el panel "Ajustes generales".
+    response = client.get("/editor-diapositivas/")
+    assert response.status_code == 200
+    assert "Ajustes generales" in response.text
+
+    # Guardar vía POST persiste los cuatro valores.
+    response = client.post(
+        "/editor-diapositivas/ajustes/guardar",
+        data={"titulo": "24", "subtitulo": "18", "cita": "14", "cuerpo": "12"},
+    )
+    assert response.status_code == 200
+    assert "guardado" in response.text.lower()
+
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    conn.row_factory = sqlite3.Row
+    filas = {
+        r["parte"]: r["tamano_pt"]
+        for r in conn.execute("SELECT parte, tamano_pt FROM ajustes_editor")
+    }
+    conn.close()
+    assert filas == {"titulo": 24, "subtitulo": 18, "cita": 14, "cuerpo": 12}
+
+    # La página de inicio refleja los valores guardados.
+    response = client.get("/editor-diapositivas/")
+    for valor in ("24", "18", "14", "12"):
+        assert f'value="{valor}"' in response.text
+
+    # Un valor fuera de rango (8-72) no se persiste.
+    client.post(
+        "/editor-diapositivas/ajustes/guardar",
+        data={"titulo": "99", "subtitulo": "18", "cita": "14", "cuerpo": "12"},
+    )
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    titulo = conn.execute(
+        "SELECT tamano_pt FROM ajustes_editor WHERE parte = 'titulo'"
+    ).fetchone()[0]
+    conn.close()
+    assert titulo == 24
+
+    # El preview escala pt -> px: px = pt * PREVIEW_W_PX / SLIDE_WIDTH_INCHES / 72.
+    factor = eds.PREVIEW_W_PX / eds.SLIDE_WIDTH_INCHES / 72
+    preview = eds._render_preview(
+        {
+            "tipo": "portada",
+            "titulo": "T",
+            "contenido": "",
+            "cita": "",
+            "subtitulo": "",
+            "momento": "",
+            "imagen": "",
+        }
+    )
+    m = re.search(r"--fuente-titulo:([\d.]+)px", preview)
+    assert m
+    assert float(m.group(1)) == pytest.approx(24 * factor, abs=0.01)

@@ -43,6 +43,12 @@ CREATE TABLE admin_users (
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
 
+CREATE TABLE ajustes_editor (
+    parte TEXT PRIMARY KEY,
+    tamano_pt INTEGER NOT NULL,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
 CREATE TABLE automation_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             agente TEXT NOT NULL,

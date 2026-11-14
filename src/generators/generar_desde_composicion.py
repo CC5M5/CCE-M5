@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from src import db_manager
 from src.config import settings
 from src.constants import COLORES_LITURGICOS
 
@@ -362,6 +363,8 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                 "lema": "Somos uno",
                 "lema_imagen": "assets/lema_somos_uno.jpg",
                 "generado": datetime.now().isoformat(),
+                # S2: tamaños globales de letra por parte (pt).
+                "tamanos_fuente": db_manager.get_ajustes_tamano_letra(DB_PATH),
             },
             "slides": [asdict(s) for s in slides],
         }

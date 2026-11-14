@@ -11,7 +11,11 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR
 from pptx.util import Inches, Pt
 
-from src.constants import SLIDE_HEIGHT_INCHES, SLIDE_WIDTH_INCHES
+from src.constants import (
+    SLIDE_HEIGHT_INCHES,
+    SLIDE_WIDTH_INCHES,
+    TAMANO_LETRA_DEFECTO,
+)
 
 
 def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
@@ -27,26 +31,44 @@ def _add_formatted_run(
     para_index: int,
     slide_data: dict[str, Any],
     primary_rgb: tuple[int, int, int],
+    parte: str | None = None,
+    tamanos: dict[str, int] | None = None,
 ):
-    """Añade el texto del párrafo respetando marcadores **negrita**."""
+    """Añade el texto del párrafo respetando marcadores **negrita**.
+
+    ``parte`` identifica la parte de la diapositiva ("momento", "titulo",
+    "subtitulo", "cita", "cuerpo"); si no se da se infiere por posición como
+    antes. ``tamanos`` son los tamaños globales (pt) por parte (S2); se
+    combinan con ``TAMANO_LETRA_DEFECTO``. La portada usa el mismo título
+    global que el resto de diapositivas.
+    """
     primary = RGBColor(*primary_rgb)
     accent_gold = RGBColor(212, 167, 106)
     text_dark = RGBColor(55, 53, 47)
-    is_momento = para_index == 0 and slide_data.get("momento")
-    is_titulo = (para_index == 0 and not slide_data.get("momento")) or (
-        para_index == 1 and slide_data.get("momento")
-    )
-    is_cita = slide_data.get("cita") and para_text.startswith(slide_data["cita"])
+    tamanos = dict(TAMANO_LETRA_DEFECTO, **(tamanos or {}))
+    if parte is None:
+        is_momento = para_index == 0 and slide_data.get("momento")
+        is_titulo = (para_index == 0 and not slide_data.get("momento")) or (
+            para_index == 1 and slide_data.get("momento")
+        )
+        is_cita = slide_data.get("cita") and para_text.startswith(slide_data["cita"])
+        is_subtitulo = not (is_momento or is_titulo or is_cita)
+    else:
+        is_momento = parte == "momento"
+        is_titulo = parte == "titulo"
+        is_subtitulo = parte == "subtitulo"
+        is_cita = parte == "cita"
 
-    base_size = Pt(19 if is_cancion else 20)
     if is_momento:
         base_size, base_bold, base_color = Pt(15), True, primary
     elif is_titulo:
-        base_size, base_bold, base_color = Pt(34 if is_portada else 26), True, primary
+        base_size, base_bold, base_color = Pt(tamanos["titulo"]), True, primary
+    elif is_subtitulo:
+        base_size, base_bold, base_color = Pt(tamanos["subtitulo"]), False, text_dark
     elif is_cita:
-        base_size, base_bold, base_color = Pt(15), True, accent_gold
+        base_size, base_bold, base_color = Pt(tamanos["cita"]), True, accent_gold
     else:
-        base_size, base_bold, base_color = Pt(19 if is_cancion else 20), False, text_dark
+        base_size, base_bold, base_color = Pt(tamanos["cuerpo"]), False, text_dark
         if is_cancion:
             p.line_spacing = 1.05
         else:
@@ -67,10 +89,11 @@ def _add_formatted_run(
         run.font.color.rgb = base_color
 
 
-def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
+def _render_pptx(data: dict[str, Any], pptx_path: Path | str, assets_dir: Path | str):
     """Genera PPTX 4:3 desde el JSON intermediario común."""
     from src.constants import COLORES_LITURGICOS
 
+    assets_dir = Path(assets_dir)
     prs = Presentation()
     prs.slide_width = Inches(SLIDE_WIDTH_INCHES)
     prs.slide_height = Inches(SLIDE_HEIGHT_INCHES)
@@ -185,16 +208,24 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
         text_width = card_width - Inches(0.6)
         text_height = card_height - Inches(0.44)
 
-        full_text = ""
+        # S2: tamaños globales por parte (pt); sin meta se usan los defectos.
+        tamanos = (
+            data.get("meta", {}).get("tamanos_fuente") or dict(TAMANO_LETRA_DEFECTO)
+        )
+
+        # Párrafos con su parte explícita (los huecos preservan el layout anterior).
+        partes: list[tuple[str, str]] = []
         if slide_data.get("momento"):
-            full_text += f"{slide_data['momento'].upper()}\n"
-        full_text += f"{slide_data['titulo']}\n"
+            partes.append((slide_data["momento"].upper(), "momento"))
+        partes.append((slide_data["titulo"], "titulo"))
         if slide_data.get("subtitulo"):
-            full_text += f"{slide_data['subtitulo']}\n"
+            partes.append((slide_data["subtitulo"], "subtitulo"))
         if slide_data.get("cita"):
-            full_text += f"\n{slide_data['cita']}\n"
+            partes.append(("", ""))
+            partes.append((slide_data["cita"], "cita"))
         if slide_data.get("contenido"):
-            full_text += f"\n{slide_data['contenido']}"
+            partes.append(("", ""))
+            partes.append((slide_data["contenido"], "cuerpo"))
 
         box = slide.shapes.add_textbox(text_left, text_top, text_width, text_height)
         tf = box.text_frame
@@ -206,13 +237,15 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path, assets_dir: Path):
         tf.vertical_anchor = MSO_ANCHOR.TOP
         tf.auto_size = None
 
-        paragraphs = full_text.split("\n")
-        for i, para_text in enumerate(paragraphs):
+        for i, (para_text, parte) in enumerate(partes):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             if not para_text.strip():
                 p.space_after = Pt(0)
                 p.space_before = Pt(0)
                 continue
-            _add_formatted_run(p, para_text, is_cancion, is_portada, i, slide_data, primary)
+            _add_formatted_run(
+                p, para_text, is_cancion, is_portada, i, slide_data, primary,
+                parte=parte, tamanos=tamanos,
+            )
 
     prs.save(str(pptx_path))

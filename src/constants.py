@@ -151,5 +151,15 @@ TEXTOS_LITURGICOS = {
     ),
 }
 
+# S2: tamaños de letra globales por parte de diapositiva (en puntos),
+# iguales para todas las diapositivas (incluida la portada). El label
+# "momento" conserva su tamaño fijo (15 pt) y no es una parte ajustable.
+TAMANO_LETRA_DEFECTO: dict[str, int] = {
+    "titulo": 26,
+    "subtitulo": 20,
+    "cita": 15,
+    "cuerpo": 20,
+}
+
 LEMA_CURSO = "Somos uno"
 URL_LEMA_CURSO = "https://escolappios.es/somos-uno-lema-del-curso-26-27/"

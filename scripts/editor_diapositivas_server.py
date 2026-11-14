@@ -37,7 +37,9 @@ from src.canciones_manager import (
     CancionCreateUpdate,
     crear_cancion,
 )
+from src import db_manager
 from src.config import settings
+from src.constants import SLIDE_WIDTH_INCHES, TAMANO_LETRA_DEFECTO
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -62,10 +64,26 @@ LEMA_PATH = settings.data_dir / "lemas" / "somos_uno.jpg"
 
 app_editor_diapositivas = Flask(__name__)
 
+# S2: la vista previa mide 440 px de ancho para una diapositiva de 13,333 in
+# (1 pt = 1/72 in), así px = pt * 440 / 13.333 / 72.
+PREVIEW_W_PX = 440
+PREVIEW_PT_A_PX = PREVIEW_W_PX / SLIDE_WIDTH_INCHES / 72
+
+ETIQUETAS_PARTES = {
+    "titulo": "Título",
+    "subtitulo": "Subtítulo",
+    "cita": "Cita",
+    "cuerpo": "Cuerpo (contenido)",
+}
+
 
 def _root() -> str:
     """Prefijo del editor bajo FastAPI (request.script_root)."""
-    return request.script_root or ""
+    try:
+        return request.script_root or ""
+    except RuntimeError:
+        # Fuera de contexto de petición (p. ej. tests): sin prefijo.
+        return ""
 
 
 COLORES_LITURGICOS = {
@@ -173,6 +191,12 @@ def _render_preview(slide: dict[str, Any]) -> str:
     """Genera HTML que simula la diapositiva real 4:3, dividiendo si hay --- DIAPOSITIVA ---."""
     color = slide.get("color_liturgico") or "verde"
     color_info = COLORES_LITURGICOS.get(color, COLORES_LITURGICOS["verde"])
+    # S2: variables de fuente escaladas de los ajustes globales (pt -> px).
+    ajustes = db_manager.get_ajustes_tamano_letra(DB_PATH)
+    fuente_vars = ";".join(
+        f"--fuente-{parte}:{ajustes[parte] * PREVIEW_PT_A_PX:.4f}px"
+        for parte in TAMANO_LETRA_DEFECTO
+    )
     tipo = slide.get("tipo", "")
     titulo = html_module.escape(slide.get("titulo") or "")
     subtitulo = html_module.escape(slide.get("subtitulo") or "")
@@ -226,7 +250,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
             inner += f'<div class="contenido">{contenido}</div>\n'
 
         return f"""
-        <div class="preview-frame {clase}" style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};">
+        <div class="preview-frame {clase}" style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};{fuente_vars}">
           <div class="slide-wrapper">
             {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ""}
             <div class="tarjeta">
@@ -248,10 +272,18 @@ def _render_preview(slide: dict[str, Any]) -> str:
 
 
 def _render_base(
-    title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = ""
+    title: str,
+    sidebar: str = "",
+    content: str = "",
+    mensaje: str = "",
+    mensaje_clase: str = "",
 ) -> str:
     msg_html = (
         f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
+    )
+    vars_fuente = " ".join(
+        f"--fuente-{parte}:{TAMANO_LETRA_DEFECTO[parte] * PREVIEW_PT_A_PX:.4f}px"
+        for parte in TAMANO_LETRA_DEFECTO
     )
     _listar_ilustraciones()
     # Compatibilidad con montaje bajo FastAPI en path prefix.
@@ -270,7 +302,7 @@ def _render_base(
   {base_href}
   <title>{html_module.escape(title)} - Editor Diapositivas CCE-M5</title>
   <style>
-    :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; }}
+    :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; {vars_fuente} }}
     body {{ font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; }}
     header {{ max-width: 1600px; margin: 0 auto 20px; }}
     h1 {{ color: var(--accent); margin: 0 0 10px; }}
@@ -293,11 +325,11 @@ def _render_base(
     .preview-frame.portada .slide-wrapper {{ justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 100%); }}
     .preview-frame.portada .tarjeta {{ text-align: center; }}
     .preview-frame.portada h1 {{ text-align: center; color: var(--liturgia-acento); }}
-    .preview-frame h1 {{ font-size: 16px; color: var(--liturgia-acento); text-transform: uppercase; margin: 0 0 6px; }}
-    .preview-frame h2 {{ font-size: 12px; color: #555; margin: 0 0 6px; font-weight: 400; }}
+    .preview-frame h1 {{ font-size: var(--fuente-titulo); color: var(--liturgia-acento); text-transform: uppercase; margin: 0 0 6px; }}
+    .preview-frame h2 {{ font-size: var(--fuente-subtitulo); color: #555; margin: 0 0 6px; font-weight: 400; }}
     .preview-frame h3 {{ font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #777; margin: 0 0 4px; }}
-    .preview-frame .cita {{ font-size: 10px; font-weight: 700; background: linear-gradient(90deg, var(--liturgia-acento), #A16207); color: white; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }}
-    .preview-frame .contenido {{ font-size: 11px; line-height: 1.25; color: #2c3e50; white-space: pre-wrap; }}
+    .preview-frame .cita {{ font-size: var(--fuente-cita); font-weight: 700; background: linear-gradient(90deg, var(--liturgia-acento), #A16207); color: white; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }}
+    .preview-frame .contenido {{ font-size: var(--fuente-cuerpo); line-height: 1.25; color: #2c3e50; white-space: pre-wrap; }}
     .preview-frame .contenido br {{ display: block; content: ""; margin-bottom: 0.05em; }}
     .preview-frame.cancion .contenido {{ line-height: 1.22; }}
     .preview-frame.cancion .contenido br {{ margin-bottom: 0; }}
@@ -357,6 +389,41 @@ def _render_base(
 
 @app_editor_diapositivas.route("/")
 def index():
+    return _render_index()
+
+
+@app_editor_diapositivas.route("/ajustes/guardar", methods=["POST"])
+def guardar_ajustes():
+    """Guarda los tamaños globales de letra por parte (S2)."""
+    payload = {parte: request.form.get(parte, "") for parte in TAMANO_LETRA_DEFECTO}
+    try:
+        db_manager.guardar_ajustes_tamano_letra(payload, DB_PATH)
+    except ValueError as exc:
+        return _render_index(f"⚠️ {exc}", "err")
+    return _render_index("✅ Ajustes guardados.", "ok")
+
+
+def _panel_ajustes() -> str:
+    """Panel 'Ajustes generales': tamaño global (pt) de cada parte."""
+    ajustes = db_manager.get_ajustes_tamano_letra(DB_PATH)
+    campos = "".join(
+        f'<label>{ETIQUETAS_PARTES[parte]}</label>'
+        f'<input type="number" name="{parte}" min="8" max="72" step="1" value="{ajustes[parte]}">'
+        for parte in TAMANO_LETRA_DEFECTO
+    )
+    return (
+        '<section style="margin-bottom:20px;border:1px solid #eee;border-radius:12px;padding:14px;">'
+        "<h2>Ajustes generales</h2>"
+        '<p style="margin:0 0 10px;font-size:13px;color:#555;">Tamaño de la letra (pt) de cada parte '
+        "de la diapositiva. Se aplica a todas (incluida la portada) y a las presentaciones "
+        "generadas (PPTX/HTML/PDF). Rango: 8-72 pt.</p>"
+        f'<form method="post" action="{_root()}/ajustes/guardar">{campos}'
+        '<button type="submit">💾 Guardar ajustes</button></form>'
+        "</section>"
+    )
+
+
+def _render_index(mensaje: str = "", mensaje_clase: str = "") -> str:
     tipos = _tipos()
     sidebar_parts = []
     for t in tipos:
@@ -371,8 +438,11 @@ def index():
             f"<details open><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
-    content = "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
-    return _render_base("Diapositivas", sidebar, content)
+    content = (
+        _panel_ajustes()
+        + "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
+    )
+    return _render_base("Diapositivas", sidebar, content, mensaje, mensaje_clase)
 
 
 @app_editor_diapositivas.route("/slides/")

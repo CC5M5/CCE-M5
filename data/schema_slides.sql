@@ -76,6 +76,16 @@ CREATE TABLE IF NOT EXISTS presentacion_slides (
     FOREIGN KEY (slide_id) REFERENCES slides(id)
 );
 
+-- Ajustes globales del editor (S2): tamaño de letra (pt) de cada parte de la
+-- diapositiva (titulo, subtitulo, cita, cuerpo). Un único valor por parte,
+-- aplicado a todas las diapositivas (incluida la portada) y a las
+-- presentaciones generadas. Defecto: titulo 26, subtitulo 20, cita 15, cuerpo 20.
+CREATE TABLE IF NOT EXISTS ajustes_editor (
+    parte TEXT PRIMARY KEY,
+    tamano_pt INTEGER NOT NULL,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Índices
 CREATE INDEX IF NOT EXISTS idx_slides_tipo ON slides(tipo);
 CREATE INDEX IF NOT EXISTS idx_slides_subtipo ON slides(subtipo);
