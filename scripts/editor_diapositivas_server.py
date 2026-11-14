@@ -435,7 +435,7 @@ def editar(id: int):
         nombre_completo = html_module.escape(Path(img).name)
         return f"""<label data-artista="{artista}" data-nombre="{html_module.escape(Path(img).name.lower())}">
           <input type="radio" name="imagen" value="{html_module.escape(img)}" {"checked" if img == imagen_actual else ""}>
-          <img src="{_root()}/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
+          <img src="{_root()}/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}" loading="lazy" decoding="async">
           <small title="{nombre_completo}">{nombre}</small>
         </label>"""
 

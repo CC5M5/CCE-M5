@@ -169,6 +169,51 @@ def test_editor_diapositivas_nueva_get(client):
     assert response.status_code in (200, 404)
 
 
+def test_editor_diapositivas_miniaturas_lazy(client):
+    """Las miniaturas de ilustraciones cargan en diferido (loading="lazy").
+
+    Regresión del bug 429: 123 <img> simultáneas agotaban el limitador IP.
+    """
+    import json as json_module
+
+    import scripts.editor_diapositivas_server as eds
+    from src.web_admin import config as auth_config
+
+    catalogo = eds.CATALOGO_PATH
+    catalogo.parent.mkdir(parents=True, exist_ok=True)
+    catalogo.write_text(
+        json_module.dumps(
+            {"imagenes": {"entrada": ["artista-uno/luz.png", "artista-dos/paz.png"]}}
+        ),
+        encoding="utf-8",
+    )
+
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    try:
+        fila = conn.execute(
+            "SELECT id FROM slides WHERE activo = 1 ORDER BY id LIMIT 1"
+        ).fetchone()
+        if fila is None:
+            fila = conn.execute("SELECT id FROM slides ORDER BY id LIMIT 1").fetchone()
+        if fila is not None:
+            slide_id = fila[0]
+        else:
+            cursor = conn.execute(
+                "INSERT INTO slides (tipo, subtipo, titulo, contenido) "
+                "VALUES ('entrada', '', 'Título de prueba', 'Cuerpo de prueba')"
+            )
+            conn.commit()
+            slide_id = cursor.lastrowid
+    finally:
+        conn.close()
+
+    response = client.get(f"/editor-diapositivas/slides/{slide_id}")
+    assert response.status_code == 200
+    assert 'loading="lazy"' in response.text
+    # Cada miniatura del catálogo (2 entradas) debe ser diferida.
+    assert response.text.count('loading="lazy"') >= 2
+
+
 def test_admin_health(client):
     """El healthcheck responde 200 con un estado valido."""
     response = client.get("/health")
