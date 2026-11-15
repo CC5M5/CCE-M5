@@ -102,9 +102,18 @@ def ensure_columnas_posiciones(conn: sqlite3.Connection) -> None:
 
     Posiciones en milésimas (0-1000) del ancho/alto de la diapositiva,
     JSON {"x","y","w","h"}; NULL mantiene el diseño por defecto.
-    Idempotente: no hace nada si las columnas ya existen.
+    Idempotente y tolerante: si una tabla aún no existe (p. ej. esquema
+    mínimo en tests), no se toca; las columnas llegan con el esquema
+    completo. No usa try/except para respetar la validación estricta de
+    _add_column_if_missing (auditoría B15): comprueba existencia antes.
     """
     for tabla in ("slides", "presentacion_slides"):
+        existe = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?",
+            (tabla,),
+        ).fetchone()
+        if existe is None:
+            continue
         for columna in ("imagen_pos", "texto_pos"):
             _add_column_if_missing(conn, tabla, columna, "TEXT")
 
