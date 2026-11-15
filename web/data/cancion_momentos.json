@@ -460,10 +460,6 @@
     "momento_liturgico": "entrada"
   },
   {
-    "cancion_id": 230,
-    "momento_liturgico": "entrada"
-  },
-  {
     "cancion_id": 231,
     "momento_liturgico": "acto_penitencial"
   },
@@ -473,10 +469,6 @@
   },
   {
     "cancion_id": 231,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 233,
     "momento_liturgico": "entrada"
   },
   {
@@ -492,10 +484,6 @@
     "momento_liturgico": "entrada"
   },
   {
-    "cancion_id": 236,
-    "momento_liturgico": "entrada"
-  },
-  {
     "cancion_id": 237,
     "momento_liturgico": "acto_penitencial"
   },
@@ -505,10 +493,6 @@
   },
   {
     "cancion_id": 237,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 239,
     "momento_liturgico": "entrada"
   },
   {
@@ -524,10 +508,6 @@
     "momento_liturgico": "entrada"
   },
   {
-    "cancion_id": 242,
-    "momento_liturgico": "entrada"
-  },
-  {
     "cancion_id": 243,
     "momento_liturgico": "acto_penitencial"
   },
@@ -540,10 +520,6 @@
     "momento_liturgico": "entrada"
   },
   {
-    "cancion_id": 245,
-    "momento_liturgico": "entrada"
-  },
-  {
     "cancion_id": 246,
     "momento_liturgico": "acto_penitencial"
   },
@@ -553,10 +529,6 @@
   },
   {
     "cancion_id": 246,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 248,
     "momento_liturgico": "entrada"
   }
 ]
