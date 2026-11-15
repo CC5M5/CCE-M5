@@ -40,6 +40,7 @@ from src.canciones_manager import (
 from src import db_manager
 from src.config import settings
 from src.constants import SLIDE_WIDTH_INCHES, TAMANO_LETRA_DEFECTO
+from src.generators.presentacion.posiciones import parse_posicion
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -208,7 +209,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
     else:
         imagen_url = imagen or ""
 
-    lema_url = "{_root()}/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
+    lema_url = f"{_root()}/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
 
     clase = tipo
     if tipo in (
@@ -232,6 +233,14 @@ def _render_preview(slide: dict[str, Any]) -> str:
     if not partes:
         partes = [""]
 
+    # S5/S6: posiciones guardadas de la imagen y del cuadro de texto expuestas
+    # al DOM del preview (contrato de la fase 2); NULL = diseño por defecto.
+    pos_attrs = ""
+    for clave in ("imagen_pos", "texto_pos"):
+        pos = parse_posicion(slide.get(clave))
+        if pos is not None:
+            pos_attrs += f" data-{clave.replace('_', '-')}='{json.dumps(pos)}'"
+
     def _render_slide_mini(contenido_parte: str, idx: int, total: int) -> str:
         contenido = html_module.escape(contenido_parte)
         contenido = _apply_bold_html(contenido)
@@ -250,7 +259,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
             inner += f'<div class="contenido">{contenido}</div>\n'
 
         return f"""
-        <div class="preview-frame {clase}" style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};{fuente_vars}">
+        <div class="preview-frame {clase}"{pos_attrs} style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};{fuente_vars}">
           <div class="slide-wrapper">
             {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ""}
             <div class="tarjeta">
@@ -643,6 +652,22 @@ def guardar(id: int):
             id,
         ),
     )
+
+    # S5/S6: posiciones de imagen y cuadro de texto (fase 2). Solo se tocan
+    # si el formulario las envía; cadenas vacías o inválidas => NULL
+    # (diseño por defecto).
+    if "imagen_pos" in request.form or "texto_pos" in request.form:
+        db_manager.ensure_columnas_posiciones(conn)
+        imagen_pos = parse_posicion(request.form.get("imagen_pos"))
+        texto_pos = parse_posicion(request.form.get("texto_pos"))
+        cursor.execute(
+            "UPDATE slides SET imagen_pos = ?, texto_pos = ? WHERE id = ?",
+            (
+                json.dumps(imagen_pos) if imagen_pos is not None else None,
+                json.dumps(texto_pos) if texto_pos is not None else None,
+                id,
+            ),
+        )
     conn.commit()
     conn.close()
 

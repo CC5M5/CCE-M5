@@ -286,3 +286,81 @@ def test_editor_diapositivas_ajustes_guardar(client):
     m = re.search(r"--fuente-titulo:([\d.]+)px", preview)
     assert m
     assert float(m.group(1)) == pytest.approx(24 * factor, abs=0.01)
+
+
+def test_editor_diapositivas_posiciones_guardar(client):
+    """T5/T6 (S5/S6): las posiciones arrastradas se guardan y el preview las refleja.
+
+    Contrato de fase 2: un POST a /guardar con ``imagen_pos``/``texto_pos``
+    (JSON en permiles 0-1000) persiste los valores y el frame del preview
+    los expone como ``data-imagen-pos='{...}'`` / ``data-texto-pos='{...}'``.
+    Cadenas vacías dejan la diapositiva con posiciones NULL: la página
+    muestra los defectos y no hay atributos data con valores propios.
+    """
+    import json as json_module
+
+    from src.web_admin import config as auth_config
+
+    # Una diapositiva existente del catálogo (seed).
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    try:
+        fila = conn.execute(
+            "SELECT id FROM slides WHERE activo = 1 ORDER BY id LIMIT 1"
+        ).fetchone()
+        if fila is None:
+            cursor = conn.execute(
+                "INSERT INTO slides (tipo, subtipo, titulo, contenido) "
+                "VALUES ('evangelio', '', 'Título de prueba', 'Cuerpo de prueba')"
+            )
+            conn.commit()
+            slide_id = cursor.lastrowid
+        else:
+            slide_id = fila[0]
+    finally:
+        conn.close()
+
+    campos = {
+        "titulo": "Título arrastre",
+        "subtitulo": "",
+        "contenido": "Cuerpo arrastre",
+        "cita": "",
+        "momento": "",
+        "imagen": "",
+    }
+
+    # Guardar posiciones propias las persiste y el preview las muestra.
+    response = client.post(
+        f"/editor-diapositivas/slides/{slide_id}/guardar",
+        data={
+            **campos,
+            "imagen_pos": '{"x": 120, "y": 80, "w": 320, "h": 240}',
+            "texto_pos": '{"x": 45, "y": 60, "w": 660, "h": 700}',
+        },
+    )
+    assert response.status_code == 200
+
+    page = client.get(f"/editor-diapositivas/slides/{slide_id}")
+    assert page.status_code == 200
+    m = re.search(r"data-imagen-pos='([^']*)'", page.text)
+    assert m, "data-imagen-pos no presente en el preview"
+    assert json_module.loads(m.group(1)) == {
+        "x": 120, "y": 80, "w": 320, "h": 240,
+    }
+    m = re.search(r"data-texto-pos='([^']*)'", page.text)
+    assert m, "data-texto-pos no presente en el preview"
+    assert json_module.loads(m.group(1)) == {
+        "x": 45, "y": 60, "w": 660, "h": 700,
+    }
+
+    # Cadenas vacías -> posiciones NULL: la página muestra los defectos y
+    # no hay atributos data con valores propios.
+    response = client.post(
+        f"/editor-diapositivas/slides/{slide_id}/guardar",
+        data={**campos, "imagen_pos": "", "texto_pos": ""},
+    )
+    assert response.status_code == 200
+
+    page = client.get(f"/editor-diapositivas/slides/{slide_id}")
+    assert page.status_code == 200
+    assert not re.search(r"data-imagen-pos='\{", page.text)
+    assert not re.search(r"data-texto-pos='\{", page.text)

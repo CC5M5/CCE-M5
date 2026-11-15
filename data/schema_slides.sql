@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS slides (
     es_default INTEGER DEFAULT 0,     -- 1 = variante por defecto para (tipo, subtipo, color_liturgico)
     activo INTEGER DEFAULT 1,
     notas TEXT,
+    imagen_pos TEXT,   -- S5: {"x","y","w","h"} en milésimas (0-1000) del ancho/alto; NULL = diseño por defecto
+    texto_pos TEXT,    -- S6: ídem, para el cuadro de texto
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tipo) REFERENCES slides_tipos(id)
@@ -71,6 +73,8 @@ CREATE TABLE IF NOT EXISTS presentacion_slides (
     momento TEXT DEFAULT '',
     activo INTEGER DEFAULT 1,
     personalizado INTEGER DEFAULT 0,  -- 1 = editado a mano para esa semana
+    imagen_pos TEXT,                  -- S5: posición de la imagen copiada de la slide (milésimas 0-1000)
+    texto_pos TEXT,                   -- S6: posición del cuadro de texto (milésimas 0-1000)
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (presentacion_id) REFERENCES presentaciones(id) ON DELETE CASCADE,
     FOREIGN KEY (slide_id) REFERENCES slides(id)

@@ -97,6 +97,18 @@ def _ensure_schema_version(conn: sqlite3.Connection) -> None:
         )
 
 
+def ensure_columnas_posiciones(conn: sqlite3.Connection) -> None:
+    """Añade imagen_pos/texto_pos a slides y presentacion_slides (S5/S6).
+
+    Posiciones en milésimas (0-1000) del ancho/alto de la diapositiva,
+    JSON {"x","y","w","h"}; NULL mantiene el diseño por defecto.
+    Idempotente: no hace nada si las columnas ya existen.
+    """
+    for tabla in ("slides", "presentacion_slides"):
+        for columna in ("imagen_pos", "texto_pos"):
+            _add_column_if_missing(conn, tabla, columna, "TEXT")
+
+
 def init_database(db_path: Path | None = None) -> None:
     """Inicializa la base de datos con el esquema, índices y control de versiones."""
     target = db_path or DB_PATH
@@ -117,6 +129,7 @@ def init_database(db_path: Path | None = None) -> None:
             _create_default_indexes(conn)
 
         _ensure_ajustes_editor_table(conn)
+        ensure_columnas_posiciones(conn)
 
         logger.info("Base de datos inicializada: %s", target)
 
