@@ -289,6 +289,8 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                         subtitulo=subtitulo,
                         momento="",
                         imagen=imagen or self._ilustracion_para(tipo),
+                        imagen_pos=item.get("imagen_pos"),
+                        texto_pos=item.get("texto_pos"),
                     )
                 )
                 continue
@@ -307,6 +309,8 @@ class GeneradorDesdeComposicion(GeneradorPresentacionHTML):
                         subtitulo=subtitulo,
                         momento=momento,
                         imagen=imagen or self._ilustracion_para(tipo),
+                        imagen_pos=item.get("imagen_pos"),
+                        texto_pos=item.get("texto_pos"),
                     )
                 )
 

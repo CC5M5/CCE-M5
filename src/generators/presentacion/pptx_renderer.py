@@ -16,6 +16,7 @@ from src.constants import (
     SLIDE_WIDTH_INCHES,
     TAMANO_LETRA_DEFECTO,
 )
+from src.generators.presentacion.posiciones import parse_posicion, pptx_inches
 
 
 def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
@@ -146,12 +147,27 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path | str, assets_dir: Path |
                     height=Inches(0.75),
                 )
 
+        # S5/S6: posiciones guardadas por diapositiva (per-mille);
+        # NULL = diseño fijo actual.
+        imagen_pos = parse_posicion(slide_data.get("imagen_pos"))
+        texto_pos = parse_posicion(slide_data.get("texto_pos"))
+
         if has_image:
             base_name = Path(slide_data["imagen"]).stem
             for ext in (".png", ".jpg", ".jpeg", ".svg"):
                 img_path = assets_dir / f"{base_name}{ext}"
                 if img_path.exists():
-                    if is_portada:
+                    if imagen_pos is not None:
+                        # S5: la imagen cabe en la caja guardada conservando su
+                        # proporción, centrada en ella.
+                        bx, by, bw, bh = pptx_inches(imagen_pos)
+                        pic = slide.shapes.add_picture(str(img_path), 0, 0)
+                        escala = min(Inches(bw) / pic.width, Inches(bh) / pic.height)
+                        pic.width = int(round(pic.width * escala))
+                        pic.height = int(round(pic.height * escala))
+                        pic.left = int(round(Inches(bx) + (Inches(bw) - pic.width) / 2))
+                        pic.top = int(round(Inches(by) + (Inches(bh) - pic.height) / 2))
+                    elif is_portada:
                         slide.shapes.add_picture(
                             str(img_path), Inches(3.5), Inches(0.5), height=Inches(2.6)
                         )
@@ -161,7 +177,12 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path | str, assets_dir: Path |
                         )
                     break
 
-        if is_portada:
+        if texto_pos is not None:
+            # S6: tarjeta y texto en la posición guardada (per-mille).
+            card_left, card_top, card_width, card_height = (
+                Inches(v) for v in pptx_inches(texto_pos)
+            )
+        elif is_portada:
             card_left = Inches(1.2)
             card_top = Inches(4.2)
             card_width = Inches(10.9)

@@ -4,6 +4,7 @@ from typing import Any
 
 from src.constants import SLIDE_WIDTH_INCHES, TAMANO_LETRA_DEFECTO
 from src.generators.presentacion.plantillas import base
+from src.generators.presentacion.posiciones import html_percent, parse_posicion
 from src.generators.presentacion.text_utils import _apply_bold_html, _escape_html
 
 
@@ -15,6 +16,9 @@ def _slide_to_html(slide: dict[str, Any], color_info: dict[str, str]) -> str:
     subtitulo = _escape_html(slide["subtitulo"])
     momento = _escape_html(slide["momento"])
     imagen = slide.get("imagen", "")
+    # S5/S6: posiciones guardadas por diapositiva (per-mille); NULL = CSS actual.
+    imagen_pos = parse_posicion(slide.get("imagen_pos"))
+    texto_pos = parse_posicion(slide.get("texto_pos"))
 
     lema_img = "assets/lema_somos_uno.jpg"
     inner = ""
@@ -38,8 +42,23 @@ def _slide_to_html(slide: dict[str, Any], color_info: dict[str, str]) -> str:
     html = f'<section class="{clase}" data-transition="fade">\n'
     html += '  <div class="slide-wrapper">\n'
     if imagen:
-        html += f'    <img class="ilustracion" src="{imagen}" alt="ilustración">\n'
-    html += f'    <div class="tarjeta">\n{inner}    </div>\n'
+        if imagen_pos is not None:
+            p = html_percent(imagen_pos)
+            html += (
+                f'    <img class="ilustracion ilustracion-pos" src="{imagen}" alt="ilustración" '
+                f'style="left:{p["left"]};top:{p["top"]};width:{p["width"]};height:{p["height"]}">\n'
+            )
+        else:
+            html += f'    <img class="ilustracion" src="{imagen}" alt="ilustración">\n'
+    if texto_pos is not None:
+        p = html_percent(texto_pos)
+        html += (
+            f'    <div class="tarjeta tarjeta-pos" '
+            f'style="left:{p["left"]};top:{p["top"]};width:{p["width"]};height:{p["height"]}">\n'
+            f'{inner}    </div>\n'
+        )
+    else:
+        html += f'    <div class="tarjeta">\n{inner}    </div>\n'
     html += f'    <img class="logo-lema" src="{lema_img}" alt="Somos uno">\n'
     html += '  </div>\n'
     html += '</section>\n'

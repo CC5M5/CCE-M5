@@ -331,6 +331,17 @@ TEMPLATE = """<!DOCTYPE html>
       margin-bottom: 0.02em;
     }}
 
+    /* S5/S6: posiciones guardadas por diapositiva (% del lienzo). */
+    .reveal .slides section .ilustracion-pos {{
+      position: absolute;
+      margin: 0;
+    }}
+    .reveal .slides section .tarjeta-pos {{
+      position: absolute;
+      margin: 0;
+      box-sizing: border-box;
+    }}
+
     @keyframes fadeInUp {{
       from {{ opacity: 0; transform: translateY(20px); }}
       to {{ opacity: 1; transform: translateY(0); }}

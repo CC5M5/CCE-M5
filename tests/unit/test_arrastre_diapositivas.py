@@ -10,9 +10,18 @@ Cubre:
 """
 from __future__ import annotations
 
-import pytest
+import json
+import struct
+import zlib
 
-from src.generators.presentacion import posiciones
+import pytest
+from pptx import Presentation
+from pptx.enum.shapes import MSO_SHAPE_TYPE
+from pptx.util import Inches
+
+from src.constants import COLORES_LITURGICOS
+from src.generators.presentacion import html_renderer, posiciones, pptx_renderer
+from src.generators.presentacion.slide import Slide
 
 
 # ---------------------------------------------------------------------------
@@ -135,3 +144,180 @@ def test_posiciones_por_defecto_sin_imagen() -> None:
     imagen, texto = posiciones.posiciones_por_defecto(_slide("evangelio", ""))
     assert imagen is None
     assert texto == {"x": 45, "y": 60, "w": 908, "h": 700}
+
+
+# ---------------------------------------------------------------------------
+# Propagación a generadores (fase 2b)
+# ---------------------------------------------------------------------------
+
+def _datos(slides: list[dict]) -> dict:
+    return {
+        "meta": {
+            "fecha": "2026-01-01",
+            "celebracion": "Domingo",
+            "color_liturgico": "verde",
+            "lema": "Somos uno",
+            "lema_imagen": "assets/lema_somos_uno.jpg",
+            "generado": "2026-01-01T00:00:00",
+        },
+        "slides": slides,
+    }
+
+
+def _slide_json(**kwargs) -> dict:
+    base = {
+        "numero": 1, "tipo": "portada", "titulo": "D", "contenido": "",
+        "cita": "", "subtitulo": "", "momento": "", "imagen": "",
+        "imagen_pos": None, "texto_pos": None,
+    }
+    base.update(kwargs)
+    return base
+
+
+def _png(path, w: int, h: int) -> None:
+    """Genera un PNG RGB w x h válido sin dependencias externas."""
+    def chunk(tag: bytes, data: bytes) -> bytes:
+        return (
+            struct.pack(">I", len(data)) + tag + data
+            + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+        )
+
+    raw = b"".join(b"\x00" + b"\x00\x80\xff" * w for _ in range(h))
+    path.write_bytes(
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+        + chunk(b"IDAT", zlib.compress(raw))
+        + chunk(b"IEND", b"")
+    )
+
+
+def _pptx_render(tmp_path, slides: list[dict]):
+    datos = _datos(slides)
+    assets = tmp_path / "assets"
+    assets.mkdir(exist_ok=True)
+    salida = tmp_path / "salida.pptx"
+    pptx_renderer._render_pptx(datos, salida, assets)
+    return Presentation(str(salida))
+
+
+def _forma_por_rect(slide, left, top, width, height):
+    for forma in slide.shapes:
+        if (
+            forma.left == left
+            and forma.top == top
+            and forma.width == width
+            and forma.height == height
+        ):
+            return forma
+    return None
+
+
+def test_slide_dataclass_carga_posiciones() -> None:
+    from dataclasses import asdict
+
+    s = Slide(
+        numero=1, tipo="portada", titulo="T", contenido="",
+        imagen_pos='{"x": 1, "y": 2, "w": 300, "h": 400}', texto_pos=None,
+    )
+    d = asdict(s)
+    assert d["imagen_pos"] == '{"x": 1, "y": 2, "w": 300, "h": 400}'
+    assert d["texto_pos"] is None
+
+
+def test_pptx_texto_pos_portada(tmp_path) -> None:
+    """S6: portada con texto_pos {90,420,818,340} -> tarjeta en pptx_inches."""
+    pos = {"x": 90, "y": 420, "w": 818, "h": 340}
+    prs = _pptx_render(tmp_path, [_slide_json(texto_pos=json.dumps(pos))])
+    slide = prs.slides[0]
+    ex, ey, ew, eh = posiciones.pptx_inches(pos)
+    card = _forma_por_rect(slide, Inches(ex), Inches(ey), Inches(ew), Inches(eh))
+    assert card is not None, "la tarjeta no está en la posición guardada"
+    caja = next(f for f in slide.shapes if f.shape_type == MSO_SHAPE_TYPE.TEXT_BOX)
+    assert caja.left == card.left + Inches(0.3)
+    assert caja.top == card.top + Inches(0.22)
+    assert caja.width == card.width - Inches(0.6)
+    assert caja.height == card.height - Inches(0.44)
+
+
+def test_pptx_imagen_pos_cabe_en_caja(tmp_path) -> None:
+    """S5: imagen con imagen_pos se coloca dentro de la caja, con su
+    proporción preservada y centrada."""
+    assets = tmp_path / "assets"
+    assets.mkdir(exist_ok=True)
+    _png(assets / "foo.png", 200, 100)  # proporción 2:1
+    pos = {"x": 50, "y": 100, "w": 400, "h": 400}
+    datos = _datos([_slide_json(
+        numero=2, tipo="evangelio", contenido="x",
+        imagen="assets/foo.png", imagen_pos=json.dumps(pos),
+    )])
+    salida = tmp_path / "salida.pptx"
+    pptx_renderer._render_pptx(datos, salida, assets)
+    slide = Presentation(str(salida)).slides[0]
+    pic = next(f for f in slide.shapes if f.shape_type == MSO_SHAPE_TYPE.PICTURE)
+    bx, by, bw, bh = posiciones.pptx_inches(pos)
+    tol = 9525  # 0.01 in en EMU
+    # Debe caber íntegramente dentro de la caja.
+    assert pic.left >= Inches(bx) - tol
+    assert pic.top >= Inches(by) - tol
+    assert pic.left + pic.width <= Inches(bx) + Inches(bw) + tol
+    assert pic.top + pic.height <= Inches(by) + Inches(bh) + tol
+    # 2:1 es más ancha que la caja (1.33:1) -> llena el ancho y centra en alto.
+    assert pic.width == pytest.approx(Inches(bw), abs=tol)
+    assert pic.height == pytest.approx(Inches(bw) / 2, abs=tol)
+    assert pic.left == pytest.approx(Inches(bx), abs=tol)
+    assert pic.top == pytest.approx(
+        Inches(by) + (Inches(bh) - Inches(bw) / 2) / 2, abs=tol
+    )
+
+
+def test_pptx_sin_posiciones_mantiene_layout_fijo(tmp_path) -> None:
+    """NULL: se conserva el layout fijo actual por tipo (constantes de hoy)."""
+    assets = tmp_path / "assets"
+    assets.mkdir(exist_ok=True)
+    _png(assets / "foo.png", 200, 100)
+    datos = _datos([
+        _slide_json(),  # portada sin posiciones
+        _slide_json(numero=2, tipo="evangelio", contenido="x", imagen="assets/foo.png"),
+    ])
+    salida = tmp_path / "salida.pptx"
+    pptx_renderer._render_pptx(datos, salida, assets)
+    prs = Presentation(str(salida))
+    portada = prs.slides[0]
+    assert _forma_por_rect(portada, Inches(1.2), Inches(4.2), Inches(10.9), Inches(3.4)) is not None
+    cuerpo = prs.slides[1]
+    assert _forma_por_rect(cuerpo, Inches(0.6), Inches(0.6), Inches(8.8), Inches(7.0)) is not None
+    pic = next(f for f in cuerpo.shapes if f.shape_type == MSO_SHAPE_TYPE.PICTURE)
+    assert pic.left == Inches(7.3)
+    assert pic.top == Inches(1.1)
+    assert pic.height == Inches(2.8)
+
+
+def test_html_posiciones_percent() -> None:
+    """S5/S6: las posiciones se emiten como % (html_percent) en el HTML."""
+    datos = _datos([_slide_json(
+        numero=2, tipo="evangelio", titulo="E", contenido="x",
+        imagen="assets/foo.png",
+        imagen_pos=json.dumps({"x": 90, "y": 10, "w": 400, "h": 500}),
+        texto_pos=json.dumps({"x": 5, "y": 6, "w": 600, "h": 700}),
+    )])
+    html = html_renderer._render_html(datos, COLORES_LITURGICOS["verde"])
+    assert (
+        '<img class="ilustracion ilustracion-pos" src="assets/foo.png" '
+        'alt="ilustración" style="left:9.00%;top:1.00%;width:40.00%;height:50.00%">'
+    ) in html
+    assert (
+        '<div class="tarjeta tarjeta-pos" '
+        'style="left:0.50%;top:0.60%;width:60.00%;height:70.00%">'
+    ) in html
+
+
+def test_html_sin_posiciones_css_actual() -> None:
+    """NULL: el HTML mantiene el CSS actual (sin clases ni estilos de posición)."""
+    datos = _datos([_slide_json(
+        numero=2, tipo="evangelio", titulo="E", contenido="x", imagen="assets/foo.png",
+    )])
+    html = html_renderer._render_html(datos, COLORES_LITURGICOS["verde"])
+    assert 'class="ilustracion ilustracion-pos"' not in html
+    assert 'class="tarjeta tarjeta-pos"' not in html
+    assert '<img class="ilustracion" src="assets/foo.png" alt="ilustración">' in html
+    assert '<div class="tarjeta">' in html

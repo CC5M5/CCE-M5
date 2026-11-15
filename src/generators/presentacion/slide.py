@@ -13,3 +13,7 @@ class Slide:
     subtitulo: str = ""
     momento: str = ""
     imagen: str = ""
+    # S5/S6: posiciones guardadas de la imagen y el texto (JSON en per-mille);
+    # None o inválido significa el diseño fijo (NULL en la BD).
+    imagen_pos: str | None = None
+    texto_pos: str | None = None

@@ -281,6 +281,8 @@ def _registrar_presentacion_slide(
     subtitulo: str,
     imagen: str,
     momento: str,
+    imagen_pos: str | None = None,
+    texto_pos: str | None = None,
 ):
     cursor = conn.cursor()
     cursor.execute(
@@ -295,8 +297,8 @@ def _registrar_presentacion_slide(
     cursor.execute(
         """
         INSERT INTO presentacion_slides
-        (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, imagen_pos, texto_pos)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             presentacion_id,
@@ -310,6 +312,8 @@ def _registrar_presentacion_slide(
             subtitulo,
             imagen,
             momento,
+            imagen_pos,
+            texto_pos,
         ),
     )
     conn.commit()
@@ -491,6 +495,8 @@ def main():
                     subtitulo,
                     imagen,
                     momento,
+                    slide.get("imagen_pos"),
+                    slide.get("texto_pos"),
                 )
                 stats["pasos"] += 1
                 continue
@@ -547,6 +553,8 @@ def main():
                 subtitulo,
                 imagen,
                 momento,
+                slide.get("imagen_pos"),
+                slide.get("texto_pos"),
             )
 
     # Normalizar es_default: solo una por (tipo, subtipo)

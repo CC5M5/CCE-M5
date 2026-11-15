@@ -40,7 +40,7 @@ from src.canciones_manager import (
 from src import db_manager
 from src.config import settings
 from src.constants import SLIDE_WIDTH_INCHES, TAMANO_LETRA_DEFECTO
-from src.generators.presentacion.posiciones import parse_posicion
+from src.generators.presentacion.posiciones import parse_posicion, posiciones_por_defecto
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -240,6 +240,9 @@ def _render_preview(slide: dict[str, Any]) -> str:
         pos = parse_posicion(slide.get(clave))
         if pos is not None:
             pos_attrs += f" data-{clave.replace('_', '-')}='{json.dumps(pos)}'"
+    # Fase 2b: posición de texto por defecto (por tipo) para el preview.
+    _, texto_defecto = posiciones_por_defecto(slide)
+    pos_attrs += f" data-texto-default='{json.dumps(texto_defecto)}'"
 
     def _render_slide_mini(contenido_parte: str, idx: int, total: int) -> str:
         contenido = html_module.escape(contenido_parte)
@@ -261,7 +264,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
         return f"""
         <div class="preview-frame {clase}"{pos_attrs} style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};{fuente_vars}">
           <div class="slide-wrapper">
-            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ""}
+            {f'<div class="cuadro-imagen"><img class="ilustracion" src="{imagen_url}" alt="ilustración"></div>' if imagen_url else ""}
             <div class="tarjeta">
               {inner}
             </div>
@@ -343,7 +346,12 @@ def _render_base(
     .preview-frame.cancion .contenido {{ line-height: 1.22; }}
     .preview-frame.cancion .contenido br {{ margin-bottom: 0; }}
     .preview-frame .tarjeta {{ background: rgba(255,255,255,0.94); border-radius: 12px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(124,58,237,0.12); max-height: 86%; overflow: auto; z-index: 5; }}
-    .preview-frame .ilustracion {{ position: absolute; bottom: 50px; right: 18px; max-width: 110px; max-height: 110px; opacity: 0.98; z-index: 6; border-radius: 8px; object-fit: contain; }}
+    .preview-frame .cuadro-imagen {{ position: absolute; bottom: 50px; right: 18px; width: 110px; height: 110px; z-index: 6; touch-action: none; }}
+    .preview-frame .cuadro-imagen .ilustracion {{ width: 100%; height: 100%; display: block; opacity: 0.98; border-radius: 8px; object-fit: contain; }}
+    .preview-frame .posicionable {{ position: absolute; margin: 0; cursor: move; touch-action: none; box-sizing: border-box; }}
+    .preview-frame .posicionable .manija-resize {{ position: absolute; right: -6px; bottom: -6px; width: 14px; height: 14px; background: var(--accent); border: 2px solid #fff; border-radius: 50%; cursor: nwse-resize; z-index: 20; }}
+    .preview-frame .posicionable .restablecer {{ position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; margin: 0; padding: 0; border-radius: 50%; background: rgba(255,255,255,0.85); color: #333; font-size: 13px; line-height: 19px; text-align: center; cursor: pointer; opacity: 0.55; z-index: 20; }}
+    .preview-frame .posicionable .restablecer:hover {{ opacity: 1; }}
     .preview-frame .logo-lema {{ position: absolute; bottom: 10px; right: 14px; height: 22px; width: auto; z-index: 10; }}
     .preview-frame:has(.ilustracion) .tarjeta {{ margin-right: 110px; }}
     button {{ background: var(--accent); color: #fff; border: none; padding: 12px 22px; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 12px; margin-right: 8px; }}
@@ -522,8 +530,16 @@ def editar(id: int):
 
     preview = _render_preview(slide)
 
+    # S5/S6 (fase 2b): campos ocultos que llevan las posiciones en cada
+    # guardado; valor vacío = diseño por defecto (NULL en la BD).
+    imagen_pos_inicial = parse_posicion(slide.get("imagen_pos"))
+    texto_pos_inicial = parse_posicion(slide.get("texto_pos"))
+    imagen_pos_attr = f" value='{json.dumps(imagen_pos_inicial)}'" if imagen_pos_inicial else " value=''"
+    texto_pos_attr = f" value='{json.dumps(texto_pos_inicial)}'" if texto_pos_inicial else " value=''"
     content = f"""<h2>Editar diapositiva #{slide["id"]}</h2>
     <form method="post" action="{_root()}/slides/{slide["id"]}/guardar" id="editor-form">
+      <input type="hidden" name="imagen_pos" id="imagen_pos"{imagen_pos_attr}>
+      <input type="hidden" name="texto_pos" id="texto_pos"{texto_pos_attr}>
       <div class="two-col">
         <div>
           <label>Tipo</label>
@@ -584,6 +600,157 @@ def editar(id: int):
         ta.focus();
         ta.setSelectionRange(start + '--- DIAPOSITIVA ---'.length, start + '--- DIAPOSITIVA ---'.length);
       }}
+      // S5/S6 (fase 2b): arrastrar y redimensionar imagen y cuadro de texto.
+      // px -> per-mille: x_permil = round(px / 440 * 1000), y_permil = round(py / 330 * 1000).
+      (function() {{
+        var form = document.getElementById('editor-form');
+        var campos = {{
+          imagen: form.querySelector('input[name="imagen_pos"]'),
+          texto: form.querySelector('input[name="texto_pos"]')
+        }};
+        if (!campos.imagen || !campos.texto) return;
+        var frames = Array.prototype.slice.call(form.querySelectorAll('.preview-frame'));
+        if (!frames.length) return;
+        var MIN_FRAC = 0.08; // mínimo igual que parse_posicion: 80 per-mille.
+
+        function dims(frame) {{
+          return {{ W: frame.offsetWidth || 440, H: frame.offsetHeight || 330 }};
+        }}
+        function px(pos, W, H) {{
+          return {{ x: pos.x / 1000 * W, y: pos.y / 1000 * H, w: pos.w / 1000 * W, h: pos.h / 1000 * H }};
+        }}
+        function permil(p, W, H) {{
+          return {{
+            x: Math.round(p.x / W * 1000),
+            y: Math.round(p.y / H * 1000),
+            w: Math.round(p.w / W * 1000),
+            h: Math.round(p.h / H * 1000)
+          }};
+        }}
+        function aplicar(el, p) {{
+          el.classList.add('posicionable');
+          el.style.left = p.x + 'px';
+          el.style.top = p.y + 'px';
+          el.style.width = p.w + 'px';
+          el.style.height = p.h + 'px';
+        }}
+        function liberar(el) {{
+          el.classList.remove('posicionable');
+          el.style.left = ''; el.style.top = '';
+          el.style.width = ''; el.style.height = '';
+        }}
+        function rectActual(el, frame) {{
+          var fr = frame.getBoundingClientRect();
+          var r = el.getBoundingClientRect();
+          return {{ x: r.left - fr.left, y: r.top - fr.top, w: r.width, h: r.height }};
+        }}
+        function arrastrar(el, frame, campo) {{
+          var d = dims(frame);
+          var W = d.W, H = d.H;
+          el.addEventListener('pointerdown', function (ev) {{
+            if (ev.button !== 0) return;
+            if (ev.target.classList && ev.target.classList.contains('manija-resize')) return;
+            if (ev.target.closest && ev.target.closest('button')) return;
+            ev.preventDefault();
+            var p0 = rectActual(el, frame);
+            var sx = ev.clientX, sy = ev.clientY;
+            el.setPointerCapture(ev.pointerId);
+            function move(e) {{
+              var nx = Math.min(Math.max(0, p0.x + e.clientX - sx), W - p0.w);
+              var ny = Math.min(Math.max(0, p0.y + e.clientY - sy), H - p0.h);
+              el.style.left = nx + 'px';
+              el.style.top = ny + 'px';
+              campos[campo].value = JSON.stringify(permil({{ x: nx, y: ny, w: p0.w, h: p0.h }}, W, H));
+            }}
+            function fin() {{
+              el.releasePointerCapture(ev.pointerId);
+              el.removeEventListener('pointermove', move);
+              el.removeEventListener('pointerup', fin);
+              el.removeEventListener('pointercancel', fin);
+            }}
+            el.addEventListener('pointermove', move);
+            el.addEventListener('pointerup', fin);
+            el.addEventListener('pointercancel', fin);
+          }});
+        }}
+        function redimensionar(el, frame, campo) {{
+          var d = dims(frame);
+          var W = d.W, H = d.H;
+          var manija = document.createElement('span');
+          manija.className = 'manija-resize';
+          manija.addEventListener('pointerdown', function (ev) {{
+            if (ev.button !== 0) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+            var p0 = rectActual(el, frame);
+            var sx = ev.clientX, sy = ev.clientY;
+            manija.setPointerCapture(ev.pointerId);
+            function move(e) {{
+              var nw = Math.min(Math.max(W * MIN_FRAC, p0.w + e.clientX - sx), W - p0.x);
+              var nh = Math.min(Math.max(H * MIN_FRAC, p0.h + e.clientY - sy), H - p0.y);
+              el.style.width = nw + 'px';
+              el.style.height = nh + 'px';
+              campos[campo].value = JSON.stringify(permil({{ x: p0.x, y: p0.y, w: nw, h: nh }}, W, H));
+            }}
+            function fin() {{
+              manija.releasePointerCapture(ev.pointerId);
+              manija.removeEventListener('pointermove', move);
+              manija.removeEventListener('pointerup', fin);
+              manija.removeEventListener('pointercancel', fin);
+            }}
+            manija.addEventListener('pointermove', move);
+            manija.addEventListener('pointerup', fin);
+            manija.addEventListener('pointercancel', fin);
+          }});
+          el.appendChild(manija);
+        }}
+        function restablecer(el, frame, campo, defecto) {{
+          var d = dims(frame);
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'restablecer';
+          btn.textContent = '↺';
+          btn.title = 'Restablecer posición y tamaño';
+          btn.addEventListener('click', function () {{
+            campos[campo].value = '';
+            liberar(el);
+            if (defecto) aplicar(el, px(defecto, d.W, d.H));
+          }});
+          el.appendChild(btn);
+        }}
+
+        frames.forEach(function (frame) {{
+          var d = dims(frame);
+          var img = frame.querySelector('.cuadro-imagen');
+          var tarjeta = frame.querySelector('.tarjeta');
+          var textoDefecto = null;
+          try {{
+            textoDefecto = frame.dataset.textoDefecto ? JSON.parse(frame.dataset.textoDefecto) : null;
+          }} catch (e) {{}}
+          if (img) {{
+            // Sin posición guardada la imagen mantiene el CSS actual.
+            var guardadaImg = null;
+            try {{
+              guardadaImg = frame.dataset.imagenPos ? JSON.parse(frame.dataset.imagenPos) : null;
+            }} catch (e) {{}}
+            if (guardadaImg) aplicar(img, px(guardadaImg, d.W, d.H));
+            arrastrar(img, frame, 'imagen');
+            redimensionar(img, frame, 'imagen');
+            restablecer(img, frame, 'imagen', null);
+          }}
+          if (tarjeta) {{
+            var guardadaTxt = null;
+            try {{
+              guardadaTxt = frame.dataset.textoPos ? JSON.parse(frame.dataset.textoPos) : null;
+            }} catch (e) {{}}
+            if (guardadaTxt) aplicar(tarjeta, px(guardadaTxt, d.W, d.H));
+            else if (textoDefecto) aplicar(tarjeta, px(textoDefecto, d.W, d.H));
+            arrastrar(tarjeta, frame, 'texto');
+            redimensionar(tarjeta, frame, 'texto');
+            restablecer(tarjeta, frame, 'texto', textoDefecto);
+          }}
+        }});
+      }})();
       function filtrarImagenes(filtro) {{
         document.querySelectorAll('.filtros-imagenes button').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
