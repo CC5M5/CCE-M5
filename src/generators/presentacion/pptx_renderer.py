@@ -246,7 +246,11 @@ def _render_pptx(data: dict[str, Any], pptx_path: Path | str, assets_dir: Path |
             partes.append((slide_data["cita"], "cita"))
         if slide_data.get("contenido"):
             partes.append(("", ""))
-            partes.append((slide_data["contenido"], "cuerpo"))
+            # Multilínea: cada línea de la letra es su propio párrafo OOXML
+            # (regresión R3-pptx-multiline-paragraphs: un \n crudo dentro del
+            # run no produce salto estructural en los visores).
+            for linea in slide_data["contenido"].split("\n"):
+                partes.append((linea, "cuerpo"))
 
         box = slide.shapes.add_textbox(text_left, text_top, text_width, text_height)
         tf = box.text_frame

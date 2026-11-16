@@ -225,3 +225,43 @@ def test_preview_css_usa_variables_y_momento_fijo(db_path: Path, monkeypatch: py
     assert "var(--fuente-cuerpo" in base
     # El label "momento" (h3) conserva su tamaño fijo.
     assert "h3 { font-size: 10px" in base
+
+
+def test_pptx_contenido_multilinea_un_parrafo_por_linea(
+    db_path: Path, tmp_path: Path
+) -> None:
+    """Regresión R3-pptx-multiline-paragraphs.
+
+    El contenido multilínea (letras con saltos) debe renderizar cada línea
+    como su propio párrafo OOXML; un salto crudo dentro del run no produce
+    separación estructural en los visores.
+    """
+    datos = _datos()
+    datos["slides"][2]["contenido"] = "Línea uno de la letra.\nLínea dos de la letra."
+    pptx_path = _render(datos, tmp_path)
+
+    entrada = Presentation(str(pptx_path)).slides[2]
+    textos = [
+        p.text
+        for shape in entrada.shapes
+        if shape.has_text_frame
+        for p in shape.text_frame.paragraphs
+    ]
+    assert "Línea uno de la letra." in textos
+    assert "Línea dos de la letra." in textos
+
+    # Ningún run lleva un salto crudo: la separación de líneas es estructural.
+    for shape in entrada.shapes:
+        if shape.has_text_frame:
+            for p in shape.text_frame.paragraphs:
+                for run in p.runs:
+                    assert "\n" not in run.text
+
+    # Ambas líneas usan el tamaño global del cuerpo.
+    por_texto = _tamanos_por_slide(pptx_path)[2]
+    assert por_texto["Línea uno de la letra."] == pytest.approx(
+        TAMANO_LETRA_DEFECTO["cuerpo"]
+    )
+    assert por_texto["Línea dos de la letra."] == pytest.approx(
+        TAMANO_LETRA_DEFECTO["cuerpo"]
+    )
