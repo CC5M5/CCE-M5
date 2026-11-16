@@ -54,6 +54,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import re
 import shutil
@@ -239,7 +240,6 @@ def clean_db(conn: sqlite3.Connection, aplicar: bool = True) -> dict:
     ids_prueba = _canciones_prueba_ids(conn)
     ids_prueba_set = set(ids_prueba)
     slide_ids = _slides_prueba_ids(conn, ids_prueba)
-    slide_ids_set = set(slide_ids)
     ids_vivos = {row[0] for row in conn.execute("SELECT id FROM canciones")}
 
     # Anomalías: solo se reportan, nunca se mutan aquí.
@@ -253,12 +253,11 @@ def clean_db(conn: sqlite3.Connection, aplicar: bool = True) -> dict:
         "SELECT COUNT(*) FROM slides WHERE titulo LIKE 'Aleluya%'"
     ).fetchone()[0]
     workflow_l = 0
-    try:
+    # tabla de runtime ausente (p. ej. en un seed)
+    with contextlib.suppress(sqlite3.OperationalError):
         workflow_l = conn.execute(
             "SELECT COUNT(*) FROM workflow_runs WHERE steps_data LIKE '%l %'"
         ).fetchone()[0]
-    except sqlite3.OperationalError:
-        pass  # tabla de runtime ausente (p. ej. en un seed)
     slides_L_mayuscula = [
         row[0]
         for row in conn.execute(
@@ -337,7 +336,7 @@ def clean_db(conn: sqlite3.Connection, aplicar: bool = True) -> dict:
         "slides": slide_ids,
         "presentacion_slides": pres_slides_a_borrar,
         "presentaciones": [p[0] for p in presentaciones_tocar],
-        "lecturas": [l[0] for l in lecturas_tocar],
+        "lecturas": [row[0] for row in lecturas_tocar],
         "refs_prueba_eliminadas": sum(p[3] for p in presentaciones_tocar),
         "refs_hueras_eliminadas": sum(p[4] for p in presentaciones_tocar),
         "anomalias": {
@@ -690,7 +689,7 @@ def clean_schema_sql(schema_path: Path, aplicar: bool = True) -> dict:
                 scratch.execute(stmt)
                 cur = scratch.execute(f"SELECT * FROM {tabla} ORDER BY rowid DESC LIMIT 1")
                 desc = [d[0] for d in cur.description]
-                fila = dict(zip(desc, cur.fetchone()))
+                fila = dict(zip(desc, cur.fetchone(), strict=True))
                 scratch.execute(
                     f"DELETE FROM {tabla} WHERE rowid = (SELECT MAX(rowid) FROM {tabla})"
                 )
@@ -841,7 +840,7 @@ def _imprimir_bd(res: dict) -> None:
 
 def _imprimir_deuda(res: dict, dry_run: bool) -> None:
     verbo = "se eliminarían" if dry_run else "eliminadas"
-    print(f"Fase deuda (L8/L9)" + (" [dry-run: nada mutado]" if dry_run else ""))
+    print("Fase deuda (L8/L9)" + (" [dry-run: nada mutado]" if dry_run else ""))
     print(f"  canciones «Aleluya%» {verbo}: {len(res['aleluya_canciones'])} {res['aleluya_canciones']}")
     print(f"  cancion_momentos {verbo}: {res['aleluya_cancion_momentos']}")
     print(f"  slides del lote «Aleluya%» {verbo}: {len(res['aleluya_slides'])} {res['aleluya_slides']}")

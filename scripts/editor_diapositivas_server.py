@@ -32,15 +32,14 @@ from typing import Any
 
 from flask import Flask, abort, redirect, request
 
+from src import db_manager
 from src.canciones_manager import (
     MOMENTOS_LITURGICOS,
     CancionCreateUpdate,
     crear_cancion,
 )
-from src import db_manager
 from src.config import settings
 from src.constants import SLIDE_WIDTH_INCHES, TAMANO_LETRA_DEFECTO
-from src.generators.presentacion.posiciones import parse_posicion, posiciones_por_defecto
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -49,6 +48,7 @@ from src.generators.composicion_catalogo import (
     guardar_composicion,
     proponer_composicion,
 )
+from src.generators.presentacion.posiciones import parse_posicion, posiciones_por_defecto
 from src.rebuild_web import rebuild_web
 from src.web_admin.editores import (
     get_connection,

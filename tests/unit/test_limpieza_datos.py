@@ -9,7 +9,6 @@ from pathlib import Path
 
 import pytest
 
-
 RAIZ_PROYECTO = Path(__file__).resolve().parents[2]
 SCHEMA_SQL_REAL = RAIZ_PROYECTO / "data" / "schema.sql"
 

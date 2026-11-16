@@ -14,7 +14,6 @@ from pathlib import Path
 
 import pytest
 from pptx import Presentation
-from pptx.util import Pt
 
 from src import db_manager
 from src.constants import TAMANO_LETRA_DEFECTO

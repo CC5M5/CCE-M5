@@ -23,7 +23,6 @@ from src.constants import COLORES_LITURGICOS
 from src.generators.presentacion import html_renderer, posiciones, pptx_renderer
 from src.generators.presentacion.slide import Slide
 
-
 # ---------------------------------------------------------------------------
 # parse_posicion
 # ---------------------------------------------------------------------------
