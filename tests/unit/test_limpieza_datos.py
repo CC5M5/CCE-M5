@@ -1,9 +1,6 @@
-"""Tests para scripts/limpieza_datos.py (S3 limpieza de datos de prueba, S4 prefijo «l »).
-
-Cada test construye una BD sintética en tmp_path; no toca la BD viva.
-El test de invariantes del archivo real (data/schema.sql) sí lo lee, pero en
-modo solo lectura.
-"""
+"""Tests para scripts/limpieza_datos.py (S3 limpieza de datos de prueba, S4 prefijo «l »,
+fase deuda L8/L9: lote «Aleluya%», slides huérfanas, workflow_runs con «l », slides
+«l »/«L » y el 16-N «generado»)."""
 
 import importlib
 import json
@@ -269,6 +266,267 @@ def test_backup_consistente(limpieza, tmp_path):
         assert _ids(conn2, "SELECT id FROM canciones") == {1, 2, 3, 4}
     finally:
         conn2.close()
+
+
+# ---------------------------------------------------------------------------
+# Fase deuda de datos (L8/L9): clean_deuda
+# ---------------------------------------------------------------------------
+
+
+def _build_deuda_db(path: Path, raiz: Path | None = None) -> None:
+    """BD sintética con la deuda de datos L8/L9 presente.
+
+    Si `raiz` se pasa, también crea el bundle 2026-11-16_presentacion/.
+    """
+    conn = sqlite3.connect(path)
+    conn.executescript(DDL_BASE)
+    conn.executemany("INSERT INTO canciones VALUES (?, ?)", [
+        (4, "PREPARAD EL CAMINO"),
+        (15, "Aleluya"),
+        (16, "Aleluya (refrain)"),
+    ])
+    conn.executemany("INSERT INTO cancion_momentos VALUES (?, ?)", [
+        (4, "entrada"),
+        (15, "entrada"),
+        (15, "salmo"),
+        (16, "entrada"),
+    ])
+    conn.executemany("INSERT INTO slides VALUES (?, ?, ?, ?, ?)", [
+        (101, "entrada", "cancion_15", "Aleluya", "Auto-creada desde canción"),
+        (102, "entrada", "cancion_16", "Aleluya (refrain)", "Auto-creada desde canción"),
+        (103, "entrada", "cancion_4", "PREPARAD EL CAMINO", None),
+        (104, "entrada", "cancion_999", "Orfana", None),
+        (105, "portada", "general", "L XXVI DOMINGO DEL TIEMPO ORDINARIO", None),
+        (106, "portada", "general", "l XXVI Domingo del Tiempo Ordinario", None),
+        (107, "portada", "general", "Lunes de la semana 5", None),
+    ])
+    conn.executemany("INSERT INTO presentacion_slides VALUES (?, ?, ?, ?)", [
+        (1, 1, 101, 1),
+        (2, 1, 102, 2),
+        (3, 1, 103, 3),
+        (4, 2, 104, 1),
+        (10, 173, 103, 1),
+        (11, 173, 107, 2),
+    ])
+    cj = json.dumps(
+        {
+            "cancion_4": {"id": 4},
+            "cancion_15": {"id": 15},
+            "cancion_16": 16,
+            "cancion_888": {"id": 888},
+        },
+        ensure_ascii=False,
+    )
+    conn.execute(
+        "INSERT INTO presentaciones VALUES (1, '2026-10-25', 1, ?, 'publicado', NULL)",
+        (cj,),
+    )
+    conn.execute(
+        "INSERT INTO presentaciones VALUES (173, '2026-11-16', NULL, NULL, 'generado', NULL)"
+    )
+    conn.executemany(
+        "INSERT INTO presentaciones VALUES (?, '2026-11-16', NULL, NULL, 'borrador', NULL)",
+        [(175,), (176,)],
+    )
+    conn.executemany(
+        "INSERT INTO workflow_runs VALUES (?, ?)",
+        [
+            (
+                1,
+                json.dumps(
+                    {"steps": ["l XXVI Domingo del Tiempo Ordinario", "l Aleluya de prueba"]},
+                    ensure_ascii=False,
+                ),
+            ),
+            (
+                2,
+                json.dumps(
+                    {
+                        "lectura_json": json.dumps(
+                            {"celebracion": "l XXXII Domingo del Tiempo Ordinario"},
+                            ensure_ascii=False,
+                        )
+                    },
+                    ensure_ascii=False,
+                ),
+            ),
+            (3, "texto plano con l XXX que no es JSON"),
+            (4, json.dumps({"pasos": ["l 123 no romano"]}, ensure_ascii=False)),
+        ],
+    )
+    conn.commit()
+    conn.close()
+    if raiz is not None:
+        bundle = raiz / "presentaciones_html" / "2026-11-16_presentacion"
+        bundle.mkdir(parents=True, exist_ok=True)
+        (bundle / "index.html").write_text("<html></html>", encoding="utf-8")
+
+
+def _snapshot_deuda(conn: sqlite3.Connection) -> dict:
+    out = {}
+    for tabla in (
+        "canciones", "cancion_momentos", "slides",
+        "presentacion_slides", "presentaciones", "workflow_runs",
+    ):
+        out[tabla] = conn.execute(f"SELECT * FROM {tabla} ORDER BY 1").fetchall()
+    return out
+
+
+def test_deuda_elimina_lote_aleluya(limpieza, tmp_path):
+    """L8: el lote «Aleluya%» se elimina con sus momentos, slides y refs.
+
+    La protección previa (L5: solo reportar) está levantada por la decisión
+    L9. Una canción no de prueba con otro título sigue viva.
+    """
+    db = tmp_path / "db.sqlite3"
+    _build_deuda_db(db)
+    conn = sqlite3.connect(db)
+    try:
+        res = limpieza.clean_deuda(conn)
+        assert res["aleluya_canciones"] == [15, 16]
+        assert res["aleluya_cancion_momentos"] == 3
+        assert sorted(res["aleluya_slides"]) == [101, 102]
+
+        assert _ids(conn, "SELECT id FROM canciones") == {4}
+        assert _ids(conn, "SELECT cancion_id FROM cancion_momentos") == {4}
+        assert _ids(conn, "SELECT id FROM slides") == {103, 105, 106, 107}
+        # Solo sobrevive la ref a la canción viva (4); 15/16/888 purgadas.
+        cj = json.loads(conn.execute("SELECT canciones_json FROM presentaciones WHERE id=1").fetchone()[0])
+        assert cj == {"cancion_4": {"id": 4}}
+        assert res["refs_eliminadas"] == 3
+    finally:
+        conn.close()
+
+
+def test_deuda_elimina_slides_hueras(limpieza, tmp_path):
+    """L8: slide con subtipo cancion_<id> sin canción se elimina; la slide de
+    una canción viva sobrevive con su snapshot."""
+    db = tmp_path / "db.sqlite3"
+    _build_deuda_db(db)
+    conn = sqlite3.connect(db)
+    try:
+        res = limpieza.clean_deuda(conn)
+        assert res["slides_hueras"] == [104]
+        assert 104 not in _ids(conn, "SELECT id FROM slides")
+        assert 103 in _ids(conn, "SELECT id FROM slides")
+        # Snapshot de la huérfana borrada; el de la keeper (slide 103) intacto.
+        assert _ids(conn, "SELECT slide_id FROM presentacion_slides") == {103}
+    finally:
+        conn.close()
+
+
+def test_deuda_normaliza_workflow_l(limpieza, tmp_path):
+    """L8: steps_data JSON con «l » + numerales romanos se normaliza
+    recursivamente (incluye la clave anidada «lectura_json»); lo no JSON y el
+    «l » sin guard romano se dejan intactos; solo se reescriben filas que cambian."""
+    db = tmp_path / "db.sqlite3"
+    _build_deuda_db(db)
+    conn = sqlite3.connect(db)
+    try:
+        res = limpieza.clean_deuda(conn)
+        assert res["workflow_runs"] == [1, 2]
+
+        w1 = json.loads(conn.execute("SELECT steps_data FROM workflow_runs WHERE id=1").fetchone()[0])
+        assert w1["steps"] == ["XXVI Domingo del Tiempo Ordinario", "l Aleluya de prueba"]
+
+        w2 = json.loads(conn.execute("SELECT steps_data FROM workflow_runs WHERE id=2").fetchone()[0])
+        assert json.loads(w2["lectura_json"])["celebracion"] == "XXXII Domingo del Tiempo Ordinario"
+
+        w3 = conn.execute("SELECT steps_data FROM workflow_runs WHERE id=3").fetchone()[0]
+        assert w3 == "texto plano con l XXX que no es JSON"
+
+        w4 = json.loads(conn.execute("SELECT steps_data FROM workflow_runs WHERE id=4").fetchone()[0])
+        assert w4["pasos"] == ["l 123 no romano"]
+    finally:
+        conn.close()
+
+
+def test_deuda_arregla_slides_prefijo_l_y_L(limpieza, tmp_path):
+    """L8: slide «L » mayúscula con guard romano se arregla (idem «l »);
+    título que no cumple el guard no se toca."""
+    db = tmp_path / "db.sqlite3"
+    _build_deuda_db(db)
+    conn = sqlite3.connect(db)
+    try:
+        res = limpieza.clean_deuda(conn)
+        assert sorted(res["slides_prefijo_l"]) == [105, 106]
+        assert (
+            conn.execute("SELECT titulo FROM slides WHERE id=105").fetchone()[0]
+            == "XXVI DOMINGO DEL TIEMPO ORDINARIO"
+        )
+        assert (
+            conn.execute("SELECT titulo FROM slides WHERE id=106").fetchone()[0]
+            == "XXVI Domingo del Tiempo Ordinario"
+        )
+        assert (
+            conn.execute("SELECT titulo FROM slides WHERE id=107").fetchone()[0]
+            == "Lunes de la semana 5"
+        )
+    finally:
+        conn.close()
+
+
+def test_deuda_elimina_presentacion_16n(limpieza, tmp_path):
+    """L9: la presentación «generado» del 16-N y sus snapshots se eliminan
+    (con su bundle); las «borrador» del mismo día se conservan."""
+    db = tmp_path / "db.sqlite3"
+    raiz = tmp_path / "raiz"
+    _build_deuda_db(db, raiz=raiz)
+    conn = sqlite3.connect(db)
+    try:
+        res = limpieza.clean_deuda(conn, raiz=raiz)
+        assert res["presentaciones_16n"] == [173]
+        assert res["presentacion_slides_16n"] == 2
+        assert res["bundle_eliminado"] is True
+        assert not (raiz / "presentaciones_html" / "2026-11-16_presentacion").exists()
+
+        restantes = {r[0]: r[1] for r in conn.execute("SELECT id, estado FROM presentaciones")}
+        assert restantes == {1: "publicado", 175: "borrador", 176: "borrador"}
+        assert _ids(conn, "SELECT id FROM presentacion_slides") == {3}
+    finally:
+        conn.close()
+
+
+def test_deuda_dry_run_no_muta(limpieza, tmp_path):
+    db = tmp_path / "db.sqlite3"
+    raiz = tmp_path / "raiz"
+    _build_deuda_db(db, raiz=raiz)
+    conn = sqlite3.connect(db)
+    try:
+        res = limpieza.clean_deuda(conn, aplicar=False, raiz=raiz)
+        # Plan calculado, pero nada mutado.
+        assert res["aleluya_canciones"] == [15, 16]
+        assert res["slides_hueras"] == [104]
+        assert res["presentaciones_16n"] == [173]
+        assert res["bundle_eliminado"] is False
+        assert _ids(conn, "SELECT id FROM canciones") == {4, 15, 16}
+        assert _ids(conn, "SELECT id FROM slides") == {101, 102, 103, 104, 105, 106, 107}
+        w1 = conn.execute("SELECT steps_data FROM workflow_runs WHERE id=1").fetchone()[0]
+        assert "l XXVI" in w1
+        assert (raiz / "presentaciones_html" / "2026-11-16_presentacion").exists()
+    finally:
+        conn.close()
+
+
+def test_deuda_idempotente(limpieza, tmp_path):
+    db = tmp_path / "db.sqlite3"
+    _build_deuda_db(db)
+    conn = sqlite3.connect(db)
+    try:
+        res1 = limpieza.clean_deuda(conn)
+        assert res1["aleluya_canciones"]
+
+        antes = _snapshot_deuda(conn)
+        res2 = limpieza.clean_deuda(conn)
+        assert res2["aleluya_canciones"] == []
+        assert res2["slides_hueras"] == []
+        assert res2["workflow_runs"] == []
+        assert res2["slides_prefijo_l"] == []
+        assert res2["presentaciones_16n"] == []
+        assert res2["presentaciones"] == []
+        assert _snapshot_deuda(conn) == antes
+    finally:
+        conn.close()
 
 
 _SCHEMA_DIRTY = """BEGIN TRANSACTION;

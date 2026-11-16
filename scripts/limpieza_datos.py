@@ -18,9 +18,25 @@ guardados:
 No muta logs históricos (workflow_runs.steps_data) ni títulos con «L »
 mayúscula: solo los reporta como anomalías.
 
+Deuda de datos (L8/L9) — fase `clean_deuda` (activa por defecto; se omite
+con --no-deuda). Autorizada por el usuario (L9):
+  - Lote «Aleluya%»: canciones, sus cancion_momentos, sus slides (título
+    «Aleluya%» o subtipo «cancion_<id>» del lote), sus presentacion_slides y
+    sus referencias en presentaciones.canciones_json.
+  - Slides huérfanas: subtipo «cancion_<id>» cuyo id no existe en canciones
+    (recontadas tras el lote anterior).
+  - workflow_runs.steps_data: quita el prefijo «l » (guard de numerales
+    romanos `^l [IVXLCDM]+[ .,]`) recursivamente, incluidos los JSON
+    anidados tipo «lectura_json»; solo se reescriben las filas que cambian;
+    los valores no JSON se dejan intactos.
+  - Slides con título «l »/«L » (guard de numerales romanos).
+  - T9: la presentación «generado» de 2026-11-16, sus presentacion_slides y
+    su bundle presentaciones_html/2026-11-16_presentacion/ (las «borrador» del
+    mismo día no se tocan).
+
 Además:
   - Crea un backup consistente ANTES de mutar:
-      <bd>.bak-limpieza-<YYYYMMDD-HHMMSS>
+      <bd>.bak-deuda-<YYYYMMDD-HHMMSS> (o .bak-limpieza-… con --no-deuda)
   - Limpia quirúrgicamente data/schema.sql a nivel de sentencias SQL (no de
     líneas, porque el dump concatena sentencias) para que una instalación
     nueva no resucite los datos de prueba ni el prefijo «l ».
@@ -32,6 +48,7 @@ Idempotente: una segunda ejecución no cambia nada e imprime conteos en cero.
 Uso:
     .venv/bin/python scripts/limpieza_datos.py [--dry-run] [--no-schema]
     .venv/bin/python scripts/limpieza_datos.py --no-export-web
+    .venv/bin/python scripts/limpieza_datos.py --no-deuda  # solo S3+S4
 """
 
 from __future__ import annotations
@@ -39,6 +56,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import sqlite3
 import tempfile
 from datetime import datetime
@@ -46,6 +64,11 @@ from pathlib import Path
 
 CANCIONES_PRUEBA = ("Canción A", "Canción B")
 PREFIJO_L = "l "
+FECHA_PRESENTACION_16N = "2026-11-16"
+# Guard de numerales romanos: solo se quita «l »/«L » si va seguido de un
+# numeral romano (y espacio/punto/coma), para no tocar «Lunes», «l Aleluya»…
+RE_L_ROMANO = re.compile(r"^l [IVXLCDM]+[ .,]")
+RE_L_ROMANO_MAYUSCULA = re.compile(r"^L [IVXLCDM]+[ .,]")
 
 RAIZ_PROYECTO = Path(__file__).resolve().parents[1]
 
@@ -83,6 +106,65 @@ def _normalizar_lectura_json(valor):
         return valor, False
     obj["celebracion"] = celebracion
     return json.dumps(obj, ensure_ascii=False), True
+
+
+def _normalizar_json_l(valor):
+    """Recursivo: quita el prefijo «l » (guard de numerales romanos).
+
+    Sobre un valor JSON ya parseado: en cadenas quita el prefijo «l » solo si
+    encaja el guard; en cadenas que son JSON anidado (p. ej. la clave
+    «lectura_json») parsea y recursa. Devuelve (nuevo_valor, cambiado).
+    """
+    if isinstance(valor, dict):
+        nuevo = {}
+        cambio = False
+        for clave, v in valor.items():
+            nv, c = _normalizar_json_l(v)
+            cambio = cambio or c
+            nuevo[clave] = nv
+        return nuevo, cambio
+    if isinstance(valor, list):
+        salida = []
+        cambio = False
+        for v in valor:
+            nv, c = _normalizar_json_l(v)
+            cambio = cambio or c
+            salida.append(nv)
+        return salida, cambio
+    if isinstance(valor, str):
+        if valor.startswith(PREFIJO_L) and RE_L_ROMANO.match(valor):
+            return valor[len(PREFIJO_L):].lstrip(), True
+        try:
+            anidado = json.loads(valor)
+        except (ValueError, TypeError):
+            return valor, False
+        if isinstance(anidado, (dict, list)):
+            nuevo, cambio = _normalizar_json_l(anidado)
+            if not cambio:
+                return valor, False
+            return json.dumps(nuevo, ensure_ascii=False), True
+        return valor, False
+    return valor, False
+
+
+def _normalizar_steps_data(valor):
+    """Normaliza workflow_runs.steps_data (JSON textual).
+
+    Solo devuelve el valor reescrito cuando cambió; los valores no JSON se
+    devuelven intactos. Devuelve (nuevo_valor, cambiado).
+    """
+    if not isinstance(valor, str):
+        return valor, False
+    try:
+        obj = json.loads(valor)
+    except (ValueError, TypeError):
+        return valor, False
+    if not isinstance(obj, (dict, list)):
+        return valor, False
+    nuevo, cambio = _normalizar_json_l(obj)
+    if not cambio:
+        return valor, False
+    return json.dumps(nuevo, ensure_ascii=False), True
 
 
 def _purgar_canciones_json(valor, ids_vivos, ids_prueba):
@@ -263,6 +345,183 @@ def clean_db(conn: sqlite3.Connection, aplicar: bool = True) -> dict:
             "workflow_l": workflow_l,
             "slides_titulo_L_mayuscula": slides_L_mayuscula,
         },
+    }
+
+
+def clean_deuda(
+    conn: sqlite3.Connection,
+    aplicar: bool = True,
+    raiz: Path = RAIZ_PROYECTO,
+) -> dict:
+    """Fase de deuda de datos (L8/L9). Devuelve los conteos del plan/aplicado.
+
+    1. Lote «Aleluya%»: canciones + cancion_momentos + slides (título
+       «Aleluya%» o subtipo «cancion_<id>» del lote) + presentacion_slides +
+       refs en presentaciones.canciones_json (vía _purgar_canciones_json).
+    2. Slides huérfanas: subtipo «cancion_<id>» sin canción (recontadas
+       tras el paso 1; incluye «cancion_…» sin id resolvable).
+    3. workflow_runs.steps_data: prefijo «l » con guard de numerales romanos
+       (recursivo; JSON anidado tipo «lectura_json»; solo filas que cambian).
+    4. Slides con título «l »/«L » (guard de numerales romanos).
+    5. T9: presentación «generado» de FECHA_PRESENTACION_16N + sus
+       presentacion_slides + su bundle en presentaciones_html/ (las
+       «borrador» del mismo día no se tocan).
+    """
+    conn.execute("PRAGMA foreign_keys=ON")
+
+    # 1. Lote «Aleluya%».
+    aleluya_ids = [
+        row[0]
+        for row in conn.execute(
+            "SELECT id FROM canciones WHERE titulo LIKE 'Aleluya%' ORDER BY id"
+        )
+    ]
+    aleluya_set = set(aleluya_ids)
+    ids_vivos = {row[0] for row in conn.execute("SELECT id FROM canciones")}
+
+    sql = "SELECT id FROM slides WHERE titulo LIKE 'Aleluya%'"
+    params: list = []
+    if aleluya_ids:
+        sql += " OR subtipo IN (" + ",".join("?" for _ in aleluya_ids) + ")"
+        params = list(aleluya_ids)
+    aleluya_slide_ids = [row[0] for row in conn.execute(sql, params)]
+    aleluya_slide_set = set(aleluya_slide_ids)
+
+    # 2. Slides huérfanas (recontadas tras el paso 1).
+    slides_hueras: list[int] = []
+    for sid, subtipo in conn.execute(
+        "SELECT id, subtipo FROM slides WHERE subtipo LIKE 'cancion_%'"
+    ):
+        if sid in aleluya_slide_set:
+            continue
+        m = re.fullmatch(r"cancion_(\d+)", subtipo or "")
+        if m and int(m.group(1)) in ids_vivos:
+            continue  # slide de una canción viva
+        slides_hueras.append(sid)
+
+    todas_slides = sorted(aleluya_slide_set | set(slides_hueras))
+
+    # Conteos (cálculo siempre; escritura solo si aplicar).
+    momentos_a_borrar = 0
+    pres_slides_a_borrar = 0
+    if aleluya_ids:
+        ph = ",".join("?" for _ in aleluya_ids)
+        momentos_a_borrar = conn.execute(
+            f"SELECT COUNT(*) FROM cancion_momentos WHERE cancion_id IN ({ph})",
+            aleluya_ids,
+        ).fetchone()[0]
+    if todas_slides:
+        ph = ",".join("?" for _ in todas_slides)
+        pres_slides_a_borrar = conn.execute(
+            f"SELECT COUNT(*) FROM presentacion_slides WHERE slide_id IN ({ph})",
+            todas_slides,
+        ).fetchone()[0]
+
+    # Refs en presentaciones.canciones_json (reutiliza _purgar_canciones_json:
+    # refs del lote + refs huérfanas a canciones inexistentes).
+    presentaciones_tocar: list[tuple[int, object, int]] = []
+    for pid, cj in conn.execute(
+        "SELECT id, canciones_json FROM presentaciones WHERE canciones_json IS NOT NULL"
+    ):
+        nuevo_cj, refs_p, refs_h = _purgar_canciones_json(
+            cj, ids_vivos - aleluya_set, aleluya_set
+        )
+        if nuevo_cj != cj:
+            presentaciones_tocar.append((pid, nuevo_cj, refs_p + refs_h))
+
+    # 3. workflow_runs.steps_data (tabla de runtime: puede no existir).
+    workflow_tocar: list[tuple[int, str]] = []
+    try:
+        for rid, steps_data in conn.execute("SELECT id, steps_data FROM workflow_runs"):
+            nuevo, cambio = _normalizar_steps_data(steps_data)
+            if cambio:
+                workflow_tocar.append((rid, nuevo))
+    except sqlite3.OperationalError:
+        pass
+
+    # 4. Slides con título «l »/«L » (LIKE ASCII es insensible a mayúsculas).
+    slides_prefijo: list[tuple[int, str]] = []
+    for sid, titulo in conn.execute(
+        "SELECT id, titulo FROM slides WHERE titulo LIKE 'l %' OR titulo LIKE 'L %'"
+    ):
+        if RE_L_ROMANO.match(titulo) or RE_L_ROMANO_MAYUSCULA.match(titulo):
+            nuevo = titulo[2:].lstrip()
+            if nuevo != titulo:
+                slides_prefijo.append((sid, nuevo))
+
+    # 5. T9: 16-N «generado».
+    pres_16n = [
+        row[0]
+        for row in conn.execute(
+            "SELECT id FROM presentaciones "
+            "WHERE fecha_domingo = ? AND estado = 'generado' ORDER BY id",
+            (FECHA_PRESENTACION_16N,),
+        )
+    ]
+    pres_slides_16n = 0
+    if pres_16n:
+        ph = ",".join("?" for _ in pres_16n)
+        pres_slides_16n = conn.execute(
+            f"SELECT COUNT(*) FROM presentacion_slides WHERE presentacion_id IN ({ph})",
+            pres_16n,
+        ).fetchone()[0]
+    bundle_dir = raiz / "presentaciones_html" / f"{FECHA_PRESENTACION_16N}_presentacion"
+    bundle_16n = str(bundle_dir) if bundle_dir.is_dir() else None
+    bundle_eliminado = False
+    if aplicar and pres_16n and bundle_16n:
+        shutil.rmtree(bundle_dir)
+        bundle_eliminado = True
+
+    if aplicar:
+        with conn:
+            if todas_slides:
+                ph = ",".join("?" for _ in todas_slides)
+                conn.execute(
+                    f"DELETE FROM presentacion_slides WHERE slide_id IN ({ph})",
+                    todas_slides,
+                )
+                conn.execute(f"DELETE FROM slides WHERE id IN ({ph})", todas_slides)
+            if aleluya_ids:
+                ph = ",".join("?" for _ in aleluya_ids)
+                conn.execute(
+                    f"DELETE FROM cancion_momentos WHERE cancion_id IN ({ph})",
+                    aleluya_ids,
+                )
+                conn.execute(f"DELETE FROM canciones WHERE id IN ({ph})", aleluya_ids)
+            if pres_16n:
+                ph = ",".join("?" for _ in pres_16n)
+                conn.execute(
+                    f"DELETE FROM presentacion_slides WHERE presentacion_id IN ({ph})",
+                    pres_16n,
+                )
+                conn.execute(f"DELETE FROM presentaciones WHERE id IN ({ph})", pres_16n)
+            for pid, nuevo_cj, _refs in presentaciones_tocar:
+                conn.execute(
+                    "UPDATE presentaciones SET canciones_json=? WHERE id=?",
+                    (nuevo_cj, pid),
+                )
+            for sid, nuevo_titulo in slides_prefijo:
+                conn.execute("UPDATE slides SET titulo=? WHERE id=?", (nuevo_titulo, sid))
+            for rid, nuevo in workflow_tocar:
+                conn.execute(
+                    "UPDATE workflow_runs SET steps_data=? WHERE id=?", (nuevo, rid)
+                )
+
+    return {
+        "aleluya_canciones": aleluya_ids,
+        "aleluya_cancion_momentos": momentos_a_borrar,
+        "aleluya_slides": sorted(aleluya_slide_ids),
+        "slides_hueras": sorted(slides_hueras),
+        "slides": todas_slides,
+        "presentacion_slides": pres_slides_a_borrar,
+        "presentaciones": [p[0] for p in presentaciones_tocar],
+        "refs_eliminadas": sum(p[2] for p in presentaciones_tocar),
+        "workflow_runs": [r[0] for r in workflow_tocar],
+        "slides_prefijo_l": [s[0] for s in slides_prefijo],
+        "presentaciones_16n": pres_16n,
+        "presentacion_slides_16n": pres_slides_16n,
+        "bundle_16n": bundle_16n,
+        "bundle_eliminado": bundle_eliminado,
     }
 
 
@@ -580,13 +839,39 @@ def _imprimir_bd(res: dict) -> None:
     print(f"  slides con «L » mayúscula: {a['slides_titulo_L_mayuscula']}")
 
 
+def _imprimir_deuda(res: dict, dry_run: bool) -> None:
+    verbo = "se eliminarían" if dry_run else "eliminadas"
+    print(f"Fase deuda (L8/L9)" + (" [dry-run: nada mutado]" if dry_run else ""))
+    print(f"  canciones «Aleluya%» {verbo}: {len(res['aleluya_canciones'])} {res['aleluya_canciones']}")
+    print(f"  cancion_momentos {verbo}: {res['aleluya_cancion_momentos']}")
+    print(f"  slides del lote «Aleluya%» {verbo}: {len(res['aleluya_slides'])} {res['aleluya_slides']}")
+    print(f"  slides huérfanas {verbo}: {len(res['slides_hueras'])}")
+    print(f"  presentacion_slides {verbo}: {res['presentacion_slides']}")
+    print(f"  presentaciones purgadas (canciones_json): {len(res['presentaciones'])} {res['presentaciones']}")
+    print(f"  refs en canciones_json eliminadas: {res['refs_eliminadas']}")
+    print(f"  workflow_runs.steps_data normalizados: {len(res['workflow_runs'])} {res['workflow_runs']}")
+    print(f"  slides «l »/«L » normalizadas: {len(res['slides_prefijo_l'])} {res['slides_prefijo_l']}")
+    print(f"  presentaciones 16-N «generado» {verbo}: {len(res['presentaciones_16n'])} {res['presentaciones_16n']}")
+    print(f"  presentacion_slides 16-N {verbo}: {res['presentacion_slides_16n']}")
+    if res["bundle_16n"]:
+        if res["bundle_eliminado"]:
+            print(f"  bundle 16-N eliminado: {res['bundle_16n']}")
+        else:
+            print(f"  bundle 16-N que se eliminaría: {res['bundle_16n']}")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        description="Limpia datos de prueba (Canción A/B) y normaliza el prefijo «l »."
+        description="Limpia datos de prueba (Canción A/B), normaliza el prefijo «l » "
+        "y limpia la deuda de datos L8/L9 (lote «Aleluya%», huérfanas, workflow_runs, «L », 16-N)."
     )
     parser.add_argument("--db", type=Path, default=None, help="BD a limpiar")
     parser.add_argument("--schema", type=Path, default=None, help="schema.sql a limpiar")
     parser.add_argument("--no-schema", action="store_true", help="No tocar data/schema.sql")
+    parser.add_argument(
+        "--no-deuda", action="store_true",
+        help="No ejecutar la fase de deuda de datos (L8/L9)",
+    )
     parser.add_argument(
         "--no-export-web", action="store_true", help="No regenerar web/data/canciones.json"
     )
@@ -607,18 +892,24 @@ def main(argv=None) -> int:
         print("MODO DRY-RUN: no se mutará nada ni se creará backup.")
 
     if not args.dry_run and not args.skip_backup:
+        prefijo_bak = "deuda" if not args.no_deuda else "limpieza"
         backup_path = db_path.with_name(
-            f"{db_path.name}.bak-limpieza-{datetime.now():%Y%m%d-%H%M%S}"
+            f"{db_path.name}.bak-{prefijo_bak}-{datetime.now():%Y%m%d-%H%M%S}"
         )
         backup_database(db_path, backup_path)
         print(f"Backup creado: {backup_path}")
 
     conn = sqlite3.connect(str(db_path))
+    res_deuda = None
     try:
         res = clean_db(conn, aplicar=not args.dry_run)
+        if not args.no_deuda:
+            res_deuda = clean_deuda(conn, aplicar=not args.dry_run)
     finally:
         conn.close()
     _imprimir_bd(res)
+    if res_deuda is not None:
+        _imprimir_deuda(res_deuda, dry_run=args.dry_run)
 
     if not args.no_schema:
         if schema_path.exists():

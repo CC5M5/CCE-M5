@@ -37,4 +37,7 @@ def test_seed_2026_11_01_has_composition_slides():
         WHERE p.fecha_domingo = '2026-11-01'
         """
     ).fetchone()[0]
-    assert n == 28
+    assert n == 27
+    # 27 desde la limpieza de deuda L9 (2026-11-16): la slide «ALELUYA (Leonard
+    # Cohen)» (subtipo cancion_15, canción eliminada del lote «Aleluya%») salió de
+    # esta composición. Antes: 28.

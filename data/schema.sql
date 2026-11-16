@@ -12,6 +12,11 @@ CREATE TABLE admin_users (
                 );
 INSERT INTO "admin_users" VALUES(1,'rafael.torres','$2b$12$ZIuCyJ.GhY1tkg6syBXkiOnlFBdRJiNyDvoPjZV3/aOrnQ1Lpo/VK','Rafael Torres','admin',1,'2026-09-28 09:51:39','2026-10-20T23:27:04.597868+00:00');
 INSERT INTO "admin_users" VALUES(2,'nuevo','$2b$12$D13sgd.Xq0rVkfb4sd2HGui/dGkxPgnCSQnKyjNYYFgUH2xpQOIwG','Nuevo','viewer',1,'2026-10-18 22:44:36','2026-10-18T22:44:36.326801+00:00');
+CREATE TABLE ajustes_editor (
+            parte TEXT PRIMARY KEY,
+            tamano_pt INTEGER NOT NULL,
+            actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
 CREATE TABLE automation_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             agente TEXT NOT NULL,
@@ -28,7 +33,6 @@ CREATE TABLE cancion_momentos (
     );
 INSERT INTO "cancion_momentos" VALUES(7,'aleluya');
 INSERT INTO "cancion_momentos" VALUES(14,'aleluya');
-INSERT INTO "cancion_momentos" VALUES(16,'aleluya');
 INSERT INTO "cancion_momentos" VALUES(25,'aleluya');
 INSERT INTO "cancion_momentos" VALUES(38,'aleluya');
 INSERT INTO "cancion_momentos" VALUES(47,'aleluya');
@@ -117,7 +121,6 @@ INSERT INTO "cancion_momentos" VALUES(82,'ofertorio');
 INSERT INTO "cancion_momentos" VALUES(51,'paz');
 INSERT INTO "cancion_momentos" VALUES(20,'despedida');
 INSERT INTO "cancion_momentos" VALUES(89,'santo');
-INSERT INTO "cancion_momentos" VALUES(15,'aleluya');
 INSERT INTO "cancion_momentos" VALUES(91,'salmo');
 INSERT INTO "cancion_momentos" VALUES(91,'ofertorio');
 INSERT INTO "cancion_momentos" VALUES(91,'comunion');
@@ -138,27 +141,6 @@ INSERT INTO "cancion_momentos" VALUES(22,'entrada');
 INSERT INTO "cancion_momentos" VALUES(22,'comunion');
 INSERT INTO "cancion_momentos" VALUES(22,'despedida');
 INSERT INTO "cancion_momentos" VALUES(22,'perdon');
-INSERT INTO "cancion_momentos" VALUES(228,'entrada');
-INSERT INTO "cancion_momentos" VALUES(228,'comunion');
-INSERT INTO "cancion_momentos" VALUES(228,'acto_penitencial');
-INSERT INTO "cancion_momentos" VALUES(231,'entrada');
-INSERT INTO "cancion_momentos" VALUES(231,'comunion');
-INSERT INTO "cancion_momentos" VALUES(231,'acto_penitencial');
-INSERT INTO "cancion_momentos" VALUES(234,'entrada');
-INSERT INTO "cancion_momentos" VALUES(234,'comunion');
-INSERT INTO "cancion_momentos" VALUES(234,'acto_penitencial');
-INSERT INTO "cancion_momentos" VALUES(237,'entrada');
-INSERT INTO "cancion_momentos" VALUES(237,'comunion');
-INSERT INTO "cancion_momentos" VALUES(237,'acto_penitencial');
-INSERT INTO "cancion_momentos" VALUES(240,'entrada');
-INSERT INTO "cancion_momentos" VALUES(240,'comunion');
-INSERT INTO "cancion_momentos" VALUES(240,'acto_penitencial');
-INSERT INTO "cancion_momentos" VALUES(243,'entrada');
-INSERT INTO "cancion_momentos" VALUES(243,'comunion');
-INSERT INTO "cancion_momentos" VALUES(243,'acto_penitencial');
-INSERT INTO "cancion_momentos" VALUES(246,'entrada');
-INSERT INTO "cancion_momentos" VALUES(246,'comunion');
-INSERT INTO "cancion_momentos" VALUES(246,'acto_penitencial');
 CREATE TABLE canciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT NOT NULL,
@@ -2833,423 +2815,6 @@ mas tus palabras no pasarán. <o:p></o:p></div>
 <span style="color: #c00000; mso-bidi-font-size: 10.0pt;">Lam Fa    Sol 
 Do<o:p></o:p></span></div>
 <span style=''font-family: "calibri" , sans-serif; font-size: 11.0pt; line-height: 115%;''>Aleluya, aleluya.</span>
-<div style="clear: both;"></div>
-</div>');
-INSERT INTO "canciones" VALUES(15,'ALELUYA (Leonard Cohen)','https://betaniamusic.blogspot.com/2018/06/aleluya-leonard-cohen.html','Sol                Mim
-Quiero escuchar tu corazón,
-  Sol             Mim
-conozco el sonido de tu voz,
- Do               Re     Sol   Re
-abrázame con tu palabra, Padre.
- Sol       Do     Re
-Ayúdanos a comprender
-    Mim              Do
-que hay tantas cosas por hacer,
-  Re          Si7       Mim
-regálanos tus manos, aleluya.
-   Do       Mim
-ALELUYA, ALELUYA,
-   Do       Sol Re
-ALELUYA, ALELU…
-   Do       Mim
-ALELUYA, ALELUYA,
-   Do       Sol  Re Sol
-ALELUYA, ALELUYA','Quiero escuchar tu corazón,
-conozco el sonido de tu voz,
-abrázame con tu palabra, Padre.
-Ayúdanos a comprender
-que hay tantas cosas por hacer,
-regálanos tus manos, aleluya.
-ALELUYA, ALELUYA,
-ALELUYA, ALELU…
-ALELUYA, ALELUYA,
-ALELUYA, ALELUYA','','Sol','aleluya',NULL,NULL,NULL,NULL,'betaniamusic.blogspot.com','2026-09-15 10:26:15','[{"tipo": "acordes_letra", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Mim", "posicion": 4}], "letra": "Quiero escuchar tu corazón,", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Mim", "posicion": 4}], "letra": "conozco el sonido de tu voz,", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Sol", "posicion": 6}, {"acorde": "Re", "posicion": 10}], "letra": "abrázame con tu palabra, Padre.", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Do", "posicion": 4}, {"acorde": "Re", "posicion": 7}], "letra": "Ayúdanos a comprender", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Mim", "posicion": 0}, {"acorde": "Do", "posicion": 4}], "letra": "que hay tantas cosas por hacer,", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Re", "posicion": 0}, {"acorde": "Si7", "posicion": 3}, {"acorde": "Mim", "posicion": 7}], "letra": "regálanos tus manos, aleluya.", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Mim", "posicion": 3}], "letra": "ALELUYA, ALELUYA,", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Sol", "posicion": 3}, {"acorde": "Re", "posicion": 7}], "letra": "ALELUYA, ALELU…", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Mim", "posicion": 3}], "letra": "ALELUYA, ALELUYA,", "texto": ""}, {"tipo": "acordes_letra", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Sol", "posicion": 3}, {"acorde": "Re", "posicion": 7}, {"acorde": "Sol", "posicion": 10}], "letra": "ALELUYA, ALELUYA", "texto": ""}]','<div class="cancion-con-acordes">
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes"><span class="acorde">Sol</span>                <span class="acorde">Mim</span></div>
-  <div class="linea-letra">Quiero escuchar tu corazón,</div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">  <span class="acorde">Sol</span>             <span class="acorde">Mim</span></div>
-  <div class="linea-letra">conozco el sonido de tu voz,</div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes"> <span class="acorde">Do</span>               <span class="acorde">Re</span>     <span class="acorde">Sol</span>   <span class="acorde">Re</span></div>
-  <div class="linea-letra">abrázame con tu palabra, Padre.  </div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes"> <span class="acorde">Sol</span>       <span class="acorde">Do</span>     <span class="acorde">Re</span></div>
-  <div class="linea-letra">Ayúdanos a comprender</div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">    <span class="acorde">Mim</span>              <span class="acorde">Do</span></div>
-  <div class="linea-letra">que hay tantas cosas por hacer,</div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">  <span class="acorde">Re</span>          <span class="acorde">Si7</span>       <span class="acorde">Mim</span></div>
-  <div class="linea-letra">regálanos tus manos, aleluya.</div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">   <span class="acorde">Do</span>       <span class="acorde">Mim</span></div>
-  <div class="linea-letra"><strong>ALELUYA, ALELUYA,</strong></div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">   <span class="acorde">Do</span>       <span class="acorde">Sol</span> <span class="acorde">Re</span></div>
-  <div class="linea-letra"><strong>ALELUYA, ALELU…   </strong></div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">   <span class="acorde">Do</span>       <span class="acorde">Mim</span></div>
-  <div class="linea-letra"><strong>ALELUYA, ALELUYA,</strong></div>
-</div>
-<div class="bloque-acordes-letra">
-  <div class="linea-acordes">   <span class="acorde">Do</span>       <span class="acorde">Sol</span>  <span class="acorde">Re</span> <span class="acorde">Sol</span></div>
-  <div class="linea-letra"><strong>ALELUYA, ALELUYA       </strong></div>
-</div>
-</div>','<div class="post-body entry-content" id="post-body-7829981915889577195" itemprop="description articleBody">
-<br/>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b><u><a href="https://youtu.be/67KRJzj96tA" target="_blank">escuchar</a></u></b><b>    /    </b><b><u><a href="https://betaniamusic.blogspot.com/p/cancionero-escolapio.html">volver a lista de canciones</a></u></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><br/></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;">Sol<span style="mso-tab-count: 2;">                         </span><span style="mso-spacerun: yes;">   </span><span style="mso-spacerun: yes;">  </span>Mim<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="mso-bidi-font-size: 10.0pt;">Quiero escuchar tu corazón,<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">   
-</span>Sol<span style="mso-spacerun: yes;">                     </span>Mim<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="mso-bidi-font-size: 10.0pt;">conozco el sonido de tu voz,<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">   </span>Do<span style="mso-tab-count: 2;">                      </span> <span style="mso-spacerun: yes;">   </span><span style="mso-spacerun: yes;"> </span>Re<span style="mso-tab-count: 1;">     </span><span style="mso-spacerun: yes;">   </span>Sol<span style="mso-spacerun: yes;">   </span><span style="mso-spacerun: yes;"> </span>Re<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="mso-bidi-font-size: 10.0pt;">abrázame con tu palabra, Padre.<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;"> </span>Sol<span style="mso-tab-count: 1;">      </span><span style="mso-spacerun: yes;">   </span><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;">  </span>Do<span style="mso-spacerun: yes;">          
-</span>Re<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="mso-bidi-font-size: 10.0pt;">Ayúdanos a comprender<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">      
-</span>Mim<span style="mso-spacerun: yes;">                       </span>Do<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="mso-bidi-font-size: 10.0pt;">que hay tantas cosas por hacer,<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">   
-</span>Re<span style="mso-tab-count: 1;">      </span><span style="mso-spacerun: yes;">         </span><span style="mso-spacerun: yes;"> </span>Si7<span style="mso-spacerun: yes;">            
-</span>Mim<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="mso-bidi-font-size: 10.0pt;">regálanos tus manos, aleluya.<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<br/></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;">  </span>Do<span style="mso-tab-count: 1;">   </span><span style="mso-spacerun: yes;">    </span><span style="mso-spacerun: yes;">    </span>Mim<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b style="mso-bidi-font-weight: normal;"><span style="mso-bidi-font-size: 10.0pt;">ALELUYA, ALELUYA,<o:p></o:p></span></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;">   </span>Do<span style="mso-spacerun: yes;">        </span><span style="mso-spacerun: yes;">   </span><span style="mso-spacerun: yes;"> </span>Sol<span style="mso-spacerun: yes;">   
-</span>Re<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b style="mso-bidi-font-weight: normal;"><span style="mso-bidi-font-size: 10.0pt;">ALELUYA, ALELU…<o:p></o:p></span></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">    </span><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;"> </span>Do <span style="mso-tab-count: 1;"> </span><span style="mso-spacerun: yes;">  </span><span style="mso-spacerun: yes;">     </span><span style="mso-spacerun: yes;"> </span>Mim<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b style="mso-bidi-font-weight: normal;"><span style="mso-bidi-font-size: 10.0pt;">ALELUYA, ALELUYA,<o:p></o:p></span></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000;"><span style="mso-spacerun: yes;">   </span><span style="mso-spacerun: yes;"> </span><span style="mso-spacerun: yes;">  </span>Do<span style="mso-tab-count: 1;">   </span><span style="mso-spacerun: yes;">     </span><span style="mso-spacerun: yes;">      </span>Sol Re Sol<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b style="mso-bidi-font-weight: normal;"><span style="mso-bidi-font-size: 10.0pt;">ALELUYA, ALELUYA<o:p></o:p></span></b></div>
-<br/>
-<div style="clear: both;"></div>
-</div>');
-INSERT INTO "canciones" VALUES(16,'ALELUYA DE LA TIERRA','https://betaniamusic.blogspot.com/2018/06/aleluya-de-la-tierra.html','Sol                             Do              Re                     Sol
-
-¿Quién quiere resucitar a este
-mundo que se muere?
-
-                                     Do                Re                     Sol
-
-¿Quién cantará el aleluya de
-esa nueva luz que viene?
-
-                                          Do                 Lam                Si7
-
-¿Quién cuando mire la tierra y
-las tragedias observe,
-
-   Do dim
-                Mim          La7                       Re
-
-sentirá en su corazón el dolor
-de quien se muere?
-
-Do dim            Mi    Sol7
-
-¿Quién es capaz de salvar a
-este mundo decadente,
-
-Do                             Re                  Do          Re       Sol
-
-y mantiene la esperanza de los
-muchos que la pierden?
-
-Sol      Do      Re         SoL                Lam      Si7      Mim
-
-EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,
-
-             Do      Re      Sol     Mim      Re
-Sol
-
-Y OTROS SON ESPECTADORES, NO LO SIENTEN.
-
- Sol                             Do               Re            Sol
-
-¿Quién bajará de la cruz a
-tanto cristo sufriente,
-
-                                            Do              Re                   Sol
-
-mientras los hombres miramos,
-impasivos e indolentes?
-
-                                          Do                            Lam                     Si7
-
-¿Quién grita desde el silencio
-de un ser que a su Dios retiene,
-
-  Do dim                  Mim                 La7                      Re
-
-porque se hace palabra que sin
-hablar se la entiende?
-
-                                      Do dim                               Mim
- Sol7
-
-¿Quién se torna en aleluya
-porque traduce la muerte,
-
-Do                                 Re                 Do                     Sol
-
-como el trigo que se pudre y de
-uno cientos vienen?
-
-Sol  Do    Re
-   Sol                 Lam   Si7
-     Mim
-
-¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,
-
-      Do     Re    Sol  Mim
-Re Sol
-
-Y LA
-TIERRA SONREIRÁ. ¡ALELUYA!','¿Quién quiere resucitar a este
-mundo que se muere?
-¿Quién cantará el aleluya de
-esa nueva luz que viene?
-¿Quién cuando mire la tierra y
-las tragedias observe,
-Do dim
-sentirá en su corazón el dolor
-de quien se muere?
-Do dim Mi Sol7
-¿Quién es capaz de salvar a
-este mundo decadente,
-y mantiene la esperanza de los
-muchos que la pierden?
-EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,
-Y OTROS SON ESPECTADORES, NO LO SIENTEN.
-¿Quién bajará de la cruz a
-tanto cristo sufriente,
-mientras los hombres miramos,
-impasivos e indolentes?
-¿Quién grita desde el silencio
-de un ser que a su Dios retiene,
-Do dim Mim La7 Re
-porque se hace palabra que sin
-hablar se la entiende?
-Do dim Mim
-¿Quién se torna en aleluya
-porque traduce la muerte,
-como el trigo que se pudre y de
-uno cientos vienen?
-¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,
-Y LA
-TIERRA SONREIRÁ. ¡ALELUYA!','','Sol','aleluya',NULL,NULL,NULL,NULL,'betaniamusic.blogspot.com','2026-09-15 10:26:15','[{"tipo": "acordes", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Do", "posicion": 4}, {"acorde": "Re", "posicion": 7}, {"acorde": "Sol", "posicion": 10}], "letra": "", "texto": "", "acordes_raw": "Sol                             Do              Re                     Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién quiere resucitar a este", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "mundo que se muere?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Sol", "posicion": 6}], "letra": "", "texto": "", "acordes_raw": "                                     Do                Re                     Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién cantará el aleluya de", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "esa nueva luz que viene?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Lam", "posicion": 3}, {"acorde": "Si7", "posicion": 7}], "letra": "", "texto": "", "acordes_raw": "                                          Do                 Lam                Si7"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién cuando mire la tierra y", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "las tragedias observe,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "Do dim", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Mim", "posicion": 0}, {"acorde": "La7", "posicion": 4}, {"acorde": "Re", "posicion": 8}], "letra": "", "texto": "", "acordes_raw": "                Mim          La7                       Re"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "sentirá en su corazón el dolor", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "de quien se muere?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "Do dim Mi Sol7", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién es capaz de salvar a", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "este mundo decadente,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Do", "posicion": 6}, {"acorde": "Re", "posicion": 9}, {"acorde": "Sol", "posicion": 12}], "letra": "", "texto": "", "acordes_raw": "Do                             Re                  Do          Re       Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "y mantiene la esperanza de los", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "muchos que la pierden?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Do", "posicion": 4}, {"acorde": "Re", "posicion": 7}, {"acorde": "SoL", "posicion": 10}, {"acorde": "Lam", "posicion": 14}, {"acorde": "Si7", "posicion": 18}, {"acorde": "Mim", "posicion": 22}], "letra": "", "texto": "", "acordes_raw": "Sol      Do      Re         SoL                Lam      Si7      Mim"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Sol", "posicion": 6}, {"acorde": "Mim", "posicion": 10}, {"acorde": "Re", "posicion": 14}], "letra": "", "texto": "", "acordes_raw": "             Do      Re      Sol     Mim      Re"}, {"tipo": "acordes", "acordes": [{"acorde": "Sol", "posicion": 0}], "letra": "", "texto": "", "acordes_raw": "Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "Y OTROS SON ESPECTADORES, NO LO SIENTEN.", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Do", "posicion": 4}, {"acorde": "Re", "posicion": 7}, {"acorde": "Sol", "posicion": 10}], "letra": "", "texto": "", "acordes_raw": " Sol                             Do               Re            Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién bajará de la cruz a", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "tanto cristo sufriente,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Sol", "posicion": 6}], "letra": "", "texto": "", "acordes_raw": "                                            Do              Re                   Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "mientras los hombres miramos,", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "impasivos e indolentes?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Lam", "posicion": 3}, {"acorde": "Si7", "posicion": 7}], "letra": "", "texto": "", "acordes_raw": "                                          Do                            Lam                     Si7"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién grita desde el silencio", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "de un ser que a su Dios retiene,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "Do dim Mim La7 Re", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "porque se hace palabra que sin", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "hablar se la entiende?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "Do dim Mim", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Sol7", "posicion": 0}], "letra": "", "texto": "", "acordes_raw": " Sol7"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¿Quién se torna en aleluya", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "porque traduce la muerte,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Do", "posicion": 6}, {"acorde": "Sol", "posicion": 9}], "letra": "", "texto": "", "acordes_raw": "Do                                 Re                 Do                     Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "como el trigo que se pudre y de", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "uno cientos vienen?", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Do", "posicion": 4}, {"acorde": "Re", "posicion": 7}], "letra": "", "texto": "", "acordes_raw": "Sol  Do    Re"}, {"tipo": "acordes", "acordes": [{"acorde": "Sol", "posicion": 0}, {"acorde": "Lam", "posicion": 4}, {"acorde": "Si7", "posicion": 8}], "letra": "", "texto": "", "acordes_raw": "   Sol                 Lam   Si7"}, {"tipo": "acordes", "acordes": [{"acorde": "Mim", "posicion": 0}], "letra": "", "texto": "", "acordes_raw": "     Mim"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,", "texto": "", "acordes_raw": ""}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "acordes", "acordes": [{"acorde": "Do", "posicion": 0}, {"acorde": "Re", "posicion": 3}, {"acorde": "Sol", "posicion": 6}, {"acorde": "Mim", "posicion": 10}], "letra": "", "texto": "", "acordes_raw": "      Do     Re    Sol  Mim"}, {"tipo": "acordes", "acordes": [{"acorde": "Re", "posicion": 0}, {"acorde": "Sol", "posicion": 3}], "letra": "", "texto": "", "acordes_raw": "Re Sol"}, {"tipo": "vacía", "acordes": [], "letra": "", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "Y LA", "texto": "", "acordes_raw": ""}, {"tipo": "letra", "acordes": [], "letra": "TIERRA SONREIRÁ. ¡ALELUYA!", "texto": "", "acordes_raw": ""}]','<div class="cancion-con-acordes">
-<div class="linea-acordes-suelta">Sol Do Re Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién quiere resucitar a este</div>
-<div class="letra-solo">mundo que se muere?</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Re Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién cantará el aleluya de</div>
-<div class="letra-solo">esa nueva luz que viene?</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Lam Si7</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién cuando mire la tierra y</div>
-<div class="letra-solo">las tragedias observe,</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">Do dim</div>
-<div class="linea-acordes-suelta">Mim La7 Re</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">sentirá en su corazón el dolor</div>
-<div class="letra-solo">de quien se muere?</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">Do dim Mi Sol7</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién es capaz de salvar a</div>
-<div class="letra-solo">este mundo decadente,</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Re Do Re Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">y mantiene la esperanza de los</div>
-<div class="letra-solo">muchos que la pierden?</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Sol Do Re Sol Lam Si7 Mim</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo"><strong>EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,</strong></div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Re Sol Mim Re</div>
-<div class="linea-acordes-suelta">Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo"><strong>Y OTROS SON ESPECTADORES, NO LO SIENTEN.</strong></div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Sol Do Re Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién bajará de la cruz a</div>
-<div class="letra-solo">tanto cristo sufriente,</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Re Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">mientras los hombres miramos,</div>
-<div class="letra-solo">impasivos e indolentes?</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Lam Si7</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién grita desde el silencio</div>
-<div class="letra-solo">de un ser que a su Dios retiene,</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">Do dim Mim La7 Re</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">porque se hace palabra que sin</div>
-<div class="letra-solo">hablar se la entiende?</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">Do dim Mim</div>
-<div class="linea-acordes-suelta">Sol7</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">¿Quién se torna en aleluya</div>
-<div class="letra-solo">porque traduce la muerte,</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Re Do Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo">como el trigo que se pudre y de</div>
-<div class="letra-solo">uno cientos vienen?</div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Sol Do Re</div>
-<div class="linea-acordes-suelta">Sol Lam Si7</div>
-<div class="linea-acordes-suelta">Mim</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo"><strong>¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,</strong></div>
-<div class="linea-vacia"></div>
-<div class="linea-acordes-suelta">Do Re Sol Mim</div>
-<div class="linea-acordes-suelta">Re Sol</div>
-<div class="linea-vacia"></div>
-<div class="letra-solo"><strong>Y LA</strong></div>
-<div class="letra-solo"><strong>TIERRA SONREIRÁ. ¡ALELUYA!</strong></div>
-</div>','<div class="post-body entry-content" id="post-body-6252609128679765962" itemprop="description articleBody">
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b><u><a href="https://youtu.be/WIAXUxQyeKU" target="_blank">escuchar</a></u></b><b>    /    </b><b><u><a href="https://betaniamusic.blogspot.com/p/cancionero-escolapio.html">volver a lista de canciones</a></u></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;"><br/></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">Sol                             Do              Re                     Sol <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién quiere resucitar a este
-mundo que se muere? <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">                                     Do                Re                     Sol <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién cantará el aleluya de
-esa nueva luz que viene? <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">                                          Do                 Lam                Si7 <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién cuando mire la tierra y
-las tragedias observe, <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">   Do dim
-                Mim          La7                       Re <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-sentirá en su corazón el dolor
-de quien se muere? <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">                                                          
-Do dim            Mi    Sol7
-<o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién es capaz de salvar a
-este mundo decadente, <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span lang="EN-US" style="color: #c00000; mso-ansi-language: EN-US; mso-bidi-font-size: 10.0pt;">Do                             Re                  Do          Re       Sol <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-y mantiene la esperanza de los
-muchos que la pierden? <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<br/></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">Sol      Do      Re         SoL                Lam      Si7      Mim <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b>EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE, <o:p></o:p></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-ansi-language: EN-US; mso-bidi-font-size: 10.0pt;"> <span lang="EN-US">             Do      Re      Sol     Mim      Re 
-Sol <o:p></o:p></span></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b>Y OTROS SON ESPECTADORES, NO LO SIENTEN. <o:p></o:p></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;"> Sol                             Do               Re            Sol <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién bajará de la cruz a
-tanto cristo sufriente, <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">                                            Do              Re                   Sol <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-mientras los hombres miramos,
-impasivos e indolentes? <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">                                          Do                            Lam                     Si7 <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién grita desde el silencio
-de un ser que a su Dios retiene, <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">  Do dim                  Mim                 La7                      Re <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-porque se hace palabra que sin
-hablar se la entiende? <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">                                      Do dim                               Mim     
- Sol7 <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-¿Quién se torna en aleluya
-porque traduce la muerte, <o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">Do                                 Re                 Do                     Sol <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-como el trigo que se pudre y de
-uno cientos vienen?<o:p></o:p></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<br/></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-bidi-font-size: 10.0pt;">Sol  Do    Re
-   Sol                 Lam   Si7
-     Mim <o:p></o:p></span></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<b>¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA, <o:p></o:p></b></div>
-<div class="MsoNormal" style="line-height: normal; margin-bottom: .0001pt; margin-bottom: 0cm;">
-<span style="color: #c00000; mso-ansi-language: EN-US; mso-bidi-font-size: 10.0pt;"> <span lang="EN-US">      Do     Re    Sol  Mim
-Re Sol <o:p></o:p></span></span></div>
-<b><span style=''font-family: "calibri" , sans-serif; font-size: 11.0pt; line-height: 115%;''>Y LA
-TIERRA SONREIRÁ. ¡ALELUYA!</span></b>
 <div style="clear: both;"></div>
 </div>');
 INSERT INTO "canciones" VALUES(17,'ALMA MISIONERA','https://betaniamusic.blogspot.com/2018/06/alma-misionera.html','Re
@@ -24093,20 +23658,6 @@ EL SEÑOR ES MI PASTOR.','','Do',NULL,NULL,NULL,NULL,NULL,'manual','2026-10-07 1
   <div class="linea-letra"><strong>EL SEÑOR ES MI PASTOR.</strong></div>
 </div>
 </div>',NULL);
-INSERT INTO "canciones" VALUES(228,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-10-29 20:25:36',NULL,'<b>Aleluya</b>',NULL);
-INSERT INTO "canciones" VALUES(231,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-10-29 20:25:54',NULL,'<b>Aleluya</b>',NULL);
-INSERT INTO "canciones" VALUES(234,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-11-09 17:52:02',NULL,'<b>Aleluya</b>',NULL);
-INSERT INTO "canciones" VALUES(237,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-11-09 17:58:37',NULL,'<b>Aleluya</b>',NULL);
-INSERT INTO "canciones" VALUES(240,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-11-09 19:24:34',NULL,'<b>Aleluya</b>',NULL);
-INSERT INTO "canciones" VALUES(243,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-11-09 19:25:36',NULL,'<b>Aleluya</b>',NULL);
-INSERT INTO "canciones" VALUES(246,'Aleluya',NULL,'Am
-Aleluya','Aleluya',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'blogspot','2026-11-14 21:34:34',NULL,'<b>Aleluya</b>',NULL);
 CREATE TABLE comentarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             presentacion_id INTEGER,
@@ -25524,17 +25075,6 @@ INSERT INTO "presentacion_slides" VALUES(839,46,9,8,'salmo','general','SALMO RES
 
 El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-09-29 00:39:36',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(840,46,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-09-29 00:39:36',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(841,46,52,10,'aleluya','cancion_15','ALELUYA (Leonard Cohen)','Quiero escuchar tu corazón,
-conozco el sonido de tu voz,
-abrázame con tu palabra, Padre.
-Ayúdanos a comprender
-que hay tantas cosas por hacer,
-regálanos tus manos, aleluya.
-
-ALELUYA, ALELUYA,
-ALELUYA, ALELU…
-ALELUYA, ALELUYA,
-ALELUYA, ALELUYA','','','fano/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg','',1,0,'2026-09-29 00:39:36',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(842,46,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-09-29 00:39:36',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(843,46,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-09-29 00:39:36',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(844,46,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
@@ -25725,11 +25265,6 @@ INSERT INTO "presentacion_slides" VALUES(1197,48,9,8,'salmo','general','SALMO RE
 
 El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-10-10 10:33:25',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1198,48,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-10-10 10:33:25',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1199,48,107,10,'aleluya','cancion_16_corta','ALELUYA DE LA TIERRA','EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,
-Y OTROS SON ESPECTADORES, NO LO SIENTEN.
-
-**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**
-**Y LA TIERRA SONREIRÁ. ¡ALELUYA! (BIS)**','','','fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg','',1,0,'2026-10-10 10:33:25',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1200,48,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-10-10 10:33:25',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1201,48,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-10-10 10:33:25',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1202,48,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
@@ -25906,17 +25441,6 @@ INSERT INTO "presentacion_slides" VALUES(1251,49,9,8,'salmo','general','SALMO RE
 
 El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-10-18 00:32:50',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1252,49,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-10-18 00:32:50',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1253,49,52,10,'aleluya','cancion_15','ALELUYA (Leonard Cohen)','Quiero escuchar tu corazón,
-conozco el sonido de tu voz,
-abrázame con tu palabra, Padre.
-Ayúdanos a comprender
-que hay tantas cosas por hacer,
-regálanos tus manos, aleluya.
-
-ALELUYA, ALELUYA,
-ALELUYA, ALELU…
-ALELUYA, ALELUYA,
-ALELUYA, ALELUYA','','','fano/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg','',1,0,'2026-10-18 00:32:50',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1254,49,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-10-18 00:32:50',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1255,49,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-10-18 00:32:50',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1256,49,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
@@ -26215,25 +25739,6 @@ INSERT INTO "presentacion_slides" VALUES(1671,137,9,8,'salmo','general','SALMO R
 
 El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-10-23 22:48:37',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1672,137,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-10-23 22:48:37',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1673,137,38,10,'aleluya','cancion_16','ALELUYA DE LA TIERRA','¿Quién quiere resucitar a este mundo que se muere?
-¿Quién cantará el aleluya de esa nueva luz que viene?
-¿Quién cuando mire la tierra y las tragedias observe,
-sentirá en su corazón el dolor de quien se muere?
-¿Quién es capaz de salvar a este mundo decadente,
-y mantiene la esperanza de los muchos que la pierden?
-
-**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**
-**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**
---- DIAPOSITIVA ---
-¿Quién bajará de la cruz a tanto cristo sufriente,
-mientras los hombres miramos, impasivos e indolentes?
-¿Quién grita desde el silencio de un ser que a su Dios retiene,
-porque se hace palabra que sin hablar se la entiende?
-¿Quién se torna en aleluya porque traduce la muerte,
-como el trigo que se pudre y de uno cientos vienen?
-
-**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,
-Y LA TIERRA SONREIRÁ. ¡ALELUYA!**','','','fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg','',1,0,'2026-10-23 22:48:37',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1674,137,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-10-23 22:48:37',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1675,137,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-10-23 22:48:37',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1676,137,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
@@ -26565,17 +26070,6 @@ INSERT INTO "presentacion_slides" VALUES(1699,165,9,8,'salmo','general','SALMO R
 
 El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-10-26 22:47:03',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1700,165,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-10-26 22:47:03',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1701,165,52,10,'aleluya','cancion_15','ALELUYA (Leonard Cohen)','Quiero escuchar tu corazón,
-conozco el sonido de tu voz,
-abrázame con tu palabra, Padre.
-Ayúdanos a comprender
-que hay tantas cosas por hacer,
-regálanos tus manos, aleluya.
-
-ALELUYA, ALELUYA,
-ALELUYA, ALELU…
-ALELUYA, ALELUYA,
-ALELUYA, ALELUYA','','','fano/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg','',1,0,'2026-10-26 22:47:03',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1702,165,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-10-26 22:47:03',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1703,165,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-10-26 22:47:03',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1704,165,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
@@ -26937,17 +26431,6 @@ INSERT INTO "presentacion_slides" VALUES(1783,172,9,8,'salmo','general','SALMO R
 
 El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-11-06 16:23:39',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1784,172,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-11-06 16:23:39',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1785,172,52,10,'aleluya','cancion_15','ALELUYA (Leonard Cohen)','Quiero escuchar tu corazón,
-conozco el sonido de tu voz,
-abrázame con tu palabra, Padre.
-Ayúdanos a comprender
-que hay tantas cosas por hacer,
-regálanos tus manos, aleluya.
-
-ALELUYA, ALELUYA,
-ALELUYA, ALELU…
-ALELUYA, ALELUYA,
-ALELUYA, ALELUYA','','','fano/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg','',1,0,'2026-11-06 16:23:39',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1786,172,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-11-06 16:23:39',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1787,172,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-11-06 16:23:39',NULL,NULL);
 INSERT INTO "presentacion_slides" VALUES(1788,172,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
@@ -27103,229 +26586,6 @@ Viene la alegría para ti y para mí
 INSERT INTO "presentacion_slides" VALUES(1803,172,45,28,'portada','despedida','¡ID EN PAZ!','La paz del Señor esté siempre con vosotros.
 
 «¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»','','Somos uno','assets/fano_25_domingo_vina.jpg','',1,0,'2026-11-06 16:23:39',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1860,173,1,1,'portada','general','DOMINGO DEL TIEMPO ORDINARIO','','','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1861,173,2,2,'entrada','cancion_8','PREPARAD EL CAMINO','PREPARAD EL CAMINO
-PREPARAD EL CAMINO AL SEÑOR
-Y ESCUCHAD LA PALABRA DE DIOS.(Bis)
-Voz que clama en el desierto:
-preparad los caminos de Dios,
-desterrad la mentira por siempre,
-preparad los caminos de Dios(Bis)','','','fano/fano_20140953_camina_al_ritmo_del_buen_pastor.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1862,173,3,3,'transicion_palabra','general','LITURGIA DE LA PALABRA','Escuchemos la Palabra de Dios','','','fano/fano_20140961_daré_wifi_a_tus_palabras.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1863,173,4,4,'perdon','acto_penitencial','ACTO PENITENCIAL','Yo confieso ante Dios todopoderoso
-y ante vosotros, hermanos,
-que he pecado mucho de pensamiento, palabra, obra y omisión:
-por mi culpa, por mi culpa, por mi gran culpa.
-
-Por eso ruego a Santa María, siempre Virgen,
-a los ángeles, a los santos y a vosotros, hermanos,
-que intercedáis por mí ante Dios, nuestro Señor.','','','fano/fano_20140955_corazones_encadenados_yo_en_él_él_en_mí.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1864,173,NULL,5,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1865,173,7,6,'gloria','gloria_a_dios','GLORIA A DIOS','Te damos gracias, Señor,
-por la tierra y el sol
-por la luna y las estrellas;
-bendecimos tu nombre
-alzando las manos,
-cantando para Ti, Señor.
-
-Te damos gracias, Jesús,
-por el fuego y la luz,
-por la noche y por el día;
-bendecimos tu nombre
-alzando las manos,
-cantando para Ti, Señor.
-
-**¡GLORIA A DIOS!**
-(A él sea el poder),
-**¡GLORIA A DIOS!**
- él sea el honor).
-**¡GLORIA A DIOS POR SIEMPRE,**
-**GLORIA A TODO EL CIELO!,**
-**¡GLORIA PARA NUESTRO DIOS! (Bis)**
-
---- DIAPOSITIVA ---
-
-Te damos gracias, Señor,
-por los campos en flor,
-por la nieve de los montes;
-bendecimos tu nombre
-alzando las manos,
-cantando para Ti, Señor.
-
-Te damos gracias, Jesús,
-por las olas del mar,
-por el canto de las aves;
-bendecimos tu nombre
-alzando las manos,
-cantando para Ti, Señor.
-
-**¡GLORIA A DIOS!**
-(A él sea el poder),
-**¡GLORIA A DIOS!**
- él sea el honor).
-**¡GLORIA A DIOS POR SIEMPRE,**
-**GLORIA A TODO EL CIELO!,**
-**¡GLORIA PARA NUESTRO DIOS! (Bis)**','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1866,173,8,7,'primera_lectura','general','PRIMERA LECTURA','En el principio creó Dios el cielo y la tierra...','Gn 1, 1-10','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1867,173,9,8,'salmo','general','SALMO RESPONSORIAL','Antífona: El Señor es mi pastor.
-
-El Señor es mi pastor, nada me falta...','Sal 23 (24)','','fano/fano_20140962_un_vaso_de_agua_dado_a_los_pequeños_te_saciará_desde_el_ciel.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1868,173,10,9,'segunda_lectura','general','SEGUNDA LECTURA','Estad siempre alegres en el Señor...','Fil 4, 4-9','','fano/fano_20140960_nos_llama_por_nuestro_nombre_a_alzar_la_mirada.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1869,173,11,10,'aleluya','cancion_14','ALE, ALELUYA','Ale, aleluya,
-aleluya, aleluya,
-aleluya, aleluya,
-aleluya, aleluya.
-Pasarán los cielos,
-pasará la tierra,
-mas tus palabras no pasarán.
-Aleluya, aleluya.','','','fano/fano_20140957_movidos_por_la_ola_del_espíritu.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1870,173,12,11,'evangelio','general','EVANGELIO','Viendo Jesús a la multitud, subió al monte...','Mt 5, 1-12','','assets/fano_25_domingo_vina.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1871,173,13,12,'transicion_eucaristia','general','LITURGIA EUCARÍSTICA','Preparémonos para la mesa del Señor','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1872,173,14,13,'credo','texto_fijo','CREDO','Creo en Dios, Padre todopoderoso, 
-creador del cielo y de la tierra.
-Creo en Jesucristo, su único Hijo, nuestro Señor, 
-que fue concebido por obra y gracia del Espíritu Santo; 
-nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; 
-fue crucificado, muerto y sepultado; descendió a los infiernos; 
-al tercer día resucitó de entre los muertos; 
-subió a los cielos y está sentado a la derecha de Dios Padre todopoderoso.
-Desde allí ha de venir a juzgar a vivos y muertos.
-Creo en el Espíritu Santo, la santa Iglesia católica, 
-la comunión de los santos, el perdón de los pecados, 
-la resurrección de la carne y la vida eterna. Amén.','','','fano/fano_20140954_tú_en_mí_lo_mueves_todo.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1873,173,NULL,14,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1874,173,16,15,'ofertorio','cancion_6','HOY COMO AYER','HOY COMO AYER
-Hoy como ayer calla quien no tiene voz,
-aquél a quien nadie enseñó a decir su palabra.
-Hoy como ayer quien sabe podrá dominar
-y el pobre tendrá que bajar otra vez la mirada.
-CORO
-Calasanz nos enseñó como hacer realidad
-un mañana de esperanza, una nueva humanidad
-despertando la razón, la conciencia y dignidad,
-educando al hombre nuevo en amor y libertad.
-Calasanz nos enseñó como hacer realidad
-un mañana de esperanza, una nueva humanidad
-ayudando a descubrir que Jesús de Nazaret
-sigue vivo y su camino juntos hay que recorrer.
-Mira y verás que hay niños que nunca sabrán
-que tienen derecho a reír y a jugar en la plaza.
-Mira y verás que muchos explotan sin fin
-la fuerza de la juventud para hacer su ganancia','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1875,173,NULL,16,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1876,173,18,17,'santo','cancion_42','GRITO SANTO','Hoy quiero proclamarte,
-quiero cantar a tu nombre
-santo,
-quiero bailar ante tu presencia
-hasta morir.
-Y bendecirte, mi Dios; amarte,
-no detenerme hasta encontrarte
-buscar las sendas que me
-conducen
-hacia la luz.
-Y GRITO SANTO, SANTO, SANTO.
-TÚ ERES SANTO, SANTO, SANTO.
-TÚ SIEMPRE SANTO, SANTO, SANTO;
-SANTO ERES TÚ. (Bis)
-Siento en mí tu mirada
-que me traspasa hasta lo más
-hondo
-como una fuerza que me arrastra
-hacia tu cruz.
-Y allí me limpias, me
-purificas,
-sacas de mí el corazón de
-piedra
-y me transformas en criatura
-viva por ti.
-Y GRITO SANTO…','','','fano/fano_20140957_movidos_por_la_ola_del_espíritu.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1877,173,NULL,18,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1878,173,20,19,'padre_nuestro','cancion_72','PADRE NUESTRO (Gallego)','En el mar he oído hoy
-Señor tu voz que me llamó
-y me pidió que me entregara
-a mis hermanos.
-Esa voz me transformó,
-mi vida entera ya cambió,
-y sólo pienso ahora Señor
-en repetirte:
-
-**PADRE NUESTRO**
-**EN TI CREEMOS,**
-**PADRE NUESTRO**
-**TE OFRECEMOS,**
-**PADRE NUESTRO**
-**NUESTRAS MANOS**
-**DE HERMANOS.**
---- DIAPOSITIVA ---
-Cuando vaya a otro lugar
-tendré Señor que abandonar
-a mi familia a mis amigos
-por seguirte.
-Pero sé que así algún día
-podré enseñar tu verdad,
-ir a mi hermano y junto a él
-yo repetirte.
-
-**PADRE NUESTRO**
-**EN TI CREEMOS,**
-**PADRE NUESTRO**
-**TE OFRECEMOS,**
-**PADRE NUESTRO**
-**NUESTRAS MANOS**
-**DE HERMANOS.**','','','fano/fano_20140352_un_amor_más_que_justo.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1879,173,NULL,20,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1880,173,22,21,'paz','rito_fijo','RITO DE LA PAZ','Señor Jesucristo, que dijiste a tus apóstoles:
-«La paz os dejo, mi paz os doy»,
-no tengas en cuenta nuestros pecados,
-sino la fe de tu Iglesia,
-y conforme a tu palabra concédele la paz y la unidad.
-
-Tú que vives y reinas por los siglos de los siglos. Amén.
-
-La paz del Señor esté siempre con vosotros.','','','fano/fano_20140958_busca_una_paz_trinitaria.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1881,173,NULL,22,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1882,173,24,23,'comunion','cancion_7','MARÍA, MÚSICA DE DIOS','MARÍA, MÚSICA DE DIOS
-Me quedé sin voz con qué cantar
-y mi alma vacía dormía en sequedad
-Y pensé para mí: me pondré en sus manos
-manos de Madre, me dejaré en su amor
-Y tú, María, házme música de Dios
-Y tú, María, anima tú las cuerdas de mi alma
-Aleluya, Amén
-Y tú, María, házme música de Dios
-Y tú, María, anima tú las cuerdas de mi alma
-Aleluya, Amén
-María, acompaña tú mi caminar
-yo sola no puedo, ayúdame a andar
-Y pensé para mí: me pondré en sus manos
-manos de Madre, me dejaré en su amor
-Y tú, María, házme música de Dios
-Y tú, María, anima tú las cuerdas de mi alma
-Aleluya, Amén
-Y tú, María, házme música de Dios
-Y tú, María, anima tú las cuerdas de mi alma
-Aleluya, Amén','','','fano/fano_20140959_el_que_come_este_pan_vivirá_para_siempre.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1883,173,NULL,24,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1884,173,26,25,'maria','rito_fijo','CANTO A MARÍA','Dios te salve, María;
-llena eres de gracia;
-el Señor es contigo.
-Bendita tú eres entre todas las mujeres,
-y bendito es el fruto de tu vientre, Jesús.
-
-Santa María, Madre de Dios,
-ruega por nosotros, pecadores,
-ahora y en la hora de nuestra muerte. Amén.','','','assets/virgen_fatima.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1885,173,NULL,26,'paso','paso_neutro','','','','','','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1886,173,28,27,'despedida','cancion_8','PREPARAD EL CAMINO','PREPARAD EL CAMINO
-PREPARAD EL CAMINO AL SEÑOR
-Y ESCUCHAD LA PALABRA DE DIOS.(Bis)
-Voz que clama en el desierto:
-preparad los caminos de Dios,
-desterrad la mentira por siempre,
-preparad los caminos de Dios(Bis)','','','fano/fano_20140953_camina_al_ritmo_del_buen_pastor.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
-INSERT INTO "presentacion_slides" VALUES(1887,173,45,28,'portada','despedida','¡ID EN PAZ!','La paz del Señor esté siempre con vosotros.
-
-«¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.»','','Somos uno','assets/fano_25_domingo_vina.jpg','',1,0,'2026-11-09 20:40:09',NULL,NULL);
 CREATE TABLE presentaciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             fecha_domingo DATE NOT NULL,
@@ -27342,11 +26602,11 @@ CREATE TABLE presentaciones (
         );
 INSERT INTO "presentaciones" VALUES(10,'2026-09-13',3,'{"aleluya": 4, "comunion": 7, "despedida": 8, "entrada": 8, "gloria": 9, "maria": 7, "ofertorio": 6, "padre_nuestro": 5, "paz": 6, "perdon": 2, "salmo": 3, "santo": 9}',NULL,'presentaciones_html/2026-09-13_presentacion/2026-09-13_presentacion.pptx','presentaciones_html/2026-09-13_presentacion/2026-09-13_presentacion.pdf','presentaciones/2026-09-13_hoja_musicos.pdf','presentaciones_html/2026-09-13_presentacion/index.html','generado','2026-09-14 05:51:53','{"celebracion": "Domingo del Tiempo Ordinario", "ciclo": "C", "color_liturgico": "verde", "domingo": "Domingo Ordinario", "evangelio_cita": "Mt 5, 1-12", "evangelio_texto": "Viendo Jesús a la multitud, subió al monte...", "fecha": "2026-09-13", "primera_lectura_cita": "Gn 1, 1-10", "primera_lectura_texto": "En el principio creó Dios el cielo y la tierra...", "salmo_antifona": "El Señor es mi pastor.", "salmo_cita": "Sal 23 (24)", "salmo_texto": "El Señor es mi pastor, nada me falta...", "segunda_lectura_cita": "Fil 4, 4-9", "segunda_lectura_texto": "Estad siempre alegres en el Señor...", "temporada": "ordinario"}','','2026-09-14 05:51:53');
 INSERT INTO "presentaciones" VALUES(24,'2026-09-20',12,'{"aleluya": 38, "comunion": 95, "despedida": 26, "entrada": 8, "gloria": 5, "maria": 7, "ofertorio": 74, "padre_nuestro": 80, "paz": 100, "perdon": 70, "salmo": 105, "santo": 84}',NULL,'presentaciones_html/2026-09-20_presentacion/2026-09-20_presentacion.pptx','presentaciones_html/2026-09-20_presentacion/2026-09-20_presentacion.pdf','presentaciones/2026-09-20_hoja_musicos.pdf','presentaciones_html/2026-09-20_presentacion/index.html','generado','2026-09-15 14:24:20','{"celebracion": "XXV Domingo del Tiempo Ordinario", "color_liturgico": "verde", "evangelio_cita": "20,1-16", "evangelio_texto": "En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «El Reino de los Cielos se parece a un propietario que al amanecer salió a contratar jornaleros para su viña. Después de ajustarse con ellos en un denario por jornada, los mandó a la viña. Salió otra vez a media mañana, vio a otros que estaban en la plaza sin trabajo, y les dijo: «Id también vosotros a mi viña, y os pagaré lo debido.» Ellos fueron. Salió de nuevo hacia mediodía y a media tarde e hizo lo mismo. Salió al caer la tarde y encontró a otros, parados, y les dijo: «¿Cómo es que estáis aquí el día entero sin trabajar?» Le respondieron: «Nadie nos ha contratado.» Él les dijo: «Id también vosotros a mi viña.» Cuando oscureció, el dueño de la viña dijo al capataz: «Llama a los jornaleros y págales el jornal, empezando por los últimos y acabando por los primeros.» Vinieron los del atardecer y recibieron un denario cada uno. Cuando llegaron los primeros, pensaban que recibirían más, pero ellos también recibieron un denario cada uno. Entonces se pusieron a protestar contra el amo: «Estos últimos han trabajado sólo una hora, y los has tratado igual que a nosotros, que hemos aguantado el peso del día y el bochorno.» Él replicó a uno de ellos: «Amigo, no te hago ninguna injusticia. ¿No nos ajustamos en un denario? Toma lo tuyo y vete. Quiero darle a este último igual que a ti. ¿Es que no tengo libertad para hacer lo que quiera en mis asuntos? ¿O vas a tener tú envidia porque yo soy bueno?» Así, los últimos serán los primeros y los primeros los últimos.»\nPalabra del Señor", "fecha": "2026-09-20", "fecha_scraping": "2026-09-15T16:24:17.946881", "fuente": "ciudadredonda", "primera_lectura_cita": "55, 6-9", "primera_lectura_texto": "Buscad al Señor mientras se le encuentra, invocadlo mientras esté cerca; que el malvado abandone su camino, y el criminal sus planes; que regrese al Señor, y él tendrá piedad; a nuestro Dios, que es rico en perdón. Mis planes no son vuestros planes, vuestros caminos no son mis caminos –oráculo del Señor–. Como el cielo es más alto que la tierra, mis caminos son más altos que los vuestros, mis planes que vuestros planes.", "salmo_antifona": "Cerca está el Señor de los que lo invocan", "salmo_cita": "Sal 144", "salmo_texto": "Día tras día, te bendeciré, Dios mío\n\ny alabaré tu nombre por siempre jamás.\n\nGrande es el Señor y merece toda alabanza,\n\nes incalculable su grandeza.\nEl Señor es clemente y misericordioso,\n\nlento a la cólera y rico en piedad;\n\nel Señor es bueno con todos,\n\nes cariñoso con todas sus criaturas.\nEl Señor es justo en todos sus caminos,\n\nes bondadoso en todas sus acciones;\n\ncerca está el Señor de los que lo invocan,\n\nde los que lo invocan sinceramente.", "segunda_lectura_cita": "1,20c-24.27a", "segunda_lectura_texto": "Cristo será glorificado en mi cuerpo, sea por mi vida o por mi muerte. Para mí la vida es Cristo, y una ganancia el morir. Pero, si el vivir esta vida mortal me supone trabajo fructífero, no sé qué escoger. Me encuentro en ese dilema: por un lado, deseo partir para estar con Cristo, que es con mucho lo mejor; pero, por otro, quedarme en esta vida veo que es más necesario para vosotros. Lo importante es que vosotros llevéis una vida digna del Evangelio de Cristo.", "temporada": "ordinario"}','','2026-09-15 14:24:20');
-INSERT INTO "presentaciones" VALUES(38,'2026-09-27',30,'{"aleluya": 16, "comunion": 18, "despedida": 20, "entrada": 44, "gloria": 13, "maria": 2, "ofertorio": 82, "paz": 51, "santo": 88}',NULL,'presentaciones/2026-09-27_celebracion.pptx',NULL,'presentaciones/2026-09-27_hoja_musicos.pdf',NULL,'publicada','2026-09-27 09:14:45','{"celebracion": "XXVI Domingo del Tiempo Ordinario", "color_liturgico": "verde", "evangelio_cita": "21,28-32", "evangelio_texto": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.» Él le contestó: «No quiero.» Pero después recapacitó y fue. Se acercó al segundo y le dijo lo mismo. Él le contestó: «Voy, señor.» Pero no fue. ¿Quién de los dos hizo lo que quería el padre?»Contestaron: «El primero.»Jesús les dijo: «Os aseguro que los publicanos y las prostitutas os llevan la delantera en el camino del reino de Dios. Porque vino Juan a vosotros enseñándoos el camino de la justicia, y no le creísteis; en cambio, los publicanos y prostitutas le creyeron. Y, aun después de ver esto, vosotros no recapacitasteis ni le creísteis.»\nPalabra del Señor", "fecha": "2026-09-27", "fecha_scraping": "2026-09-27T11:14:42.392834", "fuente": "ciudadredonda", "primera_lectura_cita": "18,25-28", "primera_lectura_texto": "Así dice el Señor: «Comentáis: «No es justo el proceder del Señor». Escuchad, casa de Israel: ¿es injusto mi proceder?, ¿o no es vuestro proceder el que es injusto? Cuando el justo se aparta de su justicia, comete la maldad y muere, muere por la maldad que cometió. Y cuando el malvado se convierte de la maldad que hizo y practica el derecho y la justicia, él mismo salva su vida. Si recapacita y se convierte de los delitos cometidos, ciertamente vivirá y no morirá.»", "salmo_antifona": "Recuerda, Señor, que tu misericordia es eterna", "salmo_cita": "Sal 24,4", "salmo_texto": "Señor, enséñame tus caminos,\n\ninstrúyeme en tus sendas:\n\nhaz que camine con lealtad;\n\nenséñame, porque tú eres mi Dios y Salvador,\n\ny todo el día te estoy esperando.\nRecuerda, Señor,\n\nque tu ternura y tu misericordia son eternas;\n\nno te acuerdes de los pecados\n\nni de las maldades de mi juventud;\n\nacuérdate de mí con misericordia,\n\npor tu bondad, Señor.\nEl Señor es bueno y es recto,\n\ny enseña el camino a los pecadores;\n\nhace caminar a los humildes con rectitud,\n\nenseña su camino a los humildes.", "segunda_lectura_cita": "2,1-11", "segunda_lectura_texto": "Si queréis darme el consuelo de Cristo y aliviarme con vuestro amor, si nos une el mismo Espíritu y tenéis entrañas compasivas, dadme esta gran alegría: manteneos unánimes y concordes con un mismo amor y un mismo sentir. No obréis por rivalidad ni por ostentación, dejaos guiar por la humildad y considerad siempre superiores a los demás. No os encerréis en vuestros intereses, sino buscad todos el interés de los demás. Tened entre vosotros los sentimientos propios de Cristo Jesús. Él, a pesar de su condición divina, no hizo alarde de su categoría de Dios; al contrario, se despojó de su rango y tomó la condición de esclavo, pasando por uno de tantos. Y así, actuando como un hombre cualquiera, se rebajó hasta someterse incluso a la muerte, y una muerte de cruz. Por eso Dios lo levantó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.", "temporada": "ordinario"}','Asignación manual corregida: Canto a María = A tu amparo','2026-09-27 09:14:45');
-INSERT INTO "presentaciones" VALUES(46,'2026-10-04',47,'{"entrada": 44, "gloria": 13, "salmo": 91, "aleluya": 15, "ofertorio": 82, "santo": 89, "paz": 51, "comunion": 18, "maria": 2, "despedida": 20}',NULL,'presentaciones_html/2026-10-04_presentacion/2026-10-04_presentacion.pptx','presentaciones_html/2026-10-04_presentacion/2026-10-04_presentacion.pdf','presentaciones/2026-10-04_hoja_musicos.pdf','presentaciones_html/2026-10-04_presentacion/index.html','generado','2026-09-28 17:02:55','{"celebracion": "XXVII Domingo del Tiempo Ordinario", "color_liturgico": "verde", "evangelio_cita": "21,33-43", "evangelio_texto": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «Escuchad otra parábola: Había un propietario que plantó una viña, la rodeó con una cerca, cavó en ella un lagar, construyó la casa del guarda, la arrendó a unos labradores y se marchó de viaje. Llegado el tiempo de la vendimia, envió sus criados a los labradores, para percibir los frutos que le correspondían. Pero los labradores, agarrando a los criados, apalearon a uno, mataron a otro, y a otro lo apedrearon. Envió de nuevo otros criados, más que la primera vez, e hicieron con ellos lo mismo. Por último les mandó a su hijo, diciéndose: «Tendrán respeto a mi hijo.» Pero los labradores, al ver al hijo, se dijeron: «Éste es el heredero, venid, lo matamos y nos quedamos con su herencia.» Y, agarrándolo, lo empujaron fuera de la viña y lo mataron. Y ahora, cuando vuelva el dueño de la viña, ¿qué hará con aquellos labradores?»Le contestaron: «Hará morir de mala muerte a esos malvados y arrendará la viña a otros labradores, que le entreguen los frutos a sus tiempos.»Y Jesús les dice: «¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?» Por eso os digo que se os quitará a vosotros el reino de Dios y se dará a un pueblo que produzca sus frutos.»\nPalabra del Señor", "fecha": "2026-10-04", "fecha_scraping": "2026-09-28T08:07:32.402975", "fuente": "ciudadredonda", "primera_lectura_cita": "5,1-7", "primera_lectura_texto": "Voy a cantar en nombre de mi amigo un canto de amor a su viña. Mi amigo tenía una viña en fértil collado. La entrecavó, la descantó, y plantó buenas cepas; construyó en medio una atalaya y cavó un lagar. Y esperó que diese uvas, pero dio agrazones. Pues ahora, habitantes de Jerusalén, hombres de Judá, por favor, sed jueces entre mí y mi viña. ¿Qué más cabía hacer por mi viña que yo no lo haya hecho? ¿Por qué, esperando que diera uvas, dio agrazones? Pues ahora os diré a vosotros lo que voy a hacer con mi viña: quitar su valla para que sirva de pasto, derruir su tapia para que la pisoteen. La dejaré arrasada: no la podarán ni la escardarán, crecerán zarzas y cardos; prohibiré a las nubes que lluevan sobre ella. La viña del Señor de los ejércitos es la casa de Israel; son los hombres de Judá su plantel preferido. Esperó de ellos derecho, y ahí tenéis: asesinatos; esperó justicia, y ahí tenéis: lamentos.", "salmo_antifona": "La viña del Señor es la casa de Israel", "salmo_cita": "Sal 79,9", "salmo_texto": "Sacaste una vid de Egipto,\n\nexpulsaste a los gentiles, y la trasplantaste.\n\nExtendió sus sarmientos hasta el mar,\n\ny sus brotes hasta el Gran Río.\n¿Por qué has derribado su cerca\n\npara que la saqueen los viandantes,\n\nla pisoteen los jabalíes\n\ny se la coman las alimañas?\nDios de los ejércitos, vuélvete:\n\nmira desde el cielo, fíjate,\n\nven a visitar tu viña,\n\nla cepa que tu diestra plantó\n\ny que tú hiciste vigorosa.\nNo nos alejaremos de ti:\n\ndanos vida, para que invoquemos tu nombre.\n\nSeñor, Dios de los ejércitos,\n\nrestáuranos, que brille tu rostro y nos salve.", "segunda_lectura_cita": "4,6-9", "segunda_lectura_texto": "Nada os preocupe; sino que, en toda ocasión, en la oración y súplica con acción de gracias, vuestras peticiones sean presentadas a Dios. Y la paz de Dios, que sobrepasa todo juicio, custodiará vuestros corazones y vuestros pensamientos en Cristo Jesús. Finalmente, hermanos, todo lo que es verdadero, noble, justo, puro, amable, laudable, todo lo que es virtud o mérito, tenedlo en cuenta. Y lo que aprendisteis, recibisteis, oísteis, visteis en mí, ponedlo por obra. Y el Dios de la paz estará con vosotros.", "temporada": "ordinario"}','Asignación canónica manual CCE-M5 XXVII domingo tiempo ordinario','2026-09-28 06:07:37');
-INSERT INTO "presentaciones" VALUES(48,'2026-10-11',68,'{"entrada": 11, "gloria": 9, "aleluya": 16, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 109, "maria": 2, "despedida": 20}',NULL,'presentaciones_html/2026-10-11_presentacion/2026-10-11_presentacion.pptx','presentaciones_html/2026-10-11_presentacion/2026-10-11_presentacion.pdf','presentaciones/2026-10-11_hoja_musicos.pdf','presentaciones_html/2026-10-11_presentacion/index.html','generado','2026-10-10 10:25:50',NULL,NULL,'2026-10-07 13:24:12');
-INSERT INTO "presentaciones" VALUES(49,'2026-10-18',75,'{"entrada": 44, "gloria": 13, "aleluya": 15, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 95, "maria": 2, "despedida": 85}',NULL,'presentaciones_html/2026-10-18_presentacion/2026-10-18_presentacion.pptx','presentaciones_html/2026-10-18_presentacion/2026-10-18_presentacion.pdf','presentaciones/2026-10-18_hoja_musicos.pdf','presentaciones_html/2026-10-18_presentacion/index.html','generado','2026-10-18 00:38:35',NULL,NULL,'2026-10-14 22:40:46');
-INSERT INTO "presentaciones" VALUES(137,'2026-10-25',80,'{"entrada": 11, "gloria": 93, "aleluya": 16, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 21, "maria": 2, "despedida": 85}',NULL,'presentaciones_html/2026-10-25_presentacion/2026-10-25_presentacion.pptx','presentaciones_html/2026-10-25_presentacion/2026-10-25_presentacion.pdf','presentaciones/2026-10-25_hoja_musicos.pdf','presentaciones_html/2026-10-25_presentacion/index.html','generado','2026-10-21 00:12:19',NULL,NULL,'2026-10-20 23:40:28');
+INSERT INTO "presentaciones" VALUES(38,'2026-09-27',30,'{"comunion": 18, "despedida": 20, "entrada": 44, "gloria": 13, "maria": 2, "ofertorio": 82, "paz": 51, "santo": 88}',NULL,'presentaciones/2026-09-27_celebracion.pptx',NULL,'presentaciones/2026-09-27_hoja_musicos.pdf',NULL,'publicada','2026-09-27 09:14:45','{"celebracion": "XXVI Domingo del Tiempo Ordinario", "color_liturgico": "verde", "evangelio_cita": "21,28-32", "evangelio_texto": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «¿Qué os parece? Un hombre tenía dos hijos. Se acercó al primero y le dijo: «Hijo, ve hoy a trabajar en la viña.» Él le contestó: «No quiero.» Pero después recapacitó y fue. Se acercó al segundo y le dijo lo mismo. Él le contestó: «Voy, señor.» Pero no fue. ¿Quién de los dos hizo lo que quería el padre?»Contestaron: «El primero.»Jesús les dijo: «Os aseguro que los publicanos y las prostitutas os llevan la delantera en el camino del reino de Dios. Porque vino Juan a vosotros enseñándoos el camino de la justicia, y no le creísteis; en cambio, los publicanos y prostitutas le creyeron. Y, aun después de ver esto, vosotros no recapacitasteis ni le creísteis.»\nPalabra del Señor", "fecha": "2026-09-27", "fecha_scraping": "2026-09-27T11:14:42.392834", "fuente": "ciudadredonda", "primera_lectura_cita": "18,25-28", "primera_lectura_texto": "Así dice el Señor: «Comentáis: «No es justo el proceder del Señor». Escuchad, casa de Israel: ¿es injusto mi proceder?, ¿o no es vuestro proceder el que es injusto? Cuando el justo se aparta de su justicia, comete la maldad y muere, muere por la maldad que cometió. Y cuando el malvado se convierte de la maldad que hizo y practica el derecho y la justicia, él mismo salva su vida. Si recapacita y se convierte de los delitos cometidos, ciertamente vivirá y no morirá.»", "salmo_antifona": "Recuerda, Señor, que tu misericordia es eterna", "salmo_cita": "Sal 24,4", "salmo_texto": "Señor, enséñame tus caminos,\n\ninstrúyeme en tus sendas:\n\nhaz que camine con lealtad;\n\nenséñame, porque tú eres mi Dios y Salvador,\n\ny todo el día te estoy esperando.\nRecuerda, Señor,\n\nque tu ternura y tu misericordia son eternas;\n\nno te acuerdes de los pecados\n\nni de las maldades de mi juventud;\n\nacuérdate de mí con misericordia,\n\npor tu bondad, Señor.\nEl Señor es bueno y es recto,\n\ny enseña el camino a los pecadores;\n\nhace caminar a los humildes con rectitud,\n\nenseña su camino a los humildes.", "segunda_lectura_cita": "2,1-11", "segunda_lectura_texto": "Si queréis darme el consuelo de Cristo y aliviarme con vuestro amor, si nos une el mismo Espíritu y tenéis entrañas compasivas, dadme esta gran alegría: manteneos unánimes y concordes con un mismo amor y un mismo sentir. No obréis por rivalidad ni por ostentación, dejaos guiar por la humildad y considerad siempre superiores a los demás. No os encerréis en vuestros intereses, sino buscad todos el interés de los demás. Tened entre vosotros los sentimientos propios de Cristo Jesús. Él, a pesar de su condición divina, no hizo alarde de su categoría de Dios; al contrario, se despojó de su rango y tomó la condición de esclavo, pasando por uno de tantos. Y así, actuando como un hombre cualquiera, se rebajó hasta someterse incluso a la muerte, y una muerte de cruz. Por eso Dios lo levantó sobre todo y le concedió el Nombre-sobre-todo-nombre; de modo que al nombre de Jesús toda rodilla se doble en el cielo, en la tierra, en el abismo, y toda lengua proclame: Jesucristo es Señor, para gloria de Dios Padre.", "temporada": "ordinario"}','Asignación manual corregida: Canto a María = A tu amparo','2026-09-27 09:14:45');
+INSERT INTO "presentaciones" VALUES(46,'2026-10-04',47,'{"entrada": 44, "gloria": 13, "salmo": 91, "ofertorio": 82, "santo": 89, "paz": 51, "comunion": 18, "maria": 2, "despedida": 20}',NULL,'presentaciones_html/2026-10-04_presentacion/2026-10-04_presentacion.pptx','presentaciones_html/2026-10-04_presentacion/2026-10-04_presentacion.pdf','presentaciones/2026-10-04_hoja_musicos.pdf','presentaciones_html/2026-10-04_presentacion/index.html','generado','2026-09-28 17:02:55','{"celebracion": "XXVII Domingo del Tiempo Ordinario", "color_liturgico": "verde", "evangelio_cita": "21,33-43", "evangelio_texto": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «Escuchad otra parábola: Había un propietario que plantó una viña, la rodeó con una cerca, cavó en ella un lagar, construyó la casa del guarda, la arrendó a unos labradores y se marchó de viaje. Llegado el tiempo de la vendimia, envió sus criados a los labradores, para percibir los frutos que le correspondían. Pero los labradores, agarrando a los criados, apalearon a uno, mataron a otro, y a otro lo apedrearon. Envió de nuevo otros criados, más que la primera vez, e hicieron con ellos lo mismo. Por último les mandó a su hijo, diciéndose: «Tendrán respeto a mi hijo.» Pero los labradores, al ver al hijo, se dijeron: «Éste es el heredero, venid, lo matamos y nos quedamos con su herencia.» Y, agarrándolo, lo empujaron fuera de la viña y lo mataron. Y ahora, cuando vuelva el dueño de la viña, ¿qué hará con aquellos labradores?»Le contestaron: «Hará morir de mala muerte a esos malvados y arrendará la viña a otros labradores, que le entreguen los frutos a sus tiempos.»Y Jesús les dice: «¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?» Por eso os digo que se os quitará a vosotros el reino de Dios y se dará a un pueblo que produzca sus frutos.»\nPalabra del Señor", "fecha": "2026-10-04", "fecha_scraping": "2026-09-28T08:07:32.402975", "fuente": "ciudadredonda", "primera_lectura_cita": "5,1-7", "primera_lectura_texto": "Voy a cantar en nombre de mi amigo un canto de amor a su viña. Mi amigo tenía una viña en fértil collado. La entrecavó, la descantó, y plantó buenas cepas; construyó en medio una atalaya y cavó un lagar. Y esperó que diese uvas, pero dio agrazones. Pues ahora, habitantes de Jerusalén, hombres de Judá, por favor, sed jueces entre mí y mi viña. ¿Qué más cabía hacer por mi viña que yo no lo haya hecho? ¿Por qué, esperando que diera uvas, dio agrazones? Pues ahora os diré a vosotros lo que voy a hacer con mi viña: quitar su valla para que sirva de pasto, derruir su tapia para que la pisoteen. La dejaré arrasada: no la podarán ni la escardarán, crecerán zarzas y cardos; prohibiré a las nubes que lluevan sobre ella. La viña del Señor de los ejércitos es la casa de Israel; son los hombres de Judá su plantel preferido. Esperó de ellos derecho, y ahí tenéis: asesinatos; esperó justicia, y ahí tenéis: lamentos.", "salmo_antifona": "La viña del Señor es la casa de Israel", "salmo_cita": "Sal 79,9", "salmo_texto": "Sacaste una vid de Egipto,\n\nexpulsaste a los gentiles, y la trasplantaste.\n\nExtendió sus sarmientos hasta el mar,\n\ny sus brotes hasta el Gran Río.\n¿Por qué has derribado su cerca\n\npara que la saqueen los viandantes,\n\nla pisoteen los jabalíes\n\ny se la coman las alimañas?\nDios de los ejércitos, vuélvete:\n\nmira desde el cielo, fíjate,\n\nven a visitar tu viña,\n\nla cepa que tu diestra plantó\n\ny que tú hiciste vigorosa.\nNo nos alejaremos de ti:\n\ndanos vida, para que invoquemos tu nombre.\n\nSeñor, Dios de los ejércitos,\n\nrestáuranos, que brille tu rostro y nos salve.", "segunda_lectura_cita": "4,6-9", "segunda_lectura_texto": "Nada os preocupe; sino que, en toda ocasión, en la oración y súplica con acción de gracias, vuestras peticiones sean presentadas a Dios. Y la paz de Dios, que sobrepasa todo juicio, custodiará vuestros corazones y vuestros pensamientos en Cristo Jesús. Finalmente, hermanos, todo lo que es verdadero, noble, justo, puro, amable, laudable, todo lo que es virtud o mérito, tenedlo en cuenta. Y lo que aprendisteis, recibisteis, oísteis, visteis en mí, ponedlo por obra. Y el Dios de la paz estará con vosotros.", "temporada": "ordinario"}','Asignación canónica manual CCE-M5 XXVII domingo tiempo ordinario','2026-09-28 06:07:37');
+INSERT INTO "presentaciones" VALUES(48,'2026-10-11',68,'{"entrada": 11, "gloria": 9, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 109, "maria": 2, "despedida": 20}',NULL,'presentaciones_html/2026-10-11_presentacion/2026-10-11_presentacion.pptx','presentaciones_html/2026-10-11_presentacion/2026-10-11_presentacion.pdf','presentaciones/2026-10-11_hoja_musicos.pdf','presentaciones_html/2026-10-11_presentacion/index.html','generado','2026-10-10 10:25:50',NULL,NULL,'2026-10-07 13:24:12');
+INSERT INTO "presentaciones" VALUES(49,'2026-10-18',75,'{"entrada": 44, "gloria": 13, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 95, "maria": 2, "despedida": 85}',NULL,'presentaciones_html/2026-10-18_presentacion/2026-10-18_presentacion.pptx','presentaciones_html/2026-10-18_presentacion/2026-10-18_presentacion.pdf','presentaciones/2026-10-18_hoja_musicos.pdf','presentaciones_html/2026-10-18_presentacion/index.html','generado','2026-10-18 00:38:35',NULL,NULL,'2026-10-14 22:40:46');
+INSERT INTO "presentaciones" VALUES(137,'2026-10-25',80,'{"entrada": 11, "gloria": 93, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 21, "maria": 2, "despedida": 85}',NULL,'presentaciones_html/2026-10-25_presentacion/2026-10-25_presentacion.pptx','presentaciones_html/2026-10-25_presentacion/2026-10-25_presentacion.pdf','presentaciones/2026-10-25_hoja_musicos.pdf','presentaciones_html/2026-10-25_presentacion/index.html','generado','2026-10-21 00:12:19',NULL,NULL,'2026-10-20 23:40:28');
 INSERT INTO "presentaciones" VALUES(142,'2026-10-14',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-21 08:09:24',NULL,NULL,'2026-10-21 08:09:24');
 INSERT INTO "presentaciones" VALUES(145,'2026-10-14',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-21 08:09:40',NULL,NULL,'2026-10-21 08:09:40');
 INSERT INTO "presentaciones" VALUES(148,'2026-10-14',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-21 08:10:03',NULL,NULL,'2026-10-21 08:10:03');
@@ -27355,11 +26615,10 @@ INSERT INTO "presentaciones" VALUES(154,'2026-10-14',NULL,NULL,NULL,NULL,NULL,NU
 INSERT INTO "presentaciones" VALUES(157,'2026-10-14',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-21 15:24:19',NULL,NULL,'2026-10-21 15:24:19');
 INSERT INTO "presentaciones" VALUES(160,'2026-10-17',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-23 22:47:34',NULL,NULL,'2026-10-23 22:47:34');
 INSERT INTO "presentaciones" VALUES(163,'2026-10-17',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-23 22:48:37',NULL,NULL,'2026-10-23 22:48:37');
-INSERT INTO "presentaciones" VALUES(165,'2026-11-01',81,'{"entrada": 11, "gloria": 13, "aleluya": 15, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 24, "maria": 2, "despedida": 22}',NULL,'presentaciones_html/2026-11-01_presentacion/2026-11-01_presentacion.pptx','presentaciones_html/2026-11-01_presentacion/2026-11-01_presentacion.pdf','/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-01_hoja_musicos.pdf','presentaciones_html/2026-11-01_presentacion/index.html','generado','2026-10-28 16:17:45',NULL,NULL,'2026-10-26 22:47:03');
+INSERT INTO "presentaciones" VALUES(165,'2026-11-01',81,'{"entrada": 11, "gloria": 13, "ofertorio": 96, "santo": 90, "paz": 76, "comunion": 24, "maria": 2, "despedida": 22}',NULL,'presentaciones_html/2026-11-01_presentacion/2026-11-01_presentacion.pptx','presentaciones_html/2026-11-01_presentacion/2026-11-01_presentacion.pdf','/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-01_hoja_musicos.pdf','presentaciones_html/2026-11-01_presentacion/index.html','generado','2026-10-28 16:17:45',NULL,NULL,'2026-10-26 22:47:03');
 INSERT INTO "presentaciones" VALUES(167,'2026-10-22',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-29 20:25:36',NULL,NULL,'2026-10-29 20:25:36');
 INSERT INTO "presentaciones" VALUES(170,'2026-10-22',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-10-29 20:25:54',NULL,NULL,'2026-10-29 20:25:54');
-INSERT INTO "presentaciones" VALUES(172,'2026-11-08',82,'{"entrada": 11, "gloria": 9, "aleluya": 15, "ofertorio": 96, "santo": 88, "paz": 76, "comunion": 95, "maria": 2, "despedida": 20}',NULL,'presentaciones_html/2026-11-08_presentacion/2026-11-08_presentacion.pptx','presentaciones_html/2026-11-08_presentacion/2026-11-08_presentacion.pdf','/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_hoja_musicos.pdf','presentaciones_html/2026-11-08_presentacion/index.html','generado','2026-11-06 16:24:18',NULL,NULL,'2026-11-06 16:23:39');
-INSERT INTO "presentaciones" VALUES(173,'2026-11-16',NULL,NULL,NULL,'presentaciones_html/2026-11-16_presentacion/2026-11-16_presentacion.pptx','presentaciones_html/2026-11-16_presentacion/2026-11-16_presentacion.pdf',NULL,'presentaciones_html/2026-11-16_presentacion/index.html','generado','2026-11-09 17:52:02',NULL,NULL,'2026-11-09 17:52:02');
+INSERT INTO "presentaciones" VALUES(172,'2026-11-08',82,'{"entrada": 11, "gloria": 9, "ofertorio": 96, "santo": 88, "paz": 76, "comunion": 95, "maria": 2, "despedida": 20}',NULL,'presentaciones_html/2026-11-08_presentacion/2026-11-08_presentacion.pptx','presentaciones_html/2026-11-08_presentacion/2026-11-08_presentacion.pdf','/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_hoja_musicos.pdf','presentaciones_html/2026-11-08_presentacion/index.html','generado','2026-11-06 16:24:18',NULL,NULL,'2026-11-06 16:23:39');
 INSERT INTO "presentaciones" VALUES(174,'2026-11-02',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-11-09 17:52:02',NULL,NULL,'2026-11-09 17:52:02');
 INSERT INTO "presentaciones" VALUES(175,'2026-11-16',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-11-09 17:52:02',NULL,NULL,'2026-11-09 17:52:02');
 INSERT INTO "presentaciones" VALUES(176,'2026-11-16',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'borrador','2026-11-09 17:58:38',NULL,NULL,'2026-11-09 17:58:38');
@@ -27664,7 +26923,7 @@ cuando Tú moras en él.','','','fano/fano_20140352_un_amor_más_que_justo.jpg',
 INSERT INTO "slides" VALUES(34,'despedida','cancion_26','DE NOCHE IREMOS DE NOCHE','De noche iremos, de noche, que para encontrar la
 fuente,
 Sólo la sed nos alumbra, sólo la sed nos alumbra.','','','fano/fano_20140953_camina_al_ritmo_del_buen_pastor.jpg','',1,1,NULL,'2026-09-23 05:40:19','2026-09-23 05:40:19',NULL,NULL);
-INSERT INTO "slides" VALUES(35,'portada','general','L XXVI DOMINGO DEL TIEMPO ORDINARIO','','','27 de septiembre de 2026','assets/fano_25_domingo_vina.jpg','',0,0,NULL,'2026-09-23 05:40:19','2026-09-23 05:40:19',NULL,NULL);
+INSERT INTO "slides" VALUES(35,'portada','general','XXVI DOMINGO DEL TIEMPO ORDINARIO','','','27 de septiembre de 2026','assets/fano_25_domingo_vina.jpg','',0,0,NULL,'2026-09-23 05:40:19','2026-09-23 05:40:19',NULL,NULL);
 INSERT INTO "slides" VALUES(36,'entrada','cancion_44','HE VENIDO A SERVIR','Quien quiera ser grande,
 quien quiera ser el primero,
 sea el esclavo de todos,
@@ -27679,25 +26938,6 @@ INSERT INTO "slides" VALUES(37,'gloria','test_bold','BOLD TEST','Linea 1
 **texto en negrita**
 --- DIAPOSITIVA ---
 Linea 3','','','','verde',0,0,'','2026-09-23 05:40:19','2026-09-23 06:28:38',NULL,NULL);
-INSERT INTO "slides" VALUES(38,'aleluya','cancion_16','ALELUYA DE LA TIERRA','¿Quién quiere resucitar a este mundo que se muere?
-¿Quién cantará el aleluya de esa nueva luz que viene?
-¿Quién cuando mire la tierra y las tragedias observe,
-sentirá en su corazón el dolor de quien se muere?
-¿Quién es capaz de salvar a este mundo decadente,
-y mantiene la esperanza de los muchos que la pierden?
-
-**EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,**
-**Y OTROS SON ESPECTADORES, NO LO SIENTEN.**
---- DIAPOSITIVA ---
-¿Quién bajará de la cruz a tanto cristo sufriente,
-mientras los hombres miramos, impasivos e indolentes?
-¿Quién grita desde el silencio de un ser que a su Dios retiene,
-porque se hace palabra que sin hablar se la entiende?
-¿Quién se torna en aleluya porque traduce la muerte,
-como el trigo que se pudre y de uno cientos vienen?
-
-**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,
-Y LA TIERRA SONREIRÁ. ¡ALELUYA!**','','','fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg','verde',0,1,'','2026-09-23 05:40:19','2026-09-24 23:06:10',NULL,NULL);
 INSERT INTO "slides" VALUES(39,'ofertorio','cancion_82','QUE TE PUEDO DAR','¿Qué te puedo dar
 que no me hayas dado Tú?
 ¿Qué te puedo decir que no me hayas dicho Tú?
@@ -28273,17 +27513,6 @@ ni tu perdón. Me quieres tal como soy
 **GLORIA A TI, SEÑOR POR TU BONDAD.**
 **GLORIA, GLORIA,**
 **SIEMPRE CANTARÉ TU FIDELIDAD.**','','','fano/fano_20140634_pide_con_insistencia_a_papá_somos_sus_niños_mimados.jpg','verde',0,1,'','2026-09-23 10:07:58','2026-09-24 22:57:08',NULL,NULL);
-INSERT INTO "slides" VALUES(52,'aleluya','cancion_15','ALELUYA (Leonard Cohen)','Quiero escuchar tu corazón,
-conozco el sonido de tu voz,
-abrázame con tu palabra, Padre.
-Ayúdanos a comprender
-que hay tantas cosas por hacer,
-regálanos tus manos, aleluya.
-
-ALELUYA, ALELUYA,
-ALELUYA, ALELU…
-ALELUYA, ALELUYA,
-ALELUYA, ALELUYA','','','fano/fano_20140573_viviré_para_alabar_hacer_reverencia_y_servir_a_jesús_mi_rey.jpg','verde',0,1,'','2026-09-23 10:07:58','2026-09-28 14:23:00',NULL,NULL);
 INSERT INTO "slides" VALUES(53,'entrada','cancion_17','ALMA MISIONERA','Re
 
 La
@@ -32420,11 +31649,6 @@ Tan seguro estoy
 de Ti
 
 que nada me podrá parar.','','','','',0,1,NULL,'2026-09-23 10:07:58','2026-09-23 10:07:58',NULL,NULL);
-INSERT INTO "slides" VALUES(107,'aleluya','cancion_16_corta','ALELUYA DE LA TIERRA','EL QUE SUFRE, MATA Y MUERE, DESESPERA Y ENLOQUECE,
-Y OTROS SON ESPECTADORES, NO LO SIENTEN.
-
-**¡ALELUYA! CANTARÁ, QUIEN PERDIÓ LA ESPERANZA,**
-**Y LA TIERRA SONREIRÁ. ¡ALELUYA! (BIS)**','','','fano/fano_20140914_jesús_nos_conduce_y_lo_ilumina_todo.jpg','verde',1,1,'','2026-09-24 23:03:53','2026-10-09 04:56:40',NULL,NULL);
 INSERT INTO "slides" VALUES(108,'comunion','cancion_109','SALMO: EL SEÑOR ES MI PASTOR','**EL SEÑOR ES MI PASTOR NADA ME FALTA**
 **EL SEÑOR ES MI PASTOR.**
 **EL SEÑOR ES MI PASTOR NADA ME FALTA**
@@ -32511,131 +31735,7 @@ haciéndome ver que ha nada he de temer.
 
 **A NADA, A NADA NUNCA HE DE TEMER,**
 **YENDO JUNTO A TI CON TUS OJOS DE FE**
-**NUNCA HE DE TEMER (BIS)**','','','fano/fano_20140757_tu_palabra_no_pasará.jpg','verde',0,1,'Auto-creada desde canción id=11','2026-10-07 22:15:01','2026-10-09 04:49:54',NULL,NULL);
-INSERT INTO "slides" VALUES(111,'comunion','cancion_110','CANCION DE PRUEBA AUTO-REBUILD','
-
-       Do
-  ESTO ES UNA PRUEBA
-
-','','','','',0,1,'Auto-creada desde canción','2026-10-07 22:27:24','2026-10-07 22:27:24',NULL,NULL);
-INSERT INTO "slides" VALUES(112,'entrada','cancion_110','CANCION DE PRUEBA AUTO-REBUILD','
-
-       Do
-  ESTO ES UNA PRUEBA
-
-','','','','',0,1,'Auto-creada desde canción','2026-10-07 22:27:24','2026-10-07 22:27:24',NULL,NULL);
-INSERT INTO "slides" VALUES(113,'salmo','cancion_109_corta','SALMO: EL SEÑOR ES MI PASTOR','**EL SEÑOR ES MI PASTOR NADA ME FALTA**
-**EL SEÑOR ES MI PASTOR.**
-**EL SEÑOR ES MI PASTOR NADA ME FALTA**
-**EL SEÑOR ES MI PASTOR.**','','','fano/fano_20140953_camina_al_ritmo_del_buen_pastor.jpg','verde',0,1,'Auto-creada desde canción id=109','2026-10-09 15:36:47','2026-10-09 15:37:09',NULL,NULL);
-INSERT INTO "slides" VALUES(114,'comunion','cancion_111','Canción de prueba','
-
-
-  Am
-  Línea de prueba
-
-','','','','',0,1,'Auto-creada desde canción','2026-10-18 22:47:43','2026-10-18 22:47:43',NULL,NULL);
-INSERT INTO "slides" VALUES(115,'entrada','cancion_111','Canción de prueba','
-
-
-  Am
-  Línea de prueba
-
-','','','','',0,1,'Auto-creada desde canción','2026-10-18 22:47:43','2026-10-18 22:47:43',NULL,NULL);
-INSERT INTO "slides" VALUES(116,'gloria','cancion_112','Actualizada','
-
-
-  C
-  Actualizada
-
-','','','','',0,1,'Auto-creada desde canción','2026-10-18 22:47:43','2026-10-18 22:47:43',NULL,NULL);
-INSERT INTO "slides" VALUES(117,'comunion','cancion_114','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:06','2026-10-18 23:02:06',NULL,NULL);
-INSERT INTO "slides" VALUES(118,'entrada','cancion_114','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:06','2026-10-18 23:02:06',NULL,NULL);
-INSERT INTO "slides" VALUES(120,'comunion','cancion_117','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:13','2026-10-18 23:02:13',NULL,NULL);
-INSERT INTO "slides" VALUES(121,'entrada','cancion_117','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:13','2026-10-18 23:02:13',NULL,NULL);
-INSERT INTO "slides" VALUES(123,'comunion','cancion_120','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:38','2026-10-18 23:02:38',NULL,NULL);
-INSERT INTO "slides" VALUES(124,'entrada','cancion_120','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:38','2026-10-18 23:02:38',NULL,NULL);
-INSERT INTO "slides" VALUES(126,'perdon','cancion_123','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:47','2026-10-18 23:02:47',NULL,NULL);
-INSERT INTO "slides" VALUES(127,'comunion','cancion_123','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:47','2026-10-18 23:02:47',NULL,NULL);
-INSERT INTO "slides" VALUES(128,'entrada','cancion_123','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:47','2026-10-18 23:02:47',NULL,NULL);
-INSERT INTO "slides" VALUES(130,'perdon','cancion_126','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:53','2026-10-18 23:02:53',NULL,NULL);
-INSERT INTO "slides" VALUES(131,'comunion','cancion_126','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:53','2026-10-18 23:02:53',NULL,NULL);
-INSERT INTO "slides" VALUES(132,'entrada','cancion_126','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:02:53','2026-10-18 23:02:53',NULL,NULL);
-INSERT INTO "slides" VALUES(134,'perdon','cancion_129','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:03:21','2026-10-18 23:03:21',NULL,NULL);
-INSERT INTO "slides" VALUES(135,'comunion','cancion_129','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:03:21','2026-10-18 23:03:21',NULL,NULL);
-INSERT INTO "slides" VALUES(136,'entrada','cancion_129','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:03:21','2026-10-18 23:03:21',NULL,NULL);
-INSERT INTO "slides" VALUES(138,'perdon','cancion_132','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:24:02','2026-10-18 23:24:02',NULL,NULL);
-INSERT INTO "slides" VALUES(139,'comunion','cancion_132','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:24:02','2026-10-18 23:24:02',NULL,NULL);
-INSERT INTO "slides" VALUES(140,'entrada','cancion_132','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:24:02','2026-10-18 23:24:02',NULL,NULL);
-INSERT INTO "slides" VALUES(142,'perdon','cancion_135','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:25:00','2026-10-18 23:25:00',NULL,NULL);
-INSERT INTO "slides" VALUES(143,'comunion','cancion_135','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:25:00','2026-10-18 23:25:00',NULL,NULL);
-INSERT INTO "slides" VALUES(144,'entrada','cancion_135','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:25:00','2026-10-18 23:25:00',NULL,NULL);
-INSERT INTO "slides" VALUES(146,'perdon','cancion_138','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:38:35','2026-10-18 23:38:35',NULL,NULL);
-INSERT INTO "slides" VALUES(147,'comunion','cancion_138','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:38:35','2026-10-18 23:38:35',NULL,NULL);
-INSERT INTO "slides" VALUES(148,'entrada','cancion_138','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:38:35','2026-10-18 23:38:35',NULL,NULL);
-INSERT INTO "slides" VALUES(150,'perdon','cancion_141','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:39:42','2026-10-18 23:39:42',NULL,NULL);
-INSERT INTO "slides" VALUES(151,'comunion','cancion_141','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:39:42','2026-10-18 23:39:42',NULL,NULL);
-INSERT INTO "slides" VALUES(152,'entrada','cancion_141','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:39:42','2026-10-18 23:39:42',NULL,NULL);
-INSERT INTO "slides" VALUES(154,'perdon','cancion_144','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:42:38','2026-10-18 23:42:38',NULL,NULL);
-INSERT INTO "slides" VALUES(155,'comunion','cancion_144','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:42:38','2026-10-18 23:42:38',NULL,NULL);
-INSERT INTO "slides" VALUES(156,'entrada','cancion_144','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:42:38','2026-10-18 23:42:38',NULL,NULL);
-INSERT INTO "slides" VALUES(158,'perdon','cancion_147','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:43:50','2026-10-18 23:43:50',NULL,NULL);
-INSERT INTO "slides" VALUES(159,'comunion','cancion_147','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:43:50','2026-10-18 23:43:50',NULL,NULL);
-INSERT INTO "slides" VALUES(160,'entrada','cancion_147','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:43:50','2026-10-18 23:43:50',NULL,NULL);
-INSERT INTO "slides" VALUES(162,'perdon','cancion_150','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:44:31','2026-10-18 23:44:31',NULL,NULL);
-INSERT INTO "slides" VALUES(163,'comunion','cancion_150','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:44:31','2026-10-18 23:44:31',NULL,NULL);
-INSERT INTO "slides" VALUES(164,'entrada','cancion_150','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:44:31','2026-10-18 23:44:31',NULL,NULL);
-INSERT INTO "slides" VALUES(166,'perdon','cancion_153','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:19','2026-10-18 23:45:19',NULL,NULL);
-INSERT INTO "slides" VALUES(167,'comunion','cancion_153','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:19','2026-10-18 23:45:19',NULL,NULL);
-INSERT INTO "slides" VALUES(168,'entrada','cancion_153','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:19','2026-10-18 23:45:19',NULL,NULL);
-INSERT INTO "slides" VALUES(170,'perdon','cancion_156','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:38','2026-10-18 23:45:38',NULL,NULL);
-INSERT INTO "slides" VALUES(171,'comunion','cancion_156','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:38','2026-10-18 23:45:38',NULL,NULL);
-INSERT INTO "slides" VALUES(172,'entrada','cancion_156','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:38','2026-10-18 23:45:38',NULL,NULL);
-INSERT INTO "slides" VALUES(174,'perdon','cancion_159','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:57','2026-10-18 23:45:57',NULL,NULL);
-INSERT INTO "slides" VALUES(175,'comunion','cancion_159','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:57','2026-10-18 23:45:57',NULL,NULL);
-INSERT INTO "slides" VALUES(176,'entrada','cancion_159','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:45:57','2026-10-18 23:45:57',NULL,NULL);
-INSERT INTO "slides" VALUES(178,'perdon','cancion_162','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:46:28','2026-10-18 23:46:28',NULL,NULL);
-INSERT INTO "slides" VALUES(179,'comunion','cancion_162','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:46:28','2026-10-18 23:46:28',NULL,NULL);
-INSERT INTO "slides" VALUES(180,'entrada','cancion_162','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:46:28','2026-10-18 23:46:28',NULL,NULL);
-INSERT INTO "slides" VALUES(182,'perdon','cancion_165','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:47:19','2026-10-18 23:47:19',NULL,NULL);
-INSERT INTO "slides" VALUES(183,'comunion','cancion_165','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:47:19','2026-10-18 23:47:19',NULL,NULL);
-INSERT INTO "slides" VALUES(184,'entrada','cancion_165','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-18 23:47:19','2026-10-18 23:47:19',NULL,NULL);
-INSERT INTO "slides" VALUES(186,'perdon','cancion_168','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:09:29','2026-10-19 00:09:29',NULL,NULL);
-INSERT INTO "slides" VALUES(187,'comunion','cancion_168','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:09:29','2026-10-19 00:09:29',NULL,NULL);
-INSERT INTO "slides" VALUES(188,'entrada','cancion_168','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:09:29','2026-10-19 00:09:29',NULL,NULL);
-INSERT INTO "slides" VALUES(190,'perdon','cancion_171','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:11:45','2026-10-19 00:11:45',NULL,NULL);
-INSERT INTO "slides" VALUES(191,'comunion','cancion_171','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:11:45','2026-10-19 00:11:45',NULL,NULL);
-INSERT INTO "slides" VALUES(192,'entrada','cancion_171','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:11:45','2026-10-19 00:11:45',NULL,NULL);
-INSERT INTO "slides" VALUES(194,'perdon','cancion_174','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:12:49','2026-10-19 00:12:49',NULL,NULL);
-INSERT INTO "slides" VALUES(195,'comunion','cancion_174','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:12:49','2026-10-19 00:12:49',NULL,NULL);
-INSERT INTO "slides" VALUES(196,'entrada','cancion_174','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:12:49','2026-10-19 00:12:49',NULL,NULL);
-INSERT INTO "slides" VALUES(198,'perdon','cancion_177','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:14:13','2026-10-19 00:14:13',NULL,NULL);
-INSERT INTO "slides" VALUES(199,'comunion','cancion_177','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:14:13','2026-10-19 00:14:13',NULL,NULL);
-INSERT INTO "slides" VALUES(200,'entrada','cancion_177','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:14:13','2026-10-19 00:14:13',NULL,NULL);
-INSERT INTO "slides" VALUES(202,'perdon','cancion_180','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:15:42','2026-10-19 00:15:42',NULL,NULL);
-INSERT INTO "slides" VALUES(203,'comunion','cancion_180','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:15:42','2026-10-19 00:15:42',NULL,NULL);
-INSERT INTO "slides" VALUES(204,'entrada','cancion_180','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:15:42','2026-10-19 00:15:42',NULL,NULL);
-INSERT INTO "slides" VALUES(206,'perdon','cancion_183','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:17:07','2026-10-19 00:17:07',NULL,NULL);
-INSERT INTO "slides" VALUES(207,'comunion','cancion_183','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:17:07','2026-10-19 00:17:07',NULL,NULL);
-INSERT INTO "slides" VALUES(208,'entrada','cancion_183','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:17:07','2026-10-19 00:17:07',NULL,NULL);
-INSERT INTO "slides" VALUES(210,'perdon','cancion_186','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:18:31','2026-10-19 00:18:31',NULL,NULL);
-INSERT INTO "slides" VALUES(211,'comunion','cancion_186','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:18:31','2026-10-19 00:18:31',NULL,NULL);
-INSERT INTO "slides" VALUES(212,'entrada','cancion_186','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:18:31','2026-10-19 00:18:31',NULL,NULL);
-INSERT INTO "slides" VALUES(214,'perdon','cancion_189','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:23:53','2026-10-19 00:23:53',NULL,NULL);
-INSERT INTO "slides" VALUES(215,'comunion','cancion_189','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:23:53','2026-10-19 00:23:53',NULL,NULL);
-INSERT INTO "slides" VALUES(216,'entrada','cancion_189','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-19 00:23:53','2026-10-19 00:23:53',NULL,NULL);
-INSERT INTO "slides" VALUES(218,'perdon','cancion_192','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:16:44','2026-10-20 23:16:44',NULL,NULL);
-INSERT INTO "slides" VALUES(219,'comunion','cancion_192','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:16:44','2026-10-20 23:16:44',NULL,NULL);
-INSERT INTO "slides" VALUES(220,'entrada','cancion_192','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:16:44','2026-10-20 23:16:44',NULL,NULL);
-INSERT INTO "slides" VALUES(222,'perdon','cancion_195','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:20:08','2026-10-20 23:20:08',NULL,NULL);
-INSERT INTO "slides" VALUES(223,'comunion','cancion_195','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:20:08','2026-10-20 23:20:08',NULL,NULL);
-INSERT INTO "slides" VALUES(224,'entrada','cancion_195','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:20:08','2026-10-20 23:20:08',NULL,NULL);
-INSERT INTO "slides" VALUES(226,'perdon','cancion_198','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:22:38','2026-10-20 23:22:38',NULL,NULL);
-INSERT INTO "slides" VALUES(227,'comunion','cancion_198','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:22:38','2026-10-20 23:22:38',NULL,NULL);
-INSERT INTO "slides" VALUES(228,'entrada','cancion_198','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:22:38','2026-10-20 23:22:38',NULL,NULL);
-INSERT INTO "slides" VALUES(230,'perdon','cancion_201','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:43:09','2026-10-20 23:43:09',NULL,NULL);
-INSERT INTO "slides" VALUES(231,'comunion','cancion_201','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:43:09','2026-10-20 23:43:09',NULL,NULL);
-INSERT INTO "slides" VALUES(232,'entrada','cancion_201','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:43:09','2026-10-20 23:43:09',NULL,NULL);
+**NUNCA HE DE TEMER (BIS)**','','','fano/fano_20140425_jesús_es_la_palabra_de_dios_que_se_cumple_domingo_24_de_ener.jpg','verde',0,1,'Auto-creada desde canción id=11','2026-10-07 22:15:01','2026-11-16 11:07:34',NULL,'{"x": 58, "y": 27, "w": 494, "h": 851}');
 INSERT INTO "slides" VALUES(234,'comunion','cancion_21','COMO EL PADRE ME AMÓ','
 Re
 
@@ -32915,30 +32015,6 @@ compartiréis mi pleno gozo
 
 de amar como Él me amó.
 ','','','','',0,1,'Auto-creada desde canción','2026-10-20 23:53:30','2026-10-20 23:53:30',NULL,NULL);
-INSERT INTO "slides" VALUES(237,'perdon','cancion_204','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:09:24','2026-10-21 08:09:24',NULL,NULL);
-INSERT INTO "slides" VALUES(238,'comunion','cancion_204','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:09:24','2026-10-21 08:09:24',NULL,NULL);
-INSERT INTO "slides" VALUES(239,'entrada','cancion_204','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:09:24','2026-10-21 08:09:24',NULL,NULL);
-INSERT INTO "slides" VALUES(241,'perdon','cancion_207','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:09:40','2026-10-21 08:09:40',NULL,NULL);
-INSERT INTO "slides" VALUES(242,'comunion','cancion_207','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:09:40','2026-10-21 08:09:40',NULL,NULL);
-INSERT INTO "slides" VALUES(243,'entrada','cancion_207','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:09:40','2026-10-21 08:09:40',NULL,NULL);
-INSERT INTO "slides" VALUES(245,'perdon','cancion_210','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:10:03','2026-10-21 08:10:03',NULL,NULL);
-INSERT INTO "slides" VALUES(246,'comunion','cancion_210','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:10:03','2026-10-21 08:10:03',NULL,NULL);
-INSERT INTO "slides" VALUES(247,'entrada','cancion_210','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 08:10:03','2026-10-21 08:10:03',NULL,NULL);
-INSERT INTO "slides" VALUES(249,'perdon','cancion_213','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 09:19:51','2026-10-21 09:19:51',NULL,NULL);
-INSERT INTO "slides" VALUES(250,'comunion','cancion_213','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 09:19:51','2026-10-21 09:19:51',NULL,NULL);
-INSERT INTO "slides" VALUES(251,'entrada','cancion_213','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 09:19:51','2026-10-21 09:19:51',NULL,NULL);
-INSERT INTO "slides" VALUES(253,'perdon','cancion_216','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 09:20:10','2026-10-21 09:20:10',NULL,NULL);
-INSERT INTO "slides" VALUES(254,'comunion','cancion_216','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 09:20:10','2026-10-21 09:20:10',NULL,NULL);
-INSERT INTO "slides" VALUES(255,'entrada','cancion_216','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 09:20:10','2026-10-21 09:20:10',NULL,NULL);
-INSERT INTO "slides" VALUES(257,'perdon','cancion_219','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 15:24:19','2026-10-21 15:24:19',NULL,NULL);
-INSERT INTO "slides" VALUES(258,'comunion','cancion_219','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 15:24:19','2026-10-21 15:24:19',NULL,NULL);
-INSERT INTO "slides" VALUES(259,'entrada','cancion_219','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-21 15:24:19','2026-10-21 15:24:19',NULL,NULL);
-INSERT INTO "slides" VALUES(261,'perdon','cancion_222','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-23 22:47:34','2026-10-23 22:47:34',NULL,NULL);
-INSERT INTO "slides" VALUES(262,'comunion','cancion_222','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-23 22:47:34','2026-10-23 22:47:34',NULL,NULL);
-INSERT INTO "slides" VALUES(263,'entrada','cancion_222','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-23 22:47:34','2026-10-23 22:47:34',NULL,NULL);
-INSERT INTO "slides" VALUES(265,'perdon','cancion_225','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-23 22:48:37','2026-10-23 22:48:37',NULL,NULL);
-INSERT INTO "slides" VALUES(266,'comunion','cancion_225','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-23 22:48:37','2026-10-23 22:48:37',NULL,NULL);
-INSERT INTO "slides" VALUES(267,'entrada','cancion_225','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-23 22:48:37','2026-10-23 22:48:37',NULL,NULL);
 INSERT INTO "slides" VALUES(269,'comunion','cancion_22','COMO TUS BRAZOS','
 Sol
 
@@ -33401,27 +32477,6 @@ y de la justicia defensor.
 Nos enseñará a servir, a
 bendecir y a perdonar
 ','','','','',0,1,'Auto-creada desde canción','2026-10-26 19:03:38','2026-10-26 19:03:38',NULL,NULL);
-INSERT INTO "slides" VALUES(272,'perdon','cancion_228','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-29 20:25:36','2026-10-29 20:25:36',NULL,NULL);
-INSERT INTO "slides" VALUES(273,'comunion','cancion_228','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-29 20:25:36','2026-10-29 20:25:36',NULL,NULL);
-INSERT INTO "slides" VALUES(274,'entrada','cancion_228','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-29 20:25:36','2026-10-29 20:25:36',NULL,NULL);
-INSERT INTO "slides" VALUES(276,'perdon','cancion_231','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-29 20:25:54','2026-10-29 20:25:54',NULL,NULL);
-INSERT INTO "slides" VALUES(277,'comunion','cancion_231','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-29 20:25:54','2026-10-29 20:25:54',NULL,NULL);
-INSERT INTO "slides" VALUES(278,'entrada','cancion_231','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-10-29 20:25:54','2026-10-29 20:25:54',NULL,NULL);
-INSERT INTO "slides" VALUES(280,'perdon','cancion_234','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 17:52:02','2026-11-09 17:52:02',NULL,NULL);
-INSERT INTO "slides" VALUES(281,'comunion','cancion_234','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 17:52:02','2026-11-09 17:52:02',NULL,NULL);
-INSERT INTO "slides" VALUES(282,'entrada','cancion_234','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 17:52:02','2026-11-09 17:52:02',NULL,NULL);
-INSERT INTO "slides" VALUES(284,'perdon','cancion_237','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 17:58:37','2026-11-09 17:58:37',NULL,NULL);
-INSERT INTO "slides" VALUES(285,'comunion','cancion_237','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 17:58:37','2026-11-09 17:58:37',NULL,NULL);
-INSERT INTO "slides" VALUES(286,'entrada','cancion_237','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 17:58:37','2026-11-09 17:58:37',NULL,NULL);
-INSERT INTO "slides" VALUES(288,'perdon','cancion_240','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 19:24:34','2026-11-09 19:24:34',NULL,NULL);
-INSERT INTO "slides" VALUES(289,'comunion','cancion_240','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 19:24:34','2026-11-09 19:24:34',NULL,NULL);
-INSERT INTO "slides" VALUES(290,'entrada','cancion_240','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 19:24:34','2026-11-09 19:24:34',NULL,NULL);
-INSERT INTO "slides" VALUES(292,'perdon','cancion_243','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 19:25:36','2026-11-09 19:25:36',NULL,NULL);
-INSERT INTO "slides" VALUES(293,'comunion','cancion_243','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 19:25:36','2026-11-09 19:25:36',NULL,NULL);
-INSERT INTO "slides" VALUES(294,'entrada','cancion_243','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-09 19:25:36','2026-11-09 19:25:36',NULL,NULL);
-INSERT INTO "slides" VALUES(296,'perdon','cancion_246','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-14 21:34:34','2026-11-14 21:34:34',NULL,NULL);
-INSERT INTO "slides" VALUES(297,'comunion','cancion_246','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-14 21:34:34','2026-11-14 21:34:34',NULL,NULL);
-INSERT INTO "slides" VALUES(298,'entrada','cancion_246','Aleluya','Aleluya','','','','',0,1,'Auto-creada desde canción','2026-11-14 21:34:34','2026-11-14 21:34:34',NULL,NULL);
 CREATE TABLE slides_tipos (
     id TEXT PRIMARY KEY,
     nombre TEXT NOT NULL,
@@ -33661,14 +32716,14 @@ CREATE TABLE workflow_runs (
                 );
 INSERT INTO "workflow_runs" VALUES(15,'2026-10-04','superseded','init','{"fecha": "2026-10-04"}','rafael.torres','2026-09-28 11:11:54','2026-09-28T11:12:21.378259+00:00',NULL,16);
 INSERT INTO "workflow_runs" VALUES(16,'2026-10-04','superseded','verify_lectures','{"fecha": "2026-10-04", "lecturas": {"fecha": "2026-10-04", "domingo": "", "temporada": "", "ciclo": "", "color_liturgico": "verde", "primera_lectura_cita": "", "primera_lectura_texto": "", "salmo_cita": "", "salmo_antifona": "", "salmo_texto": "", "segunda_lectura_cita": "", "segunda_lectura_texto": "", "evangelio_cita": "", "evangelio_texto": "", "fuente_scraping": "manual"}, "lecturas_fuente": "manual"}','rafael.torres','2026-09-28 11:12:21','2026-09-28T11:18:52.317943+00:00',NULL,17);
-INSERT INTO "workflow_runs" VALUES(17,'2026-10-04','generate_assets','generate_assets','{"fecha": "2026-10-04", "lecturas": {"fecha": "2026-10-04", "fuente": "ciudadredonda", "fecha_scraping": "2026-09-28T13:19:03.889115", "celebracion": "l XXVII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Lectura del libro de Isaías 5,1-7", "primera_lectura_texto": "Voy a cantar en nombre de mi amigo un canto de amor a su viña. Mi amigo tenía una viña en fértil collado. La entrecavó, la descantó, y plantó buenas cepas; construyó en medio una atalaya y cavó un lagar. Y esperó que diese uvas, pero dio agrazones. Pues ahora, habitantes de Jerusalén, hombres de Judá, por favor, sed jueces entre mí y mi viña. ¿Qué más cabía hacer por mi viña que yo no lo haya hecho? ¿Por qué, esperando que diera uvas, dio agrazones? Pues ahora os diré a vosotros lo que voy a hacer con mi viña: quitar su valla para que sirva de pasto, derruir su tapia para que la pisoteen. La dejaré arrasada: no la podarán ni la escardarán, crecerán zarzas y cardos; prohibiré a las nubes que lluevan sobre ella. La viña del Señor de los ejércitos es la casa de Israel; son los hombres de Judá su plantel preferido. Esperó de ellos derecho, y ahí tenéis: asesinatos; esperó justicia, y ahí tenéis: lamentos.", "salmo_cita": "Sal 79,9.12.13-14.15-16.19-20", "salmo_antifona": "La viña del Señor es la casa de Israel", "salmo_texto": "Sacaste una vid de Egipto,\n\nexpulsaste a los gentiles, y la trasplantaste.\n\nExtendió sus sarmientos hasta el mar,\n\ny sus brotes hasta el Gran Río.\n¿Por qué has derribado su cerca\n\npara que la saqueen los viandantes,\n\nla pisoteen los jabalíes\n\ny se la coman las alimañas?\nDios de los ejércitos, vuélvete:\n\nmira desde el cielo, fíjate,\n\nven a visitar tu viña,\n\nla cepa que tu diestra plantó\n\ny que tú hiciste vigorosa.\nNo nos alejaremos de ti:\n\ndanos vida, para que invoquemos tu nombre.\n\nSeñor, Dios de los ejércitos,\n\nrestáuranos, que brille tu rostro y nos salve.", "segunda_lectura_cita": "Lectura de la carta del apóstol san Pablo a los Filipenses (4,6-9):", "segunda_lectura_texto": "Nada os preocupe; sino que, en toda ocasión, en la oración y súplica con acción de gracias, vuestras peticiones sean presentadas a Dios. Y la paz de Dios, que sobrepasa todo juicio, custodiará vuestros corazones y vuestros pensamientos en Cristo Jesús. Finalmente, hermanos, todo lo que es verdadero, noble, justo, puro, amable, laudable, todo lo que es virtud o mérito, tenedlo en cuenta. Y lo que aprendisteis, recibisteis, oísteis, visteis en mí, ponedlo por obra. Y el Dios de la paz estará con vosotros.", "evangelio_cita": "Lectura del santo evangelio según san Mateo (21,33-43):", "evangelio_texto": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «Escuchad otra parábola: Había un propietario que plantó una viña, la rodeó con una cerca, cavó en ella un lagar, construyó la casa del guarda, la arrendó a unos labradores y se marchó de viaje. Llegado el tiempo de la vendimia, envió sus criados a los labradores, para percibir los frutos que le correspondían. Pero los labradores, agarrando a los criados, apalearon a uno, mataron a otro, y a otro lo apedrearon. Envió de nuevo otros criados, más que la primera vez, e hicieron con ellos lo mismo. Por último les mandó a su hijo, diciéndose: «Tendrán respeto a mi hijo.» Pero los labradores, al ver al hijo, se dijeron: «Éste es el heredero, venid, lo matamos y nos quedamos con su herencia.» Y, agarrándolo, lo empujaron fuera de la viña y lo mataron. Y ahora, cuando vuelva el dueño de la viña, ¿qué hará con aquellos labradores?»Le contestaron: «Hará morir de mala muerte a esos malvados y arrendará la viña a otros labradores, que le entreguen los frutos a sus tiempos.»Y Jesús les dice: «¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?» Por eso os digo que se os quitará a vosotros el reino de Dios y se dará a un pueblo que produzca sus frutos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "domingo": "", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 44, "titulo": "ALMA MISIONERA", "score": 0.579, "temas_comunes": ["agua", "amor", "camino", "esperanza"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "COMO TUS BRAZOS", "score": 0.582, "temas_comunes": ["paz", "camino", "amor"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 13, "titulo": "NUNC DIMITIS", "score": 0.832, "temas_comunes": ["paz", "alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": 91, "titulo": "VOSOTROS SERÉIS MI PUEBLO", "score": 0.598, "temas_comunes": ["paz", "amor", "esperanza", "camino"], "momento_liturgico": "general"}, "Aleluya": {"cancion_id": 15, "titulo": "CRISTO VIVE, ANÚNCIALO", "score": 0.76, "temas_comunes": ["paz", "amor", "camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 82, "titulo": "PADRE NUESTRO SIMON Y GARFUNKEL", "score": 0.723, "temas_comunes": ["paz", "amor", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 89, "titulo": "QUIERO HACER LO MISMO", "score": 0.44, "temas_comunes": ["camino", "amor", "alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PADRE NUESTRO (Gallego)", "score": 0.723, "temas_comunes": ["paz", "camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 51, "titulo": "PAZ, SEÑOR (Palomas)", "score": 0.933, "temas_comunes": ["paz", "amor", "camino", "esperanza"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 18, "titulo": "LUCHARÉ POR TI", "score": 0.412, "temas_comunes": ["amor", "camino", "agua"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "ALABO TU BONDAD", "score": 0.513, "temas_comunes": ["paz", "alabanza", "amor"], "momento_liturgico": "general"}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.452, "temas_comunes": ["agua", "alabanza"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 44, "perdon": null, "gloria": 13, "salmo": 91, "aleluya": 15, "ofertorio": 82, "santo": 89, "padre_nuestro": null, "paz": 51, "comunion": 18, "maria": 2, "despedida": 20}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-04_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-04_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-04_fieles.pdf", "pdf_musicos": null}, "publicado": true}','rafael.torres','2026-09-28 11:18:52','2026-09-28T16:51:31.249671+00:00','2026-09-28T14:24:23.353991+00:00',NULL);
-INSERT INTO "workflow_runs" VALUES(18,'2026-10-11','superseded','verify_songs','{"fecha": "2026-10-11", "lecturas": {"fecha": "2026-10-11", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-07T15:11:29.049328", "celebracion": "l XXVIII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 25,6-10a", "primera_lectura_texto": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»", "salmo_cita": "Sal 22, 1", "salmo_antifona": "Habitaré en la casa del Señor", "salmo_texto": "El Señor es mi pastor, nada me falta:\n\nen verdes praderas me hace recostar;\n\nme conduce hacia fuentes tranquilas\n\ny repara mis fuerzas.\nMe guía por el sendero justo,\n\npor el honor de su nombre.\n\nAunque camine por cañadas oscuras,\n\nnada temo, porque tú vas conmigo:\n\ntu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí,\n\nenfrente de mis enemigos;\n\nme unges la cabeza con perfume,\n\ny mi copa rebosa.\nTu bondad y tu misericordia me acompañan\n\ntodos los días de mi vida,\n\ny habitaré en la casa del Señor\n\npor años sin término.", "segunda_lectura_cita": "Flp 4,12-14.19-20", "segunda_lectura_texto": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.", "evangelio_cita": "Mt 22,1-14", "evangelio_texto": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXVIII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": null, "titulo": "VEN JESÚS", "score": 0.72, "temas_comunes": ["camino", "pan"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "PADRE NUESTRO DEL CIELO", "score": 0.675, "temas_comunes": ["pan", "perdon"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": null, "titulo": "EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS (KAIROI)", "score": 0.649, "temas_comunes": ["espiritu", "salvacion", "camino", "alabanza", "esperanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.524, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": null, "titulo": "ESCUCHA, TÚ", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": null, "titulo": "TOMA MI VIDA", "score": 0.702, "temas_comunes": ["pan", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": null, "titulo": "SANTO (I)", "score": 0.524, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": null, "titulo": "ORACIÓN DEL  POBRE", "score": 0.438, "temas_comunes": ["perdon", "camino", "espiritu"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": null, "titulo": "LUCHARÉ POR TI", "score": 0.388, "temas_comunes": ["camino", "salvacion"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": null, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": null, "titulo": "COMO CORRE UN RÍO", "score": 0.166, "temas_comunes": ["alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": null, "perdon": null, "gloria": null, "salmo": null, "aleluya": null, "ofertorio": null, "santo": null, "padre_nuestro": null, "paz": null, "comunion": null, "maria": null, "despedida": null}}','rafael.torres','2026-10-07 13:09:13','2026-10-07T13:35:23.525420+00:00',NULL,19);
-INSERT INTO "workflow_runs" VALUES(19,'2026-10-11','superseded','verify_songs','{"fecha": "2026-10-11", "lecturas": {"fecha": "2026-10-11", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-07T15:37:22.819721", "celebracion": "l XXVIII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 25,6-10a", "primera_lectura_texto": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»", "salmo_cita": "Sal 22, 1", "salmo_antifona": "Habitaré en la casa del Señor", "salmo_texto": "El Señor es mi pastor, nada me falta:\n\nen verdes praderas me hace recostar;\n\nme conduce hacia fuentes tranquilas\n\ny repara mis fuerzas.\nMe guía por el sendero justo,\n\npor el honor de su nombre.\n\nAunque camine por cañadas oscuras,\n\nnada temo, porque tú vas conmigo:\n\ntu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí,\n\nenfrente de mis enemigos;\n\nme unges la cabeza con perfume,\n\ny mi copa rebosa.\nTu bondad y tu misericordia me acompañan\n\ntodos los días de mi vida,\n\ny habitaré en la casa del Señor\n\npor años sin término.", "segunda_lectura_cita": "Flp 4,12-14.19-20", "segunda_lectura_texto": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.", "evangelio_cita": "Mt 22,1-14", "evangelio_texto": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXVIII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 102, "titulo": "VEN JESÚS", "score": 0.72, "temas_comunes": ["camino", "pan"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": 75, "titulo": "PADRE NUESTRO DEL CIELO", "score": 0.675, "temas_comunes": ["pan", "perdon"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 5, "titulo": "EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS (KAIROI)", "score": 0.649, "temas_comunes": ["espiritu", "salvacion", "camino", "alabanza", "esperanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": 105, "titulo": "YA DE MAÑANA", "score": 0.524, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 38, "titulo": "ESCUCHA, TÚ", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "TOMA MI VIDA", "score": 0.702, "temas_comunes": ["pan", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 86, "titulo": "SANTO (I)", "score": 0.524, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": 80, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 69, "titulo": "ORACIÓN DEL  POBRE", "score": 0.438, "temas_comunes": ["perdon", "camino", "espiritu"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 54, "titulo": "LUCHARÉ POR TI", "score": 0.388, "temas_comunes": ["camino", "salvacion"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.166, "temas_comunes": ["alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": null, "perdon": null, "gloria": null, "salmo": null, "aleluya": null, "ofertorio": null, "santo": null, "padre_nuestro": null, "paz": null, "comunion": null, "maria": null, "despedida": null}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-11_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-07 13:35:23','2026-10-07T14:32:51.590899+00:00',NULL,20);
-INSERT INTO "workflow_runs" VALUES(20,'2026-10-11','done','done','{"fecha": "2026-10-11", "lecturas": {"fecha": "2026-10-11", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-10T12:23:48.388405", "celebracion": "l XXVIII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 25,6-10a", "primera_lectura_texto": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»", "salmo_cita": "Sal 22, 1", "salmo_antifona": "Habitaré en la casa del Señor", "salmo_texto": "El Señor es mi pastor, nada me falta:\n\nen verdes praderas me hace recostar;\n\nme conduce hacia fuentes tranquilas\n\ny repara mis fuerzas.\nMe guía por el sendero justo,\n\npor el honor de su nombre.\n\nAunque camine por cañadas oscuras,\n\nnada temo, porque tú vas conmigo:\n\ntu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí,\n\nenfrente de mis enemigos;\n\nme unges la cabeza con perfume,\n\ny mi copa rebosa.\nTu bondad y tu misericordia me acompañan\n\ntodos los días de mi vida,\n\ny habitaré en la casa del Señor\n\npor años sin término.", "segunda_lectura_cita": "Flp 4,12-14.19-20", "segunda_lectura_texto": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.", "evangelio_cita": "Mt 22,1-14", "evangelio_texto": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "l XXVIII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "VEN JESÚS", "score": 0.72, "temas_comunes": ["camino", "pan"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "PADRE NUESTRO DEL CIELO", "score": 0.675, "temas_comunes": ["pan", "perdon"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 9, "titulo": "EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS (KAIROI)", "score": 0.649, "temas_comunes": ["espiritu", "salvacion", "alabanza", "camino", "esperanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.524, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 16, "titulo": "ESCUCHA, TÚ", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "TOMA MI VIDA", "score": 0.702, "temas_comunes": ["pan", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "SANTO (I)", "score": 0.524, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "ORACIÓN DEL  POBRE", "score": 0.438, "temas_comunes": ["perdon", "camino", "espiritu"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 109, "titulo": "LUCHARÉ POR TI", "score": 0.388, "temas_comunes": ["camino", "salvacion"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.166, "temas_comunes": ["alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 9, "salmo": null, "aleluya": 16, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 109, "maria": 2, "despedida": 20}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-11_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-07 14:32:51','2026-10-10T10:25:58.652552+00:00','2026-10-10T10:25:58.651900+00:00',NULL);
-INSERT INTO "workflow_runs" VALUES(21,'2026-10-18','done','done','{"fecha": "2026-10-18", "lecturas": {"fecha": "2026-10-18", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-18T01:59:02.904772", "celebracion": "l XXIX Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 45,1.4-6", "primera_lectura_texto": "Así dice el Señor a su Ungido, a Ciro, a quien lleva de la mano: «Doblegaré ante él las naciones, desceñiré las cinturas de los reyes, abriré ante él las puertas, los batientes no se le cerrarán. Por mi siervo Jacob, por mi escogido Israel, te llamé por tu nombre, te di un título, aunque no me conocías. Yo soy el Señor y no hay otro; fuera de mí, no hay dios. Te pongo la insignia, aunque no me conoces, para que sepan de Oriente a Occidente que no hay otro fuera de mí. Yo soy el Señor, y no hay otro.»", "salmo_cita": "Sal 95,1", "salmo_antifona": "Aclamad la gloria y el poder del Señor", "salmo_texto": "Cantad al Señor un cántico nuevo,\n\ncantad al Señor, toda la tierra.\n\nContad a los pueblos su gloria,\n\nsus maravillas a todas las naciones.\nPorque es grande el Señor,\n\ny muy digno de alabanza,\n\nmás temible que todos los dioses.\n\nPues los dioses de los gentiles son apariencia,\n\nmientras que el Señor ha hecho el cielo.\nFamilias de los pueblos, aclamad al Señor,\n\naclamad la gloria y el poder del Señor,\n\naclamad la gloria del nombre del Señor,\n\nentrad en sus atrios trayéndole ofrendas.\nPostraos ante el Señor en el atrio sagrado,\n\ntiemble en su presencia la tierra toda;\n\ndecid a los pueblos: «El Señor es rey,\n\nél gobierna a los pueblos rectamente.»", "segunda_lectura_cita": "Tes 1,1-5b", "segunda_lectura_texto": "Pablo, Silvano y Tirnoteo a la Iglesia de los tesalonicenses, en Dios Padre y en el Señor Jesucristo. A vosotros, gracia y paz. Siempre damos gracias a Dios por todos vosotros y os tenemos presentes en nuestras oraciones. Ante Dios, nuestro Padre, recordarnos sin cesar la actividad de vuestra fe, el esfuerzo de vuestro amor y el aguante de vuestra esperanza en Jesucristo, nuestro Señor. Bien sabemos, hermanos amados de Dios, que él os ha elegido y que, cuando se proclamó el Evangelio entre vosotros, no hubo sólo palabras, sino además fuerza del Espíritu Santo y convicción profunda.", "evangelio_cita": "Mt 22,15-21", "evangelio_texto": "En aquel tiempo, se retiraron los fariseos y llegaron a un acuerdo para comprometer a Jesús con una pregunta.Le enviaron unos discípulos, con unos partidarios de Herodes, y le dijeron: «Maestro, sabemos que eres sincero y que enseñas el camino de Dios conforme a la verdad; sin que te importe nadie, porque no miras lo que la gente sea. Dinos, pues, qué opinas: ¿es licito pagar impuesto al César o no?»Comprendiendo su mala voluntad, les dijo Jesús: «Hipócritas, ¿por qué me tentáis? Enseñadme la moneda del impuesto.»Le presentaron un denario. Él les preguntó: «¿De quién son esta cara y esta inscripción?»Le respondieron: «Del César.»Entonces les replicó: «Pues pagadle al César lo que es del César y a Dios lo que es de Dios.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXIX Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 44, "titulo": "HAY ÁNGELES DE DIOS", "score": 0.751, "temas_comunes": ["alabanza"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "COMO TUS BRAZOS", "score": 0.539, "temas_comunes": ["camino", "paz", "espiritu", "amor"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 13, "titulo": "GLORIA DE NAZARET", "score": 0.844, "temas_comunes": ["alabanza", "paz", "espiritu"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.375, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 15, "titulo": "JESÚS RESUCITA HOY", "score": 0.707, "temas_comunes": ["camino", "amor", "paz", "fe", "esperanza", "espiritu"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "PADRE NUESTRO DE LA VIDA", "score": 0.568, "temas_comunes": ["camino", "paz", "fe", "amor"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "SANTO (I)", "score": 0.751, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PADRE NUESTRO (Gallego)", "score": 0.496, "temas_comunes": ["paz", "camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "PON UN POCO DE PAZ", "score": 0.653, "temas_comunes": ["paz", "fe", "camino", "amor"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 95, "titulo": "TODO MI SER", "score": 0.406, "temas_comunes": ["camino", "amor"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 85, "titulo": "QUIERO VIVIR AMANDO", "score": 0.21, "temas_comunes": ["amor", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 44, "perdon": null, "gloria": 13, "salmo": null, "aleluya": 15, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 95, "maria": 2, "despedida": 85}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-18_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-14 22:30:49','2026-10-18T00:38:42.985680+00:00','2026-10-18T00:38:42.985038+00:00',NULL);
-INSERT INTO "workflow_runs" VALUES(22,'2026-10-25','done','done','{"fecha": "2026-10-25", "lecturas": {"fecha": "2026-10-25", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-21T01:31:10.621828", "celebracion": "l XXX Domingo del Tiempo Ordinario", "primera_lectura_cita": "Ex 22,20-26", "primera_lectura_texto": "Así dice el Señor: «No oprimirás ni vejarás al forastero, porque forasteros fuisteis vosotros en Egipto. No explotarás a viudas ni a huérfanos, porque, si los explotas y ellos gritan a mí, yo los escucharé. Se encenderá mi ira y os haré morir a espada, dejando a vuestras mujeres viudas y a vuestros hijos huérfanos. Si prestas dinero a uno de mi pueblo, a un pobre que habita contigo, no serás con él un usurero, cargándole intereses. Si tomas en prenda el manto de tu prójimo, se lo devolverás antes de ponerse el sol, porque no tiene otro vestido para cubrir su cuerpo, ¿y dónde, si no, se va a acostar? Si grita a mí, yo lo escucharé, porque yo soy compasivo.»", "salmo_cita": "Sal 17,2", "salmo_antifona": "Yo te amo, Señor; tú eres mi fortaleza", "salmo_texto": "Yo te amo, Señor;\n\ntú eres mi fortaleza;\n\nSeñor, mi roca,\n\nmi alcázar, mi libertador.\nDios mío, peña mía, refugio mío, escudo mío,\n\nmi fuerza salvadora, mi baluarte.\n\nInvoco al Señor de mi alabanza\n\ny quedo libre de mis enemigos.\nViva el Señor, bendita sea mi Roca,\n\nsea ensalzado mi Dios y Salvador.\n\nTú diste gran victoria a tu rey,\n\ntuviste misericordia de tu Ungido.", "segunda_lectura_cita": "1,5c-10", "segunda_lectura_texto": "Sabéis cuál fue nuestra actuación entre vosotros para vuestro bien. Y vosotros seguisteis nuestro ejemplo y el del Señor, acogiendo la palabra entre tanta lucha con la alegría del Espíritu Santo. Así llegasteis a ser un modelo para todos los creyentes de Macedonia y de Acaya. Desde vuestra Iglesia, la palabra del Señor ha resonado no sólo en Macedonia y en Acaya, sino en todas partes. Vuestra fe en Dios había corrido de boca en boca, de modo que nosotros no teníamos necesidad de explicar nada, ya que ellos mismos cuentan los detalles de la acogida que nos hicisteis: cómo, abandonando los ídolos, os volvisteis a Dios, para servir al Dios vivo y verdadero, y vivir aguardando la vuelta de su Hijo Jesús desde el cielo, a quien ha resucitado de entre los muertos y que nos libra del castigo futuro.", "evangelio_cita": "Mt 22,34-40", "evangelio_texto": "En aquel tiempo, los fariseos, al oír que Jesús había hecho callar a los saduceos, formaron grupo, y uno de ellos, que era experto en la Ley, le preguntó para ponerlo a prueba: «Maestro, ¿cuál es el mandamiento principal de la Ley?»Él le dijo: «»Amarás al Señor, tu Dios, con todo tu corazón, con toda tu alma, con todo tu ser.» Este mandamiento es el principal y primero. El segundo es semejante a él: «Amarás a tu prójimo como a ti mismo.» Estos dos mandamientos sostienen la Ley entera y los profetas.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXX Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "HOY COMO AYER", "score": 0.406, "temas_comunes": ["esperanza", "servicio"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "MAGNIFICAT (Hna Glenda)", "score": 0.666, "temas_comunes": ["perdon", "espiritu", "alabanza"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 93, "titulo": "NO PREGUNTÉIS PORQUÉ", "score": 0.506, "temas_comunes": ["perdon", "servicio", "alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "SOIS LA SAL", "score": 0.309, "temas_comunes": ["servicio"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 16, "titulo": "JESÚS RESUCITA HOY", "score": 0.301, "temas_comunes": ["espiritu", "fe", "esperanza"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "QUE TE PUEDO DAR", "score": 0.621, "temas_comunes": ["servicio"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "MAGNIFICAT (Marcelo)", "score": 0.469, "temas_comunes": ["espiritu", "alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "COMO EL PADRE ME AMÓ", "momento_liturgico": "padre_nuestro", "score": 0.0}, "Paz": {"cancion_id": 76, "titulo": "ORACIÓN DEL  POBRE", "score": 0.638, "temas_comunes": ["perdon", "servicio", "espiritu", "fe"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 21, "titulo": "EL ALMA QUE ANDA EN AMOR", "momento_liturgico": "comunion", "score": 0.0}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 85, "titulo": "COMO CORRE UN RÍO", "score": 0.152, "temas_comunes": ["espiritu", "alabanza"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 93, "salmo": null, "aleluya": 16, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 21, "maria": 2, "despedida": 85}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-25_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-25_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-25_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-25_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-20 23:29:37','2026-10-21T00:12:28.637578+00:00','2026-10-21T00:12:28.636918+00:00',NULL);
+INSERT INTO "workflow_runs" VALUES(17,'2026-10-04','generate_assets','generate_assets','{"fecha": "2026-10-04", "lecturas": {"fecha": "2026-10-04", "fuente": "ciudadredonda", "fecha_scraping": "2026-09-28T13:19:03.889115", "celebracion": "XXVII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Lectura del libro de Isaías 5,1-7", "primera_lectura_texto": "Voy a cantar en nombre de mi amigo un canto de amor a su viña. Mi amigo tenía una viña en fértil collado. La entrecavó, la descantó, y plantó buenas cepas; construyó en medio una atalaya y cavó un lagar. Y esperó que diese uvas, pero dio agrazones. Pues ahora, habitantes de Jerusalén, hombres de Judá, por favor, sed jueces entre mí y mi viña. ¿Qué más cabía hacer por mi viña que yo no lo haya hecho? ¿Por qué, esperando que diera uvas, dio agrazones? Pues ahora os diré a vosotros lo que voy a hacer con mi viña: quitar su valla para que sirva de pasto, derruir su tapia para que la pisoteen. La dejaré arrasada: no la podarán ni la escardarán, crecerán zarzas y cardos; prohibiré a las nubes que lluevan sobre ella. La viña del Señor de los ejércitos es la casa de Israel; son los hombres de Judá su plantel preferido. Esperó de ellos derecho, y ahí tenéis: asesinatos; esperó justicia, y ahí tenéis: lamentos.", "salmo_cita": "Sal 79,9.12.13-14.15-16.19-20", "salmo_antifona": "La viña del Señor es la casa de Israel", "salmo_texto": "Sacaste una vid de Egipto,\n\nexpulsaste a los gentiles, y la trasplantaste.\n\nExtendió sus sarmientos hasta el mar,\n\ny sus brotes hasta el Gran Río.\n¿Por qué has derribado su cerca\n\npara que la saqueen los viandantes,\n\nla pisoteen los jabalíes\n\ny se la coman las alimañas?\nDios de los ejércitos, vuélvete:\n\nmira desde el cielo, fíjate,\n\nven a visitar tu viña,\n\nla cepa que tu diestra plantó\n\ny que tú hiciste vigorosa.\nNo nos alejaremos de ti:\n\ndanos vida, para que invoquemos tu nombre.\n\nSeñor, Dios de los ejércitos,\n\nrestáuranos, que brille tu rostro y nos salve.", "segunda_lectura_cita": "Lectura de la carta del apóstol san Pablo a los Filipenses (4,6-9):", "segunda_lectura_texto": "Nada os preocupe; sino que, en toda ocasión, en la oración y súplica con acción de gracias, vuestras peticiones sean presentadas a Dios. Y la paz de Dios, que sobrepasa todo juicio, custodiará vuestros corazones y vuestros pensamientos en Cristo Jesús. Finalmente, hermanos, todo lo que es verdadero, noble, justo, puro, amable, laudable, todo lo que es virtud o mérito, tenedlo en cuenta. Y lo que aprendisteis, recibisteis, oísteis, visteis en mí, ponedlo por obra. Y el Dios de la paz estará con vosotros.", "evangelio_cita": "Lectura del santo evangelio según san Mateo (21,33-43):", "evangelio_texto": "En aquel tiempo, dijo Jesús a los sumos sacerdotes y a los ancianos del pueblo: «Escuchad otra parábola: Había un propietario que plantó una viña, la rodeó con una cerca, cavó en ella un lagar, construyó la casa del guarda, la arrendó a unos labradores y se marchó de viaje. Llegado el tiempo de la vendimia, envió sus criados a los labradores, para percibir los frutos que le correspondían. Pero los labradores, agarrando a los criados, apalearon a uno, mataron a otro, y a otro lo apedrearon. Envió de nuevo otros criados, más que la primera vez, e hicieron con ellos lo mismo. Por último les mandó a su hijo, diciéndose: «Tendrán respeto a mi hijo.» Pero los labradores, al ver al hijo, se dijeron: «Éste es el heredero, venid, lo matamos y nos quedamos con su herencia.» Y, agarrándolo, lo empujaron fuera de la viña y lo mataron. Y ahora, cuando vuelva el dueño de la viña, ¿qué hará con aquellos labradores?»Le contestaron: «Hará morir de mala muerte a esos malvados y arrendará la viña a otros labradores, que le entreguen los frutos a sus tiempos.»Y Jesús les dice: «¿No habéis leído nunca en la Escritura: «La piedra que desecharon los arquitectos es ahora la piedra angular. Es el Señor quien lo ha hecho, ha sido un milagro patente?» Por eso os digo que se os quitará a vosotros el reino de Dios y se dará a un pueblo que produzca sus frutos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "domingo": "", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 44, "titulo": "ALMA MISIONERA", "score": 0.579, "temas_comunes": ["agua", "amor", "camino", "esperanza"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "COMO TUS BRAZOS", "score": 0.582, "temas_comunes": ["paz", "camino", "amor"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 13, "titulo": "NUNC DIMITIS", "score": 0.832, "temas_comunes": ["paz", "alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": 91, "titulo": "VOSOTROS SERÉIS MI PUEBLO", "score": 0.598, "temas_comunes": ["paz", "amor", "esperanza", "camino"], "momento_liturgico": "general"}, "Aleluya": {"cancion_id": 15, "titulo": "CRISTO VIVE, ANÚNCIALO", "score": 0.76, "temas_comunes": ["paz", "amor", "camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 82, "titulo": "PADRE NUESTRO SIMON Y GARFUNKEL", "score": 0.723, "temas_comunes": ["paz", "amor", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 89, "titulo": "QUIERO HACER LO MISMO", "score": 0.44, "temas_comunes": ["camino", "amor", "alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PADRE NUESTRO (Gallego)", "score": 0.723, "temas_comunes": ["paz", "camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 51, "titulo": "PAZ, SEÑOR (Palomas)", "score": 0.933, "temas_comunes": ["paz", "amor", "camino", "esperanza"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 18, "titulo": "LUCHARÉ POR TI", "score": 0.412, "temas_comunes": ["amor", "camino", "agua"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "ALABO TU BONDAD", "score": 0.513, "temas_comunes": ["paz", "alabanza", "amor"], "momento_liturgico": "general"}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.452, "temas_comunes": ["agua", "alabanza"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 44, "perdon": null, "gloria": 13, "salmo": 91, "aleluya": 15, "ofertorio": 82, "santo": 89, "padre_nuestro": null, "paz": 51, "comunion": 18, "maria": 2, "despedida": 20}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-04_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-04_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-04_fieles.pdf", "pdf_musicos": null}, "publicado": true}','rafael.torres','2026-09-28 11:18:52','2026-09-28T16:51:31.249671+00:00','2026-09-28T14:24:23.353991+00:00',NULL);
+INSERT INTO "workflow_runs" VALUES(18,'2026-10-11','superseded','verify_songs','{"fecha": "2026-10-11", "lecturas": {"fecha": "2026-10-11", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-07T15:11:29.049328", "celebracion": "XXVIII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 25,6-10a", "primera_lectura_texto": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»", "salmo_cita": "Sal 22, 1", "salmo_antifona": "Habitaré en la casa del Señor", "salmo_texto": "El Señor es mi pastor, nada me falta:\n\nen verdes praderas me hace recostar;\n\nme conduce hacia fuentes tranquilas\n\ny repara mis fuerzas.\nMe guía por el sendero justo,\n\npor el honor de su nombre.\n\nAunque camine por cañadas oscuras,\n\nnada temo, porque tú vas conmigo:\n\ntu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí,\n\nenfrente de mis enemigos;\n\nme unges la cabeza con perfume,\n\ny mi copa rebosa.\nTu bondad y tu misericordia me acompañan\n\ntodos los días de mi vida,\n\ny habitaré en la casa del Señor\n\npor años sin término.", "segunda_lectura_cita": "Flp 4,12-14.19-20", "segunda_lectura_texto": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.", "evangelio_cita": "Mt 22,1-14", "evangelio_texto": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXVIII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": null, "titulo": "VEN JESÚS", "score": 0.72, "temas_comunes": ["camino", "pan"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "PADRE NUESTRO DEL CIELO", "score": 0.675, "temas_comunes": ["pan", "perdon"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": null, "titulo": "EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS (KAIROI)", "score": 0.649, "temas_comunes": ["espiritu", "salvacion", "camino", "alabanza", "esperanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.524, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": null, "titulo": "ESCUCHA, TÚ", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": null, "titulo": "TOMA MI VIDA", "score": 0.702, "temas_comunes": ["pan", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": null, "titulo": "SANTO (I)", "score": 0.524, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": null, "titulo": "ORACIÓN DEL  POBRE", "score": 0.438, "temas_comunes": ["perdon", "camino", "espiritu"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": null, "titulo": "LUCHARÉ POR TI", "score": 0.388, "temas_comunes": ["camino", "salvacion"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": null, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": null, "titulo": "COMO CORRE UN RÍO", "score": 0.166, "temas_comunes": ["alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": null, "perdon": null, "gloria": null, "salmo": null, "aleluya": null, "ofertorio": null, "santo": null, "padre_nuestro": null, "paz": null, "comunion": null, "maria": null, "despedida": null}}','rafael.torres','2026-10-07 13:09:13','2026-10-07T13:35:23.525420+00:00',NULL,19);
+INSERT INTO "workflow_runs" VALUES(19,'2026-10-11','superseded','verify_songs','{"fecha": "2026-10-11", "lecturas": {"fecha": "2026-10-11", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-07T15:37:22.819721", "celebracion": "XXVIII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 25,6-10a", "primera_lectura_texto": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»", "salmo_cita": "Sal 22, 1", "salmo_antifona": "Habitaré en la casa del Señor", "salmo_texto": "El Señor es mi pastor, nada me falta:\n\nen verdes praderas me hace recostar;\n\nme conduce hacia fuentes tranquilas\n\ny repara mis fuerzas.\nMe guía por el sendero justo,\n\npor el honor de su nombre.\n\nAunque camine por cañadas oscuras,\n\nnada temo, porque tú vas conmigo:\n\ntu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí,\n\nenfrente de mis enemigos;\n\nme unges la cabeza con perfume,\n\ny mi copa rebosa.\nTu bondad y tu misericordia me acompañan\n\ntodos los días de mi vida,\n\ny habitaré en la casa del Señor\n\npor años sin término.", "segunda_lectura_cita": "Flp 4,12-14.19-20", "segunda_lectura_texto": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.", "evangelio_cita": "Mt 22,1-14", "evangelio_texto": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXVIII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 102, "titulo": "VEN JESÚS", "score": 0.72, "temas_comunes": ["camino", "pan"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": 75, "titulo": "PADRE NUESTRO DEL CIELO", "score": 0.675, "temas_comunes": ["pan", "perdon"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 5, "titulo": "EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS (KAIROI)", "score": 0.649, "temas_comunes": ["espiritu", "salvacion", "camino", "alabanza", "esperanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": 105, "titulo": "YA DE MAÑANA", "score": 0.524, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 38, "titulo": "ESCUCHA, TÚ", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "TOMA MI VIDA", "score": 0.702, "temas_comunes": ["pan", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 86, "titulo": "SANTO (I)", "score": 0.524, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": 80, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 69, "titulo": "ORACIÓN DEL  POBRE", "score": 0.438, "temas_comunes": ["perdon", "camino", "espiritu"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 54, "titulo": "LUCHARÉ POR TI", "score": 0.388, "temas_comunes": ["camino", "salvacion"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.166, "temas_comunes": ["alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": null, "perdon": null, "gloria": null, "salmo": null, "aleluya": null, "ofertorio": null, "santo": null, "padre_nuestro": null, "paz": null, "comunion": null, "maria": null, "despedida": null}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-11_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-07 13:35:23','2026-10-07T14:32:51.590899+00:00',NULL,20);
+INSERT INTO "workflow_runs" VALUES(20,'2026-10-11','done','done','{"fecha": "2026-10-11", "lecturas": {"fecha": "2026-10-11", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-10T12:23:48.388405", "celebracion": "XXVIII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 25,6-10a", "primera_lectura_texto": "Aquel día, el Señor de los ejércitos preparará para todos los pueblos, en este monte, un festín de manjares suculentos, un festín de vinos de solera; manjares enjundiosos, vinos generosos. Y arrancará en este monte el velo que cubre a todos los pueblos, el paño que tapa a todas las naciones. Aniquilará la muerte para siempre. El Señor Dios enjugará las lágrimas de todos los rostros, y el oprobio de su pueblo lo alejará de todo el país. Lo ha dicho el Señor. Aquel día se dirá: «Aquí está nuestro Dios, de quien esperábamos que nos salvara; celebremos y gocemos con su salvación. La mano del Señor se posará sobre este monte.»", "salmo_cita": "Sal 22, 1", "salmo_antifona": "Habitaré en la casa del Señor", "salmo_texto": "El Señor es mi pastor, nada me falta:\n\nen verdes praderas me hace recostar;\n\nme conduce hacia fuentes tranquilas\n\ny repara mis fuerzas.\nMe guía por el sendero justo,\n\npor el honor de su nombre.\n\nAunque camine por cañadas oscuras,\n\nnada temo, porque tú vas conmigo:\n\ntu vara y tu cayado me sosiegan.\nPreparas una mesa ante mí,\n\nenfrente de mis enemigos;\n\nme unges la cabeza con perfume,\n\ny mi copa rebosa.\nTu bondad y tu misericordia me acompañan\n\ntodos los días de mi vida,\n\ny habitaré en la casa del Señor\n\npor años sin término.", "segunda_lectura_cita": "Flp 4,12-14.19-20", "segunda_lectura_texto": "Sé vivir en pobreza y abundancia. Estoy entrenado para todo y en todo: la hartura y el hambre, la abundancia y la privación. Todo lo puedo en aquel que me conforta. En todo caso, hicisteis bien en compartir mi tribulación. En pago, mi Dios proveerá a todas vuestras necesidades con magnificencia, conforme a su espléndida riqueza en Cristo Jesús. A Dios, nuestro Padre, la gloria por los siglos de los siglos. Amén.", "evangelio_cita": "Mt 22,1-14", "evangelio_texto": "En aquel tiempo, de nuevo tomó Jesús la palabra y habló en parábolas a los sumos sacerdotes y a los ancianos del pueblo: «El reino de los cielos se parece a un rey que celebraba la boda de su hijo. Mandó criados para que avisaran a los convidados a la boda, pero no quisieron ir. Volvió a mandar criados, encargándoles que les dijeran: «Tengo preparado el banquete, he matado terneros y reses cebadas, y todo está a punto. Venid a la boda.» Los convidados no hicieron caso; uno se marchó a sus tierras, otro a sus negocios; los demás les echaron mano a los criados y los maltrataron hasta matarlos. El rey montó en cólera, envió sus tropas, que acabaron con aquellos asesinos y prendieron fuego a la ciudad. Luego dijo a sus criados: «La boda está preparada, pero los convidados no se la merecían. Id ahora a los cruces de los caminos, y a todos los que encontréis, convidadlos a la boda.» Los criados salieron a los caminos y reunieron a todos los que encontraron, malos y buenos. La sala del banquete se llenó de comensales. Cuando el rey entró a saludar a los comensales, reparó en uno que no llevaba traje de fiesta y le dijo: «Amigo, ¿cómo has entrado aquí sin vestirte de fiesta?» El otro no abrió la boca. Entonces el rey dijo a los camareros: «Atadlo de pies y manos y arrojadlo fuera, a las tinieblas. Allí será el llanto y el rechinar de dientes.» Porque muchos son los llamados y pocos los escogidos.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXVIII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "VEN JESÚS", "score": 0.72, "temas_comunes": ["camino", "pan"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "PADRE NUESTRO DEL CIELO", "score": 0.675, "temas_comunes": ["pan", "perdon"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 9, "titulo": "EL ESPÍRITU DEL SEÑOR, PENTECOSTÉS (KAIROI)", "score": 0.649, "temas_comunes": ["espiritu", "salvacion", "alabanza", "camino", "esperanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.524, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 16, "titulo": "ESCUCHA, TÚ", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "TOMA MI VIDA", "score": 0.702, "temas_comunes": ["pan", "camino"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "SANTO (I)", "score": 0.524, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.468, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "ORACIÓN DEL  POBRE", "score": 0.438, "temas_comunes": ["perdon", "camino", "espiritu"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 109, "titulo": "LUCHARÉ POR TI", "score": 0.388, "temas_comunes": ["camino", "salvacion"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.166, "temas_comunes": ["alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 9, "salmo": null, "aleluya": 16, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 109, "maria": 2, "despedida": 20}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-11_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-11_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-07 14:32:51','2026-10-10T10:25:58.652552+00:00','2026-10-10T10:25:58.651900+00:00',NULL);
+INSERT INTO "workflow_runs" VALUES(21,'2026-10-18','done','done','{"fecha": "2026-10-18", "lecturas": {"fecha": "2026-10-18", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-18T01:59:02.904772", "celebracion": "XXIX Domingo del Tiempo Ordinario", "primera_lectura_cita": "Is 45,1.4-6", "primera_lectura_texto": "Así dice el Señor a su Ungido, a Ciro, a quien lleva de la mano: «Doblegaré ante él las naciones, desceñiré las cinturas de los reyes, abriré ante él las puertas, los batientes no se le cerrarán. Por mi siervo Jacob, por mi escogido Israel, te llamé por tu nombre, te di un título, aunque no me conocías. Yo soy el Señor y no hay otro; fuera de mí, no hay dios. Te pongo la insignia, aunque no me conoces, para que sepan de Oriente a Occidente que no hay otro fuera de mí. Yo soy el Señor, y no hay otro.»", "salmo_cita": "Sal 95,1", "salmo_antifona": "Aclamad la gloria y el poder del Señor", "salmo_texto": "Cantad al Señor un cántico nuevo,\n\ncantad al Señor, toda la tierra.\n\nContad a los pueblos su gloria,\n\nsus maravillas a todas las naciones.\nPorque es grande el Señor,\n\ny muy digno de alabanza,\n\nmás temible que todos los dioses.\n\nPues los dioses de los gentiles son apariencia,\n\nmientras que el Señor ha hecho el cielo.\nFamilias de los pueblos, aclamad al Señor,\n\naclamad la gloria y el poder del Señor,\n\naclamad la gloria del nombre del Señor,\n\nentrad en sus atrios trayéndole ofrendas.\nPostraos ante el Señor en el atrio sagrado,\n\ntiemble en su presencia la tierra toda;\n\ndecid a los pueblos: «El Señor es rey,\n\nél gobierna a los pueblos rectamente.»", "segunda_lectura_cita": "Tes 1,1-5b", "segunda_lectura_texto": "Pablo, Silvano y Tirnoteo a la Iglesia de los tesalonicenses, en Dios Padre y en el Señor Jesucristo. A vosotros, gracia y paz. Siempre damos gracias a Dios por todos vosotros y os tenemos presentes en nuestras oraciones. Ante Dios, nuestro Padre, recordarnos sin cesar la actividad de vuestra fe, el esfuerzo de vuestro amor y el aguante de vuestra esperanza en Jesucristo, nuestro Señor. Bien sabemos, hermanos amados de Dios, que él os ha elegido y que, cuando se proclamó el Evangelio entre vosotros, no hubo sólo palabras, sino además fuerza del Espíritu Santo y convicción profunda.", "evangelio_cita": "Mt 22,15-21", "evangelio_texto": "En aquel tiempo, se retiraron los fariseos y llegaron a un acuerdo para comprometer a Jesús con una pregunta.Le enviaron unos discípulos, con unos partidarios de Herodes, y le dijeron: «Maestro, sabemos que eres sincero y que enseñas el camino de Dios conforme a la verdad; sin que te importe nadie, porque no miras lo que la gente sea. Dinos, pues, qué opinas: ¿es licito pagar impuesto al César o no?»Comprendiendo su mala voluntad, les dijo Jesús: «Hipócritas, ¿por qué me tentáis? Enseñadme la moneda del impuesto.»Le presentaron un denario. Él les preguntó: «¿De quién son esta cara y esta inscripción?»Le respondieron: «Del César.»Entonces les replicó: «Pues pagadle al César lo que es del César y a Dios lo que es de Dios.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXIX Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 44, "titulo": "HAY ÁNGELES DE DIOS", "score": 0.751, "temas_comunes": ["alabanza"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "COMO TUS BRAZOS", "score": 0.539, "temas_comunes": ["camino", "paz", "espiritu", "amor"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 13, "titulo": "GLORIA DE NAZARET", "score": 0.844, "temas_comunes": ["alabanza", "paz", "espiritu"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.375, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 15, "titulo": "JESÚS RESUCITA HOY", "score": 0.707, "temas_comunes": ["camino", "amor", "paz", "fe", "esperanza", "espiritu"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "PADRE NUESTRO DE LA VIDA", "score": 0.568, "temas_comunes": ["camino", "paz", "fe", "amor"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "SANTO (I)", "score": 0.751, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PADRE NUESTRO (Gallego)", "score": 0.496, "temas_comunes": ["paz", "camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "PON UN POCO DE PAZ", "score": 0.653, "temas_comunes": ["paz", "fe", "camino", "amor"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 95, "titulo": "TODO MI SER", "score": 0.406, "temas_comunes": ["camino", "amor"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 85, "titulo": "QUIERO VIVIR AMANDO", "score": 0.21, "temas_comunes": ["amor", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 44, "perdon": null, "gloria": 13, "salmo": null, "aleluya": 15, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 95, "maria": 2, "despedida": 85}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-18_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-18_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-14 22:30:49','2026-10-18T00:38:42.985680+00:00','2026-10-18T00:38:42.985038+00:00',NULL);
+INSERT INTO "workflow_runs" VALUES(22,'2026-10-25','done','done','{"fecha": "2026-10-25", "lecturas": {"fecha": "2026-10-25", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-21T01:31:10.621828", "celebracion": "XXX Domingo del Tiempo Ordinario", "primera_lectura_cita": "Ex 22,20-26", "primera_lectura_texto": "Así dice el Señor: «No oprimirás ni vejarás al forastero, porque forasteros fuisteis vosotros en Egipto. No explotarás a viudas ni a huérfanos, porque, si los explotas y ellos gritan a mí, yo los escucharé. Se encenderá mi ira y os haré morir a espada, dejando a vuestras mujeres viudas y a vuestros hijos huérfanos. Si prestas dinero a uno de mi pueblo, a un pobre que habita contigo, no serás con él un usurero, cargándole intereses. Si tomas en prenda el manto de tu prójimo, se lo devolverás antes de ponerse el sol, porque no tiene otro vestido para cubrir su cuerpo, ¿y dónde, si no, se va a acostar? Si grita a mí, yo lo escucharé, porque yo soy compasivo.»", "salmo_cita": "Sal 17,2", "salmo_antifona": "Yo te amo, Señor; tú eres mi fortaleza", "salmo_texto": "Yo te amo, Señor;\n\ntú eres mi fortaleza;\n\nSeñor, mi roca,\n\nmi alcázar, mi libertador.\nDios mío, peña mía, refugio mío, escudo mío,\n\nmi fuerza salvadora, mi baluarte.\n\nInvoco al Señor de mi alabanza\n\ny quedo libre de mis enemigos.\nViva el Señor, bendita sea mi Roca,\n\nsea ensalzado mi Dios y Salvador.\n\nTú diste gran victoria a tu rey,\n\ntuviste misericordia de tu Ungido.", "segunda_lectura_cita": "1,5c-10", "segunda_lectura_texto": "Sabéis cuál fue nuestra actuación entre vosotros para vuestro bien. Y vosotros seguisteis nuestro ejemplo y el del Señor, acogiendo la palabra entre tanta lucha con la alegría del Espíritu Santo. Así llegasteis a ser un modelo para todos los creyentes de Macedonia y de Acaya. Desde vuestra Iglesia, la palabra del Señor ha resonado no sólo en Macedonia y en Acaya, sino en todas partes. Vuestra fe en Dios había corrido de boca en boca, de modo que nosotros no teníamos necesidad de explicar nada, ya que ellos mismos cuentan los detalles de la acogida que nos hicisteis: cómo, abandonando los ídolos, os volvisteis a Dios, para servir al Dios vivo y verdadero, y vivir aguardando la vuelta de su Hijo Jesús desde el cielo, a quien ha resucitado de entre los muertos y que nos libra del castigo futuro.", "evangelio_cita": "Mt 22,34-40", "evangelio_texto": "En aquel tiempo, los fariseos, al oír que Jesús había hecho callar a los saduceos, formaron grupo, y uno de ellos, que era experto en la Ley, le preguntó para ponerlo a prueba: «Maestro, ¿cuál es el mandamiento principal de la Ley?»Él le dijo: «»Amarás al Señor, tu Dios, con todo tu corazón, con toda tu alma, con todo tu ser.» Este mandamiento es el principal y primero. El segundo es semejante a él: «Amarás a tu prójimo como a ti mismo.» Estos dos mandamientos sostienen la Ley entera y los profetas.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXX Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "HOY COMO AYER", "score": 0.406, "temas_comunes": ["esperanza", "servicio"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "MAGNIFICAT (Hna Glenda)", "score": 0.666, "temas_comunes": ["perdon", "espiritu", "alabanza"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 93, "titulo": "NO PREGUNTÉIS PORQUÉ", "score": 0.506, "temas_comunes": ["perdon", "servicio", "alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "SOIS LA SAL", "score": 0.309, "temas_comunes": ["servicio"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 16, "titulo": "JESÚS RESUCITA HOY", "score": 0.301, "temas_comunes": ["espiritu", "fe", "esperanza"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "QUE TE PUEDO DAR", "score": 0.621, "temas_comunes": ["servicio"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "MAGNIFICAT (Marcelo)", "score": 0.469, "temas_comunes": ["espiritu", "alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "COMO EL PADRE ME AMÓ", "momento_liturgico": "padre_nuestro", "score": 0.0}, "Paz": {"cancion_id": 76, "titulo": "ORACIÓN DEL  POBRE", "score": 0.638, "temas_comunes": ["perdon", "servicio", "espiritu", "fe"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 21, "titulo": "EL ALMA QUE ANDA EN AMOR", "momento_liturgico": "comunion", "score": 0.0}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 85, "titulo": "COMO CORRE UN RÍO", "score": 0.152, "temas_comunes": ["espiritu", "alabanza"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 93, "salmo": null, "aleluya": 16, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 21, "maria": 2, "despedida": 85}, "assets": {"bundle_dir": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-10-25_presentacion", "pptx": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-25_celebracion.pptx", "pdf_fieles": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-25_fieles.pdf", "pdf_musicos": "/home/pciath/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-10-25_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-20 23:29:37','2026-10-21T00:12:28.637578+00:00','2026-10-21T00:12:28.636918+00:00',NULL);
 INSERT INTO "workflow_runs" VALUES(23,'2026-11-01','done','done','{"fecha": "2026-11-01", "lecturas": {"fecha": "2026-11-01", "fuente": "ciudadredonda", "fecha_scraping": "2026-10-26T20:01:50.257254", "celebracion": "Todos los Santos", "primera_lectura_cita": "Ap 7,2-4.9-14", "primera_lectura_texto": "Yo, Juan, vi a otro Ángel que subía del Oriente y tenía el sello de Dios vivo; y gritó con fuerte voz a los cuatro Ángeles a quienes había encomendado causar daño a la tierra y al mar: «No causéis daño ni a la tierra ni al mar ni a los árboles, hasta que marquemos con el sello la frente de los siervos de nuestro Dios.»Y oí el número de los marcados con el sello: ciento cuarenta y cuatro mil sellados, de todas las tribus de los hijos de Israel. Después miré y había una muchedumbre inmensa, que nadie podría contar, de toda nación, razas, pueblos y lenguas, de pie delante del trono y el Cordero, vestidos con vestiduras blancas y con palmas en sus manos.Y gritan con fuerte voz: «La salvación es de nuestro Dios, que está sentado en el trono, y del Cordero.»Y todos los Ángeles que estaban en pie alrededor del trono de los Ancianos y de los cuatro Vivientes, se postraron delante del trono, rostro en tierra, y adoraron a Dios diciendo: «Amén, alabanza, gloria, sabiduría, acción de gracias, honor, poder y fuerza, a nuestro Dios por los siglos de los siglos, amén.»Uno de los Ancianos tomó la palabra y me dijo: «Esos que están vestidos con vestiduras blancas quiénes son y de dónde han venido?»Yo le respondí: «Señor mío, tú lo sabrás.»Me respondió: «Esos son los que vienen de la gran tribulación; han lavado sus vestiduras y las han blanqueado con la Sangre del Cordero.»", "salmo_cita": "Sal 23,1", "salmo_antifona": "Este es el grupo que viene a tu presencia, Señor", "salmo_texto": "Del Señor es la tierra y cuanto la llena,\n\nel orbe y todos sus habitantes:\n\nél la fundó sobre los mares,\n\nél la afianzó sobre los ríos.\nQuién puede subir al monte del Señor?\n\nQuién puede estar en el recinto sacro?\n\nEl hombre de manos inocentes y puro corazón,\n\nque no confía en los ídolos.\nÉse recibirá la bendición del Señor,\n\nle hará justicia el Dios de salvación.\n\nÉste es el grupo que busca al Señor,\n\nque viene a tu presencia, Dios de Jacob.", "segunda_lectura_cita": "Jn 3,1-3", "segunda_lectura_texto": "Mirad qué amor nos ha tenido el Padre para llamarnos hijos de Dios, pues ¡lo somos! El mundo no nos conoce porque no le conoció a él. Queridos, ahora somos hijos de Dios y aún no se ha manifestado lo que seremos. Sabemos que, cuando se manifieste, seremos semejantes a él porque le veremos tal cual es. Todo el que tiene esta esperanza en él se purificará a sí mismo, como él es puro.", "evangelio_cita": "Mt 5,1-12", "evangelio_texto": "Viendo la muchedumbre, subió al monte, se sentó, y sus discípulos se le acercaron. Y tomando la palabra, les enseñaba diciendo: «Bienaventurados los pobres de espíritu, porque de ellos es el Reino de los Cielos. Bienaventurados los mansos, porque ellos poseerán en herencia la tierra. Bienaventurados los que lloran, porque ellos serán consolados. Bienaventurados los que tienen hambre y sed de justicia, porque ellos serán saciados. Bienaventurados los misericordiosos, porque ellos alcanzarán misericordia. Bienaventurados los limpios de corazón, porque ellos verán a Dios. Bienaventurados los que trabajan por la paz, porque ellos serán llamados hijos de Dios. Bienaventurados los perseguidos por causa de la justicia, porque de ellos es el Reino de los Cielos. Bienaventurados seréis cuando os injurien, y os persigan y digan con mentira toda clase de mal contra vosotros por mi causa. Alegraos y regocijaos, porque vuestra recompensa será grande en los cielos; pues de la misma manera persiguieron a los profetas anteriores a vosotros.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "Todos los Santos", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "ESTAMOS POR TI", "score": 0.396, "temas_comunes": ["paz", "amor"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "COMO TUS BRAZOS", "score": 0.491, "temas_comunes": ["paz", "espiritu", "amor"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 13, "titulo": "NUNC DIMITIS", "score": 0.836, "temas_comunes": ["paz", "alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "AQUÍ ESTOY, SEÑOR (SALMO 39)", "score": 0.404, "temas_comunes": ["salvacion", "esperanza"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 15, "titulo": "CRISTO VIVE, ANÚNCIALO", "score": 0.608, "temas_comunes": ["paz", "amor"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "PADRE NUESTRO SIMON Y GARFUNKEL", "score": 0.711, "temas_comunes": ["paz", "amor", "pan"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 90, "titulo": "SANTO (I)", "score": 0.373, "temas_comunes": ["alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PADRE NUESTRO (Gallego)", "score": 0.535, "temas_comunes": ["paz"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "PAZ, SEÑOR (Palomas)", "score": 0.846, "temas_comunes": ["paz", "amor", "esperanza"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 24, "titulo": "LUCHARÉ POR TI", "score": 0.418, "temas_comunes": ["salvacion", "amor", "agua"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 22, "titulo": "COMO CORRE UN RÍO", "score": 0.261, "temas_comunes": ["agua", "alabanza", "espiritu"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 13, "salmo": null, "aleluya": 15, "ofertorio": 96, "santo": 90, "padre_nuestro": null, "paz": 76, "comunion": 24, "maria": 2, "despedida": 22}, "assets": {"bundle_dir": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-11-01_presentacion", "pptx": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-01_celebracion.pptx", "pdf_fieles": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-01_fieles.pdf", "pdf_musicos": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-01_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-10-26 18:58:55','2026-10-28T16:17:51.027322+00:00','2026-10-28T16:17:51.026753+00:00',NULL);
-INSERT INTO "workflow_runs" VALUES(24,'2026-11-08','done','done','{"fecha": "2026-11-08", "lecturas": {"fecha": "2026-11-08", "fuente": "ciudadredonda", "fecha_scraping": "2026-11-06T17:19:29.624495", "celebracion": "l XXXII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Sab 6,12-16", "primera_lectura_texto": "La sabiduría es radiante e inmarcesible, la ven fácilmente los que la aman, y la encuentran los que la buscan; ella misma se da a conocer a los que la desean. Quien madruga por ella no se cansa: la encuentra sentada a la puerta. Meditar en ella es prudencia consumada, el que vela por ella pronto se ve libre de preocupaciones; ella misma va de un lado a otro buscando a los que la merecen; los aborda benigna por los caminos y les sale al paso en cada pensamiento.", "salmo_cita": "", "salmo_antifona": "", "salmo_texto": "Sal 62,2.3-4.5-6.7-8\n\nR/.Mi alma está sedienta de ti, Señor, Dios mío\nOh Dios, tú eres mi Dios, por ti madrugo,\n\nmi alma está sedienta de ti;\n\nmi carne tiene ansía de ti,\n\ncomo tierra reseca, agostada, sin agua.\n¡Cómo te contemplaba en el santuario\n\nviendo tu fuerza y tu gloria!\n\nTu gracia vale más que la vida,\n\nte alabarán mis labios.\nToda mi vida te bendeciré\n\ny alzaré las manos invocándote.\n\nMe saciaré como de enjundia y de manteca,\n\ny mis labios te alabarán jubilosos.\nEn el lecho me acuerdo de ti\n\ny velando medito en ti,\n\nporque fuiste mi auxilio,\n\ny a la sombra de tus alas\n\ncanto con júbilo.", "segunda_lectura_cita": "4,13-17", "segunda_lectura_texto": "No queremos que ignoréis la suerte de los difuntos para que no os aflijáis como los hombres sin esperanza. Pues si creemos que Jesús ha muerto y resucitado, del mismo modo, a los que han muerto, Dios, por medio de Jesús, los llevará con él. Esto es lo que os decimos como palabra del Señor: Nosotros, los que vivimos y quedamos para cuando venga el Señor, no aventajaremos a los difuntos. Pues él mismo, el Señor, cuando se dé la orden, a la voz del arcángel y al son de la trompeta divina, descenderá del cielo, y los muertos en Cristo resucitarán en primer lugar. Después nosotros, los que aún vivimos, seremos arrebatados con ellos en la nube, al encuentro del Señor, en el aire. Y así estaremos siempre con el Señor. Consolaos, pues, mutuamente con estas palabras.", "evangelio_cita": "Mt 25,1-13", "evangelio_texto": "En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «Se parecerá el reino de los cielos a diez doncellas que tomaron sus lámparas y salieron a esperar al esposo. Cinco de ellas eran necias y cinco eran sensatas. Las necias, al tomar las lámparas, se dejaron el aceite; en cambio, las sensatas se llevaron alcuzas de aceite con las lámparas. El esposo tardaba, les entró sueño a todas y se durmieron. A medianoche se oyó una voz: «¡Que llega el esposo, salid a recibirlo!» Entonces se despertaron todas aquellas doncellas y se pusieron a preparar sus lámparas. Y las necias dijeron a las sensatas: «Dadnos un poco de vuestro aceite, que se nos apagan las lámparas.» Pero las sensatas contestaron: «Por si acaso no hay bastante para vosotras y nosotras, mejor es que vayáis a la tienda y os lo compréis.» Mientras iban a comprarlo, llegó el esposo, y las que estaban preparadas entraron con él al banquete de bodas, y se cerró la puerta. Más tarde llegaron también las otras doncellas, diciendo: «Señor, señor, ábrenos.» Pero él respondió: «Os lo aseguro: no os conozco.» Por tanto, velad, porque no sabéis el día ni la hora.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXXII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "PREPARAD EL CAMINO", "score": 0.8, "temas_comunes": ["camino"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "OTRA OPORTUNIDAD", "score": 0.714, "temas_comunes": ["camino"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 9, "titulo": "QUIERO ALABARTE", "score": 0.4, "temas_comunes": ["alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.8, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 15, "titulo": "ESCUCHA, TÚ", "score": 0.714, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "PADRE NUESTRO DE LA VIDA", "score": 0.619, "temas_comunes": ["camino", "fe"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 88, "titulo": "QUIERO HACER LO MISMO", "score": 0.691, "temas_comunes": ["camino", "alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.714, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "UNA NUEVA ESPERANZA", "score": 0.57, "temas_comunes": ["camino", "esperanza"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 95, "titulo": "TODO MI SER", "score": 0.573, "temas_comunes": ["camino"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.382, "temas_comunes": ["agua", "alabanza"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 9, "salmo": null, "aleluya": 15, "ofertorio": 96, "santo": 88, "padre_nuestro": null, "paz": 76, "comunion": 95, "maria": 2, "despedida": 20}, "assets": {"bundle_dir": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-11-08_presentacion", "pptx": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_celebracion.pptx", "pdf_fieles": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_fieles.pdf", "pdf_musicos": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-11-06 16:17:50','2026-11-06T16:24:41.617031+00:00','2026-11-06T16:24:41.616383+00:00',NULL);
+INSERT INTO "workflow_runs" VALUES(24,'2026-11-08','done','done','{"fecha": "2026-11-08", "lecturas": {"fecha": "2026-11-08", "fuente": "ciudadredonda", "fecha_scraping": "2026-11-06T17:19:29.624495", "celebracion": "XXXII Domingo del Tiempo Ordinario", "primera_lectura_cita": "Sab 6,12-16", "primera_lectura_texto": "La sabiduría es radiante e inmarcesible, la ven fácilmente los que la aman, y la encuentran los que la buscan; ella misma se da a conocer a los que la desean. Quien madruga por ella no se cansa: la encuentra sentada a la puerta. Meditar en ella es prudencia consumada, el que vela por ella pronto se ve libre de preocupaciones; ella misma va de un lado a otro buscando a los que la merecen; los aborda benigna por los caminos y les sale al paso en cada pensamiento.", "salmo_cita": "", "salmo_antifona": "", "salmo_texto": "Sal 62,2.3-4.5-6.7-8\n\nR/.Mi alma está sedienta de ti, Señor, Dios mío\nOh Dios, tú eres mi Dios, por ti madrugo,\n\nmi alma está sedienta de ti;\n\nmi carne tiene ansía de ti,\n\ncomo tierra reseca, agostada, sin agua.\n¡Cómo te contemplaba en el santuario\n\nviendo tu fuerza y tu gloria!\n\nTu gracia vale más que la vida,\n\nte alabarán mis labios.\nToda mi vida te bendeciré\n\ny alzaré las manos invocándote.\n\nMe saciaré como de enjundia y de manteca,\n\ny mis labios te alabarán jubilosos.\nEn el lecho me acuerdo de ti\n\ny velando medito en ti,\n\nporque fuiste mi auxilio,\n\ny a la sombra de tus alas\n\ncanto con júbilo.", "segunda_lectura_cita": "4,13-17", "segunda_lectura_texto": "No queremos que ignoréis la suerte de los difuntos para que no os aflijáis como los hombres sin esperanza. Pues si creemos que Jesús ha muerto y resucitado, del mismo modo, a los que han muerto, Dios, por medio de Jesús, los llevará con él. Esto es lo que os decimos como palabra del Señor: Nosotros, los que vivimos y quedamos para cuando venga el Señor, no aventajaremos a los difuntos. Pues él mismo, el Señor, cuando se dé la orden, a la voz del arcángel y al son de la trompeta divina, descenderá del cielo, y los muertos en Cristo resucitarán en primer lugar. Después nosotros, los que aún vivimos, seremos arrebatados con ellos en la nube, al encuentro del Señor, en el aire. Y así estaremos siempre con el Señor. Consolaos, pues, mutuamente con estas palabras.", "evangelio_cita": "Mt 25,1-13", "evangelio_texto": "En aquel tiempo, dijo Jesús a sus discípulos esta parábola: «Se parecerá el reino de los cielos a diez doncellas que tomaron sus lámparas y salieron a esperar al esposo. Cinco de ellas eran necias y cinco eran sensatas. Las necias, al tomar las lámparas, se dejaron el aceite; en cambio, las sensatas se llevaron alcuzas de aceite con las lámparas. El esposo tardaba, les entró sueño a todas y se durmieron. A medianoche se oyó una voz: «¡Que llega el esposo, salid a recibirlo!» Entonces se despertaron todas aquellas doncellas y se pusieron a preparar sus lámparas. Y las necias dijeron a las sensatas: «Dadnos un poco de vuestro aceite, que se nos apagan las lámparas.» Pero las sensatas contestaron: «Por si acaso no hay bastante para vosotras y nosotras, mejor es que vayáis a la tienda y os lo compréis.» Mientras iban a comprarlo, llegó el esposo, y las que estaban preparadas entraron con él al banquete de bodas, y se cerró la puerta. Más tarde llegaron también las otras doncellas, diciendo: «Señor, señor, ábrenos.» Pero él respondió: «Os lo aseguro: no os conozco.» Por tanto, velad, porque no sabéis el día ni la hora.»\nPalabra del Señor", "temporada": "ordinario", "color_liturgico": "verde", "fuente_scraping": "ciudadredonda", "domingo": "XXXII Domingo del Tiempo Ordinario", "ciclo": ""}, "lecturas_fuente": "ciudad_redonda", "lecturas_verificadas": true, "canciones_propuestas": {"Entrada": {"cancion_id": 11, "titulo": "PREPARAD EL CAMINO", "score": 0.8, "temas_comunes": ["camino"], "momento_liturgico": "entrada"}, "Perdón": {"cancion_id": null, "titulo": "OTRA OPORTUNIDAD", "score": 0.714, "temas_comunes": ["camino"], "momento_liturgico": "perdon"}, "Gloria": {"cancion_id": 9, "titulo": "QUIERO ALABARTE", "score": 0.4, "temas_comunes": ["alabanza"], "momento_liturgico": "gloria"}, "Salmo": {"cancion_id": null, "titulo": "YA DE MAÑANA", "score": 0.8, "temas_comunes": ["camino"], "momento_liturgico": "salmo"}, "Aleluya": {"cancion_id": 15, "titulo": "ESCUCHA, TÚ", "score": 0.714, "temas_comunes": ["camino"], "momento_liturgico": "aleluya"}, "Ofertorio": {"cancion_id": 96, "titulo": "PADRE NUESTRO DE LA VIDA", "score": 0.619, "temas_comunes": ["camino", "fe"], "momento_liturgico": "ofertorio"}, "Santo": {"cancion_id": 88, "titulo": "QUIERO HACER LO MISMO", "score": 0.691, "temas_comunes": ["camino", "alabanza"], "momento_liturgico": "santo"}, "Padre Nuestro": {"cancion_id": null, "titulo": "PONGO MI VIDA EN TUS MANOS", "score": 0.714, "temas_comunes": ["camino"], "momento_liturgico": "padre_nuestro"}, "Paz": {"cancion_id": 76, "titulo": "UNA NUEVA ESPERANZA", "score": 0.57, "temas_comunes": ["camino", "esperanza"], "momento_liturgico": "paz"}, "Comunión": {"cancion_id": 95, "titulo": "TODO MI SER", "score": 0.573, "temas_comunes": ["camino"], "momento_liturgico": "comunion"}, "Canto a María": {"cancion_id": 2, "titulo": "A TU AMPARO Y PROTECCIÓN", "momento_liturgico": "maria", "score": 0.0}, "Despedida": {"cancion_id": 20, "titulo": "COMO CORRE UN RÍO", "score": 0.382, "temas_comunes": ["agua", "alabanza"], "momento_liturgico": "despedida"}}, "canciones_verificadas": true, "canciones_json": {"entrada": 11, "perdon": null, "gloria": 9, "salmo": null, "aleluya": 15, "ofertorio": 96, "santo": 88, "padre_nuestro": null, "paz": 76, "comunion": 95, "maria": 2, "despedida": 20}, "assets": {"bundle_dir": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones_html/2026-11-08_presentacion", "pptx": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_celebracion.pptx", "pdf_fieles": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_fieles.pdf", "pdf_musicos": "/home/apolo/proyectos/CCE-M5-Web-Presentaciones/presentaciones/2026-11-08_hoja_musicos.pdf"}, "publicado": true}','rafael.torres','2026-11-06 16:17:50','2026-11-06T16:24:41.617031+00:00','2026-11-06T16:24:41.616383+00:00',NULL);
 CREATE INDEX idx_lecturas_fecha ON lecturas(fecha);
 CREATE INDEX idx_canciones_momento ON canciones(momento_liturgico);
 CREATE INDEX idx_presentaciones_fecha ON presentaciones(fecha_domingo);
