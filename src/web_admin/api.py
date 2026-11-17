@@ -155,14 +155,24 @@ app.add_middleware(
 )
 
 
-# Rate limiting global por IP (excluye health y archivos estáticos/admin).
+# Rate limiting global por IP (excluye health, admin, archivos estáticos y
+# assets del editor de diapositivas: miniaturas y lema, que son estáticos y
+# se solicitan en masa al abrir el editor).
 _ip_rate_limiter = IPRateLimiter(max_requests=120, window_seconds=60)
 
 
 @app.middleware("http")
 async def ip_rate_limit_middleware(request: Request, call_next):
     path = request.url.path
-    if path.startswith(("/health", "/admin", "/static")):
+    if path.startswith(
+        (
+            "/health",
+            "/admin",
+            "/static",
+            "/editor-diapositivas/__ilustraciones/",
+            "/editor-diapositivas/__lema/",
+        )
+    ):
         return await call_next(request)
     try:
         _ip_rate_limiter.check_or_raise(request)

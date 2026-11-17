@@ -9,6 +9,7 @@ import sqlite3
 from pathlib import Path
 
 from src.config import settings
+from src.constants import TAMANO_LETRA_DEFECTO
 from src.log_config import get_logger
 
 logger = get_logger(__name__)
@@ -96,6 +97,27 @@ def _ensure_schema_version(conn: sqlite3.Connection) -> None:
         )
 
 
+def ensure_columnas_posiciones(conn: sqlite3.Connection) -> None:
+    """Añade imagen_pos/texto_pos a slides y presentacion_slides (S5/S6).
+
+    Posiciones en milésimas (0-1000) del ancho/alto de la diapositiva,
+    JSON {"x","y","w","h"}; NULL mantiene el diseño por defecto.
+    Idempotente y tolerante: si una tabla aún no existe (p. ej. esquema
+    mínimo en tests), no se toca; las columnas llegan con el esquema
+    completo. No usa try/except para respetar la validación estricta de
+    _add_column_if_missing (auditoría B15): comprueba existencia antes.
+    """
+    for tabla in ("slides", "presentacion_slides"):
+        existe = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?",
+            (tabla,),
+        ).fetchone()
+        if existe is None:
+            continue
+        for columna in ("imagen_pos", "texto_pos"):
+            _add_column_if_missing(conn, tabla, columna, "TEXT")
+
+
 def init_database(db_path: Path | None = None) -> None:
     """Inicializa la base de datos con el esquema, índices y control de versiones."""
     target = db_path or DB_PATH
@@ -114,6 +136,9 @@ def init_database(db_path: Path | None = None) -> None:
         else:
             _create_default_schema(conn)
             _create_default_indexes(conn)
+
+        _ensure_ajustes_editor_table(conn)
+        ensure_columnas_posiciones(conn)
 
         logger.info("Base de datos inicializada: %s", target)
 
@@ -281,6 +306,86 @@ def _add_column_if_missing(
     if columna not in cols:
         conn.execute(f"ALTER TABLE {tabla} ADD COLUMN {columna} {tipo}")
         logger.info("Migración: añadida columna %s a %s", columna, tabla)
+
+
+# S2: rango de tamaños de letra globales (puntos) por parte de diapositiva.
+TAMANO_LETRA_MIN = 8
+TAMANO_LETRA_MAX = 72
+
+
+def _ensure_ajustes_editor_table(conn: sqlite3.Connection) -> None:
+    """Migra la base: crea la tabla de ajustes del editor si no existe.
+
+    Idempotente: en bases nuevas la crea junto al resto del esquema y en bases
+    existentes la añade sin tocar ninguna otra tabla ni fila.
+    """
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS ajustes_editor (
+            parte TEXT PRIMARY KEY,
+            tamano_pt INTEGER NOT NULL,
+            actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+
+
+def get_ajustes_tamano_letra(db_path: Path | str) -> dict[str, int]:
+    """Devuelve el tamaño (pt) de cada parte, combinando lo guardado con el defecto.
+
+    Siempre devuelve las cuatro claves de ``TAMANO_LETRA_DEFECTO``; las partes
+    sin fila propia usan su valor por defecto. La conexión se cierra siempre,
+    incluso si la lectura falla.
+    """
+    ajustes = dict(TAMANO_LETRA_DEFECTO)
+    with contextlib.closing(create_connection(db_path)) as conn:
+        _ensure_ajustes_editor_table(conn)
+        filas = conn.execute(
+            "SELECT parte, tamano_pt FROM ajustes_editor WHERE parte IN (?, ?, ?, ?)",
+            tuple(TAMANO_LETRA_DEFECTO),
+        ).fetchall()
+    for parte, tamano in filas:
+        ajustes[parte] = int(tamano)
+    return ajustes
+
+
+def guardar_ajustes_tamano_letra(payload: dict[str, int], db_path: Path | str) -> None:
+    """Guarda los tamaños (pt) de las partes enviadas, reemplazando lo anterior.
+
+    ``payload`` acepta enteros o cadenas numéricas con claves dentro de
+    ``TAMANO_LETRA_DEFECTO``. Rechaza (``ValueError``) partes desconocidas,
+    valores no numéricos o fuera de rango (8-72 pt) sin tocar la tabla.
+    """
+    valores: dict[str, int] = {}
+    for parte, valor in payload.items():
+        if parte not in TAMANO_LETRA_DEFECTO:
+            raise ValueError(f"Parte desconocida: {parte}")
+        try:
+            pt = int(valor)
+        except (TypeError, ValueError):
+            raise ValueError(f"Tamaño no válido para '{parte}': {valor}") from None
+        if not TAMANO_LETRA_MIN <= pt <= TAMANO_LETRA_MAX:
+            raise ValueError(
+                f"Tamaño fuera de rango para '{parte}': {pt} "
+                f"(rango {TAMANO_LETRA_MIN}-{TAMANO_LETRA_MAX} pt)"
+            )
+        valores[parte] = pt
+    if not valores:
+        return
+    with contextlib.closing(create_connection(db_path)) as conn:
+        _ensure_ajustes_editor_table(conn)
+        with conn:
+            for parte, pt in valores.items():
+                conn.execute(
+                    """
+                    INSERT INTO ajustes_editor (parte, tamano_pt, actualizado_en)
+                    VALUES (?, ?, CURRENT_TIMESTAMP)
+                    ON CONFLICT(parte) DO UPDATE SET
+                        tamano_pt = excluded.tamano_pt,
+                        actualizado_en = excluded.actualizado_en
+                    """,
+                    (parte, pt),
+                )
 
 
 def get_connection() -> sqlite3.Connection:

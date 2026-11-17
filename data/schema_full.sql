@@ -43,6 +43,12 @@ CREATE TABLE admin_users (
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
 
+CREATE TABLE ajustes_editor (
+    parte TEXT PRIMARY KEY,
+    tamano_pt INTEGER NOT NULL,
+    actualizado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
 CREATE TABLE automation_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             agente TEXT NOT NULL,
@@ -122,6 +128,8 @@ CREATE TABLE presentacion_slides (
     momento TEXT DEFAULT '',
     activo INTEGER DEFAULT 1,
     personalizado INTEGER DEFAULT 0,  -- 1 = editado a mano para esa semana
+    imagen_pos TEXT,                  -- S5: posición de la imagen copiada de la slide (milésimas 0-1000)
+    texto_pos TEXT,                   -- S6: posición del cuadro de texto (milésimas 0-1000)
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (presentacion_id) REFERENCES presentaciones(id) ON DELETE CASCADE,
     FOREIGN KEY (slide_id) REFERENCES slides(id)
@@ -162,6 +170,8 @@ CREATE TABLE slides (
     es_default INTEGER DEFAULT 0,     -- 1 = variante por defecto para (tipo, subtipo, color_liturgico)
     activo INTEGER DEFAULT 1,
     notas TEXT,
+    imagen_pos TEXT,   -- S5: {"x","y","w","h"} en milésimas (0-1000); NULL = diseño por defecto
+    texto_pos TEXT,    -- S6: ídem, cuadro de texto
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_modificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tipo) REFERENCES slides_tipos(id)

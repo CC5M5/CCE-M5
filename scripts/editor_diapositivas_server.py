@@ -32,12 +32,14 @@ from typing import Any
 
 from flask import Flask, abort, redirect, request
 
+from src import db_manager
 from src.canciones_manager import (
     MOMENTOS_LITURGICOS,
     CancionCreateUpdate,
     crear_cancion,
 )
 from src.config import settings
+from src.constants import SLIDE_WIDTH_INCHES, TAMANO_LETRA_DEFECTO
 from src.generators.composicion_catalogo import (
     _canciones_asignadas,
     _get_presentacion_por_fecha,
@@ -46,6 +48,7 @@ from src.generators.composicion_catalogo import (
     guardar_composicion,
     proponer_composicion,
 )
+from src.generators.presentacion.posiciones import parse_posicion, posiciones_por_defecto
 from src.rebuild_web import rebuild_web
 from src.web_admin.editores import (
     get_connection,
@@ -62,10 +65,26 @@ LEMA_PATH = settings.data_dir / "lemas" / "somos_uno.jpg"
 
 app_editor_diapositivas = Flask(__name__)
 
+# S2: la vista previa mide 440 px de ancho para una diapositiva de 13,333 in
+# (1 pt = 1/72 in), así px = pt * 440 / 13.333 / 72.
+PREVIEW_W_PX = 440
+PREVIEW_PT_A_PX = PREVIEW_W_PX / SLIDE_WIDTH_INCHES / 72
+
+ETIQUETAS_PARTES = {
+    "titulo": "Título",
+    "subtitulo": "Subtítulo",
+    "cita": "Cita",
+    "cuerpo": "Cuerpo (contenido)",
+}
+
 
 def _root() -> str:
     """Prefijo del editor bajo FastAPI (request.script_root)."""
-    return request.script_root or ""
+    try:
+        return request.script_root or ""
+    except RuntimeError:
+        # Fuera de contexto de petición (p. ej. tests): sin prefijo.
+        return ""
 
 
 COLORES_LITURGICOS = {
@@ -173,6 +192,12 @@ def _render_preview(slide: dict[str, Any]) -> str:
     """Genera HTML que simula la diapositiva real 4:3, dividiendo si hay --- DIAPOSITIVA ---."""
     color = slide.get("color_liturgico") or "verde"
     color_info = COLORES_LITURGICOS.get(color, COLORES_LITURGICOS["verde"])
+    # S2: variables de fuente escaladas de los ajustes globales (pt -> px).
+    ajustes = db_manager.get_ajustes_tamano_letra(DB_PATH)
+    fuente_vars = ";".join(
+        f"--fuente-{parte}:{ajustes[parte] * PREVIEW_PT_A_PX:.4f}px"
+        for parte in TAMANO_LETRA_DEFECTO
+    )
     tipo = slide.get("tipo", "")
     titulo = html_module.escape(slide.get("titulo") or "")
     subtitulo = html_module.escape(slide.get("subtitulo") or "")
@@ -184,7 +209,7 @@ def _render_preview(slide: dict[str, Any]) -> str:
     else:
         imagen_url = imagen or ""
 
-    lema_url = "{_root()}/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
+    lema_url = f"{_root()}/__lema/lema_somos_uno.jpg" if LEMA_PATH.exists() else ""
 
     clase = tipo
     if tipo in (
@@ -208,6 +233,17 @@ def _render_preview(slide: dict[str, Any]) -> str:
     if not partes:
         partes = [""]
 
+    # S5/S6: posiciones guardadas de la imagen y del cuadro de texto expuestas
+    # al DOM del preview (contrato de la fase 2); NULL = diseño por defecto.
+    pos_attrs = ""
+    for clave in ("imagen_pos", "texto_pos"):
+        pos = parse_posicion(slide.get(clave))
+        if pos is not None:
+            pos_attrs += f" data-{clave.replace('_', '-')}='{json.dumps(pos)}'"
+    # Fase 2b: posición de texto por defecto (por tipo) para el preview.
+    _, texto_defecto = posiciones_por_defecto(slide)
+    pos_attrs += f" data-texto-default='{json.dumps(texto_defecto)}'"
+
     def _render_slide_mini(contenido_parte: str, idx: int, total: int) -> str:
         contenido = html_module.escape(contenido_parte)
         contenido = _apply_bold_html(contenido)
@@ -226,9 +262,9 @@ def _render_preview(slide: dict[str, Any]) -> str:
             inner += f'<div class="contenido">{contenido}</div>\n'
 
         return f"""
-        <div class="preview-frame {clase}" style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};">
+        <div class="preview-frame {clase}"{pos_attrs} style="--liturgia-from:{color_info["from"]};--liturgia-to:{color_info["to"]};--liturgia-acento:{color_info["acento"]};{fuente_vars}">
           <div class="slide-wrapper">
-            {f'<img class="ilustracion" src="{imagen_url}" alt="ilustración">' if imagen_url else ""}
+            {f'<div class="cuadro-imagen"><img class="ilustracion" src="{imagen_url}" alt="ilustración"></div>' if imagen_url else ""}
             <div class="tarjeta">
               {inner}
             </div>
@@ -248,10 +284,18 @@ def _render_preview(slide: dict[str, Any]) -> str:
 
 
 def _render_base(
-    title: str, sidebar: str, content: str, mensaje: str = "", mensaje_clase: str = ""
+    title: str,
+    sidebar: str = "",
+    content: str = "",
+    mensaje: str = "",
+    mensaje_clase: str = "",
 ) -> str:
     msg_html = (
         f'<div class="msg {mensaje_clase}">{html_module.escape(mensaje)}</div>' if mensaje else ""
+    )
+    vars_fuente = " ".join(
+        f"--fuente-{parte}:{TAMANO_LETRA_DEFECTO[parte] * PREVIEW_PT_A_PX:.4f}px"
+        for parte in TAMANO_LETRA_DEFECTO
     )
     _listar_ilustraciones()
     # Compatibilidad con montaje bajo FastAPI en path prefix.
@@ -270,7 +314,7 @@ def _render_base(
   {base_href}
   <title>{html_module.escape(title)} - Editor Diapositivas CCE-M5</title>
   <style>
-    :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; }}
+    :root {{ --accent: #7C3AED; --bg: #f8f9fa; --card: #fff; {vars_fuente} }}
     body {{ font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; }}
     header {{ max-width: 1600px; margin: 0 auto 20px; }}
     h1 {{ color: var(--accent); margin: 0 0 10px; }}
@@ -293,16 +337,21 @@ def _render_base(
     .preview-frame.portada .slide-wrapper {{ justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, var(--liturgia-acento) 0%, #6D28D9 100%); }}
     .preview-frame.portada .tarjeta {{ text-align: center; }}
     .preview-frame.portada h1 {{ text-align: center; color: var(--liturgia-acento); }}
-    .preview-frame h1 {{ font-size: 16px; color: var(--liturgia-acento); text-transform: uppercase; margin: 0 0 6px; }}
-    .preview-frame h2 {{ font-size: 12px; color: #555; margin: 0 0 6px; font-weight: 400; }}
+    .preview-frame h1 {{ font-size: var(--fuente-titulo); color: var(--liturgia-acento); text-transform: uppercase; margin: 0 0 6px; }}
+    .preview-frame h2 {{ font-size: var(--fuente-subtitulo); color: #555; margin: 0 0 6px; font-weight: 400; }}
     .preview-frame h3 {{ font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #777; margin: 0 0 4px; }}
-    .preview-frame .cita {{ font-size: 10px; font-weight: 700; background: linear-gradient(90deg, var(--liturgia-acento), #A16207); color: white; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }}
-    .preview-frame .contenido {{ font-size: 11px; line-height: 1.25; color: #2c3e50; white-space: pre-wrap; }}
+    .preview-frame .cita {{ font-size: var(--fuente-cita); font-weight: 700; background: linear-gradient(90deg, var(--liturgia-acento), #A16207); color: white; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }}
+    .preview-frame .contenido {{ font-size: var(--fuente-cuerpo); line-height: 1.25; color: #2c3e50; white-space: pre-wrap; }}
     .preview-frame .contenido br {{ display: block; content: ""; margin-bottom: 0.05em; }}
     .preview-frame.cancion .contenido {{ line-height: 1.22; }}
     .preview-frame.cancion .contenido br {{ margin-bottom: 0; }}
     .preview-frame .tarjeta {{ background: rgba(255,255,255,0.94); border-radius: 12px; padding: 14px 18px; box-shadow: 0 8px 24px rgba(124,58,237,0.12); max-height: 86%; overflow: auto; z-index: 5; }}
-    .preview-frame .ilustracion {{ position: absolute; bottom: 50px; right: 18px; max-width: 110px; max-height: 110px; opacity: 0.98; z-index: 6; border-radius: 8px; object-fit: contain; }}
+    .preview-frame .cuadro-imagen {{ position: absolute; bottom: 50px; right: 18px; width: 110px; height: 110px; z-index: 6; touch-action: none; }}
+    .preview-frame .cuadro-imagen .ilustracion {{ width: 100%; height: 100%; display: block; opacity: 0.98; border-radius: 8px; object-fit: contain; }}
+    .preview-frame .posicionable {{ position: absolute; margin: 0; cursor: move; touch-action: none; box-sizing: border-box; }}
+    .preview-frame .posicionable .manija-resize {{ position: absolute; right: -6px; bottom: -6px; width: 14px; height: 14px; background: var(--accent); border: 2px solid #fff; border-radius: 50%; cursor: nwse-resize; z-index: 20; }}
+    .preview-frame .posicionable .restablecer {{ position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; margin: 0; padding: 0; border-radius: 50%; background: rgba(255,255,255,0.85); color: #333; font-size: 13px; line-height: 19px; text-align: center; cursor: pointer; opacity: 0.55; z-index: 20; }}
+    .preview-frame .posicionable .restablecer:hover {{ opacity: 1; }}
     .preview-frame .logo-lema {{ position: absolute; bottom: 10px; right: 14px; height: 22px; width: auto; z-index: 10; }}
     .preview-frame:has(.ilustracion) .tarjeta {{ margin-right: 110px; }}
     button {{ background: var(--accent); color: #fff; border: none; padding: 12px 22px; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 12px; margin-right: 8px; }}
@@ -357,6 +406,41 @@ def _render_base(
 
 @app_editor_diapositivas.route("/")
 def index():
+    return _render_index()
+
+
+@app_editor_diapositivas.route("/ajustes/guardar", methods=["POST"])
+def guardar_ajustes():
+    """Guarda los tamaños globales de letra por parte (S2)."""
+    payload = {parte: request.form.get(parte, "") for parte in TAMANO_LETRA_DEFECTO}
+    try:
+        db_manager.guardar_ajustes_tamano_letra(payload, DB_PATH)
+    except ValueError as exc:
+        return _render_index(f"⚠️ {exc}", "err")
+    return _render_index("✅ Ajustes guardados.", "ok")
+
+
+def _panel_ajustes() -> str:
+    """Panel 'Ajustes generales': tamaño global (pt) de cada parte."""
+    ajustes = db_manager.get_ajustes_tamano_letra(DB_PATH)
+    campos = "".join(
+        f'<label>{ETIQUETAS_PARTES[parte]}</label>'
+        f'<input type="number" name="{parte}" min="8" max="72" step="1" value="{ajustes[parte]}">'
+        for parte in TAMANO_LETRA_DEFECTO
+    )
+    return (
+        '<section style="margin-bottom:20px;border:1px solid #eee;border-radius:12px;padding:14px;">'
+        "<h2>Ajustes generales</h2>"
+        '<p style="margin:0 0 10px;font-size:13px;color:#555;">Tamaño de la letra (pt) de cada parte '
+        "de la diapositiva. Se aplica a todas (incluida la portada) y a las presentaciones "
+        "generadas (PPTX/HTML/PDF). Rango: 8-72 pt.</p>"
+        f'<form method="post" action="{_root()}/ajustes/guardar">{campos}'
+        '<button type="submit">💾 Guardar ajustes</button></form>'
+        "</section>"
+    )
+
+
+def _render_index(mensaje: str = "", mensaje_clase: str = "") -> str:
     tipos = _tipos()
     sidebar_parts = []
     for t in tipos:
@@ -371,8 +455,11 @@ def index():
             f"<details open><summary>{html_module.escape(t['nombre'])} ({len(slides)})</summary>{links}</details>"
         )
     sidebar = "\n".join(sidebar_parts)
-    content = "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
-    return _render_base("Diapositivas", sidebar, content)
+    content = (
+        _panel_ajustes()
+        + "<h2>Selecciona una diapositiva</h2><p>Elige una diapositiva del menú lateral para editarla.</p>"
+    )
+    return _render_base("Diapositivas", sidebar, content, mensaje, mensaje_clase)
 
 
 @app_editor_diapositivas.route("/slides/")
@@ -435,7 +522,7 @@ def editar(id: int):
         nombre_completo = html_module.escape(Path(img).name)
         return f"""<label data-artista="{artista}" data-nombre="{html_module.escape(Path(img).name.lower())}">
           <input type="radio" name="imagen" value="{html_module.escape(img)}" {"checked" if img == imagen_actual else ""}>
-          <img src="{_root()}/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}">
+          <img src="{_root()}/__ilustraciones/{html_module.escape(img)}" alt="{html_module.escape(img)}" loading="lazy" decoding="async">
           <small title="{nombre_completo}">{nombre}</small>
         </label>"""
 
@@ -443,8 +530,16 @@ def editar(id: int):
 
     preview = _render_preview(slide)
 
+    # S5/S6 (fase 2b): campos ocultos que llevan las posiciones en cada
+    # guardado; valor vacío = diseño por defecto (NULL en la BD).
+    imagen_pos_inicial = parse_posicion(slide.get("imagen_pos"))
+    texto_pos_inicial = parse_posicion(slide.get("texto_pos"))
+    imagen_pos_attr = f" value='{json.dumps(imagen_pos_inicial)}'" if imagen_pos_inicial else " value=''"
+    texto_pos_attr = f" value='{json.dumps(texto_pos_inicial)}'" if texto_pos_inicial else " value=''"
     content = f"""<h2>Editar diapositiva #{slide["id"]}</h2>
     <form method="post" action="{_root()}/slides/{slide["id"]}/guardar" id="editor-form">
+      <input type="hidden" name="imagen_pos" id="imagen_pos"{imagen_pos_attr}>
+      <input type="hidden" name="texto_pos" id="texto_pos"{texto_pos_attr}>
       <div class="two-col">
         <div>
           <label>Tipo</label>
@@ -505,6 +600,157 @@ def editar(id: int):
         ta.focus();
         ta.setSelectionRange(start + '--- DIAPOSITIVA ---'.length, start + '--- DIAPOSITIVA ---'.length);
       }}
+      // S5/S6 (fase 2b): arrastrar y redimensionar imagen y cuadro de texto.
+      // px -> per-mille: x_permil = round(px / 440 * 1000), y_permil = round(py / 330 * 1000).
+      (function() {{
+        var form = document.getElementById('editor-form');
+        var campos = {{
+          imagen: form.querySelector('input[name="imagen_pos"]'),
+          texto: form.querySelector('input[name="texto_pos"]')
+        }};
+        if (!campos.imagen || !campos.texto) return;
+        var frames = Array.prototype.slice.call(form.querySelectorAll('.preview-frame'));
+        if (!frames.length) return;
+        var MIN_FRAC = 0.08; // mínimo igual que parse_posicion: 80 per-mille.
+
+        function dims(frame) {{
+          return {{ W: frame.offsetWidth || 440, H: frame.offsetHeight || 330 }};
+        }}
+        function px(pos, W, H) {{
+          return {{ x: pos.x / 1000 * W, y: pos.y / 1000 * H, w: pos.w / 1000 * W, h: pos.h / 1000 * H }};
+        }}
+        function permil(p, W, H) {{
+          return {{
+            x: Math.round(p.x / W * 1000),
+            y: Math.round(p.y / H * 1000),
+            w: Math.round(p.w / W * 1000),
+            h: Math.round(p.h / H * 1000)
+          }};
+        }}
+        function aplicar(el, p) {{
+          el.classList.add('posicionable');
+          el.style.left = p.x + 'px';
+          el.style.top = p.y + 'px';
+          el.style.width = p.w + 'px';
+          el.style.height = p.h + 'px';
+        }}
+        function liberar(el) {{
+          el.classList.remove('posicionable');
+          el.style.left = ''; el.style.top = '';
+          el.style.width = ''; el.style.height = '';
+        }}
+        function rectActual(el, frame) {{
+          var fr = frame.getBoundingClientRect();
+          var r = el.getBoundingClientRect();
+          return {{ x: r.left - fr.left, y: r.top - fr.top, w: r.width, h: r.height }};
+        }}
+        function arrastrar(el, frame, campo) {{
+          var d = dims(frame);
+          var W = d.W, H = d.H;
+          el.addEventListener('pointerdown', function (ev) {{
+            if (ev.button !== 0) return;
+            if (ev.target.classList && ev.target.classList.contains('manija-resize')) return;
+            if (ev.target.closest && ev.target.closest('button')) return;
+            ev.preventDefault();
+            var p0 = rectActual(el, frame);
+            var sx = ev.clientX, sy = ev.clientY;
+            el.setPointerCapture(ev.pointerId);
+            function move(e) {{
+              var nx = Math.min(Math.max(0, p0.x + e.clientX - sx), W - p0.w);
+              var ny = Math.min(Math.max(0, p0.y + e.clientY - sy), H - p0.h);
+              el.style.left = nx + 'px';
+              el.style.top = ny + 'px';
+              campos[campo].value = JSON.stringify(permil({{ x: nx, y: ny, w: p0.w, h: p0.h }}, W, H));
+            }}
+            function fin() {{
+              el.releasePointerCapture(ev.pointerId);
+              el.removeEventListener('pointermove', move);
+              el.removeEventListener('pointerup', fin);
+              el.removeEventListener('pointercancel', fin);
+            }}
+            el.addEventListener('pointermove', move);
+            el.addEventListener('pointerup', fin);
+            el.addEventListener('pointercancel', fin);
+          }});
+        }}
+        function redimensionar(el, frame, campo) {{
+          var d = dims(frame);
+          var W = d.W, H = d.H;
+          var manija = document.createElement('span');
+          manija.className = 'manija-resize';
+          manija.addEventListener('pointerdown', function (ev) {{
+            if (ev.button !== 0) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+            var p0 = rectActual(el, frame);
+            var sx = ev.clientX, sy = ev.clientY;
+            manija.setPointerCapture(ev.pointerId);
+            function move(e) {{
+              var nw = Math.min(Math.max(W * MIN_FRAC, p0.w + e.clientX - sx), W - p0.x);
+              var nh = Math.min(Math.max(H * MIN_FRAC, p0.h + e.clientY - sy), H - p0.y);
+              el.style.width = nw + 'px';
+              el.style.height = nh + 'px';
+              campos[campo].value = JSON.stringify(permil({{ x: p0.x, y: p0.y, w: nw, h: nh }}, W, H));
+            }}
+            function fin() {{
+              manija.releasePointerCapture(ev.pointerId);
+              manija.removeEventListener('pointermove', move);
+              manija.removeEventListener('pointerup', fin);
+              manija.removeEventListener('pointercancel', fin);
+            }}
+            manija.addEventListener('pointermove', move);
+            manija.addEventListener('pointerup', fin);
+            manija.addEventListener('pointercancel', fin);
+          }});
+          el.appendChild(manija);
+        }}
+        function restablecer(el, frame, campo, defecto) {{
+          var d = dims(frame);
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'restablecer';
+          btn.textContent = '↺';
+          btn.title = 'Restablecer posición y tamaño';
+          btn.addEventListener('click', function () {{
+            campos[campo].value = '';
+            liberar(el);
+            if (defecto) aplicar(el, px(defecto, d.W, d.H));
+          }});
+          el.appendChild(btn);
+        }}
+
+        frames.forEach(function (frame) {{
+          var d = dims(frame);
+          var img = frame.querySelector('.cuadro-imagen');
+          var tarjeta = frame.querySelector('.tarjeta');
+          var textoDefecto = null;
+          try {{
+            textoDefecto = frame.dataset.textoDefecto ? JSON.parse(frame.dataset.textoDefecto) : null;
+          }} catch (e) {{}}
+          if (img) {{
+            // Sin posición guardada la imagen mantiene el CSS actual.
+            var guardadaImg = null;
+            try {{
+              guardadaImg = frame.dataset.imagenPos ? JSON.parse(frame.dataset.imagenPos) : null;
+            }} catch (e) {{}}
+            if (guardadaImg) aplicar(img, px(guardadaImg, d.W, d.H));
+            arrastrar(img, frame, 'imagen');
+            redimensionar(img, frame, 'imagen');
+            restablecer(img, frame, 'imagen', null);
+          }}
+          if (tarjeta) {{
+            var guardadaTxt = null;
+            try {{
+              guardadaTxt = frame.dataset.textoPos ? JSON.parse(frame.dataset.textoPos) : null;
+            }} catch (e) {{}}
+            if (guardadaTxt) aplicar(tarjeta, px(guardadaTxt, d.W, d.H));
+            else if (textoDefecto) aplicar(tarjeta, px(textoDefecto, d.W, d.H));
+            arrastrar(tarjeta, frame, 'texto');
+            redimensionar(tarjeta, frame, 'texto');
+            restablecer(tarjeta, frame, 'texto', textoDefecto);
+          }}
+        }});
+      }})();
       function filtrarImagenes(filtro) {{
         document.querySelectorAll('.filtros-imagenes button').forEach(b => b.classList.remove('active'));
         event.target.classList.add('active');
@@ -573,6 +819,22 @@ def guardar(id: int):
             id,
         ),
     )
+
+    # S5/S6: posiciones de imagen y cuadro de texto (fase 2). Solo se tocan
+    # si el formulario las envía; cadenas vacías o inválidas => NULL
+    # (diseño por defecto).
+    if "imagen_pos" in request.form or "texto_pos" in request.form:
+        db_manager.ensure_columnas_posiciones(conn)
+        imagen_pos = parse_posicion(request.form.get("imagen_pos"))
+        texto_pos = parse_posicion(request.form.get("texto_pos"))
+        cursor.execute(
+            "UPDATE slides SET imagen_pos = ?, texto_pos = ? WHERE id = ?",
+            (
+                json.dumps(imagen_pos) if imagen_pos is not None else None,
+                json.dumps(texto_pos) if texto_pos is not None else None,
+                id,
+            ),
+        )
     conn.commit()
     conn.close()
 

@@ -52,14 +52,6 @@
     "momento_liturgico": "aleluya"
   },
   {
-    "cancion_id": 15,
-    "momento_liturgico": "aleluya"
-  },
-  {
-    "cancion_id": 16,
-    "momento_liturgico": "aleluya"
-  },
-  {
     "cancion_id": 17,
     "momento_liturgico": "entrada"
   },
@@ -446,101 +438,5 @@
   {
     "cancion_id": 109,
     "momento_liturgico": "salmo"
-  },
-  {
-    "cancion_id": 228,
-    "momento_liturgico": "acto_penitencial"
-  },
-  {
-    "cancion_id": 228,
-    "momento_liturgico": "comunion"
-  },
-  {
-    "cancion_id": 228,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 230,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 231,
-    "momento_liturgico": "acto_penitencial"
-  },
-  {
-    "cancion_id": 231,
-    "momento_liturgico": "comunion"
-  },
-  {
-    "cancion_id": 231,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 233,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 234,
-    "momento_liturgico": "acto_penitencial"
-  },
-  {
-    "cancion_id": 234,
-    "momento_liturgico": "comunion"
-  },
-  {
-    "cancion_id": 234,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 236,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 237,
-    "momento_liturgico": "acto_penitencial"
-  },
-  {
-    "cancion_id": 237,
-    "momento_liturgico": "comunion"
-  },
-  {
-    "cancion_id": 237,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 239,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 240,
-    "momento_liturgico": "acto_penitencial"
-  },
-  {
-    "cancion_id": 240,
-    "momento_liturgico": "comunion"
-  },
-  {
-    "cancion_id": 240,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 242,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 243,
-    "momento_liturgico": "acto_penitencial"
-  },
-  {
-    "cancion_id": 243,
-    "momento_liturgico": "comunion"
-  },
-  {
-    "cancion_id": 243,
-    "momento_liturgico": "entrada"
-  },
-  {
-    "cancion_id": 245,
-    "momento_liturgico": "entrada"
   }
 ]

@@ -18,6 +18,10 @@ TEMPLATE = """<!DOCTYPE html>
       --oro: #A16207;
       --morado: #7C3AED;
       --blanco-tarjeta: rgba(255,255,255,0.94);
+      --fuente-titulo:{fuente_titulo}px;
+      --fuente-subtitulo:{fuente_subtitulo}px;
+      --fuente-cita:{fuente_cita}px;
+      --fuente-cuerpo:{fuente_cuerpo}px;
     }}
 
     .reveal {{
@@ -82,8 +86,8 @@ TEMPLATE = """<!DOCTYPE html>
       letter-spacing: -0.01em;
     }}
 
-    .reveal h1 {{ font-size: 1.35em; }}
-    .reveal h2 {{ font-size: 0.95em; font-weight: 400; text-transform: none; color: #555; }}
+    .reveal h1 {{ font-size: var(--fuente-titulo); }}
+    .reveal h2 {{ font-size: var(--fuente-subtitulo); font-weight: 400; text-transform: none; color: #555; }}
     .reveal h3 {{ font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }}
 
     .reveal .lectura .tarjeta,
@@ -135,7 +139,7 @@ TEMPLATE = """<!DOCTYPE html>
     }}
 
     .reveal .cita {{
-      font-size: 0.85em;
+      font-size: var(--fuente-cita);
       font-weight: 700;
       margin-bottom: 0.6em;
       padding: 0.25em 0.7em;
@@ -149,19 +153,19 @@ TEMPLATE = """<!DOCTYPE html>
       white-space: pre-wrap;
       max-height: none;
       overflow: visible;
-      font-size: 0.9em;
+      font-size: var(--fuente-cuerpo);
       line-height: 1.22;
     }}
 
     .reveal .primera_lectura .contenido,
     .reveal .segunda_lectura .contenido,
     .reveal .evangelio .contenido {{
-      font-size: 1em;
+      font-size: var(--fuente-cuerpo);
       line-height: 1.18;
     }}
 
     .reveal .salmo .contenido {{
-      font-size: 0.95em;
+      font-size: var(--fuente-cuerpo);
       line-height: 1.22;
     }}
 
@@ -219,13 +223,13 @@ TEMPLATE = """<!DOCTYPE html>
 
     .reveal .portada h1 {{
       text-align: center;
-      font-size: 1.8em;
+      font-size: var(--fuente-titulo);
       margin-top: 0;
     }}
 
     .reveal .portada h2 {{
       text-align: center;
-      font-size: 1.1em;
+      font-size: var(--fuente-subtitulo);
       color: #555;
       text-transform: none;
       font-weight: 400;
@@ -266,7 +270,7 @@ TEMPLATE = """<!DOCTYPE html>
     .reveal .transicion h1,
     .reveal .paso h1 {{
       text-align: center;
-      font-size: 2.4em;
+      font-size: var(--fuente-titulo);
       letter-spacing: 0.02em;
       color: var(--liturgia-acento);
       margin-bottom: 0.2em;
@@ -275,7 +279,7 @@ TEMPLATE = """<!DOCTYPE html>
     .reveal .transicion h2,
     .reveal .paso h2 {{
       text-align: center;
-      font-size: 1.1em;
+      font-size: var(--fuente-subtitulo);
       color: #555;
       font-weight: 400;
       margin-bottom: 0.8em;
@@ -283,7 +287,7 @@ TEMPLATE = """<!DOCTYPE html>
 
     .reveal .transicion .contenido,
     .reveal .paso .contenido {{
-      font-size: 1.0em;
+      font-size: var(--fuente-cuerpo);
       color: #2c3e50;
       text-align: center;
     }}
@@ -306,7 +310,7 @@ TEMPLATE = """<!DOCTYPE html>
     }}
 
     .reveal .cancion .contenido {{
-      font-size: 0.88em;
+      font-size: var(--fuente-cuerpo);
       line-height: 1.25;
     }}
 
@@ -317,7 +321,7 @@ TEMPLATE = """<!DOCTYPE html>
     }}
 
     .reveal .salmo .contenido {{
-      font-size: 0.95em;
+      font-size: var(--fuente-cuerpo);
       line-height: 1.18;
     }}
 
@@ -325,6 +329,17 @@ TEMPLATE = """<!DOCTYPE html>
       display: block;
       content: "";
       margin-bottom: 0.02em;
+    }}
+
+    /* S5/S6: posiciones guardadas por diapositiva (% del lienzo). */
+    .reveal .slides section .ilustracion-pos {{
+      position: absolute;
+      margin: 0;
+    }}
+    .reveal .slides section .tarjeta-pos {{
+      position: absolute;
+      margin: 0;
+      box-sizing: border-box;
     }}
 
     @keyframes fadeInUp {{

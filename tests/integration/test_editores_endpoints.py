@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import re
 import shutil
 import sqlite3
 from pathlib import Path
@@ -169,6 +170,51 @@ def test_editor_diapositivas_nueva_get(client):
     assert response.status_code in (200, 404)
 
 
+def test_editor_diapositivas_miniaturas_lazy(client):
+    """Las miniaturas de ilustraciones cargan en diferido (loading="lazy").
+
+    Regresión del bug 429: 123 <img> simultáneas agotaban el limitador IP.
+    """
+    import json as json_module
+
+    import scripts.editor_diapositivas_server as eds
+    from src.web_admin import config as auth_config
+
+    catalogo = eds.CATALOGO_PATH
+    catalogo.parent.mkdir(parents=True, exist_ok=True)
+    catalogo.write_text(
+        json_module.dumps(
+            {"imagenes": {"entrada": ["artista-uno/luz.png", "artista-dos/paz.png"]}}
+        ),
+        encoding="utf-8",
+    )
+
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    try:
+        fila = conn.execute(
+            "SELECT id FROM slides WHERE activo = 1 ORDER BY id LIMIT 1"
+        ).fetchone()
+        if fila is None:
+            fila = conn.execute("SELECT id FROM slides ORDER BY id LIMIT 1").fetchone()
+        if fila is not None:
+            slide_id = fila[0]
+        else:
+            cursor = conn.execute(
+                "INSERT INTO slides (tipo, subtipo, titulo, contenido) "
+                "VALUES ('entrada', '', 'Título de prueba', 'Cuerpo de prueba')"
+            )
+            conn.commit()
+            slide_id = cursor.lastrowid
+    finally:
+        conn.close()
+
+    response = client.get(f"/editor-diapositivas/slides/{slide_id}")
+    assert response.status_code == 200
+    assert 'loading="lazy"' in response.text
+    # Cada miniatura del catálogo (2 entradas) debe ser diferida.
+    assert response.text.count('loading="lazy"') >= 2
+
+
 def test_admin_health(client):
     """El healthcheck responde 200 con un estado valido."""
     response = client.get("/health")
@@ -178,3 +224,143 @@ def test_admin_health(client):
     # En CI el build de web estatica no siempre existe, asi que 'degraded'
     # es aceptable mientras el propio endpoint responda 200.
     assert data["status"] in ("ok", "degraded")
+
+
+def test_editor_diapositivas_ajustes_guardar(client):
+    """El panel 'Ajustes generales' guarda tamaños y el preview los escala."""
+    import scripts.editor_diapositivas_server as eds
+    from src.web_admin import config as auth_config
+
+    # La página de inicio expone el panel "Ajustes generales".
+    response = client.get("/editor-diapositivas/")
+    assert response.status_code == 200
+    assert "Ajustes generales" in response.text
+
+    # Guardar vía POST persiste los cuatro valores.
+    response = client.post(
+        "/editor-diapositivas/ajustes/guardar",
+        data={"titulo": "24", "subtitulo": "18", "cita": "14", "cuerpo": "12"},
+    )
+    assert response.status_code == 200
+    assert "guardado" in response.text.lower()
+
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    conn.row_factory = sqlite3.Row
+    filas = {
+        r["parte"]: r["tamano_pt"]
+        for r in conn.execute("SELECT parte, tamano_pt FROM ajustes_editor")
+    }
+    conn.close()
+    assert filas == {"titulo": 24, "subtitulo": 18, "cita": 14, "cuerpo": 12}
+
+    # La página de inicio refleja los valores guardados.
+    response = client.get("/editor-diapositivas/")
+    for valor in ("24", "18", "14", "12"):
+        assert f'value="{valor}"' in response.text
+
+    # Un valor fuera de rango (8-72) no se persiste.
+    client.post(
+        "/editor-diapositivas/ajustes/guardar",
+        data={"titulo": "99", "subtitulo": "18", "cita": "14", "cuerpo": "12"},
+    )
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    titulo = conn.execute(
+        "SELECT tamano_pt FROM ajustes_editor WHERE parte = 'titulo'"
+    ).fetchone()[0]
+    conn.close()
+    assert titulo == 24
+
+    # El preview escala pt -> px: px = pt * PREVIEW_W_PX / SLIDE_WIDTH_INCHES / 72.
+    factor = eds.PREVIEW_W_PX / eds.SLIDE_WIDTH_INCHES / 72
+    preview = eds._render_preview(
+        {
+            "tipo": "portada",
+            "titulo": "T",
+            "contenido": "",
+            "cita": "",
+            "subtitulo": "",
+            "momento": "",
+            "imagen": "",
+        }
+    )
+    m = re.search(r"--fuente-titulo:([\d.]+)px", preview)
+    assert m
+    assert float(m.group(1)) == pytest.approx(24 * factor, abs=0.01)
+
+
+def test_editor_diapositivas_posiciones_guardar(client):
+    """T5/T6 (S5/S6): las posiciones arrastradas se guardan y el preview las refleja.
+
+    Contrato de fase 2: un POST a /guardar con ``imagen_pos``/``texto_pos``
+    (JSON en permiles 0-1000) persiste los valores y el frame del preview
+    los expone como ``data-imagen-pos='{...}'`` / ``data-texto-pos='{...}'``.
+    Cadenas vacías dejan la diapositiva con posiciones NULL: la página
+    muestra los defectos y no hay atributos data con valores propios.
+    """
+    import json as json_module
+
+    from src.web_admin import config as auth_config
+
+    # Una diapositiva existente del catálogo (seed).
+    conn = sqlite3.connect(auth_config.DB_PATH)
+    try:
+        fila = conn.execute(
+            "SELECT id FROM slides WHERE activo = 1 ORDER BY id LIMIT 1"
+        ).fetchone()
+        if fila is None:
+            cursor = conn.execute(
+                "INSERT INTO slides (tipo, subtipo, titulo, contenido) "
+                "VALUES ('evangelio', '', 'Título de prueba', 'Cuerpo de prueba')"
+            )
+            conn.commit()
+            slide_id = cursor.lastrowid
+        else:
+            slide_id = fila[0]
+    finally:
+        conn.close()
+
+    campos = {
+        "titulo": "Título arrastre",
+        "subtitulo": "",
+        "contenido": "Cuerpo arrastre",
+        "cita": "",
+        "momento": "",
+        "imagen": "",
+    }
+
+    # Guardar posiciones propias las persiste y el preview las muestra.
+    response = client.post(
+        f"/editor-diapositivas/slides/{slide_id}/guardar",
+        data={
+            **campos,
+            "imagen_pos": '{"x": 120, "y": 80, "w": 320, "h": 240}',
+            "texto_pos": '{"x": 45, "y": 60, "w": 660, "h": 700}',
+        },
+    )
+    assert response.status_code == 200
+
+    page = client.get(f"/editor-diapositivas/slides/{slide_id}")
+    assert page.status_code == 200
+    m = re.search(r"data-imagen-pos='([^']*)'", page.text)
+    assert m, "data-imagen-pos no presente en el preview"
+    assert json_module.loads(m.group(1)) == {
+        "x": 120, "y": 80, "w": 320, "h": 240,
+    }
+    m = re.search(r"data-texto-pos='([^']*)'", page.text)
+    assert m, "data-texto-pos no presente en el preview"
+    assert json_module.loads(m.group(1)) == {
+        "x": 45, "y": 60, "w": 660, "h": 700,
+    }
+
+    # Cadenas vacías -> posiciones NULL: la página muestra los defectos y
+    # no hay atributos data con valores propios.
+    response = client.post(
+        f"/editor-diapositivas/slides/{slide_id}/guardar",
+        data={**campos, "imagen_pos": "", "texto_pos": ""},
+    )
+    assert response.status_code == 200
+
+    page = client.get(f"/editor-diapositivas/slides/{slide_id}")
+    assert page.status_code == 200
+    assert not re.search(r"data-imagen-pos='\{", page.text)
+    assert not re.search(r"data-texto-pos='\{", page.text)

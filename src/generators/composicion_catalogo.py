@@ -276,8 +276,8 @@ def guardar_composicion(fecha: str, items: list[dict[str, Any]]) -> None:
                 cursor.execute(
                     """
                     INSERT INTO presentacion_slides
-                    (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo)
-                    SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?
+                    (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, cita, subtitulo, imagen, momento, activo, imagen_pos, texto_pos)
+                    SELECT ?, s.id, ?, ?, ?, s.titulo, s.contenido, s.cita, s.subtitulo, s.imagen, '', ?, s.imagen_pos, s.texto_pos
                     FROM slides s
                     WHERE s.id = ?
                 """,
@@ -296,8 +296,8 @@ def guardar_composicion(fecha: str, items: list[dict[str, Any]]) -> None:
                 cursor.execute(
                     """
                     INSERT INTO presentacion_slides
-                    (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo)
-                    VALUES (?, NULL, ?, ?, ?, ?, '', ?)
+                    (presentacion_id, slide_id, numero, tipo, subtipo, titulo, contenido, activo, imagen_pos, texto_pos)
+                    VALUES (?, NULL, ?, ?, ?, ?, '', ?, NULL, NULL)
                 """,
                     (
                         pres["id"],
