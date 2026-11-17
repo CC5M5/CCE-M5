@@ -354,7 +354,7 @@
       }
       function hide(id) { document.getElementById(id).style.display = 'none'; }
 
-      async function api(path, opts) {
+      async function api(path, opts = {}) {
         const sep = path.includes('?') ? '&' : '?';
         const cacheBuster = (!opts || opts.method === 'GET' || !opts.method) ? `${sep}_=${Date.now()}` : '';
         const url = `${API_BASE}${path}${cacheBuster}`;

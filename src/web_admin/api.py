@@ -353,7 +353,7 @@ def _github_api_request(
         "Accept": "application/vnd.github+json",
         "Authorization": f"Bearer {GITHUB_TOKEN_COMENTARIOS}",
     }
-    response = httpx.request(url, method=method, headers=headers, json=payload, timeout=20.0)
+    response = httpx.request(method, url, headers=headers, json=payload, timeout=20.0)
     if response.status_code >= 400:
         raise GithubApiError(response.status_code, _github_error_detail(response))
     return response
