@@ -366,8 +366,9 @@ def _fake_httpx_response(status_code: int = 200):
 def test_github_api_request_orden_de_argumentos_httpx(client, monkeypatch):
     """httpx.request(method, url, ...) recibe metodo y url por posicion en ese
     orden; si no, httpx lanza 'multiple values for argument method'."""
-    import src.web_admin.api as api
     import httpx
+
+    import src.web_admin.api as api
 
     monkeypatch.setattr(api, "GITHUB_TOKEN_COMENTARIOS", "token-prueba")
     calls = []
@@ -393,8 +394,9 @@ def test_github_api_request_orden_de_argumentos_httpx(client, monkeypatch):
 
 def test_github_api_request_error_4xx_lanza_github_api_error(client, monkeypatch):
     """Comportamiento previo del helper: 4xx de GitHub -> GithubApiError."""
-    import src.web_admin.api as api
     import httpx
+
+    import src.web_admin.api as api
 
     monkeypatch.setattr(api, "GITHUB_TOKEN_COMENTARIOS", "token-prueba")
 
